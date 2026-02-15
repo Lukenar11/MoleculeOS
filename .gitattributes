@@ -10,6 +10,10 @@
 *.cc  linguist-detectable=true
 *.hh  linguist-detectable=true
 
+# CMake
+CMakeLists.txt linguist-detectable=true
+*.cmake linguist-detectable=true
+
 # JavaScript
 .js   linguist-detectable=true
 .mjs  linguist-detectable=true
