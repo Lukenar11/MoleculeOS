@@ -17,6 +17,11 @@ BootProcedure:
     ; _init_ GDT
     lgdt [GdtDescriptor]
 
+    ; _init_ Protected-Mode
+    mov eax, cr0    ; Control => Accumulator (32 Bit)
+    or al, 1        ; set Protection Enable
+    mov cr0, eax    ; Protection Enable => Control
+
     ; Interrupts on
     sti
     halt

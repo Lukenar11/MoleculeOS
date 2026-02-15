@@ -44,15 +44,6 @@ The GDT is placed in conventional RAM and loaded using the `lgdt` instruction.
 </h6>
 
 ``` text
-    +---------------------------+ 0x0000
-    | Interrupt Vector Table    |
-    | (IVT, 1 KB)               |
-    +---------------------------+ 0x0400
-    | BIOS Data Area (BDA)      |
-    | (256 Bytes)               |
-    +---------------------------+ 0x0500
-    | Free / conventional RAM   |
-    | ...                       |
     +---------------------------+ 0x7C00
     | Bootloader (512 Bytes)    |
     | MoleculeOS Boot Sector    |
@@ -63,11 +54,6 @@ The GDT is placed in conventional RAM and loaded using the `lgdt` instruction.
     | Free / conventional RAM   |
     | ...                       |
     +---------------------------+ 0xA000
-    | VGA Text Mode Memory      |
-    | (0xB8000 physical)        |
-    +---------------------------+ 0xFFFF
-    | BIOS ROM / Option ROMs    |
-    +---------------------------+
 ```
 
 ---
