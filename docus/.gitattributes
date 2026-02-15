@@ -1,0 +1,20 @@
+# Assembly
+*.asm linguist-detectable=true
+*.s   linguist-detectable=true
+*.S   linguist-detectable=true
+
+# C++
+*.cpp linguist-detectable=true
+*.hpp linguist-detectable=true
+*.h   linguist-detectable=true
+*.cc  linguist-detectable=true
+*.hh  linguist-detectable=true
+
+# JavaScript
+.js   linguist-detectable=true
+.mjs  linguist-detectable=true
+.cjs  linguist-detectable=true
+.jsx  linguist-detectable=true
+.ts   linguist-detectable=true
+.tsx  linguist-detectable=true
+.json linguist-detectable=true
