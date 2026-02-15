@@ -38,7 +38,7 @@ The GDT is placed in conventional RAM and loaded using the `lgdt` instruction.
 ## Memory Layout Including the GDT
 
 <h6>
-    <strong> Note: </strong>
+    <strong> Note: </strong> <br>
     This is a simplified excerpt of the memory layout of MoleculeOS. <br>
     Only the areas relevant for initializing the GDT are shown here.
 </h6>
@@ -65,11 +65,11 @@ MoleculeOS uses a readable, non‑compact GDT definition to make each field expl
     align 8
 
     gdt: 
-        ; Null descriptor
+        ; Null descriptor (GDT index 0: 0x00)
         gdt_null:
             dq 0x00
 
-        ; Code segment descriptor
+        ; Code-Segment descriptor (GDT index 1: 0x08)
         gdt_code:
             dw 0xFFFF   ; Limit low
             dw 0x0000   ; Base low
@@ -78,7 +78,7 @@ MoleculeOS uses a readable, non‑compact GDT definition to make each field expl
             db 0xCF     ; Flags (4K, 32-bit) + Limit high
             db 0x00     ; Base high
 
-        ; Data segment descriptor
+        ; Data-Segment descriptor (GDT index 2: 0x10)
         gdt_data:
             dw 0xFFFF   ; Limit low
             dw 0x0000   ; Base low

@@ -35,7 +35,7 @@ Only after these conditions are met, the **PE (Protection Enable)** bit in `cr0`
     +---------------------------+ 0x7E20
     | Free / Stack Growth Area  |
     | ...                       |
-    +---------------------------+ 0x890
+    +---------------------------+ 0x8900
     | ↑↑↑                       |
     | Stack (grows downward)    |
     +---------------------------+ 0x9C00 ← Stackpointer (SP)
@@ -69,4 +69,4 @@ The transition to protected mode is controlled via the CR0 register:
 Afterwards, the CPU interprets segment selectors using the GDT.
 
 After enabling PE, the CPU is technically in protected mode, but continues to execute instructions as if it were in 16-bit mode. <br>
-Once CR0.PE = 1 is set, a far jump to a 32-bit code segment is required to fully switch to 32-bit execution.
+Once **PE (Protection Enable) Bit** is set, a far jump to a 32-bit code segment is required to fully switch to 32-bit execution.

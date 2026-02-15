@@ -4,6 +4,7 @@
 jmp BootProcedure
 
 %include "Boot/BootProcedure/Gdt.asm"
+%include "Boot/BootProcedure/ProtectedModeEntry.asm"
 
 BootProcedure:
     ; Interrupts off
@@ -22,9 +23,7 @@ BootProcedure:
     or al, 1        ; set Protection Enable
     mov cr0, eax    ; Protection Enable => Control
 
-    ; Interrupts on
-    sti
-    halt
+    call 0x08:ProtectedModeEntry
 
 times 510-($-$$) db 0
 dw 0xAA55
