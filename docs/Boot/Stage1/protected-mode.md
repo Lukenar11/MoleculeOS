@@ -52,7 +52,7 @@ The stack and GDT are both available and stable when the mode switch occurs.
 
 ``` asm
     mov eax, cr0    ; Control => Accumulator (32 Bit)
-    or al, 1        ; set Protection Enable
+    or eax, 1       ; set Protection Enable
     mov cr0, eax    ; Protection Enable => Control
 ```
 

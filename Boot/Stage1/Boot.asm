@@ -3,9 +3,6 @@
 
 jmp BootProcedure
 
-%include "Boot/BootProcedure/Gdt.asm"
-%include "Boot/BootProcedure/ProtectedModeEntry.asm"
-
 BootProcedure:
     ; Interrupts off
     cli
@@ -15,15 +12,21 @@ BootProcedure:
     mov ss, ax      ; set Stack-Segment
     mov sp, 0x9C00  ; set Stack-Size (8 KB)
 
+    call DiskReadLoader
+
     ; _init_ GDT
     lgdt [GdtDescriptor]
 
     ; _init_ Protected-Mode
     mov eax, cr0    ; Control => Accumulator (32 Bit)
-    or al, 1        ; set Protection Enable
+    or eax, 1       ; set Protection Enable
     mov cr0, eax    ; Protection Enable => Control
 
     call 0x08:ProtectedModeEntry
+
+%include "Boot/Stage1/Gdt.asm"
+%include "Boot/Stage1/ProtectedModeEntry.asm"
+%include "Boot/Stage1/DiskReadLoader.asm"
 
 times 510-($-$$) db 0
 dw 0xAA55

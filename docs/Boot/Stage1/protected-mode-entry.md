@@ -1,4 +1,4 @@
-# MoleculeOS - Entering 32-Bit Protected Mode
+# Entering 32-Bit Protected Mode
 
 This documentation describes the moment when MoleculeOS fully switches to 32-bit Protected Mode. <br>
 At this point, the bootloader has:

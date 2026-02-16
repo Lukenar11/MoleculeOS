@@ -11,5 +11,5 @@ ProtectedModeEntry:
     ; new Stack-Size (~1 MiB)
     mov esp, 0x100000
 
-    .hang:
-        jmp .hang
+    ; start OsLoader
+    jmp 0x08:0x7E00
