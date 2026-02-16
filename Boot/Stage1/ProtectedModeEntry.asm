@@ -8,8 +8,5 @@ ProtectedModeEntry:
     mov gs, ax      ; General-Purpose segment
     mov ss, ax      ; new Stack-Segment (32-bit)
 
-    ; new Stack-Size (~1 MiB)
-    mov esp, 0x100000
-
-    ; start OsLoader
+    ; _start_ OsLoader (Stage 2) (fully 32-Bit Mode)
     jmp 0x08:0x7E00

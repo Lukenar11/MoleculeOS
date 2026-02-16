@@ -12,6 +12,7 @@ BootProcedure:
     mov ss, ax      ; set Stack-Segment
     mov sp, 0x9C00  ; set Stack-Size (8 KB)
 
+    ; _init_ Disk-Loader
     call DiskReadLoader
 
     ; _init_ GDT
@@ -22,6 +23,7 @@ BootProcedure:
     or eax, 1       ; set Protection Enable
     mov cr0, eax    ; Protection Enable => Control
 
+    ; _start_ Protected-Mode
     call 0x08:ProtectedModeEntry
 
 %include "Boot/Stage1/Gdt.asm"

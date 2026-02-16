@@ -1,26 +1,18 @@
 [bits 32]
 
-global OsLoader
-jmp OsLoader
+global OsLoader 
+
+; kernel::main (C++ Function)
+extern main
 
 section .text
     OsLoader:
-        mov edi, 0xB8000
+        ; new Stack-Size (~0.5 MiB)
+        mov esp, 0x83F00
 
-        mov byte [edi], 'H'
-        mov byte [edi+1], 0x0F
-
-        mov byte [edi+2], 'e'
-        mov byte [edi+3], 0x0F
-
-        mov byte [edi+4], 'l'
-        mov byte [edi+5], 0x0F
-
-        mov byte [edi+6], 'l'
-        mov byte [edi+7], 0x0F
-
-        mov byte [edi+8], 'o'
-        mov byte [edi+9], 0x0F
+        ; _start_ Kernel
+        call main
 
         .hang:
+            hlt
             jmp .hang

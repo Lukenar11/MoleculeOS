@@ -72,7 +72,7 @@ These services are only available in:
 - virtual 8086 mode (not used here)
 - Once the CPU enters protected mode:
 - BIOS interrupts are no longer available
-- int 0x13 cannot be used
+- `int 0x13` cannot be used
 
 disk access must be implemented manually **(ATA, AHCI, NVMe drivers)**
 

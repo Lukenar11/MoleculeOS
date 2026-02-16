@@ -79,15 +79,15 @@ jmp 0x08:ProtectedModeEntry
         mov gs, ax      ; General-Purpose segment
         mov ss, ax      ; new Stack-Segment (32-bit)
 
-        ; new Stack-Size (~1 MiB)
-        mov esp, 0x100000
+        ; _start_ OsLoader
+        jmp 0x08:0x7E00
 ```
 ---
 
 ## Why All Segment Registers Are Set
 
-After the far jump, only `CS` is correctly set. <br> 
-All other segments **(**`DS`**,** `ES`**,** `FS`**,** `GS`**,** `SS`**)** still contain real-mode values, which are invalid in protected mode. 
+After the far jump, only `cs` is correctly set. <br> 
+All other segments **(**`ds`**,** `es`**,** `fs`**,** `gs`**,** `ss`**)** still contain real-mode values, which are invalid in protected mode. 
 
 Therefore, they must be immediately set to a valid data segment selector.
 
