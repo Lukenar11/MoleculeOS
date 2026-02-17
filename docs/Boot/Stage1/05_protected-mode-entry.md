@@ -23,10 +23,13 @@ Only then is the switch safe.
 ---
 
 ## Far Jump into the 32‑Bit Code Segment
-After setting the PE bit, the CPU technically remains in Protected Mode, <br> but continues to interpret 16‑bit instructions as long as `cs` is not reloaded. <br> Therefore, a far jump is necessary
+After setting the PE bit, the CPU technically remains in Protected Mode, <br>
+but continues to interpret 16‑bit instructions as long as `cs` is not reloaded. <br>
+Therefore, a far jump is necessary
 
 ``` asm
-jmp 0x08:ProtectedModeEntry
+    ; _start_ Protected-Mode
+    call 0x08:ProtectedModeEntry
 ```
 **0x08** is the segment selector for the 32‑bit code segment.
 
@@ -79,7 +82,7 @@ jmp 0x08:ProtectedModeEntry
         mov gs, ax      ; General-Purpose segment
         mov ss, ax      ; new Stack-Segment (32-bit)
 
-        ; _start_ OsLoader
+        ; _start_ OsLoader (Stage 2) (fully 32-Bit Mode)
         jmp 0x08:0x7E00
 ```
 ---
@@ -93,27 +96,11 @@ Therefore, they must be immediately set to a valid data segment selector.
 
 ---
 
-## Why the Stack is Being Reset
-
-- The real-mode stack is 16-bit wide
-- The protected-mode stack is 32-bit wide
-- The old SS:SP is invalid in protected mode
-- An incorrect stack immediately leads to a triple fault
-
-Therefore:
-```asm
-    mov ss, ax
-    mov esp, 0x100000
-```
-
----
-
 ## Summary
 
 The Protected Mode Entry:
 
 - reloads all segment registers
-- sets up a 32-bit stack
 - ensures that the CPU is fully operating in Protected Mode
 - forms the basis for the subsequent OS loader or kernel
 

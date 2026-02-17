@@ -101,6 +101,7 @@ MoleculeOS uses a readable, non‑compact GDT definition to make each field expl
 Before switching to protected mode, the bootloader loads the GDT using:
 
 ``` asm 
+    ; _init_ GDT
     lgdt [GdtDescriptor]
 ```
 

@@ -115,8 +115,9 @@ After switching to Protected Mode, the old Real‑Mode stack is invalid:
 
 Therefore, the OsLoader sets a temporary 32‑bit stack:
 
-``` text
-    ESP = 0x9FC00
+``` asm
+    ; new Stack-Size (~0.5 MiB)
+    mov esp, 0x83F00
 ```
 
 This region is:

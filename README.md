@@ -28,7 +28,7 @@ MoleculeOS is intentionally simple:
 - no paging  
 - no multitasking  
 - no 64‑bit mode  
-- no complex drivers  
+- no complex drivers
 
 The goal is to understand the *essence* of OS development without unnecessary complexity.
 

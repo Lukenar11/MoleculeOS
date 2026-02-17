@@ -85,7 +85,7 @@ After the far jump, MoleculeOS runs in full 32‑bit mode.
     +---------------------------+ 0x0009FC00 ← Stack Pointer (ESP)
     | ↑↑↑                       |
     | Temporary 32‑bit Stack    |
-    | (~0.5 KiB)                |
+    | (~0.5 MiB)                |
     | (grows downward)          |
     +---------------------------+ 0x000A0000
     | Free / conventional RAM   |
