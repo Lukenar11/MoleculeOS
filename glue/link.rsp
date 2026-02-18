@@ -1,9 +1,0 @@
--m elf_i386
--T Kernel/linker.ld
--o build/kernel.elf
-
-build/osloader.o
-build/main.o
-build/idt.o
-build/isr.o
-build/loadidt.o
