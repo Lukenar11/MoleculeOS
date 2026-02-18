@@ -1,100 +1,130 @@
-const {execSync} = require("child_process");
-const fs = require("fs");
-const path = require("path");
+import {execSync} from "child_process";
+import {fileURLToPath} from "url";
+import fs from "fs";
+import path from "path";
 
-const ROOT = path.join(__dirname, "..");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const ROOT = path.resolve(__dirname, "..");
 const BUILD_DIR = path.join(ROOT, "build");
 
 const BOOT_SRC = path.join(ROOT, "Boot", "Stage1", "Boot.asm");
 const BOOT_BIN = path.join(BUILD_DIR, "boot.bin");
 
-const STAGE2_SRC = path.join(ROOT, "Boot", "Stage2", "OsLoader.asm");
-const STAGE2_OBJ = path.join(BUILD_DIR, "OsLoader.o");
+const STAGE2_SRC = path.join(ROOT, "Boot", "Stage2", "OSLoader.asm");
+const STAGE2_OBJ = path.join(BUILD_DIR, "osloader.o");
 
-const KERNEL_CPP = path.join(ROOT, "Kernel", "src", "main.cpp");
-const KERNEL_OBJ = path.join(BUILD_DIR, "kernel_main.o");
-
-const LINKER_LD  = path.join(ROOT, "Kernel", "linker.ld");
 const KERNEL_ELF = path.join(BUILD_DIR, "kernel.elf");
 const KERNEL_BIN = path.join(BUILD_DIR, "kernel.bin");
-
-const OS_IMG = path.join(BUILD_DIR, "MoleculeOS.img");
+const OS_IMG  = path.join(BUILD_DIR, "MoleculeOS.img");
 
 function run(cmd) {
 
-    console.log(">", cmd);
-    execSync(cmd, {stdio: "inherit"});
+    console.log(">>>", cmd);
+    execSync(cmd, {stdio: "inherit", cwd: ROOT});
 }
 
-function ensure_build_dir() {
+function ensureBuildDir() {
 
     if (!fs.existsSync(BUILD_DIR))
-        fs.mkdirSync(BUILD_DIR);
+        fs.mkdirSync(BUILD_DIR, {recursive: true});
 }
 
-function assemble_bootloader() {
+function assembleBootloader() {
 
-    console.log("Assembling bootloader...");
-    run(`nasm -f bin ${BOOT_SRC} -o ${BOOT_BIN}`);
+    console.log("\nAssembling Stage1 (bootloader)");
+    run(`nasm -f bin "${BOOT_SRC}" -o "${BOOT_BIN}"`);
 }
 
-function assemble_os_loader() {
+function assembleOsLoader() {
 
-    console.log("Assembling OsLoader...");
-    run(`nasm -f elf32 ${STAGE2_SRC} -o ${STAGE2_OBJ}`);
+    console.log("\n Assembling Stage2 (OSLoader)");
+    run(`nasm -f elf32 "${STAGE2_SRC}" -o "${STAGE2_OBJ}"`);
 }
 
-function compile_kernel() {
+function assembleKernelAsm() {
 
-    console.log("Compiling kernel C++...");
-    run(`clang++ -target i386-pc-linux-gnu -m32 -ffreestanding -fno-exceptions -fno-rtti -c ${KERNEL_CPP} -o ${KERNEL_OBJ}`);
+    console.log("\nAssembling kernel ASM files");
+    const commands = [
+
+       [path.join("Kernel", "src", "IDT", "ISR.asm"), path.join("build", "isr.o")],
+       [path.join("Kernel", "src", "IDT", "LoadIDT.asm"), path.join("build", "isr.o")]
+    ];
+
+    for (let i = 0; i < commands.length; i++)
+        run(`nasm -f elf32 ${commands[i][0]} -o ${commands[i][1]}`);
 }
 
-function link_kernel() {
+function compileKernel() {
 
-    console.log("Linking kernel.elf...");
-    run(`ld.lld -m elf_i386 -T ${LINKER_LD} ${STAGE2_OBJ} ${KERNEL_OBJ} -o ${KERNEL_ELF}`);
+    console.log("\nCompiling C++ kernel (via cpp.rsp)");
+    run(`clang++ ${path.join("@glue", "cpp.rsp")}`);
+
+    for (const obj of ["main.o", "Idt.o"]) {
+
+        const src = path.join(ROOT, obj);
+        const dest = path.join(BUILD_DIR, obj);
+
+        if (fs.existsSync(src))
+            fs.renameSync(src, dest);
+    }
 }
 
-function convert_kernel() {
+function linkKernel() {
 
-    console.log("Converting kernel.elf to kernel.bin...");
-    run(`llvm-objcopy -O binary ${KERNEL_ELF} ${KERNEL_BIN}`);
+    console.log("\nLinking kernel.elf (via link.rsp)");
+    run(`clang++ ${path.join("@glue", "cpp.rsp")}`);;
 }
 
-function create_disk_image() {
+function convertKernel() {
 
-    console.log("Creating disk image...");
-    run(`dd if=/dev/zero of=${OS_IMG} bs=512 count=2880`);
+    console.log("\nConverting kernel.elf → kernel.bin");
+    run(`llvm-objcopy -O binary "${KERNEL_ELF}" "${KERNEL_BIN}"`);
 }
 
-function write_bootloader() {
+function createDiskImage() {
 
-    console.log("Writing bootloader to image...");
-    run(`dd if=${BOOT_BIN} of=${OS_IMG} bs=512 seek=0 conv=notrunc`);
+    console.log("\nCreating floppy image");
+    run(`dd if=/dev/zero of="${OS_IMG}" bs=512 count=2880`);
 }
 
-function write_kernel() {
+function writeBootloader() {
 
-    console.log("Writing kernel to image...");
-    run(`dd if=${KERNEL_BIN} of=${OS_IMG} bs=512 seek=1 conv=notrunc`);
+    console.log("\nWriting Stage1 bootloader to image");
+    run(`dd if="${BOOT_BIN}" of="${OS_IMG}" bs=512 seek=0 conv=notrunc`);
 }
 
-function run_qemu() {
+function writeKernel() {
 
-    console.log("Starting QEMU...");
-    run(`qemu-system-i386 -drive format=raw,file=${OS_IMG},if=floppy`);
+    console.log("\nWriting kernel.bin to image");
+    run(`dd if="${KERNEL_BIN}" of="${OS_IMG}" bs=512 seek=1 conv=notrunc`);
 }
 
-ensure_build_dir();
-assemble_bootloader();
-assemble_os_loader();
-compile_kernel();
-link_kernel();
-convert_kernel();
-create_disk_image();
-write_bootloader();
-write_kernel();
-run_qemu();
+function runQemu() {
 
-console.log("\nBuild complete.");
+    console.log("\nStarting QEMU");
+    run(`qemu-system-i386 -drive format=raw,file="${OS_IMG}",if=floppy`);
+}
+
+async function main() {
+
+    ensureBuildDir();
+    assembleBootloader();
+    assembleOsLoader();
+    assembleKernelAsm();
+    compileKernel();
+    linkKernel();
+    convertKernel();
+    createDiskImage();
+    writeBootloader();
+    writeKernel();
+    runQemu();
+    console.log("\nBuild complete.");
+}
+
+main().catch(err => {
+
+    console.error("Build failed:", err);
+    process.exit(1);
+});

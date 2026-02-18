@@ -13,6 +13,9 @@
 # Linker Script
 *.ld linguist-detectable=true
 
+# Response File
+*.rsp linguist-detectable=true
+
 # JavaScript
 .js   linguist-detectable=true
 .mjs  linguist-detectable=true
@@ -21,3 +24,6 @@
 .ts   linguist-detectable=true
 .tsx  linguist-detectable=true
 .json linguist-detectable=true
+
+# end of line
+* text eol=lf

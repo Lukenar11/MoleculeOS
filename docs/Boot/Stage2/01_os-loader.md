@@ -1,27 +1,27 @@
-# MoleculeOS – Stage 2 Loader (OsLoader)
+# MoleculeOS – Stage 2 Loader (OSLoader)
 
-The OsLoader is the second stage of the MoleculeOS boot process.
+The OSLoader is the second stage of the MoleculeOS boot process.
 
 It is loaded and executed by Stage 1 after:
 - the kernel image has been copied into memory
 - the Global Descriptor Table **(GDT)** has been loaded
 - the CPU has switched into **32‑bit Protected Mode**
 
-The OsLoader is intentionally minimal:
+The OSLoader is intentionally minimal:
 It sets up a valid 32‑bit stack, prepares the environment for C++ execution, <br> 
 calls the kernel entry point, and halts if the kernel ever returns.
 
 ---
 
-## Purpose of the OsLoader
+## Purpose of the OSLoader
 
-The OsLoader performs the following tasks:
+The OSLoader performs the following tasks:
 - initialize a new valid 32‑bit stack
 - call the kernel entry function (`kernel::main`)
 - ensure a stable transition into the kernel
 - remain in a halt loop if the kernel returns unexpectedly
 
-The OsLoader is the first fully 32‑bit component of MoleculeOS.
+The OSLoader is the first fully 32‑bit component of MoleculeOS.
 
 ---
 
@@ -34,7 +34,7 @@ The Stage‑1 bootloader is:
 - unable to execute C++ code
 - unable to run a Protected‑Mode kernel
 
-The OsLoader acts as the bridge between:
+The OSLoader acts as the bridge between:
 
 ``` text
     BIOS → Real-Mode → Protected-Mode → C++ Kernel
@@ -43,7 +43,7 @@ The OsLoader acts as the bridge between:
 
 ## Memory Layout at the Start of Stage 2
 
-Stage 1 loads the OsLoader to the physical address `0x00010000`.
+Stage 1 loads the OSLoader to the physical address `0x00010000`.
 
 The kernel linker script is aligned to this address.
 
@@ -65,7 +65,7 @@ The kernel linker script is aligned to this address.
     | Stage 2 Load Buffer       |
     | (temporary load area)     |
     +---------------------------+ 0x10000
-    | OsLoader Entry Point      |
+    | OSLoader Entry Point      |
     | Stage 2 (32-bit)          |
     +---------------------------+ 0x11000
     | Kernel Code / Data        |
@@ -82,17 +82,17 @@ Stage 2 is placed directly before the kernel and executed immediately after th
 After enabling Protected Mode (setting the **PE** bit in `cr0`), the CPU is technically in 32‑bit mode, <br>
 but still executing instructions using the old Real‑Mode cs selector.
 
-To fully enter 32‑bit execution, Stage 1 performs a far jump into the OsLoader:
+To fully enter 32‑bit execution, Stage 1 performs a far jump into the OSLoader:
 
 ``` asm
-    ; _start_ OsLoader (Stage 2) (fully 32-Bit Mode)
+    ; _start_ OSLoader (Stage 2) (fully 32-Bit Mode)
     jmp 0x08:0x7E00
 ```
 
 Where:
 
 - **0x08** → 32‑bit code segment selector from the GDT
-- **0x10000** → physical address of the **OsLoader**
+- **0x10000** → physical address of the **OSLoader**
 
 This far jump:
 - reloads `cs`
@@ -113,7 +113,7 @@ After switching to Protected Mode, the old Real‑Mode stack is invalid:
 - **SS:SP** still contains Real‑Mode values
 - Any call or push would cause a triple fault
 
-Therefore, the OsLoader sets a temporary 32‑bit stack:
+Therefore, the OSLoader sets a temporary 32‑bit stack:
 
 ``` asm
     ; new Stack-Size (~0.5 MiB)
@@ -131,7 +131,7 @@ The kernel later installs its own stack.
 
 ## Transition to C++ (kernel::main)
 
-The OsLoader calls the kernel entry point:
+The OSLoader calls the kernel entry point:
 
 ``` asm
     ; _start_ Kernel
@@ -153,18 +153,18 @@ This prevents C++ name mangling and ensures the symbol is callable from assembly
 
 ---
 
-## Full OsLoader Code
+## Full OSLoader Code
 
 ``` asm
     [bits 32]
 
-    global OsLoader 
+    global OSLoader 
 
     ; kernel::main (C++ Function)
     extern main
 
     section .text
-        OsLoader:
+        OSLoader:
             ; new Stack-Size (~0.5 MiB)
             mov esp, 0x83F00
 
@@ -179,7 +179,7 @@ This prevents C++ name mangling and ensures the symbol is callable from assembly
 
 ---
 
-## Execution Flow of the OsLoader
+## Execution Flow of the OSLoader
 
 ``` text
     +-----------------------------+
@@ -194,12 +194,12 @@ This prevents C++ name mangling and ensures the symbol is callable from assembly
                   |
                   v
     +-----------------------------+
-    | Far jump → OsLoader         |
+    | Far jump → OSLoader         |
     +-------------+---------------+
                   |
                   v
     +-----------------------------+
-    | OsLoader (32-bit)           |
+    | OSLoader (32-bit)           |
     |   - Set stack               |
     |   - Call kernel::main()     |
     +-------------+---------------+
@@ -214,7 +214,7 @@ This prevents C++ name mangling and ensures the symbol is callable from assembly
 
 ## Summary
 
-The OsLoader is a minimal but essential component of the MoleculeOS boot process.
+The OSLoader is a minimal but essential component of the MoleculeOS boot process.
 It:
 
 - sets a valid 32‑bit stack

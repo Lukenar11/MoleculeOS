@@ -82,7 +82,7 @@ Therefore, a far jump is necessary
         mov gs, ax      ; General-Purpose segment
         mov ss, ax      ; new Stack-Segment (32-bit)
 
-        ; _start_ OsLoader (Stage 2) (fully 32-Bit Mode)
+        ; _start_ OSLoader (Stage 2) (fully 32-Bit Mode)
         jmp 0x08:0x7E00
 ```
 ---

@@ -1,0 +1,10 @@
+-target i386-pc-linux-gnu
+-m32
+-ffreestanding
+-fno-exceptions
+-fno-rtti
+-I Kernel/include
+-I tests/Kernel
+-c
+Kernel/src/main.cpp
+Kernel/src/IDT/IDT.cpp

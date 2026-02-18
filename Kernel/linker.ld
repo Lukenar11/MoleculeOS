@@ -1,4 +1,4 @@
-ENTRY(OsLoader)
+ENTRY(OSLoader)
 
 SECTIONS
 {

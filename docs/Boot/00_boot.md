@@ -77,7 +77,7 @@ After the far jump, MoleculeOS runs in full 32‑bit mode.
     | Bootloader (Stage 1)      |
     | (no longer used)          |
     +---------------------------+ 0x00010000
-    | OsLoader (Stage 2)        |
+    | OSLoader (Stage 2)        |
     | Entry Point               |
     +---------------------------+ 0x00011000
     | Kernel Code / Data        |
@@ -180,4 +180,4 @@ It includes the full memory layout for both execution modes, the complete <br>
 Stage‑1 bootloader code, and references to all subsystem documentation. <br>
 
 Together, these components form the foundation of the MoleculeOS boot pipeline:
-- from BIOS → Bootloader → Protected-Mode → OsLoader → C++ Kernel.
+- from BIOS → Bootloader → Protected-Mode → OSLoader → C++ Kernel.

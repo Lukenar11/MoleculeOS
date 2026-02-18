@@ -1,12 +1,12 @@
 [bits 32]
 
-global OsLoader 
+global OSLoader 
 
 ; kernel::main (C++ Function)
 extern main
 
 section .text
-    OsLoader:
+    OSLoader:
         ; new Stack-Size (~0.5 MiB)
         mov esp, 0x83F00
 
