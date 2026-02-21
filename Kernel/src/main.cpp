@@ -20,6 +20,6 @@ namespace kernel {
         test_array();
 
         while (true) 
-            __asm__ volatile("halt");
+            __asm__ volatile("hlt");
     }
 } // namespace kernel
