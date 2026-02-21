@@ -3,7 +3,7 @@
 **MoleculeOS** is a minimalist, text-based monolithic operating system, <br>
 developed in C++ by GitHub user *Lukenar11 (Luke Matthes)*.
 
-The goal of this project is to create a clearly structured, 
+The goal of this project is to create a clearly structured, <br>
 modular learning and experimentation system that makes the fundamental building blocks of an operating system <br>
 understandable and transparent - hence the name *MoleculeOS*.
 
@@ -36,9 +36,9 @@ The goal is to understand the *essence* of OS development without unnecessary co
 
 ## Current Boot Output
 
-Below is the current state of MoleculeOS running in QEMU:
+Below is the current state of MoleculeOS running in QEMU (Array-Test):
 
-![MoleculeOS boot screenshot](docs/images/qemu-hello-kernel.png)
+![MoleculeOS boot screenshot](docs/images/qemu-array-test.png)
 
 ---
 
@@ -46,15 +46,17 @@ Below is the current state of MoleculeOS running in QEMU:
 
 All technical documentation is located in the [docs/](docs/) directory.
 
-A complete overview of the boot process can be found in:
+A complete overview of the OS components can be found in:
 
-- [docs/Boot/00_boot.md](docs/Boot/00_boot.md)
+- [Boot Process](docs/Boot/00_boot.md)
+- [Kernel](docs/Kernel)
+- [Runtime](docs/Atom/00_atom.md)
 
 Subsystem documentation is organized into:
 
 - [Real-Mode bootloader](docs/Boot/Stage1)
 - [Protected-Mode OS loader](docs/Boot/Stage2)
-- [Kernel internals (planned)](docs/Kernel)
+- [Kernel internals](docs/Kernel)
 
 ---
 
@@ -65,6 +67,7 @@ To build and run MoleculeOS, the following software is required:
 - **Node.js** (used as the build orchestration / glue layer)
 - **NASM** (Netwide Assembler for Stage‑1 and Stage‑2)
 - **Clang++** (for compiling the 32‑bit kernel, requires i386 target support)
+- **Clang** (for compiling C components, requires i386 target support)
 - **QEMU** (for running the OS in a virtual machine)
 
 All build scripts are located in the `build/` directory and are executed via Node.js.
@@ -82,6 +85,7 @@ This will:
 - assemble the bootloader
 - assemble the OS loader
 - compile the kernel
+- compile the runtime
 - build a floppy disk image
 - launch QEMU
 
@@ -98,6 +102,116 @@ Node.js is not part of the operating system itself — it simply automates:
 - assembling the Stage‑1 bootloader  
 - assembling the Stage‑2 OS loader  
 - compiling the C++ kernel  
+- generating the disk image  
+- launching QEMU  
+
+This keeps the build process modular, fast, and easy to extend.
+
+===============
+
+# MoleculeOS
+
+**MoleculeOS** is a minimalist, text‑based monolithic operating system, <br>
+developed in C++ by *Luke Matthes (Lukenar11)*.
+
+The goal of this project is to create a clearly structured, <br>
+modular learning and experimentation system that makes the fundamental building blocks of an operating system understandable and transparent — hence the name *MoleculeOS*. <br>
+
+---
+
+## Features (current / planned)
+
+- Custom BIOS boot setup (x86)
+- Stage‑1 boot sector + Stage‑2 loader
+- Minimal 32‑bit kernel in C++
+- VGA text mode output
+- Basic hardware initialization
+- Interrupt Descriptor Table (IDT)
+- Runtime (Atom)
+
+---
+
+## Design Philosophy
+
+MoleculeOS is intentionally simple:
+
+- no paging  
+- no multitasking  
+- no 64‑bit mode  
+- no complex drivers  
+
+The goal is to understand the *essence* of OS development without unnecessary complexity.
+
+---
+
+## Current Boot Output
+
+Below is the current state of MoleculeOS running in QEMU (Array test):
+
+![MoleculeOS screenshot](docs/images/qemu-array-test.png)
+
+---
+
+## Documentation
+
+All technical documentation is located in the [docs/](docs/) directory.
+
+A complete overview of the OS komponentes can be found in:
+
+- [Boot Process](docs/Boot/00_boot.md)
+- [Kernel](docs/Kernel)
+- [Runtime](docs/Atom/00_atom.md)
+
+Subsystem documentation is organized into:
+
+- [Real-Mode bootloader](docs/Boot/Stage1)
+- [Protected-Mode OS loader](docs/Boot/Stage2)
+- [Kernel internals](docs/Kernel)
+- [C - Runtime](docs/Atom/C)
+- [C++ - Runtime](docs/Atom/CPP)
+
+---
+
+## Requirements
+
+To build and run MoleculeOS, the following software is required:
+
+- **Node.js** (used as the build orchestration / glue layer)
+- **NASM** (Netwide Assembler for Assembly components)
+- **Clang++** (for compiling the 32‑bit kernel, requires i386 target support)
+- **Clang** (for compiling C components, requires i386 target support)
+- **QEMU** (for running the OS in a virtual machine)
+
+All build scripts are located in the `build/` directory and are executed via Node.js.
+
+---
+
+## Build & Run
+
+```bash
+    node build/build.js
+```
+
+This will:
+
+- assemble the bootloader  
+- assemble the OS loader  
+- compile the kernel  
+- compile the C runtime  
+- build a floppy disk image  
+- launch QEMU  
+
+---
+
+## Build System & Glue Language
+
+MoleculeOS uses **Node.js** as a lightweight “glue layer” to orchestrate the entire build pipeline. <br>
+Node.js is not part of the operating system itself — it simply automates:
+
+- assembling the Stage‑1 bootloader  
+- assembling the Stage‑2 OS loader  
+- compiling the kernel  
+- compiling the runtime  
 - generating the disk image  
 - launching QEMU  
 

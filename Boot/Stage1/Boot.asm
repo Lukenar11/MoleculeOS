@@ -16,7 +16,7 @@ BootProcedure:
     call DiskReadLoader
 
     ; _init_ GDT
-    lgdt [GdtDescriptor]
+    lgdt [GDTDescriptor]
 
     ; _init_ Protected-Mode
     mov eax, cr0    ; Control => Accumulator (32 Bit)
@@ -26,7 +26,7 @@ BootProcedure:
     ; _start_ Protected-Mode
     call 0x08:ProtectedModeEntry
 
-%include "Boot/Stage1/Gdt.asm"
+%include "Boot/Stage1/GDT.asm"
 %include "Boot/Stage1/ProtectedModeEntry.asm"
 %include "Boot/Stage1/DiskReadLoader.asm"
 

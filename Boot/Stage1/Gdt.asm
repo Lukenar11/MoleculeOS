@@ -26,6 +26,6 @@ gdt:
 
     gdt_end:
 
-GdtDescriptor:
+GDTDescriptor:
     dw gdt_end - gdt - 1
     dd gdt

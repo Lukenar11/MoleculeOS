@@ -69,7 +69,7 @@ MoleculeOS stores this in:
 
       // _init_
       inline constexpr void set_gate
-         (const uint32_t base, const uint16_t selector, const uint8_t flags) {
+         (const uint32_t base, const uint16_t selector, const uint8_t flags) noexcept {
 
          base_low = base & MASK;
          base_high = (base >> 16) & MASK;
@@ -153,7 +153,7 @@ The IDT class in MoleculeOS performs the following steps:
 
 ``` cpp
    // _construct_
-   kernel::idt::IDT::IDT() {
+   kernel::idt::IDT::IDT() noexcept {
 
       // fill IDT-Descriptor
       idt_ptr.limit = (sizeof(IdtEntry) * ENTRYS) - 1;

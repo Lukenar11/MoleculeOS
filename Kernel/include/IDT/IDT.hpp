@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <Atom/CPP/Array.hpp>
 
 /*
     "__attribute__((packed))" prevents the compiler from filling the structure
@@ -21,7 +22,7 @@ namespace kernel::idt {
     extern "C" void LoadIDT(uint32_t);
 
     // Interrupt Descriptor
-    struct IdtEntry final {
+    struct IDTEntry final {
 
         uint16_t base_low;
         uint16_t selector;
@@ -31,7 +32,7 @@ namespace kernel::idt {
 
         // _init_
         inline constexpr void set_gate
-            (const uint32_t base, const uint16_t selector, const uint8_t flags) {
+            (const uint32_t base, const uint16_t selector, const uint8_t flags) noexcept {
 
             base_low = base & MASK;
             base_high = (base >> 16) & MASK;
@@ -42,14 +43,14 @@ namespace kernel::idt {
     } __attribute__((packed));
 
     // Mapping IDT Index -> Handler Merchants
-    struct IdtInitEntry final {
+    struct IDTInitEntry final {
 
         int index;
         void (*handler)();
     };
 
     // IDT-Descriptor Pointer (needed for "lidt[...]")
-    struct IdtPtr final {
+    struct IDTPtr final {
 
         uint16_t limit;
         uint32_t base;
@@ -58,17 +59,17 @@ namespace kernel::idt {
     class IDT final {
 
         private:
-            IdtEntry idt[256];
-            IdtPtr idt_ptr;
+            atom::Array<IDTEntry, 256> idt;
+            IDTPtr idt_ptr;
 
         public:
-            inline IdtEntry& operator[]
-                (int index) {return idt[index];}
+            inline IDTEntry& operator[]
+                (int index) noexcept {return idt[index];}
 
-            inline const IdtEntry& operator[]
-                (int index) const {return idt[index];}
+            inline const IDTEntry& operator[] 
+                (int index) const noexcept {return idt[index];}
 
-            IDT();
-            ~IDT() = default;
+            IDT() noexcept;
+            ~IDT() noexcept = default;
     };
 } // namespache kernel

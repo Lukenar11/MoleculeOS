@@ -118,13 +118,13 @@ they represent **two different architectural cases** and will diverge once real 
 
 After the stub pushes its values, the stack looks like this:
 
-```
-[esp+0] → interrupt number
-[esp+4] → error code (real or synthetic)
-[esp+8] → return address (from call)
-[esp+12] → EIP (CPU)
-[esp+16] → CS
-[esp+20] → EFLAGS
+``` text
+    [esp+0] → interrupt number
+    [esp+4] → error code (real or synthetic)
+    [esp+8] → return address (from call)
+    [esp+12] → EIP (CPU)
+    [esp+16] → CS
+    [esp+20] → EFLAGS
 ```
 
 The C++ handler receives:
@@ -147,11 +147,11 @@ add esp, 8
 
 All 32 ISR entry points are exported in a single, compact declaration:
 
-```asm
-global isr_0, isr_1, isr_2, isr_3, isr_4, isr_5, isr_6, isr_7, \
-       isr_8, isr_9, isr_10, isr_11, isr_12, isr_13, isr_14, isr_15, \
-       isr_16, isr_17, isr_18, isr_19, isr_20, isr_21, isr_22, isr_23, \
-       isr_24, isr_25, isr_26, isr_27, isr_28, isr_29, isr_30, isr_31
+``` asm
+    global isr_0, isr_1, isr_2, isr_3, isr_4, isr_5, isr_6, isr_7, \
+           isr_8, isr_9, isr_10, isr_11, isr_12, isr_13, isr_14, isr_15, \
+           isr_16, isr_17, isr_18, isr_19, isr_20, isr_21, isr_22, isr_23, \
+           isr_24, isr_25, isr_26, isr_27, isr_28, isr_29, isr_30, isr_31
 ```
 
 This keeps the file clean and avoids redundant declarations.

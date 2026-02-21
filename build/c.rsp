@@ -1,11 +1,8 @@
 -target i386-pc-linux-gnu
 -m32
 -ffreestanding
--fno-exceptions
--fno-rtti
 -I.
 -I Atom
 -I Kernel/include
 -c
-Kernel/src/main.cpp
-Kernel/src/IDT/IDT.cpp
+Atom/C/string.c

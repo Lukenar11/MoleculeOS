@@ -37,7 +37,7 @@ extern "C" {
 }   
 
 // _init_ IDT
-inline static constexpr kernel::idt::IdtInitEntry idt_init_table[32] = {
+inline static constexpr kernel::idt::IDTInitEntry idt_init_table[32] = {
 
     { 0, isr_0 }, { 1, isr_1 }, { 2, isr_2 }, { 3, isr_3 }, 
     { 4, isr_4 }, { 5, isr_5 }, { 6, isr_6 }, { 7, isr_7 }, 
@@ -50,10 +50,10 @@ inline static constexpr kernel::idt::IdtInitEntry idt_init_table[32] = {
 };
 
 // _construct_
-kernel::idt::IDT::IDT() {
+kernel::idt::IDT::IDT() noexcept {
 
     // fill IDT-Descriptor
-    idt_ptr.limit = (sizeof(IdtEntry) * ENTRYS) - 1;
+    idt_ptr.limit = (sizeof(IDTEntry) * ENTRYS) - 1;
     idt_ptr.base = uint32_t(&idt);
 
     // Clear table

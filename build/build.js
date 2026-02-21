@@ -11,7 +11,7 @@ const BIN = path.join(BUILD, "bin");
 const BOOT_SRC = path.join(ROOT, "Boot", "Stage1", "Boot.asm");
 const BOOT_BIN = path.join(BIN, "boot.bin");
 
-const OSLOADER_SRC = path.join(ROOT, "Boot", "Stage2", "OsLoader.asm");
+const OSLOADER_SRC = path.join(ROOT, "Boot", "Stage2", "OSLoader.asm");
 const OSLOADER_OBJ = path.join(BIN, "osloader.o");
 
 const KERNEL_ELF = path.join(BIN, "kernel.elf");
@@ -46,6 +46,12 @@ const CPP_TASK = {
 
     name: "kernel C++",
     cmd: () => `clang++ @${path.join("build", "cpp.rsp")}`
+};
+
+const C_TASK = {
+
+    name: "kernel C runtime",
+    cmd: () => `clang @${path.join("build", "c.rsp")} -o ${path.join(BIN, "string.o")}`
 };
 
 const CPP_RENAME = [
@@ -108,6 +114,7 @@ function run_task(task) {
 
     for (const task of ASM_TASKS) run_task(task);
 
+    run_task(C_TASK); 
     run_task(CPP_TASK);
 
     for (const [src, dst] of CPP_RENAME) {
