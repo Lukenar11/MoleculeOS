@@ -18,5 +18,8 @@ namespace kernel {
         idt::IDT interrupt_descriptor_table;
         // run_all_exception_tests();
         test_array();
+
+        while (true) 
+            __asm__ volatile("halt");
     }
 } // namespace kernel

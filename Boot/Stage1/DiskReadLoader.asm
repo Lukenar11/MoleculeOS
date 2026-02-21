@@ -18,5 +18,5 @@ DiskReadLoader:
     ret
 
 disk_error:
-    hlt
+    halt
     jmp disk_error

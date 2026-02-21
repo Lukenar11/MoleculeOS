@@ -12,7 +12,3 @@ section .text
 
         ; _start_ Kernel
         call main
-
-        .hang:
-            hlt
-            jmp .hang
