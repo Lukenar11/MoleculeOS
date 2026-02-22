@@ -70,3 +70,11 @@ Afterwards, the CPU interprets segment selectors using the GDT.
 
 After enabling PE, the CPU is technically in protected mode, but continues to execute instructions as if it were in 16-bit mode. <br>
 Once **PE (Protection Enable) Bit** is set, a far jump to a 32-bit code segment is required to fully switch to 32-bit execution.
+
+---
+
+## Summary
+
+MoleculeOS enters protected mode only after a valid Real‑Mode stack and a properly loaded GDT are in place. <br>
+The CPU switches modes by setting the PE bit in `cr0`, but full 32‑bit execution begins only after a far jump into a 32‑bit code segment. <br>
+This ensures a clean, safe transition from Real Mode to Protected Mode and prepares the system for the Stage‑2 Loader and the kernel.

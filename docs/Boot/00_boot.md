@@ -41,6 +41,12 @@ This layout shows the system state before switching to Protected Mode.
     +---------------------------+ 0x0500
     | BIOS Workspace / RAM      |
     | (keyboard buffer, etc.)   |
+    +---------------------------+ 0x0000
+    | Temporary Stack           |
+    | (0.25 KiB) grows downward |
+    +---------------------------+ 0x00FF ← SP (Real Mode)
+    | Free / conventional RAM   |
+    | ...                       |
     +---------------------------+ 0x7C00
     | Bootloader (512 Bytes)    |
     | MoleculeOS Boot Sector    |
@@ -50,9 +56,6 @@ This layout shows the system state before switching to Protected Mode.
     +---------------------------+ 0x7E20
     | Free / conventional RAM   |
     | ...                       |
-    +---------------------------+ 0x9C00 ← Stack Pointer (SP)
-    | ↑↑↑                       |
-    | Stack (grows downward)    |
     +---------------------------+ 0xA000
     | VGA Text Mode Memory      |
     | (0xB8000 physical)        |
@@ -70,33 +73,33 @@ After the far jump, MoleculeOS runs in full 32‑bit mode.
 ``` text
     +---------------------------+ 0x00000000
     | Null Page (unused)        |
-    +---------------------------+ 0x00001000
-    | GDT / PM Structures       |
-    | (loaded by Stage 1)       |
-    +---------------------------+ 0x00007C00
-    | Bootloader (Stage 1)      |
-    | (no longer used)          |
-    +---------------------------+ 0x00010000
-    | OSLoader (Stage 2)        |
-    | Entry Point               |
-    +---------------------------+ 0x00011000
-    | Kernel Code / Data        |
-    | kernel.bin                |
-    +---------------------------+ 0x0009FC00 ← Stack Pointer (ESP)
-    | ↑↑↑                       |
-    | Temporary 32‑bit Stack    |
-    | (~0.5 MiB)                |
-    | (grows downward)          |
-    +---------------------------+ 0x000A0000
+    +---------------------------+ 0x00000000
+    | Temporary Real-Mode Stack |
+    |(0.25 KiB) (grows downward)|
+    +---------------------------+ 0x000000FF ← SP (Real Mode)
     | Free / conventional RAM   |
     | ...                       |
+    +---------------------------+ 0x00007C00
+    | Bootloader (Stage 1)      |
+    | MoleculeOS Boot Sector    |
+    +---------------------------+ 0x00007E00
+    | BIOS-safe area            |
+    | (unused by MoleculeOS)    |
+    +---------------------------+ 0x00010000
+    | Stage 2 Loader (32-bit)   |
+    | Loader.asm                |
+    +---------------------------+ 0x00010100
+    | Kernel Entry Point        |
+    | KernelEntry.asm           |
+    +---------------------------+ ...
+    | Kernel Code / Data        |
+    | kernel.bin                |
     +---------------------------+ 0x000B8000
     | VGA Text Mode Memory      |
     | (0xB8000 physical)        |
     +---------------------------+ 0x000FFFFF
     | Reserved / ROM Shadow     |
     +---------------------------+
-
 ```
 
 ---
@@ -157,6 +160,25 @@ Responsibilities:
     times 510-($-$$) db 0
     dw 0xAA55
 ```
+
+---
+
+# full OS-Loader Code (Stage 2)
+
+``` asm
+    [bits 32]
+
+    global Loader 
+
+    ; Kernel/Boot/KernelEntry.asm
+    extern KernelEntry
+
+    section .text
+        Loader:
+            cli                 ; Interrupts off
+            mov esp, 0x00FF     ; reset Stack (0.25 KiB)
+            call KernelEntry    ; _init_ Kernel
+```
 ---
 
 ## Documentation References
@@ -180,4 +202,4 @@ It includes the full memory layout for both execution modes, the complete <br>
 Stage‑1 bootloader code, and references to all subsystem documentation. <br>
 
 Together, these components form the foundation of the MoleculeOS boot pipeline:
-- from BIOS → Bootloader → Protected-Mode → OSLoader → C++ Kernel.
+- from BIOS → Bootloader → Protected-Mode → OS Loader → C++ Kernel.

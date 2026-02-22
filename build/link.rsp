@@ -2,7 +2,9 @@
 -T build/linker.ld
 -o build/bin/kernel.elf
 
-build/bin/osloader.o
+build/bin/loader.o
+build/bin/kernelentry.o
+build/bin/stack.o
 build/bin/main.o
 build/bin/idt.o
 build/bin/isr.o

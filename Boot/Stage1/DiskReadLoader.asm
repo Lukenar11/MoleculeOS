@@ -5,7 +5,7 @@ DiskReadLoader:
     mov es, ax
     xor bx, bx      ; Offset = 0
 
-    mov ah, 0x02    ; BIOS: Read-Sectors
+    mov ah, 2       ; BIOS: Read-Sectors
     mov al, 16      ; Number of sectors
     mov ch, 0       ; Cylinder 0
     mov cl, 2       ; Start at sector 2 (sector 1 = Boot-Sector)

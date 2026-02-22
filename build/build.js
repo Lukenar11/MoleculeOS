@@ -11,8 +11,8 @@ const BIN = path.join(BUILD, "bin");
 const BOOT_SRC = path.join(ROOT, "Boot", "Stage1", "Boot.asm");
 const BOOT_BIN = path.join(BIN, "boot.bin");
 
-const OSLOADER_SRC = path.join(ROOT, "Boot", "Stage2", "OSLoader.asm");
-const OSLOADER_OBJ = path.join(BIN, "osloader.o");
+const OSLOADER_SRC = path.join(ROOT, "Boot", "Stage2", "Loader.asm");
+const OSLOADER_OBJ = path.join(BIN, "loader.o");
 
 const KERNEL_ELF = path.join(BIN, "kernel.elf");
 const KERNEL_BIN = path.join(BIN, "kernel.bin");
@@ -31,16 +31,25 @@ const ASM_TASKS = [
         cmd: () => `nasm -f elf32 ${OSLOADER_SRC} -o ${OSLOADER_OBJ}`
     },
     {
+        name: "stack",
+        cmd: () => `nasm -f elf32 ${path.join(ROOT, "Kernel", "Boot", "Stack.asm")} -o ${path.join(BIN, "stack.o")}`
+    },
+    {
+        name: "kernelentry",
+        cmd: () => `nasm -f elf32 ${path.join(ROOT, "Kernel", "Boot", "KernelEntry.asm")} -o ${path.join(BIN, "kernelentry.o")}`
+    },
+    {
         name: "isr",
         cmd: () =>
-            `nasm -f elf32 ${path.join("Kernel", "src", "IDT", "ISR.asm")} -o ${path.join(BIN, "isr.o")}`
+            `nasm -f elf32 ${path.join(ROOT, "Kernel", "src", "IDT", "ISR.asm")} -o ${path.join(BIN, "isr.o")}`
     },
     {
         name: "loadidt",
         cmd: () =>
-            `nasm -f elf32 ${path.join("Kernel", "src", "IDT", "LoadIDT.asm")} -o ${path.join(BIN, "loadidt.o")}`
+            `nasm -f elf32 ${path.join(ROOT, "Kernel", "src", "IDT", "LoadIDT.asm")} -o ${path.join(BIN, "loadidt.o")}`
     }
 ];
+
 
 const CPP_TASK = {
 
@@ -84,7 +93,7 @@ const OTHER_TASKS = [
     },
     {
         name: "run qemu",
-        cmd: () => `qemu-system-i386 -drive format=raw,file=${OS_IMG},if=floppy`
+        cmd: () => `qemu-system-i386 --accel tcg,thread=single -drive format=raw,file=${OS_IMG},if=floppy`
     }
 ];
 

@@ -1,185 +1,134 @@
-# MoleculeOS – Stage 2 Loader (OSLoader)
+# MoleculeOS – Stage 2 Loader (Loader.asm)
 
-The OSLoader is the second stage of the MoleculeOS boot process.
+The Stage 2 Loader is the first piece of MoleculeOS that runs in **32‑bit Protected Mode**. <br>
+It is intentionally minimal and performs only the essential steps required before the kernel can take over. <br>
 
-It is loaded and executed by Stage 1 after:
-- the kernel image has been copied into memory
-- the Global Descriptor Table **(GDT)** has been loaded
-- the CPU has switched into **32‑bit Protected Mode**
+Stage 1 (the Real‑Mode bootloader) performs:
 
-The OSLoader is intentionally minimal:
-It sets up a valid 32‑bit stack, prepares the environment for C++ execution, <br> 
-calls the kernel entry point, and halts if the kernel ever returns.
+- reset the Boot Stack
+- loading the kernel into memory   
 
----
-
-## Purpose of the OSLoader
-
-The OSLoader performs the following tasks:
-- initialize a new valid 32‑bit stack
-- call the kernel entry function (`kernel::main`)
-- ensure a stable transition into the kernel
-- remain in a halt loop if the kernel returns unexpectedly
-
-The OSLoader is the first fully 32‑bit component of MoleculeOS.
+Once Stage 2 begins, MoleculeOS is executing pure 32‑bit code.
 
 ---
 
-## Why a Stage‑2 Loader Is Necessary
+## Purpose of the Stage 2 Loader
 
-The Stage‑1 bootloader is:
-- 16‑bit Real Mode
-- limited to 512 bytes
-- dependent on BIOS interrupts
-- unable to execute C++ code
-- unable to run a Protected‑Mode kernel
+The Loader performs only three tasks:
 
-The OSLoader acts as the bridge between:
+- disable interrupts (safety during early boot)
+- set a small temporary 32‑bit stack (256 bytes)
+- call the kernel entry point (`KernelEntry`)
+
+The Loader does **not**:
+
+- initialize C++ runtime  
+- set up paging  
+- load drivers  
+- parse ELF files  
+- install IDT or GDT  
+
+All of this is handled later by the kernel itself.
+
+---
+
+## Why the Loader Is Minimal
+
+MoleculeOS follows a clean and modern boot architecture:
 
 ``` text
-    BIOS → Real-Mode → Protected-Mode → C++ Kernel
+    Stage 1 (Real Mode) → Stage 2 (32-bit Loader) → KernelEntry → main()
 ```
+
+Stage 2 is intentionally kept small because:
+
+- the kernel has its own stack  
+- the kernel performs all CPU‑level initialization  
+- the Loader should not duplicate work  
+- a minimal Loader is easier to debug and maintain  
+
+This design mirrors the structure of many modern OS projects.
+
 ---
 
-## Memory Layout at the Start of Stage 2
+## Memory Layout at the Start of Stage 2
 
-Stage 1 loads the OSLoader to the physical address `0x00010000`.
-
-The kernel linker script is aligned to this address.
-
----
-
-## Mode Memory Layout (32‑Bit)
+Stage 1 loads the Loader to physical address **0x00010000** and jumps to it after enabling Protected Mode.
 
 <h6>
     <strong> Note: </strong> <br>
-    This is a simplified excerpt of the memory layout of MoleculeOS. <br>
-    Only the areas relevant for the Stage 2 Loader are shown here.
+    This is a simplified excerpt of the MoleculeOS memory layout. <br>
+    Only the regions relevant for the OS Loader are shown here.
 </h6>
 
 ``` text
-    +---------------------------+ 0x07C00
-    | Bootloader (Stage 1)      |
+    +---------------------------+ 0x7C00
+    | Bootloader (512 Bytes)    |
     | MoleculeOS Boot Sector    |
-    +---------------------------+ 0x07E00
-    | Stage 2 Load Buffer       |
-    | (temporary load area)     |
+    +---------------------------+ 0x7E00
+    | BIOS-safe area            |
+    | (unused by MoleculeOS)    |
+    +---------------------------+ 0x0000
+    | Temporary Stack (0.25 KiB)|
+    | grows downward            |
+    +---------------------------+ 0x00FF ← Stack Pointer (SP)
+    | Free / conventional RAM   |
+    | ...                       |
     +---------------------------+ 0x10000
-    | OSLoader Entry Point      |
-    | Stage 2 (32-bit)          |
-    +---------------------------+ 0x11000
-    | Kernel Code / Data        |
-    | kernel.bin                |
+    | Stage 2 Loader (32-bit)   |
+    | Loader.asm (entry: Loader)|
+    +---------------------------+ 0x10100
+    | Kernel Entry Point        |
+    | KernelEntry.asm           |
     +---------------------------+ ...
 ```
-
-Stage 2 is placed directly before the kernel and executed immediately after the Protected‑Mode transition.
-
----
-
-## Transition from Stage 1 to Stage 2 (Far Jump)
-
-After enabling Protected Mode (setting the **PE** bit in `cr0`), the CPU is technically in 32‑bit mode, <br>
-but still executing instructions using the old Real‑Mode cs selector.
-
-To fully enter 32‑bit execution, Stage 1 performs a far jump into the OSLoader:
-
-``` asm
-    ; _start_ OSLoader (Stage 2) (fully 32-Bit Mode)
-    jmp 0x08:0x7E00
-```
-
-Where:
-
-- **0x08** → 32‑bit code segment selector from the GDT
-- **0x10000** → physical address of the **OSLoader**
-
-This far jump:
-- reloads `cs`
-- flushes the **prefetch queue**
-- activates **32‑bit instruction decoding**
-- transfers control to **Stage 2**
-
-From this point on, MoleculeOS is executing pure 32‑bit code.
 
 ---
 
 ## Why the Stack Must Be Reset
 
-After switching to Protected Mode, the old Real‑Mode stack is invalid:
+After switching to Protected Mode:
 
-- Real‑Mode stack is 16‑bit
-- Protected‑Mode stack is 32‑bit
-- **SS:SP** still contains Real‑Mode values
-- Any call or push would cause a triple fault
+- the Real‑Mode stack is invalid  
+- `ss`:`sp` still contains 16‑bit values  
+- any `push` or `call` would cause undefined behavior  
 
-Therefore, the OSLoader sets a temporary 32‑bit stack:
+Therefore, the Loader sets a **small temporary 32‑bit stack**:
 
-``` asm
-    ; new Stack-Size (~0.5 MiB)
-    mov esp, 0x83F00
+```asm
+    ; reset Stack (0.25 KiB)
+    mov esp, 0x00FF
 ```
 
-This region is:
-- free
-- below 1 MiB
-- safe for early kernel operations
+This stack is only used for:
 
-The kernel later installs its own stack.
+- the `call KernelEntry` instruction  
+- a few pushes/pops during early kernel startup  
+
+The kernel installs its own large stack immediately afterward.
 
 ---
 
-## Transition to C++ (kernel::main)
+## Full Loader Code
 
-The OSLoader calls the kernel entry point:
-
-``` asm
-    ; _start_ Kernel
-    call main
-```
-The function must be declared in C++ as:
-
-``` cpp
-    namespace kernel {
-
-        extern "C" void main() {
-
-            /* ... */
-        }
-    } // namespace kernel
-```
-
-This prevents C++ name mangling and ensures the symbol is callable from assembly.
-
----
-
-## Full OSLoader Code
-
-``` asm
+```asm
     [bits 32]
 
-    global OSLoader 
+    global Loader 
 
-    ; kernel::main (C++ Function)
-    extern main
+    ; Kernel/Boot/KernelEntry.asm
+    extern KernelEntry
 
     section .text
-        OSLoader:
-            ; new Stack-Size (~0.5 MiB)
-            mov esp, 0x83F00
-
-            ; _start_ Kernel
-            call main
-
-            .hang:
-                hlt
-                jmp .hang
-
+        Loader:
+            cli                 ; Interrupts off
+            mov esp, 0x00FF     ; reset Stack (0.25 KiB)
+            call KernelEntry    ; _init_ Kernel
 ```
 
 ---
 
-## Execution Flow of the OSLoader
+## Execution Flow of the Loader
 
 ``` text
     +-----------------------------+
@@ -194,19 +143,20 @@ This prevents C++ name mangling and ensures the symbol is callable from assembly
                   |
                   v
     +-----------------------------+
-    | Far jump → OSLoader         |
+    | Far jump → Loader (32-bit)  |
     +-------------+---------------+
                   |
                   v
     +-----------------------------+
-    | OSLoader (32-bit)           |
-    |   - Set stack               |
-    |   - Call kernel::main()     |
+    | Loader                      |
+    |   - disable interrupts      |
+    |   - set temporary stack     |
+    |   - call KernelEntry        |
     +-------------+---------------+
                   |
                   v
     +-----------------------------+
-    | MoleculeOS Kernel (C++)     |
+    | MoleculeOS Kernel           |
     +-----------------------------+
 ```
 
@@ -214,12 +164,17 @@ This prevents C++ name mangling and ensures the symbol is callable from assembly
 
 ## Summary
 
-The OSLoader is a minimal but essential component of the MoleculeOS boot process.
-It:
+The Stage 2 Loader is the first fully 32‑bit component of MoleculeOS. <br>
+It is intentionally minimal and exists only to provide a clean and safe transition from the Real‑Mode bootloader into the protected‑mode kernel.
 
-- sets a valid 32‑bit stack
-- calls the kernel entry point
-- ensures a stable transition
-- halts if the kernel returns
+It performs exactly three tasks:
 
-Its simplicity reduces complexity, improves debugging, and ensures a clean handoff to the kernel.
+- interrupts are disabled to avoid undefined behavior during early boot
+- a temporary 256‑byte 32‑bit stack is installed
+- control is transferred to the kernel’s entry point (KernelEntry)
+
+The Loader does not initialize hardware, C++ runtime, or system structures. <br>
+All advanced initialization is handled by the kernel itself. <br>
+
+This minimalistic design keeps the boot pipeline simple, predictable, <br>
+and easy to debug — ensuring that MoleculeOS enters its kernel in a clean and well‑defined state.

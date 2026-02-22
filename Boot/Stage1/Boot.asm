@@ -10,7 +10,7 @@ BootProcedure:
     ; _init_ Stack
     xor ax, ax      ; clear Accumulator
     mov ss, ax      ; set Stack-Segment
-    mov sp, 0x9C00  ; set Stack-Size (8 KB)
+    mov sp, 0x00FF  ; set Stack-Size (0.25 KiB)
 
     ; _init_ Disk-Loader
     call DiskReadLoader
@@ -19,7 +19,7 @@ BootProcedure:
     lgdt [GDTDescriptor]
 
     ; _init_ Protected-Mode
-    mov eax, cr0    ; Control => Accumulator (32 Bit)
+    mov eax, cr0    ; Control => Accumulator (32-bit)
     or eax, 1       ; set Protection Enable
     mov cr0, eax    ; Protection Enable => Control
 

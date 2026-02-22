@@ -175,10 +175,10 @@ Physical address calculation:
     +-------------+--------------+
                   |
                   v
-    +---------------------------+
-    | 5. Stage 2 is in RAM      |
-    |    and can be executed    |
-    +---------------------------+
+    +----------------------------+
+    | 5. Stage 2 is in RAM       |
+    |    and can be executed     |
+    +----------------------------+
 ```
 
 ---
@@ -193,7 +193,7 @@ Physical address calculation:
         mov es, ax
         xor bx, bx      ; Offset = 0
     
-        mov ah, 0x02    ; BIOS: Read-Sectors
+        mov ah, 2       ; BIOS: Read-Sectors
         mov al, 16      ; Number of sectors
         mov ch, 0       ; Cylinder 0
         mov cl, 2       ; Start at sector 2 (sector 1 = Boot-Sector)
@@ -206,7 +206,7 @@ Physical address calculation:
         ret
 
     disk_error:
-        halt
+        hlt
         jmp disk_error
 ```
 ---
