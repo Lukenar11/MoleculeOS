@@ -27,3 +27,7 @@
 
 # end of line
 * text eol=lf
+
+# png`s
+*.png binary
+*.png -text
