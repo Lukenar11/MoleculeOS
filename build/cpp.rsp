@@ -6,6 +6,8 @@
 -I.
 -I Atom
 -I Kernel/include
+-I Terminal/include
 -c
 Kernel/src/main.cpp
 Kernel/src/IDT/IDT.cpp
+Terminal/src/Drivers/VGA.cpp

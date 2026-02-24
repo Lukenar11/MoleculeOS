@@ -66,8 +66,10 @@ const C_TASK = {
 const CPP_RENAME = [
 
     ["main.o", "main.o"],
-    ["IDT.o", "idt.o"]
+    ["IDT.o", "idt.o"],
+    ["VGA.o", "vga.o"]
 ];
+
 
 const OTHER_TASKS = [
 

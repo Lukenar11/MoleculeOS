@@ -10,3 +10,4 @@ build/bin/idt.o
 build/bin/isr.o
 build/bin/loadidt.o
 build/bin/string.o
+build/bin/vga.o

@@ -36,45 +36,48 @@ extern "C" {
     void isr_31();  // Reserved (unused)
 }   
 
-// _init_ IDT
-inline static constexpr kernel::idt::IDTInitEntry idt_init_table[32] = {
+namespace kernel::idt {
 
-    { 0, isr_0 }, { 1, isr_1 }, { 2, isr_2 }, { 3, isr_3 }, 
-    { 4, isr_4 }, { 5, isr_5 }, { 6, isr_6 }, { 7, isr_7 }, 
-    { 8, isr_8 }, { 9, isr_9 }, {10, isr_10}, {11, isr_11}, 
-    {12, isr_12}, {13, isr_13}, {14, isr_14}, {15, isr_15}, 
-    {16, isr_16}, {17, isr_17}, {18, isr_18}, {19, isr_19}, 
-    {20, isr_20}, {21, isr_21}, {22, isr_22}, {23, isr_23}, 
-    {24, isr_24}, {25, isr_25}, {26, isr_26}, {27, isr_27}, 
-    {28, isr_28}, {29, isr_29}, {30, isr_30}, {31, isr_31}
-};
+    // _init_ IDT
+    inline static constexpr IDTInitEntry idt_init_table[32] = {
 
-// _construct_
-kernel::idt::IDT::IDT() noexcept {
+        { 0, isr_0 }, { 1, isr_1 }, { 2, isr_2 }, { 3, isr_3 }, 
+        { 4, isr_4 }, { 5, isr_5 }, { 6, isr_6 }, { 7, isr_7 }, 
+        { 8, isr_8 }, { 9, isr_9 }, {10, isr_10}, {11, isr_11}, 
+        {12, isr_12}, {13, isr_13}, {14, isr_14}, {15, isr_15}, 
+        {16, isr_16}, {17, isr_17}, {18, isr_18}, {19, isr_19}, 
+        {20, isr_20}, {21, isr_21}, {22, isr_22}, {23, isr_23}, 
+        {24, isr_24}, {25, isr_25}, {26, isr_26}, {27, isr_27}, 
+        {28, isr_28}, {29, isr_29}, {30, isr_30}, {31, isr_31}
+    };
 
-    // fill IDT-Descriptor
-    idt_ptr.limit = (sizeof(IDTEntry) * ENTRYS) - 1;
-    idt_ptr.base = uint32_t(&idt);
+    // _construct_
+    IDT::IDT() noexcept {
 
-    // Clear table
-    for (int i = 0; i < ENTRYS; i++)
-        idt[i].set_gate(0, 0, 0);
+        // fill IDT-Descriptor
+        idt_ptr.limit = (sizeof(IDTEntry) * ENTRYS) - 1;
+        idt_ptr.base = uint32_t(&idt);
 
-    // _build_ IDT
-    for (auto& entry : idt_init_table)
-        idt[entry.index].set_gate(uint32_t(entry.handler), 0x08, 0x8E);
+        // Clear table
+        for (int i = 0; i < ENTRYS; i++)
+            idt[i].set_gate(0, 0, 0);
 
-    LoadIDT(uint32_t(&idt_ptr));
-}
+        // _build_ IDT
+        for (auto& entry : idt_init_table)
+            idt[entry.index].set_gate(uint32_t(entry.handler), 0x08, 0x8E);
 
-extern "C" void isr_common_handler() {
-
-    static volatile char* vga = (char*)0xB88C0;
-    static const char* text_message = "Error!";
-
-    for (int i = 0; text_message[i] != '\0'; i++) {
-
-        vga[i * 2] = text_message[i];   // putc(text_message[i]);
-        vga[(i * 2) + 1] = 0x04;        // Color: red
+        LoadIDT(uint32_t(&idt_ptr));
     }
-}
+
+    extern "C" void isr_common_handler() {
+
+        static volatile char* vga = (char*)0xB88C0;
+        static const char* text_message = "Error!";
+
+        for (int i = 0; text_message[i] != '\0'; i++) {
+
+            vga[i * 2] = text_message[i];   // putc(text_message[i]);
+            vga[(i * 2) + 1] = 0x04;        // Color: red
+        }
+    }
+} // kernel::idt
