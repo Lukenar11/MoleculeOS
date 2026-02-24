@@ -51,12 +51,15 @@ A complete overview of the OS components can be found in:
 - [Boot Process](docs/Boot/00_boot.md)
 - [Kernel](docs/Kernel)
 - [Runtime](docs/Atom/00_atom.md)
+- [Terminal](docs/Terminal/Drivers/VGA/01_vga-driver.md)
 
 Subsystem documentation is organized into:
 
 - [Real-Mode bootloader](docs/Boot/Stage1)
 - [Protected-Mode OS loader](docs/Boot/Stage2)
-- [Kernel internals](docs/Kernel)
+- [Kernel Boot](docs/Kernel/Boot)
+- [Kernel IDT](docs/Kernel/IDT)
+- [Ternimal VGA-Driver](docs/Terminal/Drivers/VGA/01_vga-driver.md)
 
 ---
 
@@ -76,7 +79,7 @@ All build scripts are located in the `build/` directory and are executed via Nod
 
 ## Build & Run
 
-```bash
+``` bash
     node build/build.js
 ```
 
