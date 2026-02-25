@@ -41,7 +41,7 @@ const CPP_TASKS =
 
 const OTHER_TASKS = [
 
-    task("link kernel", () => `ld.lld @build/link.rsp`),
+    task("link kernel", () => `ld.lld ${path.join("@build", "link.rsp")}`),
     task("convert kernel", () => `llvm-objcopy -O binary ${KERNEL_ELF} ${KERNEL_BIN}`),
     task("create disk image", () => `dd if=/dev/zero of=${OS_IMG} bs=512 count=2880`),
     task("write bootloader", () => `dd if=${BOOT_BIN} of=${OS_IMG} bs=512 seek=0 conv=notrunc`),

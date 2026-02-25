@@ -33,22 +33,18 @@ namespace terminal::drivers {
     class VGA {
 
         public:
-            inline constexpr uint8_t make_color
-                (const VGAColors foreground, const VGAColors background) 
-                    const noexcept {return (uint8_t(background) << 4) | uint8_t(foreground);}
+            constexpr uint8_t make_color
+                (const VGAColors foreground, const VGAColors background) const noexcept;
 
-            inline constexpr uint16_t make_entry
-                (const char symbol, const uint8_t color) 
-                    const noexcept {return (uint16_t(color) << 8) | uint8_t(symbol);}
+            constexpr uint16_t make_entry
+                (const char symbol, const uint8_t color) const noexcept;
 
-            inline void put_char_at
-                (const char symbol, const uint8_t color, const int x, const int y) 
-                    const noexcept {VGA_BUFFER[y * VGA_WIDTH + x] = make_entry(symbol, color);}
+            void put_char_at
+                (const char symbol, const uint8_t color, const int x, const int y)  const noexcept;
 
             void clear_screen(const uint8_t color) const noexcept;
 
             VGA() noexcept = default;
             ~VGA() noexcept = default;
     };
-
 } // namespace terminal::drivers
