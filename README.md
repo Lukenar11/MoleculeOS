@@ -36,9 +36,9 @@ The goal is to understand the *essence* of OS development without unnecessary co
 
 ## Current Boot Output
 
-Below is the current state of MoleculeOS running in QEMU (VGA-Driver-Test):
+Below is the current state of MoleculeOS running in QEMU (Terminal-Output-Test):
 
-![MoleculeOS boot screenshot](docs/images/qemu-vga-driver-test.png)
+![MoleculeOS boot screenshot](docs/images/qemu-terminal-test.png)
 
 ---
 
