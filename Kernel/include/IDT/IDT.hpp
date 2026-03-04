@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include <Atom/C/stdint.h>
 #include <Atom/CPP/Array.hpp>
 
 /*

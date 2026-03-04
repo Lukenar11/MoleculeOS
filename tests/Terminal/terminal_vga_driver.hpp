@@ -8,7 +8,7 @@ void test_vga_driver() {
     terminal::drivers::VGA vga;
 
     // Clear Screen
-    vga.clear_screen(uint8_t(terminal::drivers::VGAColors::BLACK));
+    vga.clear_screen(terminal::drivers::VGAColors::BLACK);
 
     // puts(text_message);
     for (int x = 0; x < (sizeof(text_message) / sizeof(char)); x++)

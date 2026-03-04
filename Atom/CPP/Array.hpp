@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include <C/stdint.h>
 #include <C/string.h>
 
 namespace atom {

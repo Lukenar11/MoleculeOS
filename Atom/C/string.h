@@ -1,7 +1,7 @@
 #ifndef STRING_H
 #define STRING_H
 
-#include <stdint.h>
+#include <Atom/C/stdint.h>
 
 #ifdef __cplusplus
     extern "C" {

@@ -11,3 +11,4 @@
 Kernel/src/main.cpp
 Kernel/src/IDT/IDT.cpp
 Terminal/src/Drivers/VGA.cpp
+Terminal/src/Terminal.cpp

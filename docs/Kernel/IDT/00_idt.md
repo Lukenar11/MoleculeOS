@@ -59,7 +59,7 @@ MoleculeOS stores this in:
 
 ``` cpp
    // Interrupt Descriptor
-   struct IdtEntry final {
+   struct IDTEntry final {
 
       uint16_t base_low;
       uint16_t selector;
@@ -100,7 +100,7 @@ MoleculeOS stores this in:
 
 ``` cpp
    // IDT-Descriptor Pointer (needed for "lidt[...]")
-   struct IdtPtr final {
+   struct IDTPtr final {
 
       uint16_t limit;
       uint32_t base;
@@ -156,7 +156,7 @@ The IDT class in MoleculeOS performs the following steps:
    kernel::idt::IDT::IDT() noexcept {
 
       // fill IDT-Descriptor
-      idt_ptr.limit = (sizeof(IdtEntry) * ENTRYS) - 1;
+      idt_ptr.limit = (sizeof(IDTEntry) * ENTRYS) - 1;
       idt_ptr.base = uint32_t(&idt);
 
       // Clear table

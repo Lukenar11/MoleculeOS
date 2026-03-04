@@ -143,13 +143,13 @@ Useful for:
 ``` c
     #ifndef STRING_H
     #define STRING_H
-
-    #include <stdint.h>
-
+    
+    #include <Atom/C/stdint.h>
+    
     #ifdef __cplusplus
         extern "C" {
     #endif
-
+    
         void* memcpy(void* dest_ptr, const void* sourche_ptr, const uint32_t size);
         void* memmove(void* dest_ptr, const void* sourche_ptr, const uint32_t size);
         void* memset(void* dest_ptr, int value, const uint32_t size);
@@ -157,7 +157,7 @@ Useful for:
     #ifdef __cplusplus
         }
     #endif
-
+    
     #endif  // STRING_H
 ```
 

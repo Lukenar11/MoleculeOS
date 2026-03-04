@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Atom/C/stdint.h>
+
 typedef void (*test_fn)();
 
 static void test_int0() {__asm__ volatile("int $0");}   

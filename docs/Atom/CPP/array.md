@@ -227,7 +227,7 @@ This constructor allows the compiler to fully optimize the initialization and gu
 ``` cpp
     #pragma once
     
-    #include <stdint.h>
+    #include <C/stdint.h>
     #include <C/string.h>
     
     namespace atom {

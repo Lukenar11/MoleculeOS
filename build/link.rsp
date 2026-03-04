@@ -11,3 +11,4 @@ build/bin/isr.o
 build/bin/loadidt.o
 build/bin/string.o
 build/bin/vga.o
+build/bin/terminal.o

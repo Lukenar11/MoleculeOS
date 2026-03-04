@@ -109,8 +109,9 @@ Used by:
 ### Code
 
 ``` cpp
-    constexpr uint8_t terminal::drivers::VGA::make_color(const VGAColors foreground, const VGAColors background)
-        const noexcept {return (uint8_t(background) << 4) | uint8_t(foreground);}
+    static constexpr uint8_t make_color
+        (const VGAColors foreground, const VGAColors background)
+            noexcept {return (uint8_t(background) << 4) | uint8_t(foreground);}
 ```
 
 ### Explanation
@@ -137,8 +138,9 @@ Used by:
 ### Code
 
 ``` cpp
-    constexpr uint16_t terminal::drivers::VGA::make_entry(const char symbol, const uint8_t color) 
-        const noexcept {return (uint16_t(color) << 8) | uint8_t(symbol);}
+    static constexpr uint16_t make_entry
+        (const char symbol, const uint8_t color) 
+            noexcept {return (uint16_t(color) << 8) | uint8_t(symbol);}
 ```
 
 ### Explanation
@@ -286,7 +288,7 @@ The VGA driver follows the MoleculeOS principles:
 ``` cpp
     #pragma once
     
-    #include <stdint.h>
+    #include <Atom/C/stdint.h>
     
     namespace terminal::drivers {
     
@@ -319,16 +321,19 @@ The VGA driver follows the MoleculeOS principles:
         class VGA {
         
             public:
-                constexpr uint8_t make_color
-                    (const VGAColors foreground, const VGAColors background) const noexcept;
+                static constexpr uint8_t make_color
+                    (const VGAColors foreground, const VGAColors background)
+                        noexcept {return (uint8_t(background) << 4) | uint8_t(foreground);}
     
-                constexpr uint16_t make_entry
-                    (const char symbol, const uint8_t color) const noexcept;
+                static constexpr uint16_t make_entry
+                    (const char symbol, const uint8_t color) 
+                        noexcept {return (uint16_t(color) << 8) | uint8_t(symbol);}
     
                 void put_char_at
-                    (const char symbol, const uint8_t color, const int x, const int y)  const noexcept;
+                    (const char symbol, const uint8_t color, const int x, const int y) 
+                        const noexcept;
     
-                void clear_screen(const uint8_t color) const noexcept;
+                void clear_screen(const VGAColors color) const noexcept;
     
                 VGA() noexcept = default;
                 ~VGA() noexcept = default;

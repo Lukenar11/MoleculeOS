@@ -89,7 +89,7 @@ MoleculeOS uses a readable, non‑compact GDT definition to make each field expl
 
         gdt_end:
 
-    GdtDescriptor:
+    GDTDescriptor:
         dw gdt_end - gdt - 1
         dd gdt
 ```
@@ -102,7 +102,7 @@ Before switching to protected mode, the bootloader loads the GDT using:
 
 ``` asm 
     ; _init_ GDT
-    lgdt [GdtDescriptor]
+    lgdt [GDTDescriptor]
 ```
 
 This loads the GDT into the GDTR register, which the CPU uses to resolve segment selectors.
