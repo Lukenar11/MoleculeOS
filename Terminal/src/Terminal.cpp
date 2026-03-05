@@ -37,11 +37,11 @@ namespace terminal {
 
     void Terminal::put_string(const char* message) noexcept {
 
-        for (int i = 0; message[i] != '\0'; i++)
+        for (uint32_t i = 0; message[i] != '\0'; i++)
             put_char(message[i]);
     }
-    
-    void Terminal::print(int value, const PrintFormat format) noexcept {
+
+    void Terminal::print(int32_t value, const PrintFormat format) noexcept {
 
         const uint32_t unsigned_value = uint32_t(value);
         bool started = false;
@@ -62,14 +62,14 @@ namespace terminal {
                 }
 
                 atom::Array<char, 12> buffer{};
-                int index = 0;
+                uint32_t index = 0;
                 while (value > 0) {
 
                     buffer[index++] = '0' + (value % 10);
                     value /= 10;
                 }
 
-                for (int i = index - 1; i >= 0; i--)
+                for (int32_t i = index - 1; i >= 0; i--)
                     put_char(buffer[i]);
                 break;
             }
@@ -79,9 +79,9 @@ namespace terminal {
                 put_char('0');
                 put_char('x');
 
-                for (int i = (sizeof(unsigned_value) << 3) - 4; i >= 0; i -= 4) {
+                for (int32_t i = (sizeof(unsigned_value) << 3) - 4; i >= 0; i -= 4) {
 
-                    int digit = (unsigned_value >> i) & 0x0F;
+                    uint32_t digit = (unsigned_value >> i) & 0x0F;
                     if (digit != 0 || started || i == 0) {
 
                         started = true;
@@ -96,9 +96,9 @@ namespace terminal {
                 put_char('0');
                 put_char('b');
 
-                for (int i = (sizeof(unsigned_value) << 3) - 1; i >= 0; i--) {
+                for (int32_t i = (sizeof(unsigned_value) << 3) - 1; i >= 0; i--) {
 
-                    int bit = (unsigned_value >> i) & 1;
+                    uint32_t bit = (unsigned_value >> i) & 1;
                     if (bit != 0 || started || i == 0) {
 
                         started = true;

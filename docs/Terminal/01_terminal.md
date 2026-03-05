@@ -133,7 +133,7 @@ Outputs a null‑terminated string.
 ``` cpp
     void ternimal::Terminal::put_string(const char* message) noexcept {
 
-        for (int i = 0; message[i] != '\0'; i++)
+        for (uint32_t i = 0; message[i] != '\0'; i++)
             put_char(message[i]);
     }
 ```
@@ -151,7 +151,7 @@ Prints integers in decimal, hexadecimal, or binary format.
 
 ### Code (excerpt)
 ``` cpp
-    void terminal::Terminal::print(int value, const PrintFormat format) noexcept {
+    void ternimal::Terminal::print(int32_t value, const PrintFormat format) noexcept {
 
         const uint32_t unsigned_value = uint32_t(value);
         bool started = false;
@@ -172,14 +172,14 @@ Prints integers in decimal, hexadecimal, or binary format.
                 }
 
                 atom::Array<char, 12> buffer{};
-                int index = 0;
+                uint32_t index = 0;
                 while (value > 0) {
 
                     buffer[index++] = '0' + (value % 10);
                     value /= 10;
                 }
 
-                for (int i = index - 1; i >= 0; i--)
+                for (int32_t i = index - 1; i >= 0; i--)
                     put_char(buffer[i]);
                 break;
             }
@@ -189,9 +189,9 @@ Prints integers in decimal, hexadecimal, or binary format.
                 put_char('0');
                 put_char('x');
 
-                for (int i = (sizeof(unsigned_value) << 3) - 4; i >= 0; i -= 4) {
+                for (int32_t i = (sizeof(unsigned_value) << 3) - 4; i >= 0; i -= 4) {
 
-                    int digit = (unsigned_value >> i) & 0x0F;
+                    uint32_t digit = (unsigned_value >> i) & 0x0F;
                     if (digit != 0 || started || i == 0) {
 
                         started = true;
@@ -206,9 +206,9 @@ Prints integers in decimal, hexadecimal, or binary format.
                 put_char('0');
                 put_char('b');
 
-                for (int i = (sizeof(unsigned_value) << 3) - 1; i >= 0; i--) {
+                for (int32_t i = (sizeof(unsigned_value) << 3) - 1; i >= 0; i--) {
 
-                    int bit = (unsigned_value >> i) & 1;
+                    uint32_t bit = (unsigned_value >> i) & 1;
                     if (bit != 0 || started || i == 0) {
 
                         started = true;

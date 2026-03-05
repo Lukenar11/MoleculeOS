@@ -43,9 +43,6 @@ This keeps the codebase clean, predictable, and easy to extend.
 Contains minimal C‑style utilities required by the kernel:
 
 - `memcpy`, `memset`, `memcmp`
-- `strlen`, `strcmp`
-- panic and debug helpers
-- low‑level pointer utilities
 
 These functions are implemented without libc and are safe for early boot stages.
 
@@ -55,10 +52,6 @@ These functions are implemented without libc and are safe for early boot stages.
 Provides tiny, STL‑free C++ abstractions:
 
 - `Array<T, S>` — static container for fixed‑size tables  
-- `span<T>` — non‑owning view into contiguous memory  
-- `string_view` — lightweight string reference  
-- `Optional<T>` (optional future module)  
-- `print` / formatting utilities (kernel‑safe)
 
 All components are:
 
@@ -97,28 +90,6 @@ Every byte and every instruction is predictable.
 ### **3. Didactic Clarity**
 Atom is not just a runtime — it is a **teaching tool**.  
 Each module is intentionally small, readable, and easy to understand.
-
----
-
-## Example: How Atom Integrates Into the Kernel
-
-A typical kernel subsystem uses Atom like this:
-
-```cpp
-    #include <CPP/Array.hpp>
-    #include <Atom/C/memory.h>
-
-    atom::Array<IDTEntry, 256> idt;
-    memset(idt.begin(), 0, idt.size() * sizeof(IDTEntry));
-```
-
-This demonstrates:
-
-- static containers  
-- low‑level memory utilities  
-- zero‑overhead abstractions  
-
-All without relying on the standard library.
 
 ---
 

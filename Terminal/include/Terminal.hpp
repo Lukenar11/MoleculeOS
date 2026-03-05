@@ -6,8 +6,8 @@
 
 namespace terminal {
 
-    enum class PrintFormat : 
-        uint8_t {INTEGER, HEX, BINARY};
+    enum class PrintFormat 
+        : uint8_t {INTEGER, HEX, BINARY};
 
     class Terminal {
 
@@ -23,8 +23,8 @@ namespace terminal {
                     drivers::VGAColors::BLACK
                 );
 
-            int cursor_x = DEFAULT_CURSOR_POS;
-            int cursor_y = DEFAULT_CURSOR_POS;
+            int32_t cursor_x = DEFAULT_CURSOR_POS;
+            int32_t cursor_y = DEFAULT_CURSOR_POS;
             uint8_t cursor_color = DEFAULT_COLOR;
 
         public:
@@ -34,7 +34,7 @@ namespace terminal {
             void put_char(const char symbol) noexcept;
             void put_string(const char* message) noexcept;
 
-            void print(int value, const PrintFormat format) noexcept;
+            void print(int32_t value, const PrintFormat format) noexcept;
 
             Terminal() noexcept = default;
             ~Terminal() noexcept = default;

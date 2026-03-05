@@ -5,8 +5,8 @@
 namespace terminal::drivers {
 
     inline volatile uint16_t* const VGA_BUFFER = (volatile uint16_t*)0xB8000;
-    constexpr int VGA_WIDTH = 80;
-    constexpr int VGA_HEIGHT = 25;
+    constexpr uint32_t VGA_WIDTH = 80;
+    constexpr uint32_t VGA_HEIGHT = 25;
 
     // char/screen Colors
     enum class VGAColors : uint8_t {
@@ -42,7 +42,7 @@ namespace terminal::drivers {
                     noexcept {return (uint16_t(color) << 8) | uint8_t(symbol);}
 
             void put_char_at
-                (const char symbol, const uint8_t color, const int x, const int y) 
+                (const char symbol, const uint8_t color, const int32_t x, const int32_t y) 
                     const noexcept;
 
             void clear_screen(const VGAColors color) const noexcept;

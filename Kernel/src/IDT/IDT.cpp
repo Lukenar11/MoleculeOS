@@ -59,7 +59,7 @@ namespace kernel::idt {
         idt_ptr.base = uint32_t(&idt);
 
         // Clear table
-        for (int i = 0; i < ENTRYS; i++)
+        for (uint32_t i = 0; i < ENTRYS; i++)
             idt[i].set_gate(0, 0, 0);
 
         // _build_ IDT
@@ -74,7 +74,7 @@ namespace kernel::idt {
         static volatile char* vga = (char*)0xB88C0;
         static const char* text_message = "Error!";
 
-        for (int i = 0; text_message[i] != '\0'; i++) {
+        for (uint32_t i = 0; text_message[i] != '\0'; i++) {
 
             vga[i * 2] = text_message[i];   // putc(text_message[i]);
             vga[(i * 2) + 1] = 0x04;        // Color: red

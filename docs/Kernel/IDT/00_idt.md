@@ -160,7 +160,7 @@ The IDT class in MoleculeOS performs the following steps:
       idt_ptr.base = uint32_t(&idt);
 
       // Clear table
-      for (int i = 0; i < ENTRYS; i++)
+      for (uint32_t i = 0; i < ENTRYS; i++)
          idt[i].set_gate(0, 0, 0);
 
       // _build_ IDT
