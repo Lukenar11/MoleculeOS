@@ -152,23 +152,23 @@ The IDT class in MoleculeOS performs the following steps:
 ## Full Initialization Code (C++ Constructor)
 
 ``` cpp
-   // _construct_
-   kernel::idt::IDT::IDT() noexcept {
-
-      // fill IDT-Descriptor
-      idt_ptr.limit = (sizeof(IDTEntry) * ENTRYS) - 1;
-      idt_ptr.base = uint32_t(&idt);
-
-      // Clear table
-      for (uint32_t i = 0; i < ENTRYS; i++)
-         idt[i].set_gate(0, 0, 0);
-
-      // _build_ IDT
-      for (auto& entry : idt_init_table)
-         idt[entry.index].set_gate(uint32_t(entry.handler), 0x08, 0x8E);
-
-      LoadIDT(uint32_t(&idt_ptr));
-   }
+    // _construct_
+    IDT::IDT() noexcept {
+ 
+        // fill IDT-Descriptor
+        idt_ptr.limit = (sizeof(IDTEntry) * ENTRYS) - 1;
+        idt_ptr.base = reinterpret_cast<uint32_t>(&idt);
+ 
+        // Clear table
+        for (uint32_t i = 0; i < ENTRYS; i++)
+            idt[i].set_gate(0, 0, 0);
+ 
+        // _build_ IDT
+        for (const auto& entry : idt_init_table)
+            idt[entry.index].set_gate(reinterpret_cast<uint32_t>(entry.handler), 0x08, 0x8E);
+ 
+        LoadIDT(reinterpret_cast<uint32_t>(&idt_ptr));
+    }
 ```
 
 ---

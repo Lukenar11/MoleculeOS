@@ -43,7 +43,7 @@ namespace terminal {
 
     void Terminal::print(int32_t value, const PrintFormat format) noexcept {
 
-        const uint32_t unsigned_value = uint32_t(value);
+        const uint32_t unsigned_value = static_cast<uint32_t>(value);
         bool started = false;
         switch (format) {
 
@@ -81,7 +81,7 @@ namespace terminal {
 
                 for (int32_t i = (sizeof(unsigned_value) << 3) - 4; i >= 0; i -= 4) {
 
-                    uint32_t digit = (unsigned_value >> i) & 0x0F;
+                    const uint32_t digit = (unsigned_value >> i) & 0x0F;
                     if (digit != 0 || started || i == 0) {
 
                         started = true;
@@ -98,7 +98,7 @@ namespace terminal {
 
                 for (int32_t i = (sizeof(unsigned_value) << 3) - 1; i >= 0; i--) {
 
-                    uint32_t bit = (unsigned_value >> i) & 1;
+                    const uint32_t bit = (unsigned_value >> i) & 0x01;
                     if (bit != 0 || started || i == 0) {
 
                         started = true;

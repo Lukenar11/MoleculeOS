@@ -15,8 +15,8 @@
 
 namespace kernel::idt {
 
-    static constexpr int ENTRYS = 256;
-    static constexpr int MASK = 0xFFFF;
+    static constexpr uint32_t ENTRYS = 256;
+    static constexpr uint32_t MASK = 0xFFFF;
 
     // IDT-Descriptor => IDTR-Register (LoadIDT.asm)
     extern "C" void LoadIDT(uint32_t);
@@ -45,7 +45,7 @@ namespace kernel::idt {
     // Mapping IDT Index -> Handler Merchants
     struct IDTInitEntry final {
 
-        int index;
+        uint32_t index;
         void (*handler)();
     };
 
@@ -64,12 +64,12 @@ namespace kernel::idt {
 
         public:
             inline IDTEntry& operator[]
-                (int index) noexcept {return idt[index];}
+                (uint32_t index) noexcept {return idt[index];}
 
             inline const IDTEntry& operator[] 
-                (int index) const noexcept {return idt[index];}
+                (uint32_t index) const noexcept {return idt[index];}
 
             IDT() noexcept;
             ~IDT() noexcept = default;
     };
-} // namespache kernel
+} // namespace kernel

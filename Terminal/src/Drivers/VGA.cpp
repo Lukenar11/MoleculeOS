@@ -14,8 +14,8 @@ namespace terminal::drivers {
 
     void VGA::clear_screen(const VGAColors background) const noexcept {
 
-        uint8_t color = make_color(VGAColors::BLACK, background);
-        uint16_t entry = make_entry(' ', color);
+        const uint8_t color = make_color(VGAColors::BLACK, background);
+        const uint16_t entry = make_entry(' ', color);
 
         for (uint32_t y = 0; y < VGA_HEIGHT; y++)
             for (uint32_t x = 0; x < VGA_WIDTH; x++)

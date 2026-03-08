@@ -17,12 +17,12 @@ namespace terminal {
 
             // default Cursor-Position & Color
             static constexpr uint8_t DEFAULT_CURSOR_POS = 0x00;
-            const uint8_t DEFAULT_COLOR = 
-                vga_driver.make_color(
-                    drivers::VGAColors::LIGHT_GREY, 
+            static constexpr uint8_t DEFAULT_COLOR =
+                drivers::VGA::make_color(
+                    drivers::VGAColors::LIGHT_GREY,
                     drivers::VGAColors::BLACK
                 );
-
+            
             int32_t cursor_x = DEFAULT_CURSOR_POS;
             int32_t cursor_y = DEFAULT_CURSOR_POS;
             uint8_t cursor_color = DEFAULT_COLOR;

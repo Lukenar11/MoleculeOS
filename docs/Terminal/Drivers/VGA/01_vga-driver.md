@@ -18,7 +18,7 @@ The driver is intentionally small and optimized for early‑boot kernel environm
 
 The VGA text buffer resides at:
 
-```
+``` text
     0xB8000
 ```
 
@@ -110,8 +110,13 @@ Used by:
 
 ``` cpp
     static constexpr uint8_t make_color
-        (const VGAColors foreground, const VGAColors background)
-            noexcept {return (uint8_t(background) << 4) | uint8_t(foreground);}
+        (const VGAColors foreground, const VGAColors background) noexcept {
+            
+        return (
+            (static_cast<uint8_t>(background) << 4) | 
+             static_cast<uint8_t>(foreground)
+        );
+    }
 ```
 
 ### Explanation
@@ -139,8 +144,13 @@ Used by:
 
 ``` cpp
     static constexpr uint16_t make_entry
-        (const char symbol, const uint8_t color) 
-            noexcept {return (uint16_t(color) << 8) | uint8_t(symbol);}
+        (const char symbol, const uint8_t color) noexcept {
+        
+        return (
+            (static_cast<uint16_t>(color) << 8) | 
+             static_cast<uint16_t>(symbol)
+        );
+    }
 ```
 
 ### Explanation
@@ -161,7 +171,7 @@ Writes a single character to a specific **(x, y)** position on the screen.
 ### Code
 
 ``` cpp
-    void terminal::VGA::put_char_at
+    void VGA::put_char_at
         (const char symbol, const uint8_t color, const int32_t x, const int32_t y) 
         const noexcept {
             
@@ -199,17 +209,14 @@ Used for:
 ### Code
 
 ``` cpp
-    void terminal::drivers::VGA::clear_screen(const uint8_t color) const noexcept {
+    void VGA::clear_screen(const VGAColors background) const noexcept {
+
+        const uint8_t color = make_color(VGAColors::BLACK, background);
+        const uint16_t entry = make_entry(' ', color);
 
         for (uint32_t y = 0; y < VGA_HEIGHT; y++)
             for (uint32_t x = 0; x < VGA_WIDTH; x++)
-                put_char_at(
-                    0x00, make_color(
-                        VGAColors(color),
-                        VGAColors(color)
-                    ),
-                    x, y
-                );
+                VGA_BUFFER[y * VGA_WIDTH + x] = entry;
     }
 ```
 
@@ -262,7 +269,7 @@ Each entry is a 16‑bit value written directly into the VGA buffer.
     for (int x = 0; x < (sizeof(text_message) / sizeof(char)); x++)
         vga.put_char_at(
             text_message[x], 
-            uint8_t(terminal::drivers::VGAColors::GREEN), 
+            static_cast<uint8_t>(terminal::drivers::VGAColors::GREEN), 
             x, 
             18
         );
@@ -288,18 +295,19 @@ The VGA driver follows the MoleculeOS principles:
 
 ``` cpp
     #pragma once
-
+    
     #include <Atom/C/stdint.h>
-
+    
     namespace terminal::drivers {
-
-        inline volatile uint16_t* const VGA_BUFFER = (volatile uint16_t*)0xB8000;
+    
         constexpr uint32_t VGA_WIDTH = 80;
         constexpr uint32_t VGA_HEIGHT = 25;
-
+        inline volatile uint16_t* const VGA_BUFFER = 
+            reinterpret_cast<volatile uint16_t*>(0xB8000);
+    
         // char/screen Colors
         enum class VGAColors : uint8_t {
-
+        
             BLACK = 0x00,
             BLUE = 0x01,
             GREEN = 0x02,
@@ -317,25 +325,35 @@ The VGA driver follows the MoleculeOS principles:
             YELLOW = 0x0E,
             WHITE = 0x0F
         };
-
+    
         // VGA-Driver
         class VGA {
-
+        
             public:
                 static constexpr uint8_t make_color
-                    (const VGAColors foreground, const VGAColors background)
-                        noexcept {return (uint8_t(background) << 4) | uint8_t(foreground);}
-
+                    (const VGAColors foreground, const VGAColors background) noexcept {
+                        
+                    return (
+                        (static_cast<uint8_t>(background) << 4) | 
+                         static_cast<uint8_t>(foreground)
+                    );
+                }
+    
                 static constexpr uint16_t make_entry
-                    (const char symbol, const uint8_t color) 
-                        noexcept {return (uint16_t(color) << 8) | uint8_t(symbol);}
-
+                    (const char symbol, const uint8_t color) noexcept {
+                    
+                    return (
+                        (static_cast<uint16_t>(color) << 8) | 
+                         static_cast<uint16_t>(symbol)
+                    );
+                }
+    
                 void put_char_at
                     (const char symbol, const uint8_t color, const int32_t x, const int32_t y) 
                         const noexcept;
-
+    
                 void clear_screen(const VGAColors color) const noexcept;
-
+    
                 VGA() noexcept = default;
                 ~VGA() noexcept = default;
         };
