@@ -1,4 +1,4 @@
-const {execSync} = require("child_process");
+const { execSync } = require("child_process");
 const fs = require("fs");
 const path = require("path");
 
@@ -8,7 +8,7 @@ const BUILD = path.join(ROOT, "build");
 const BIN = path.join(BUILD, "bin");
 
 // Helper: define tasks compactly
-const task = (name, command) => ({name, command});
+const task = (name, command) => ({ name, command });
 
 // Sources
 const BOOT_SRC = path.join(ROOT, "Boot", "Stage1", "Boot.asm");
@@ -25,45 +25,74 @@ const OS_IMG = path.join(BIN, "MoleculeOS.img");
 // Build-Steps
 const ASM_TASKS = [
 
-    task("bootloader", () => `nasm -f bin ${BOOT_SRC} -o ${BOOT_BIN}`),
-    task("osloader", () => `nasm -f elf32 ${OSLOADER_SRC} -o ${OSLOADER_OBJ}`),
-    task("stack", () => `nasm -f elf32 ${path.join(ROOT, "Boot", "Stage2", "KernelStack.asm")} -o ${path.join(BIN, "stack.o")}`),
-    task("kernelentry", () => `nasm -f elf32 ${path.join(ROOT, "Boot", "Stage2", "KernelEntry.asm")} -o ${path.join(BIN, "kernelentry.o")}`),
-    task("isr", () => `nasm -f elf32 ${path.join(ROOT, "Kernel", "src", "IDT", "ISR.asm")} -o ${path.join(BIN, "isr.o")}`),
-    task("loadidt", () => `nasm -f elf32 ${path.join(ROOT, "Kernel", "src", "IDT", "LoadIDT.asm")} -o ${path.join(BIN, "loadidt.o")}`),
-    task("isrcommonstub", () => `nasm -f elf32 ${path.join(ROOT, "Kernel", "src", "IDT", "ISRCommonStub.asm")} -o ${path.join(BIN, "isrcommonstub.o")}`)
+    task("bootloader", () => 
+        `nasm -f bin ${BOOT_SRC} -o ${BOOT_BIN}`),
+    task("osloader", () => 
+        `nasm -f elf32 ${OSLOADER_SRC} -o ${OSLOADER_OBJ}`),
+
+    task("stack", () => 
+        `nasm -f elf32 ${path.join(ROOT, "Boot", "Stage2", "KernelStack.asm")} -o ${path.join(BIN, "stack.o")}`),
+
+    task("kernelentry", () => 
+        `nasm -f elf32 ${path.join(ROOT, "Boot", "Stage2", "KernelEntry.asm")} -o ${path.join(BIN, "kernelentry.o")}`),
+
+    task("isr", () => 
+        `nasm -f elf32 ${path.join(ROOT, "Kernel", "src", "IDT", "ISR.asm")} -o ${path.join(BIN, "isr.o")}`),
+
+    task("loadidt", () => 
+        `nasm -f elf32 ${path.join(ROOT, "Kernel", "src", "IDT", "LoadIDT.asm")} -o ${path.join(BIN, "loadidt.o")}`),
+
+    task("isrcommonstub", () => 
+        `nasm -f elf32 ${path.join(ROOT, "Kernel", "src", "IDT", "ISRCommonStub.asm")} -o ${path.join(BIN, "isrcommonstub.o")}`)
 ];
 
-const C_TASKS = 
-    [task("kernel C runtime", () => `clang ${path.join("@build", "c.rsp")} -o ${path.join(BIN, "string.o")}`)];
+const C_TASKS = [
 
-const CPP_TASKS = 
-    [task("kernel C++", () => `clang++ ${path.join("@build", "cpp.rsp")}`)];
+    task("kernel C runtime", () => 
+        `clang ${path.join("@build", "c.rsp")} -o ${path.join(BIN, "string.o")}`)
+];
+
+const CPP_TASKS = [
+    
+    task("kernel C++", () => 
+        `clang++ ${path.join("@build", "cpp.rsp")}`)
+];
 
 const OTHER_TASKS = [
 
-    task("link kernel", () => `ld.lld ${path.join("@build", "link.rsp")}`),
-    task("convert kernel", () => `llvm-objcopy -O binary ${KERNEL_ELF} ${KERNEL_BIN}`),
-    task("create disk image", () => `dd if=/dev/zero of=${OS_IMG} bs=512 count=2880`),
-    task("write bootloader", () => `dd if=${BOOT_BIN} of=${OS_IMG} bs=512 seek=0 conv=notrunc`),
-    task("write kernel", () => `dd if=${KERNEL_BIN} of=${OS_IMG} bs=512 seek=1 conv=notrunc`),
-    task("run qemu", () => `qemu-system-i386 --accel tcg,thread=single -drive format=raw,file=${OS_IMG},if=floppy`)
+    task("link kernel", () => 
+        `ld.lld ${path.join("@build", "link.rsp")}`),
+
+    task("convert kernel", () => 
+        `llvm-objcopy -O binary ${KERNEL_ELF} ${KERNEL_BIN}`),
+
+    task("create disk image", () => 
+        `dd if=/dev/zero of=${OS_IMG} bs=512 count=2880`),
+
+    task("write bootloader", () => 
+        `dd if=${BOOT_BIN} of=${OS_IMG} bs=512 seek=0 conv=notrunc`),
+
+    task("write kernel", () => 
+        `dd if=${KERNEL_BIN} of=${OS_IMG} bs=512 seek=1 conv=notrunc`),
+
+    task("run qemu", () => 
+        `qemu-system-i386 --accel tcg,thread=single -drive format=raw,file=${OS_IMG},if=floppy`)
 ];
 
 // Core classes
 class BuildTask {
 
-    constructor(name, command_function) {
+    constructor(name, commandFunction) {
 
         this.name = name;
-        this.command_function = command_function;
+        this.commandFunction = commandFunction;
     }
 
     run() {
 
         console.log(`\n[${this.name}]`);
 
-        const cmd = this.command_function();
+        const cmd = this.commandFunction();
         console.log(">", cmd);
         execSync(cmd, {stdio: "inherit"});
     }
@@ -93,13 +122,13 @@ class BuildSystem {
         this.bin = path.join(this.build, "bin");
     }
 
-    ensure_dirs() {
+    ensureDirs() {
 
         if (!fs.existsSync(this.build)) fs.mkdirSync(this.build);
         if (!fs.existsSync(this.bin)) fs.mkdirSync(this.bin);
     }
 
-    move_objects_to_lowercase() {
+    moveObjectsToLowercase() {
 
         const files = fs.readdirSync(this.root);
         for (const file of files)
@@ -113,27 +142,27 @@ class BuildSystem {
             }
     }
 
-    run_group(name, tasks) {
+    runGroup(name, tasks) {
 
         new TaskGroup(
             name, 
-            tasks.map(task => new BuildTask(task.name, task.command))
-        ).run();
+            tasks.map(task => new BuildTask(task.name, task.command)
+        )).run();
     }
 }
 
 (function main() {
 
     const build = new BuildSystem(ROOT);
-    build.ensure_dirs();
+    build.ensureDirs();
 
-    build.run_group("ASM", ASM_TASKS);
-    build.run_group("C Runtime", C_TASKS);
-    build.run_group("C++ Kernel", CPP_TASKS);
+    build.runGroup("ASM", ASM_TASKS);
+    build.runGroup("C Runtime", C_TASKS);
+    build.runGroup("C++ Kernel", CPP_TASKS);
 
-    build.move_objects_to_lowercase();
+    build.moveObjectsToLowercase();
 
-    build.run_group("Linking & Image", OTHER_TASKS);
+    build.runGroup("Linking & Image", OTHER_TASKS);
 
     console.log("\nBuild complete.");
 })();
