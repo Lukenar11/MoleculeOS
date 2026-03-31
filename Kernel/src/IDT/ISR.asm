@@ -6,6 +6,7 @@ global isr_0, isr_1, isr_2, isr_3, isr_4, isr_5, isr_6, isr_7, \
 extern isr_common_handler
 
 section .text
+    
     %macro NO_ISR_ERROR 1
         isr_%1:
             ; Interrupts off
@@ -13,7 +14,7 @@ section .text
     
             push dword 0    ; Error-Code => Stack (32-Bit)
             push dword %1   ; Interrupt-Number => Stack (32-Bit)
-
+        
             ; kernel::idt::isr_common_handler (C++ Function)
             call isr_common_handler
     
@@ -21,22 +22,23 @@ section .text
             add esp, 8
             iretd
     %endmacro
-    
+        
     %macro ISR_ERROR 1
         isr_%1:
             ; Interrupts off
             cli
+    
             push dword 0    ; Error-Code => Stack (32-Bit)
             push dword %1   ; Interrupt-Number => Stack (32-Bit)
-
+    
             ; kernel::idt::isr_common_handler (C++ Function)
             call isr_common_handler
-
+    
             ; Stack (32-Bit) => 2 Argumentes
             add esp, 8
             iretd
     %endmacro
-
+    
     ; _init_ ISR
     NO_ISR_ERROR 0  ; (isr_0 ) Divide Error
     NO_ISR_ERROR 1  ; (isr_1 ) Debug
@@ -70,3 +72,4 @@ section .text
     NO_ISR_ERROR 29 ; (isr_29) Reserved (unused)
     NO_ISR_ERROR 30 ; (isr_30) Reserved (unused)
     NO_ISR_ERROR 31 ; (isr_31) Reserved (unused)
+    

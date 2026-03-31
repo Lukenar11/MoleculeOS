@@ -27,10 +27,11 @@ const ASM_TASKS = [
 
     task("bootloader", () => `nasm -f bin ${BOOT_SRC} -o ${BOOT_BIN}`),
     task("osloader", () => `nasm -f elf32 ${OSLOADER_SRC} -o ${OSLOADER_OBJ}`),
-    task("stack", () => `nasm -f elf32 ${path.join(ROOT, "Kernel", "Boot", "Stack.asm")} -o ${path.join(BIN, "stack.o")}`),
-    task("kernelentry", () => `nasm -f elf32 ${path.join(ROOT, "Kernel", "Boot", "KernelEntry.asm")} -o ${path.join(BIN, "kernelentry.o")}`),
+    task("stack", () => `nasm -f elf32 ${path.join(ROOT, "Boot", "Stage2", "KernelStack.asm")} -o ${path.join(BIN, "stack.o")}`),
+    task("kernelentry", () => `nasm -f elf32 ${path.join(ROOT, "Boot", "Stage2", "KernelEntry.asm")} -o ${path.join(BIN, "kernelentry.o")}`),
     task("isr", () => `nasm -f elf32 ${path.join(ROOT, "Kernel", "src", "IDT", "ISR.asm")} -o ${path.join(BIN, "isr.o")}`),
-    task("loadidt", () => `nasm -f elf32 ${path.join(ROOT, "Kernel", "src", "IDT", "LoadIDT.asm")} -o ${path.join(BIN, "loadidt.o")}`)
+    task("loadidt", () => `nasm -f elf32 ${path.join(ROOT, "Kernel", "src", "IDT", "LoadIDT.asm")} -o ${path.join(BIN, "loadidt.o")}`),
+    task("isrcommonstub", () => `nasm -f elf32 ${path.join(ROOT, "Kernel", "src", "IDT", "ISRCommonStub.asm")} -o ${path.join(BIN, "isrcommonstub.o")}`)
 ];
 
 const C_TASKS = 

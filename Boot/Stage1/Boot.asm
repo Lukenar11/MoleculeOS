@@ -20,7 +20,7 @@ BootProcedure:
 
     ; _init_ Protected-Mode
     mov eax, cr0    ; Control => Accumulator (32-bit)
-    or eax, 1       ; set Protection Enable
+    or eax, 0x01    ; set Protection Enable
     mov cr0, eax    ; Protection Enable => Control
 
     ; _start_ Protected-Mode
@@ -30,5 +30,5 @@ BootProcedure:
 %include "Boot/Stage1/ProtectedModeEntry.asm"
 %include "Boot/Stage1/DiskReadLoader.asm"
 
-times 510-($-$$) db 0
+times 510-($-$$) db 0x00
 dw 0xAA55

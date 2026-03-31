@@ -27,5 +27,5 @@ gdt:
     gdt_end:
 
 GDTDescriptor:
-    dw gdt_end - gdt - 1
-    dd gdt
+    dw gdt_end - gdt - 1    ; Limit (Size of GDT - 1)
+    dd gdt                  ; Base (Address of GDT)

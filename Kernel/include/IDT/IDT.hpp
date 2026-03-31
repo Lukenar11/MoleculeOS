@@ -67,7 +67,7 @@ namespace kernel::idt {
                 (uint32_t index) noexcept {return idt[index];}
 
             inline const IDTEntry& operator[] 
-                (uint32_t index) const noexcept {return idt[index];}
+                (const uint32_t index) const noexcept {return idt[index];}
 
             IDT() noexcept;
             ~IDT() noexcept = default;
