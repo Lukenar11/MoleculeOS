@@ -8,3 +8,4 @@ section .text
         cli                 ; Interrupts off
         mov esp, 0x00FF     ; reset Stack (0.25 KiB)
         call KernelEntry    ; _init_ Kernel 
+    

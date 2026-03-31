@@ -1,6 +1,6 @@
-#include "Drivers/VGA.hpp"
+#include "VGA.hpp"
 
-namespace terminal::drivers {
+namespace drivers::vga {
 
     void VGA::put_char_at
         (const char symbol, const uint8_t color, const int32_t x, const int32_t y) 

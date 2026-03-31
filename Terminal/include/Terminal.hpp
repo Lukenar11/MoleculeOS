@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Drivers/VGA.hpp"
+#include "Drivers/VGA/include/VGA.hpp"
 #include <Atom/C/stdint.h>
 #include <Atom/CPP/Array.hpp>
 
@@ -13,14 +13,14 @@ namespace terminal {
 
         private:
             // VGA-Driver
-            static constexpr drivers::VGA vga_driver;
+            static constexpr drivers::vga::VGA vga_driver;
 
             // default Cursor-Position & Color
             static constexpr uint8_t DEFAULT_CURSOR_POS = 0x00;
             static constexpr uint8_t DEFAULT_COLOR =
-                drivers::VGA::make_color(
-                    drivers::VGAColors::LIGHT_GREY,
-                    drivers::VGAColors::BLACK
+                drivers::vga::VGA::make_color(
+                    drivers::vga::VGAColors::LIGHT_GREY,
+                    drivers::vga::VGAColors::BLACK
                 );
             
             int32_t cursor_x = DEFAULT_CURSOR_POS;

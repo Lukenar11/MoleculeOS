@@ -2,7 +2,7 @@
 
 #include <Atom/C/stdint.h>
 
-namespace terminal::drivers {
+namespace drivers::vga {
 
     constexpr uint32_t VGA_WIDTH = 80;
     constexpr uint32_t VGA_HEIGHT = 25;
