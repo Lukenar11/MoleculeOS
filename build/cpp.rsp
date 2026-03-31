@@ -8,6 +8,7 @@
 -I Kernel/include
 -I Terminal/include
 -I Drivers/VGA/include
+-I Drivers/VGA/include
 -c
 Kernel/src/main.cpp
 Kernel/src/IDT/IDT.cpp

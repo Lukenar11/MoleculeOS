@@ -8,7 +8,7 @@ namespace terminal {
         cursor_y = DEFAULT_CURSOR_POS;
         cursor_color = DEFAULT_COLOR;
 
-        vga_driver.clear_screen(drivers::vga::VGAColors::BLACK);
+        vga_driver.clear_screen(drivers::vga::types::VGAColors::BLACK);
     }
 
     void Terminal::new_line() noexcept {
@@ -16,7 +16,7 @@ namespace terminal {
         cursor_x = DEFAULT_CURSOR_POS;
         cursor_y++;
 
-        if (cursor_y >= drivers::vga::VGA_HEIGHT)
+        if (cursor_y >= drivers::vga::types::VGA_HEIGHT)
             reset();
     }
 
@@ -31,7 +31,7 @@ namespace terminal {
         vga_driver.put_char_at(symbol, cursor_color, cursor_x, cursor_y);
         cursor_x++;
 
-        if (cursor_x >= drivers::vga::VGA_WIDTH)
+        if (cursor_x >= drivers::vga::types::VGA_WIDTH)
             new_line();
     }
 

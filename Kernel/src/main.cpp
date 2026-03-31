@@ -8,10 +8,8 @@ namespace kernel {
     extern "C" void kernel_main() noexcept {
 
         idt::IDT idt;
-        
-        terminal::Terminal terminal;
-        terminal.reset();
-        terminal.put_string("Hello, World!\n");
+
+        test_terminal();
 
         while (true) 
             __asm__ volatile ("hlt");

@@ -19,8 +19,8 @@ namespace terminal {
             static constexpr uint8_t DEFAULT_CURSOR_POS = 0x00;
             static constexpr uint8_t DEFAULT_COLOR =
                 drivers::vga::VGA::make_color(
-                    drivers::vga::VGAColors::LIGHT_GREY,
-                    drivers::vga::VGAColors::BLACK
+                    drivers::vga::types::VGAColors::LIGHT_GREY,
+                    drivers::vga::types::VGAColors::BLACK
                 );
             
             int32_t cursor_x = DEFAULT_CURSOR_POS;
