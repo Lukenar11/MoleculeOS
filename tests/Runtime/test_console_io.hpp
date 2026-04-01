@@ -1,10 +1,10 @@
 #pragma once
 
-#include <Atom/CPP/ConsoleIO.hpp>
+#include <Runtime/CPP/ConsoleIO.hpp>
 
 void test_console_io() {
 
-    atom::ConsoleIO console;
+    runtime::ConsoleIO console;
     console.reset();
     console.put_char('H');
     console.put_char('e');

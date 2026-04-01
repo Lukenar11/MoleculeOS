@@ -4,7 +4,7 @@
 -fno-exceptions
 -fno-rtti
 -I.
--I Atom
+-I Runtime
 -I Kernel/include
 -c
-Atom/C/string.c
+Runtime/C/string.c

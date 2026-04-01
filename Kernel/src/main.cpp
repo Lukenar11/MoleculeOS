@@ -1,5 +1,5 @@
 #include "IDT/IDT.hpp"
-#include "tests/Atom/test_console_io.hpp"
+#include "tests/Runtime/test_console_io.hpp"
 #include "tests/Kernel/idt_errors.hpp"
 #include "Terminal/include/Terminal.hpp"
 

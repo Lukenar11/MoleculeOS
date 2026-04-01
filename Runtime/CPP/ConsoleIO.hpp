@@ -3,9 +3,9 @@
 #include "Drivers/VGA/include/VGA.hpp"
 #include <C/stdint.h>
 #include <stdarg.h>
-#include <Atom/CPP/Array.hpp>
+#include <Runtime/CPP/Array.hpp>
 
-namespace atom {
+namespace runtime {
 
     class ConsoleIO {
 

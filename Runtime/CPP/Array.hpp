@@ -3,7 +3,7 @@
 #include <C/stdint.h>
 #include <C/string.h>
 
-namespace atom {
+namespace runtime {
 
     template<class T, uint32_t S>
     class Array final {

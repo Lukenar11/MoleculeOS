@@ -1,6 +1,6 @@
 #include "ConsoleIO.hpp"
 
-namespace atom {
+namespace runtime {
 
     void ConsoleIO::reset() noexcept {
 
@@ -82,7 +82,7 @@ namespace atom {
                         value = -value;
                     }
 
-                    atom::Array<char, 12> buffer{};
+                    runtime::Array<char, 12> buffer{};
                     uint32_t index = 0;
                     while (value > 0) [[likely]] {
 
@@ -105,7 +105,7 @@ namespace atom {
                         break;
                     }
     
-                    atom::Array<char, 12> buffer{};
+                    runtime::Array<char, 12> buffer{};
                     uint32_t index = 0;
                     while (unsigned_value > 0) [[likely]] {
 
@@ -130,7 +130,7 @@ namespace atom {
                         break;
                     }
 
-                    atom::Array<char, 9> buffer{};
+                    runtime::Array<char, 9> buffer{};
                     uint32_t index = 0;
                     while (hex_value > 0) [[likely]] {
 
@@ -155,7 +155,7 @@ namespace atom {
                         break;
                     }
 
-                    atom::Array<char, 33> buffer{};
+                    runtime::Array<char, 33> buffer{};
                     uint32_t index = 0;
                     while (binary_value > 0) [[likely]] {
             
@@ -179,7 +179,7 @@ namespace atom {
                         break;
                     }
     
-                    atom::Array<char, 9> pointer_buffer{};
+                    runtime::Array<char, 9> pointer_buffer{};
                     uint32_t pointer_index = 0;
                     while (pointer_value > 0) [[likely]] {
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Atom/C/stdint.h>
+#include <Runtime/C/stdint.h>
 
 typedef void (*test_fn)();
 

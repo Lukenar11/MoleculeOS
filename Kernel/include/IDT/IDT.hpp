@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Atom/C/stdint.h>
-#include <Atom/CPP/Array.hpp>
+#include <Runtime/C/stdint.h>
+#include <Runtime/CPP/Array.hpp>
 
 /*
     "__attribute__((packed))" prevents the compiler from filling the structure
@@ -59,7 +59,7 @@ namespace kernel::idt {
     class IDT final {
 
         private:
-            atom::Array<IDTEntry, 256> idt;
+            runtime::Array<IDTEntry, 256> idt;
             IDTPtr idt_ptr;
 
         public:
