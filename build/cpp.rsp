@@ -14,3 +14,4 @@ Kernel/src/main.cpp
 Kernel/src/IDT/IDT.cpp
 Drivers/VGA/src/VGA.cpp
 Terminal/src/Terminal.cpp
+Atom/CPP/ConsoleIO.cpp

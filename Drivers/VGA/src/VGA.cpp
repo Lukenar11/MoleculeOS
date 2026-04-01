@@ -13,7 +13,8 @@ namespace drivers::vga {
                 (y < 0 || y >= types::VGA_HEIGHT)) [[unlikely]]
                 return;
 
-            types::VGA_BUFFER[y * types::VGA_WIDTH + x] = make_symbol_entry(symbol, color);
+            types::VGA_BUFFER[y * types::VGA_WIDTH + x] = 
+                make_symbol_entry(symbol, color);
     }
 
     void VGA::clear_screen(const types::VGAColors background) const noexcept {

@@ -1,0 +1,41 @@
+#pragma once
+
+#include "Drivers/VGA/include/VGA.hpp"
+#include <C/stdint.h>
+#include <stdarg.h>
+#include <Atom/CPP/Array.hpp>
+
+namespace atom {
+
+    class ConsoleIO {
+
+        private:
+            // VGA-Driver
+            static constexpr drivers::vga::VGA vga_driver;
+
+            // default Cursor-Position & Color
+            static constexpr uint8_t DEFAULT_CURSOR_POS = 0x00;
+            static constexpr uint8_t DEFAULT_COLOR =
+                drivers::vga::VGA::make_color(
+                    drivers::vga::types::VGAColors::LIGHT_GREY,
+                    drivers::vga::types::VGAColors::BLACK
+                );
+            
+            int32_t cursor_x = DEFAULT_CURSOR_POS;
+            int32_t cursor_y = DEFAULT_CURSOR_POS;
+            uint8_t cursor_color = DEFAULT_COLOR;
+
+            void new_line() noexcept;
+
+        public:
+            void reset() noexcept;
+
+            void put_char(const char symbol) noexcept;
+            void put_string(const char* message) noexcept;
+
+            void printf(const char* format, ...) noexcept;
+
+            ConsoleIO() noexcept = default;
+            ~ConsoleIO() noexcept = default;
+    };
+} // namespace atom

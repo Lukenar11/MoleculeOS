@@ -10,7 +10,7 @@ namespace drivers::vga {
         public:
             static constexpr uint8_t make_color(
                 const types::VGAColors foreground, const types::VGAColors background) noexcept {
-                    
+
                 return static_cast<uint8_t>(background) << 4 | static_cast<uint8_t>(foreground);
             }
 
