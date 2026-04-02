@@ -20,4 +20,5 @@ void test_console_io() {
     console.printf("Binary: %b\n", 0b101010);
     console.printf("Pointer: %p\n", (void*)0xDEADBEEF);
     console.printf("Percent Sign: %%\n");
+    console.printf("%c %d %u %x %b %p %%\n", 'X', -42, 42, 0x2A, 0b101010, (void*)0xDEADBEEF);
 }

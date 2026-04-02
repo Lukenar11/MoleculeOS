@@ -5,7 +5,7 @@
 namespace drivers::vga {
 
     // VGA-Driver
-    class VGA {
+    class VGA final {
 
         public:
             static constexpr uint8_t make_color(

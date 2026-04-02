@@ -5,7 +5,7 @@
 
 namespace kernel {
 
-    extern "C" void kernel_main() noexcept {
+    extern "C" void kernel_main() {
 
         idt::IDT idt;
 

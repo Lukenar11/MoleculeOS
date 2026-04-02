@@ -14,6 +14,7 @@ namespace drivers::vga::types {
 
     // Char/Symbol Color-Definition
     enum class VGAColors : uint8_t {
+
         BLACK = 0x00,
         BLUE = 0x01,
         GREEN = 0x02,

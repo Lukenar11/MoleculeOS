@@ -15,12 +15,12 @@ section .text
         mov edi, esp
         call isr_common_handler
     
-        pop ebx
-        pop ecx
-        pop edx
-        pop esi
-        pop edi
         pop ebp
+        pop edi
+        pop esi
+        pop edx
+        pop ecx
+        pop ebx
         pop eax
     
         mov esp, 16

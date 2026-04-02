@@ -43,8 +43,10 @@ namespace runtime {
 
     void ConsoleIO::printf(const char* format, ...) noexcept {
 
+        // variadic arguments list
         va_list args;
         va_start(args, format);
+
         for (uint32_t i = 0; format[i] != '\0'; i++) [[likely]] {
 
             if (format[i] != '%') [[likely]] {
