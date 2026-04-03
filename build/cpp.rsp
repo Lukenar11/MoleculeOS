@@ -12,6 +12,7 @@
 -c
 Kernel/src/main.cpp
 Kernel/src/IDT/IDT.cpp
+Kernel/src/IDT/ISR/isr_common_handler.cpp
 Drivers/VGA/src/VGA.cpp
 Terminal/src/Terminal.cpp
 Runtime/CPP/ConsoleIO.cpp

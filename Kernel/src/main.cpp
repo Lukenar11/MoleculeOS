@@ -11,6 +11,10 @@ namespace kernel {
 
         test_console_io();
 
+        // volatile int a = 1;
+        // volatile int b = 0;
+        // volatile int c = a / b;  // This will trigger a Divide Error (ISR 0)
+        
         while (true) 
             __asm__ volatile ("hlt");
     }
