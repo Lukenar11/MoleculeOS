@@ -1,6 +1,6 @@
 #pragma once
 
-#include "utils/vga_types.hpp"
+#include "utils/helpers.hpp"
 
 namespace drivers::vga {
 
