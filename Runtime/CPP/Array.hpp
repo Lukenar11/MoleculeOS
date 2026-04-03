@@ -57,4 +57,4 @@ namespace runtime {
             constexpr Array() noexcept = default;
             ~Array() noexcept = default;
     };
-} // namespace atom
+} // namespace runtie

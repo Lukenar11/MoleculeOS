@@ -38,4 +38,4 @@ namespace runtime {
             ConsoleIO() noexcept = default;
             ~ConsoleIO() noexcept = default;
     };
-} // namespace atom
+} // namespace rintime
