@@ -14,7 +14,6 @@ namespace kernel::idt {
     class IDT final {
 
         private:
-            runtime::ConsoleIO console;
             runtime::Array<IDTEntry, 256> idt;
             IDTDescriptorPTR idt_ptr;
 

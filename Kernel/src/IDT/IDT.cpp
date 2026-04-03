@@ -10,11 +10,11 @@ namespace kernel::idt {
         idt_ptr.base = reinterpret_cast<uint32_t>(&idt);
 
         // Clear table
-        for (uint32_t i = 0; i < ENTRYS; i++)
+        for (uint32_t i = 0; i < ENTRYS; i++) [[likely]]
             idt[i].set_gate(IDT_NULL, IDT_NULL, IDT_NULL);
 
         // _build_ IDT
-        for (const auto& entry : idt_init_table)
+        for (const auto& entry : idt_init_table) [[likely]]
             idt[entry.index].set_gate(
                 reinterpret_cast<uint32_t>(entry.handler),
                 CODE_SEGMENT_SELECTOR, 
