@@ -8,7 +8,7 @@ namespace runtime {
         cursor_y = DEFAULT_CURSOR_POS;
         cursor_color = DEFAULT_COLOR;
 
-        vga_driver.clear_screen(drivers::vga::types::VGAColors::BLACK);
+        vga_driver.clear_screen(drivers::vga::VGAColors::BLACK);
     }
 
     void ConsoleIO::new_line() noexcept {
@@ -16,7 +16,7 @@ namespace runtime {
         cursor_x = DEFAULT_CURSOR_POS;
         cursor_y++;
 
-        if (cursor_y >= drivers::vga::types::VGA_HEIGHT) [[unlikely]]
+        if (cursor_y >= drivers::vga::VGA_HEIGHT) [[unlikely]]
             reset();
     }
 
@@ -31,7 +31,7 @@ namespace runtime {
         vga_driver.put_char_at(symbol, cursor_color, cursor_x, cursor_y);
         cursor_x++;
 
-        if (cursor_x >= drivers::vga::types::VGA_WIDTH) [[unlikely]]
+        if (cursor_x >= drivers::vga::VGA_WIDTH) [[unlikely]]
             new_line();
     }
 
@@ -168,8 +168,7 @@ namespace runtime {
                         put_char(buffer[i]);
                     break;
                 }
-
-
+    
                 case 'p': {
     
                     put_char('0');
@@ -191,7 +190,7 @@ namespace runtime {
                     }
                 
                     for (int32_t i = pointer_index - 1; i >= 0; i--) [[likely]]
-                            put_char(pointer_buffer[i]);
+                        put_char(pointer_buffer[i]);
                     break;
                 }
 

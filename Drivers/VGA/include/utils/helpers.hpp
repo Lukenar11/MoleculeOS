@@ -2,7 +2,7 @@
 
 #include <Runtime/C/stdint.h>
 
-namespace drivers::vga::types {
+namespace drivers::vga {
 
     // Screen Dimensions
     constexpr uint32_t VGA_WIDTH = 80;
@@ -33,4 +33,4 @@ namespace drivers::vga::types {
         WHITE = 0x0F
     };
 
-} // namespace drivers::vga::types
+} // namespace drivers::vga
