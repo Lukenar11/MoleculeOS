@@ -29,6 +29,9 @@ namespace runtime {
 
         public:
             void reset() noexcept;
+            void set_char_colors(
+                const drivers::vga::VGAColors color, 
+                const drivers::vga::VGAColors background) noexcept;
 
             void put_char(const char symbol) noexcept;
             void put_string(const char* message) noexcept;
@@ -38,4 +41,4 @@ namespace runtime {
             ConsoleIO() noexcept = default;
             ~ConsoleIO() noexcept = default;
     };
-} // namespace rintime
+} // namespace runtime

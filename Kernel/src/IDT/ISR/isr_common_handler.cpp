@@ -6,6 +6,10 @@ namespace kernel::idt {
 
         runtime::ConsoleIO console;
         console.reset();
+        console.set_char_colors(
+            drivers::vga::VGAColors::RED, 
+            drivers::vga::VGAColors::BLACK
+        );
         console.put_string("ERROR!");
 
         while (true)

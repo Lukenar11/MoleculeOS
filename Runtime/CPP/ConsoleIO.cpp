@@ -11,6 +11,21 @@ namespace runtime {
         vga_driver.clear_screen(drivers::vga::VGAColors::BLACK);
     }
 
+    void ConsoleIO::set_char_colors(
+        const drivers::vga::VGAColors color, 
+        const drivers::vga::VGAColors background) noexcept {
+
+        // Guard against invalid color values
+        constexpr uint8_t MAX_COLOR = 
+            static_cast<uint8_t>(drivers::vga::VGAColors::WHITE);
+    
+        if (static_cast<uint8_t>(color) > MAX_COLOR ||
+            static_cast<uint8_t>(background) > MAX_COLOR)
+            return;
+
+        cursor_color = drivers::vga::VGA::make_color(color, background);
+    }
+
     void ConsoleIO::new_line() noexcept {
 
         cursor_x = DEFAULT_CURSOR_POS;
