@@ -1,6 +1,6 @@
 #pragma once
 
-#include "IDT/ISR/isr.hpp"
+#include "IDT/ISR/isr.h"
 #include <Runtime/C/stdint.h>
 
 namespace kernel::idt {

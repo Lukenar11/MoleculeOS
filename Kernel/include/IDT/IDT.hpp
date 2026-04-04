@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ISR/isr.hpp"
 #include "utils/IDTEntry.hpp"
 #include "utils/IDTDescriptorPTR.hpp"
 #include "utils/IDTInitEntry.hpp"
