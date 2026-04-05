@@ -1,6 +1,5 @@
 global Loader 
 
-extern KernelStackTop
 extern kernel_main
 
 section .text
@@ -16,3 +15,4 @@ section .text
         ; _start_ Kernel
         call kernel_main
     
+%include "Boot/Stage2/KernelStack.asm"

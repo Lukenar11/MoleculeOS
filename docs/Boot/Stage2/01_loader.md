@@ -98,7 +98,6 @@ After switching to Protected Mode:
 ```asm
     global Loader 
 
-    extern KernelStackTop
     extern kernel_main
 
     section .text
@@ -112,7 +111,9 @@ After switching to Protected Mode:
             mov ebp, esp            ; set Stack-Frame Pointer
 
             ; _start_ Kernel
-            call kernel_main    
+            call kernel_main
+
+    %include "Boot/Stage2/KernelStack.asm"
 ```
 
 ---

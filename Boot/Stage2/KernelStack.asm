@@ -1,7 +1,5 @@
 align 16
 
-global KernelStackTop
-
 section .bss
 
     ; Kernel-Stack (4 KiB)

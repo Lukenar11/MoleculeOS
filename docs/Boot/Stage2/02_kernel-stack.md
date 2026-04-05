@@ -63,8 +63,6 @@ It grows — like all x86 stacks — **downwards** and ends at the address `Kern
 ```asm
     align 16
 
-    global KernelStackTop
-
     section .bss
 
         ; Kernel-Stack (4 KiB)

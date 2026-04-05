@@ -31,12 +31,6 @@ const ASM_TASKS = [
     task("osloader", () => 
         `nasm -f elf32 ${OSLOADER_SRC} -o ${OSLOADER_OBJ}`),
 
-    task("stack", () => 
-        `nasm -f elf32 ${path.join(ROOT, "Boot", "Stage2", "KernelStack.asm")} -o ${path.join(BIN, "stack.o")}`),
-
-    // task("kernelentry", () => 
-    //     `nasm -f elf32 ${path.join(ROOT, "Boot", "Stage2", "KernelEntry.asm")} -o ${path.join(BIN, "kernelentry.o")}`),
-
     task("isr", () => 
         `nasm -f elf32 ${path.join(ROOT, "Kernel", "src", "IDT", "ISR", "ISR.asm")} -o ${path.join(BIN, "isr.o")}`),
 
