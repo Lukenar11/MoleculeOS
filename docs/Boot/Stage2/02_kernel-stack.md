@@ -1,9 +1,7 @@
 # MoleculeOS – Kernel Stack Memory Layout (0.5 MiB)
 
-The kernel stack in MoleculeOS is allocated as a **contiguous 512‑KiB block** in the `.bss` segment. <br>
+The kernel stack in MoleculeOS is allocated as a **contiguous 4-KiB block** in the `.bss` segment. <br>
 It grows — like all x86 stacks — **downwards** and ends at the address `KernelStackTop`. <br>
-
-The stack is set up in `KernelEntry.asm` before any kernel subsystem is initialized. <br>
 
 ---
 
@@ -69,9 +67,9 @@ The stack is set up in `KernelEntry.asm` before any kernel subsystem is initiali
 
     section .bss
 
-        ; Kernel-Stack (0.5 MiB)
-        KernelStackBottom:
-            resb 512 * 1024
+        ; Kernel-Stack (4 KiB)
+        kernel_stack_bottom: 
+            resb 4 * 1024
 
         KernelStackTop:
 ```
@@ -79,17 +77,6 @@ The stack is set up in `KernelEntry.asm` before any kernel subsystem is initiali
 ---
 
 # Why This Layout Works Perfectly
-
-### 0.5 MiB stack is extremely generous
-For a single-core, single-thread kernel without user space, that is **more than enough**:
-
-- deep function chains
-- interrupt frames
-- exception frames
-- debug outputs
-- temporary structures
-
-All easily possible.
 
 ### Stack is located in `.bss` → automatically zero-initialized
 This is ideal for:
@@ -116,21 +103,9 @@ This avoids:
 
 # **Summary**
 
-The MoleculeOS kernel stack is a **512‑KiB contiguous memory area** <br> 
+The MoleculeOS kernel stack is a **4‑KiB contiguous memory area** <br> 
 that is reserved in the `.bss` segment and entirely controlled by the kernel. <br> 
-It replaces the small temporary real-mode stack and provides the first stable runtime environment <br> as soon as `KernelEntry` is executed.
-
-The stack grows — as is usual on x86 — **downwards** and starts at `KernelStackTop`, <br> 
-which is set as the new `esp` in `KernelEntry.asm`. <br> 
+It replaces the small temporary real-mode stack and provides the first stable runtime.
+The stack grows — as is usual on x86 — **downwards** and starts at `KernelStackTop`, which is set as the new `esp`. <br> 
 Because of its placement in the `.bss`, the entire stack is automatically **zero-initialized**, <br> 
 which facilitates debugging and deterministic behavior. <br>
-
-With 0.5 MiB, the kernel stack provides more than enough space for:
-
-- deep function calls
-- interrupt and exception frames
-- register backups
-- temporary data structures
-
-The clear separation between kernel code, data, BSS, and stack prevents overlaps and memory corruption. <br> 
-This layout forms the basis for a stable, predictable, and extensible kernel architecture. <br>

@@ -1,11 +1,18 @@
 global Loader 
 
-extern KernelEntry
+extern KernelStackTop
+extern kernel_main
 
 section .text
 
     Loader:
-        cli                 ; Interrupts off
-        mov esp, 0x00FF     ; reset Stack (0.25 KiB)
-        call KernelEntry    ; _init_ Kernel 
+        ; Interrupts off
+        cli
+
+        ; _init_ Kernel-Stack
+        mov esp, KernelStackTop ; set Kernel-Stack Size (4 KiB)
+        mov ebp, esp            ; set Stack-Frame Pointer
+
+        ; _start_ Kernel
+        call kernel_main
     

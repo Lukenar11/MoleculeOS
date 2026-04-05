@@ -4,9 +4,9 @@ global KernelStackTop
 
 section .bss
 
-    ; Kernel-Stack (0.5 MiB)
-    KernelStackBottom: 
-        resb 512 * 1024
+    ; Kernel-Stack (4 KiB)
+    kernel_stack_bottom: 
+        resb 4 * 1024
 
     KernelStackTop:
     

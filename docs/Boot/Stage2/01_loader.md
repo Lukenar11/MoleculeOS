@@ -18,7 +18,6 @@ The Loader performs only three tasks:
 
 - disable interrupts (safety during early boot)
 - set a small temporary 32‑bit stack (256 bytes)
-- call the kernel entry point (`KernelEntry`)
 
 The Loader does **not**:
 
@@ -36,12 +35,11 @@ All of this is handled later by the kernel itself.
 MoleculeOS follows a clean boot architecture:
 
 ``` text
-    Stage 1 (Real Mode) → Stage 2 (32-bit Loader) → KernelEntry → kernel_main()
+    Stage 1 (Real Mode) → Stage 2 (32-bit Loader) → kernel_main()
 ```
 
 Stage 2 is intentionally kept small because:
 
-- the kernel has its own stack  
 - the kernel performs all CPU‑level initialization  
 - the Loader should not duplicate work  
 - a minimal Loader is easier to debug and maintain  
@@ -92,19 +90,6 @@ After switching to Protected Mode:
 - `ss`:`sp` still contains 16‑bit values  
 - any `push` or `call` would cause undefined behavior  
 
-Therefore, the Loader sets a **small temporary 32‑bit stack**:
-
-```asm
-    ; reset Stack (0.25 KiB)
-    mov esp, 0x00FF
-```
-
-This stack is only used for:
-
-- the `call KernelEntry` instruction  
-- a few pushes/pops during early kernel startup  
-
-The kernel installs its own large stack immediately afterward.
 
 ---
 
@@ -113,14 +98,21 @@ The kernel installs its own large stack immediately afterward.
 ```asm
     global Loader 
 
-    extern KernelEntry
+    extern KernelStackTop
+    extern kernel_main
 
     section .text
 
         Loader:
-            cli                 ; Interrupts off
-            mov esp, 0x00FF     ; reset Stack (0.25 KiB)
-            call KernelEntry    ; _init_ Kernel 
+            ; Interrupts off
+            cli
+
+            ; _init_ Kernel-Stack
+            mov esp, KernelStackTop ; set Kernel-Stack Size (4 KiB)
+            mov ebp, esp            ; set Stack-Frame Pointer
+
+            ; _start_ Kernel
+            call kernel_main    
 ```
 
 ---
@@ -147,8 +139,7 @@ The kernel installs its own large stack immediately afterward.
     +-----------------------------+
     | Loader                      |
     |   - disable interrupts      |
-    |   - set temporary stack     |
-    |   - call KernelEntry        |
+    |   - set kernel stack        |
     +-------------+---------------+
                   |
                   v
@@ -167,8 +158,8 @@ It is intentionally minimal and exists only to provide a clean and safe transiti
 It performs exactly three tasks:
 
 - interrupts are disabled to avoid undefined behavior during early boot
-- a temporary 256‑byte 32‑bit stack is installed
-- control is transferred to the kernel’s entry point (KernelEntry)
+- set the kernel stack
+- call the kernel main funktion (`kernel_main`)
 
 The Loader does not initialize hardware, C++ runtime, or system structures. <br>
 All advanced initialization is handled by the kernel itself. <br>
