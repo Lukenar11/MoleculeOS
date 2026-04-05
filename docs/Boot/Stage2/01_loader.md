@@ -22,11 +22,10 @@ The Loader performs only three tasks:
 
 The Loader does **not**:
 
-- initialize C++ runtime  
-- set up paging  
+- initialize the runtime
 - load drivers  
 - parse ELF files  
-- install IDT or GDT  
+- install IDT
 
 All of this is handled later by the kernel itself.
 
@@ -34,10 +33,10 @@ All of this is handled later by the kernel itself.
 
 ## Why the Loader Is Minimal
 
-MoleculeOS follows a clean and modern boot architecture:
+MoleculeOS follows a clean boot architecture:
 
 ``` text
-    Stage 1 (Real Mode) → Stage 2 (32-bit Loader) → KernelEntry → main()
+    Stage 1 (Real Mode) → Stage 2 (32-bit Loader) → KernelEntry → kernel_main()
 ```
 
 Stage 2 is intentionally kept small because:
@@ -112,18 +111,16 @@ The kernel installs its own large stack immediately afterward.
 ## Full Loader Code
 
 ```asm
-    [bits 32]
-
     global Loader 
 
-    ; Kernel/Boot/KernelEntry.asm
     extern KernelEntry
 
     section .text
+
         Loader:
             cli                 ; Interrupts off
             mov esp, 0x00FF     ; reset Stack (0.25 KiB)
-            call KernelEntry    ; _init_ Kernel
+            call KernelEntry    ; _init_ Kernel 
 ```
 
 ---

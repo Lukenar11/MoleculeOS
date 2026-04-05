@@ -27,6 +27,7 @@ const ASM_TASKS = [
 
     task("bootloader", () => 
         `nasm -f bin ${BOOT_SRC} -o ${BOOT_BIN}`),
+
     task("osloader", () => 
         `nasm -f elf32 ${OSLOADER_SRC} -o ${OSLOADER_OBJ}`),
 

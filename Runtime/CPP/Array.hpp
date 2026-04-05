@@ -14,8 +14,11 @@ namespace runtime {
         
         public:
             // Data access
-            inline constexpr T& operator[](uint32_t index) noexcept { return data[index]; }
-            inline constexpr const T& operator[](const uint32_t index) const noexcept { return data[index]; }
+            inline constexpr T& operator[](
+                uint32_t index) noexcept { return data[index]; }
+    
+            inline constexpr const T& operator[](
+                const uint32_t index) const noexcept { return data[index]; }
 
             // _get_ size
             inline constexpr uint32_t size() const noexcept { return S; }
@@ -57,4 +60,4 @@ namespace runtime {
             constexpr Array() noexcept = default;
             ~Array() noexcept = default;
     };
-} // namespace runtie
+} // namespace runtime

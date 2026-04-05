@@ -144,7 +144,7 @@ Useful for:
     #ifndef STRING_H
     #define STRING_H
     
-    #include <Atom/C/stdint.h>
+    #include <Runtime/C/stdint.h>
     
     #ifdef __cplusplus
         extern "C" {

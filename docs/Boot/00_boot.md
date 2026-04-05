@@ -10,10 +10,7 @@ the entire boot procedure, and references to all subsystem documentation.
 MoleculeOS uses a classic two‑stage boot process:
 
 ``` text
-    Stage 1 (Bootloader, 16‑bit Real Mode)
-    → Protected Mode transition
-    → Stage 2 (OsLoader, 32‑bit)
-    → Kernel (C++)
+    Stage 1 (Bootloader, 16‑bit Real Mode) → Protected Mode transition → Stage 2 (Loader, 32‑bit) → Kernel (C++)
 ```
 
 This document provides:
@@ -71,35 +68,64 @@ This layout shows the system state before switching to Protected Mode.
 After the far jump, MoleculeOS runs in full 32‑bit mode.
 
 ``` text
-    +---------------------------+ 0x00000000
-    | Null Page (unused)        |
-    +---------------------------+ 0x00000000
-    | Temporary Real-Mode Stack |
-    |(0.25 KiB) (grows downward)|
-    +---------------------------+ 0x000000FF ← SP (Real Mode)
-    | Free / conventional RAM   |
-    | ...                       |
-    +---------------------------+ 0x00007C00
-    | Bootloader (Stage 1)      |
-    | MoleculeOS Boot Sector    |
-    +---------------------------+ 0x00007E00
-    | BIOS-safe area            |
-    | (unused by MoleculeOS)    |
-    +---------------------------+ 0x00010000
-    | Stage 2 Loader (32-bit)   |
-    | Loader.asm                |
-    +---------------------------+ 0x00010100
-    | Kernel Entry Point        |
-    | KernelEntry.asm           |
-    +---------------------------+ ...
-    | Kernel Code / Data        |
-    | kernel.bin                |
-    +---------------------------+ 0x000B8000
-    | VGA Text Mode Memory      |
-    | (0xB8000 physical)        |
-    +---------------------------+ 0x000FFFFF
-    | Reserved / ROM Shadow     |
-    +---------------------------+
+    +-----------------------------+ 0x00000000
+    | Null Page (unused)          |
+    | (helps catch null pointers) |
+    +-----------------------------+ 0x00000000
+    | Temporary Real-Mode Stack   |
+    | (0.25 KiB, grows downward)  |
+    +-----------------------------+ 0x000000FF ← SP (Real Mode)
+    | Free / conventional RAM     |
+    | ...                         |
+    +-----------------------------+ 0x00007C00
+    | Bootloader (Stage 1)        |
+    | MoleculeOS Boot Sector      |
+    | (512 Bytes)                 |
+    +-----------------------------+ 0x00007E00
+    | BIOS-safe area              |
+    | (unused by MoleculeOS)      |
+    +-----------------------------+ 0x00010000
+    | Stage 2 Loader (32-bit)     |
+    | Loader.asm                  |
+    +-----------------------------+ 0x00010100
+    | Kernel Entry Point          |
+    | KernelEntry.asm             |
+    +-----------------------------+ 0x00010200
+    | Kernel .text section        |
+    | executable kernel code      |
+    +-----------------------------+
+    | Kernel .rodata section      |
+    | read-only data              |
+    +-----------------------------+
+    | Kernel .data section        |
+    | initialized globals         |
+    +-----------------------------+
+    | Kernel .bss section         |
+    | uninitialized globals       |
+    | includes:                   |
+    |   - KernelStackBottom       |
+    |   - KernelStackTop          |
+    +-----------------------------+ 0x00098000
+    | KernelStackBottom           |
+    | start of 0.5 MiB stack      |
+    +-----------------------------+ 0x00098000
+    |                             |
+    |   Kernel Stack (0.5 MiB)    |
+    |   grows downward            |
+    |                             |
+    +-----------------------------+ 0x000F8000
+    | KernelStackTop              |
+    | initial ESP in KernelEntry  |
+    +-----------------------------+ 0x000B8000
+    | VGA Text Mode Memory        |
+    | (physical 0xB8000)          |
+    +-----------------------------+ 0x000C0000
+    | Video ROM / Option ROMs     |
+    +-----------------------------+ 0x000E0000
+    | BIOS ROM (shadowed)         |
+    +-----------------------------+ 0x000FFFFF
+    | End of first MiB            |
+    +-----------------------------+
 ```
 
 ---
@@ -166,18 +192,16 @@ Responsibilities:
 # full OS-Loader Code (Stage 2)
 
 ``` asm
-    [bits 32]
-
     global Loader 
-
-    ; Kernel/Boot/KernelEntry.asm
+    
     extern KernelEntry
-
+    
     section .text
+    
         Loader:
             cli                 ; Interrupts off
             mov esp, 0x00FF     ; reset Stack (0.25 KiB)
-            call KernelEntry    ; _init_ Kernel
+            call KernelEntry    ; _init_ Kernel 
 ```
 ---
 
@@ -190,7 +214,9 @@ This master document links to all detailed MoleculeOS documentation:
 - [03 – GDT initialisation](Stage1/03_gdt.md)
 - [04 – Protected-Mode initialisation](Stage1/04_protected-mode.md)
 - [05 – Protected-Mode entry](Stage1/05_protected-mode-entry.md)
-- [01 – OS Loader](Stage2/01_os-loader.md)
+- [01 – Loader](Stage2/01_loader.md)
+- [02 – Kernel stack](02_kernel-stack.md)
+- [03 – Kenel Entry](Stage2/03_kernel-entry.md)
 
 ---
 

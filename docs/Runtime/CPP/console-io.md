@@ -1,7 +1,112 @@
-#include "ConsoleIO.hpp"
+# MoleculeOS – ConsoleIO (Textausgabe‑Subsystem)
+ConsoleIO is the central text output subsystem of MoleculeOS. <br> 
+It provides an **easy-to-use, hardware-agnostic API** that internally uses the VGA driver to output text in **80×25 text mode**. <br>
 
-namespace runtime {
+ConsoleIO is deliberately minimal and forms the basis for:
 
+- Kernel debug output
+- Error messages (e.g., in `isr_common_handler`)
+- Simple user interaction
+- Early runtime functions like `printf`
+
+ConsoleIO is completely heap-free, deterministic, and suitable for kernel use.
+
+---
+
+## Purpose of ConsoleIO
+
+ConsoleIO wraps the VGA driver and provides a **convenient, C-like API, with OOP style**:
+
+- Output characters
+- Output strings
+- Output formatted text (`printf`)
+- Set text colors
+- Manage cursor position
+
+ConsoleIO does **not** handle complex tasks such as:
+
+- Scrolling
+- Cursor blinking
+- Graphics mode
+- Unicode
+
+It is a deliberately simple text I/O subsystem.
+
+---
+
+## Why ConsoleIO Exists
+
+The VGA driver operates at a very low level:
+
+- direct write access to `0xB8000`
+- manually setting color attributes
+- managing cursor position yourself
+
+ConsoleIO abstracts these details and provides a **clean runtime API** that the kernel can use everywhere.
+
+The result:
+
+- less code duplication
+- clearer kernel structure
+- simple debug output
+- consistent text display
+
+---
+
+## ConsoleIO Architecture Overview
+
+ConsoleIO consists of:
+
+- an **internal cursor** (`cursor_x`, `cursor_y`)
+- a **current text color** (`cursor_color`)
+- a **VGA driver object** (`vga_driver`)
+- a new line function (`new_line`)
+- simple output functions (`put_char`, `put_string`)
+- a small but functional `printf` parser
+
+ConsoleIO is completely **hardware-agnostic** since all hardware access goes through the VGA driver.
+
+---
+
+## Memory Layout Interaction
+
+ConsoleIO writes exclusively to the VGA text mode memory:
+
+``` text
+    0x000B8000 – 0x000B8FA0
+```
+
+This area is:
+
+- 80×25 characters
+- 2 bytes per character (ASCII + color)
+- directly visible on the screen
+
+ConsoleIO manages:
+
+- Cursor position
+- Line breaks
+- Screen reset
+
+---
+
+# `reset` – Clear screen and reset cursor
+
+### **Purpose**
+
+`reset()` sets the console to a defined initial state.
+It is typically used at kernel startup or after an error.
+
+The function:
+
+- clears the entire VGA text mode screen
+- sets the cursor to position (0,0)
+- restores the default color
+- ensures a clean output environment
+
+### **Code**
+
+```cpp
     void ConsoleIO::reset() noexcept {
 
         cursor_x = DEFAULT_CURSOR_POS;
@@ -10,7 +115,53 @@ namespace runtime {
 
         vga_driver.clear_screen(drivers::vga::VGAColors::BLACK);
     }
+```
 
+---
+
+## `new_line` – Move cursor to next line
+
+### **Purpose**
+
+`new_line()` encapsulates the behavior of a line break.
+Instead of duplicating `'n'` special logic everywhere, this function bundles:
+
+- Set the cursor to the beginning of the line
+- Move one line down
+
+It is the internal basis for line breaks in `put_char` and `printf`.
+
+### **Code**
+
+```cpp
+    void ConsoleIO::new_line() noexcept {
+
+        cursor_x = DEFAULT_CURSOR_POS;
+        cursor_y++;
+
+        if (cursor_y >= drivers::vga::VGA_HEIGHT) [[unlikely]]
+            reset();
+    }
+```
+
+---
+
+# `set_char_colors` – Set text and background color
+
+### **Purpose**
+
+Sets the current text color, which applies to all future output.  
+The color is not applied retroactively — only new characters use it.  
+
+Important for:  
+
+- Error messages  
+- Colored debug output  
+- Visual structuring
+
+### **Code**
+
+```cpp
     void ConsoleIO::set_char_colors(
         const drivers::vga::VGAColors color, 
         const drivers::vga::VGAColors background) noexcept {
@@ -25,16 +176,24 @@ namespace runtime {
 
         cursor_color = drivers::vga::VGA::make_color(color, background);
     }
+```
 
-    void ConsoleIO::new_line() noexcept {
+---
 
-        cursor_x = DEFAULT_CURSOR_POS;
-        cursor_y++;
+# `put_char` – Write a single character
 
-        if (cursor_y >= drivers::vga::VGA_HEIGHT) [[unlikely]]
-            reset();
-    }
+### **Purpose**
 
+Outputs a single character at the current cursor position. <br>
+This is the basic output operation on which all other functions are built. <br>
+
+Special cases:
+
+- `'n'` → line break
+
+### **Code**
+
+```cpp
     void ConsoleIO::put_char(const char symbol) noexcept {
 
         if (symbol == '\n') [[unlikely]] {
@@ -49,13 +208,55 @@ namespace runtime {
         if (cursor_x >= drivers::vga::VGA_WIDTH) [[unlikely]]
             new_line();
     }
+```
 
+---
+
+# `put_string` – Write a null‑terminated string
+
+### **Purpose**
+
+Outputs a null-terminated C string, character by character. <br>
+This is the standard function for simple text output. <br>
+
+Frequently used for:
+
+- Debug output
+- Error messages
+
+### **Code**
+
+```cpp
     void ConsoleIO::put_string(const char* message) noexcept {
 
         for (uint32_t i = 0; message[i] != '\0'; i++) [[likely]]
             put_char(message[i]);
     }
+```
 
+---
+
+# `printf` – Formatted kernel output
+
+### **Purpose**
+
+`printf` is the most important output function in the kernel.  
+It allows formatted text.
+
+Supported format specifiers:
+
+- `%c` – character
+- `%s` – string
+- `%d` – signed int
+- `%u` – unsigned int
+- `%x` – hexadecimal
+- `%b` – binary
+- `%p` – pointer
+- `%%` – percent sign
+
+### **Code**
+
+```cpp
     void ConsoleIO::printf(const char* format, ...) noexcept {
 
         // variadic arguments list
@@ -222,4 +423,31 @@ namespace runtime {
         // clean variadic arguments list
         va_end(args);
     }
-} // namespace runtime
+```
+
+---
+
+## Example Usage
+
+``` cpp
+    #include <Runtime/CPP/ConsoleIO.hpp>
+
+    runtime::ConsoleIO console;
+    console.reset();
+    console.put_string("Hello, World!");
+```
+
+---
+
+# Summary
+
+ConsoleIO is the central text output subsystem of MoleculeOS.
+It provides a simple, deterministic, and heap-free API for:
+
+- Character and string output
+- Colored text output
+- Formatted text (`printf`)
+- Cursor management
+
+ConsoleIO abstracts the VGA driver and enables the kernel to have clear, uniform, and easily understandable text output. <br>
+It is intentionally kept minimal to keep complexity low and to make the core principles of OS development clearly visible.
