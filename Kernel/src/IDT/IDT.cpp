@@ -6,11 +6,11 @@ namespace kernel::idt {
     IDT::IDT() noexcept {
 
         // fill IDT-Descriptor
-        idt_ptr.limit = (sizeof(IDTEntry) * ENTRYS) - 1;
-        idt_ptr.base = reinterpret_cast<uint32_t>(&idt);
+        idt_ptr.limit = (sizeof(IDTEntry) * idt.size()) - 1;
+        idt_ptr.base = reinterpret_cast<uint32_t>(idt.begin());
 
         // Clear table
-        for (uint32_t i = 0; i < ENTRYS; i++) [[likely]]
+        for (uint32_t i = 0; i < idt.size(); i++) [[likely]]
             idt[i].set_gate(IDT_NULL, IDT_NULL, IDT_NULL);
 
         // _build_ IDT
@@ -23,5 +23,4 @@ namespace kernel::idt {
 
         LoadIDT(reinterpret_cast<uint32_t>(&idt_ptr));
     }
-
 } // kernel::idt

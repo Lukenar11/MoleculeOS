@@ -6,7 +6,6 @@
 #include "utils/helpers.hpp"
 #include <Runtime/C/stdint.h>
 #include <Runtime/CPP/Array.hpp>
-#include <Runtime/CPP/ConsoleIO.hpp>
 
 namespace kernel::idt {
 

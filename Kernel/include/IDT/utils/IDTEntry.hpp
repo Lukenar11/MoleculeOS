@@ -30,8 +30,8 @@ namespace kernel::idt {
             const uint16_t selector, 
             const uint8_t flags) noexcept {
 
-            base_low = base & MASK;
-            base_high = (base >> 16) & MASK;
+            base_low = base & WORD_MASK;
+            base_high = base >> SHIFT_16 & WORD_MASK;
             this->selector = selector;
             this->always_0 = IDT_NULL;
             this->flags = flags;
