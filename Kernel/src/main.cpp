@@ -29,10 +29,6 @@ namespace kernel {
             "MIT Licensed\n",
             "https://github.com/Lukenar11/MoleculeOS\n"
         );
-    
-        // volatile int a = 42;
-        // volatile int b = 0;
-        // volatile int c = a / b;  // This will trigger a Divide Error (ISR 0)
 
         run_while_loop();
     }
