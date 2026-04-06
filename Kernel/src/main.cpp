@@ -3,12 +3,6 @@
 
 namespace kernel {
 
-    volatile void run_while_loop() {
-    
-        while (true)
-            __asm__ volatile ("cli \n hlt");
-    }
-    
     extern "C" void kernel_main() {
 
         idt::IDT idt;
@@ -29,7 +23,5 @@ namespace kernel {
             "MIT Licensed\n",
             "https://github.com/Lukenar11/MoleculeOS\n"
         );
-
-        run_while_loop();
     }
 } // namespace kernel

@@ -1,5 +1,3 @@
-align 16
-
 section .bss
 
     ; Kernel-Stack (4 KiB)
