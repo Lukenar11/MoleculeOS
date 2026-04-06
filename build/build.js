@@ -21,6 +21,7 @@ const KERNEL_ELF = path.join(BIN, "kernel.elf");
 const KERNEL_BIN = path.join(BIN, "kernel.bin");
 
 const OS_IMG = path.join(BIN, "MoleculeOS.img");
+const COMPILER_FLAGS = "-Os -ffreestanding -fno-exceptions -fno-rtti -m32 -target i386-pc-linux-gnu";
 
 // Build-Steps
 const ASM_TASKS = [
@@ -41,13 +42,13 @@ const ASM_TASKS = [
 const C_TASKS = [
 
     task("kernel C runtime", () => 
-        `clang ${path.join("@build", "c.rsp")} -o ${path.join(BIN, "string.o")}`)
+        `clang ${COMPILER_FLAGS} ${path.join("@build", "c.rsp")} -o ${path.join(BIN, "string.o")}`)
 ];
 
 const CPP_TASKS = [
     
     task("kernel C++", () => 
-        `clang++ ${path.join("@build", "cpp.rsp")}`)
+        `clang++ ${COMPILER_FLAGS} ${path.join("@build", "cpp.rsp")}`)
 ];
 
 const OTHER_TASKS = [

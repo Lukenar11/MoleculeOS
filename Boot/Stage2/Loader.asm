@@ -1,5 +1,4 @@
 global Loader 
-
 extern kernel_main
 
 section .text

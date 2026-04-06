@@ -12,15 +12,9 @@ section .text
             ; Interrupts off
             cli
     
-            push dword 0    ; Error-Code => Stack (32-Bit)
-            push dword %1   ; Interrupt-Number => Stack (32-Bit)
-        
-            ; kernel::idt::isr_common_handler (C++ Function)
-            call isr_common_handler
-    
-            ; Stack (32-Bit) => 2 Argumentes
-            add esp, 8
-            iretd
+            push dword 0    ; Error-Code => Stack
+            push dword %1   ; Interrupt-Number => Stack
+            jmp ISRCommonStub
     %endmacro
         
     %macro ISR_ERROR 1
@@ -28,15 +22,8 @@ section .text
             ; Interrupts off
             cli
     
-            push dword 0    ; Error-Code => Stack (32-Bit)
-            push dword %1   ; Interrupt-Number => Stack (32-Bit)
-    
-            ; kernel::idt::isr_common_handler (C++ Function)
-            call isr_common_handler
-    
-            ; Stack (32-Bit) => 2 Argumentes
-            add esp, 8
-            iretd
+            push dword %1   ; Interrupt-Number => Stack
+            jmp ISRCommonStub
     %endmacro
     
     ; _init_ ISR
@@ -73,3 +60,4 @@ section .text
     NO_ISR_ERROR 30 ; (isr_30) Reserved (unused)
     NO_ISR_ERROR 31 ; (isr_31) Reserved (unused)
     
+%include "Kernel/src/IDT/ISR/ISRCommonStub.asm"

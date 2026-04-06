@@ -56,6 +56,29 @@ namespace runtime {
             put_char(message[i]);
     }
 
+    void ConsoleIO::put_hex(uint32_t value) noexcept {
+
+        put_char('0');
+        put_char('x');
+        if (value == 0) [[unlikely]] {
+
+            put_char('0');
+            return;
+        }
+
+        runtime::Array<char, 9> buffer;
+        uint32_t index = 0;
+        while (value > 0) [[likely]] {
+
+            uint8_t digit = value & 0xF;
+            buffer[index++] = (digit < 10) ? ('0' + digit) : ('A' + digit - 10);
+            value >>= 4;
+        }
+    
+        for (int32_t i = index - 1; i >= 0; i--) [[likely]]
+            put_char(buffer[i]);
+    }
+
     void ConsoleIO::printf(const char* format, ...) noexcept {
 
         // variadic arguments list
@@ -99,7 +122,7 @@ namespace runtime {
                         value = -value;
                     }
 
-                    runtime::Array<char, 12> buffer{};
+                    runtime::Array<char, 12> buffer;
                     uint32_t index = 0;
                     while (value > 0) [[likely]] {
 
@@ -122,7 +145,7 @@ namespace runtime {
                         break;
                     }
     
-                    runtime::Array<char, 12> buffer{};
+                    runtime::Array<char, 12> buffer;
                     uint32_t index = 0;
                     while (unsigned_value > 0) [[likely]] {
 
@@ -136,30 +159,9 @@ namespace runtime {
                 }
 
                 // print Hexadecimal
-                case 'x': {
-
-                    put_char('0');
-                    put_char('x');
-                    uint32_t hex_value = va_arg(args, uint32_t);
-                    if (hex_value == 0) [[unlikely]] {
-
-                        put_char('0');
-                        break;
-                    }
-
-                    runtime::Array<char, 9> buffer{};
-                    uint32_t index = 0;
-                    while (hex_value > 0) [[likely]] {
-
-                        uint8_t digit = hex_value & 0xF;
-                        buffer[index++] = (digit < 10) ? ('0' + digit) : ('A' + digit - 10);
-                        hex_value >>= 4;
-                    }
-
-                    for (int32_t i = index - 1; i >= 0; i--) [[likely]]
-                        put_char(buffer[i]);
+                case 'x':
+                    put_hex(va_arg(args, uint32_t));
                     break;
-                }
 
                 case 'b': {
 
@@ -172,7 +174,7 @@ namespace runtime {
                         break;
                     }
 
-                    runtime::Array<char, 33> buffer{};
+                    runtime::Array<char, 33> buffer;
                     uint32_t index = 0;
                     while (binary_value > 0) [[likely]] {
             
@@ -195,7 +197,7 @@ namespace runtime {
                         break;
                     }
     
-                    runtime::Array<char, 9> pointer_buffer{};
+                    runtime::Array<char, 9> pointer_buffer;
                     uint32_t pointer_index = 0;
                     while (pointer_value > 0) [[likely]] {
 
@@ -223,3 +225,5 @@ namespace runtime {
         va_end(args);
     }
 } // namespace runtime
+
+runtime::ConsoleIO console;

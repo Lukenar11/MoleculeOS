@@ -32,5 +32,4 @@ namespace drivers::vga {
         YELLOW = 0x0E,
         WHITE = 0x0F
     };
-
 } // namespace drivers::vga

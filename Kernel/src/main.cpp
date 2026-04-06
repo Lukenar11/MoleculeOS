@@ -1,21 +1,39 @@
 #include "IDT/IDT.hpp"
-#include "tests/Runtime/test_console_io.hpp"
-#include "tests/Kernel/idt_errors.hpp"
-#include "Terminal/include/Terminal.hpp"
+#include <Runtime/CPP/ConsoleIO.hpp>
 
 namespace kernel {
 
+    volatile void run_while_loop() {
+    
+        while (true)
+            __asm__ volatile ("cli \n hlt");
+    }
+    
     extern "C" void kernel_main() {
 
         idt::IDT idt;
 
-        test_console_io();
-
-        // volatile int a = 1;
+        runtime::console.reset();
+        runtime::console.printf(
+            "%s%s%s%s%s%s%s%s%s%s%s\n",
+            " __  __       _                 _         ____   _____ \n"
+            "|  \\/  |     | |               | |       / __ \\ / ____|\n",
+            "| \\  / | ___ | | ___  ___ _   _| | ___  | |  | | (___  \n",
+            "| |\\/| |/ _ \\| |/ _ \\/ __| | | | |/ _ \\ | |  | |\\___ \\ \n",
+            "| |  | | (_) | |  __/ (__| |_| | |  __/ | |__| |____) |\n",
+            "|_|  |_|\\___/|_|\\___|\\___|\\__,_|_|\\___|  \\____/|_____/ \n",
+            "\n",
+            "Version 0.0.0 (Kernel Mode)\n",
+            "\n",
+            "Copyright (c) 2026 Lukenar11 (Luke Matthes)\n",
+            "MIT Licensed\n",
+            "https://github.com/Lukenar11/MoleculeOS\n"
+        );
+    
+        // volatile int a = 42;
         // volatile int b = 0;
         // volatile int c = a / b;  // This will trigger a Divide Error (ISR 0)
-        
-        while (true) 
-            __asm__ volatile ("hlt");
+
+        run_while_loop();
     }
 } // namespace kernel
