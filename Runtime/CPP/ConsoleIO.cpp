@@ -56,6 +56,46 @@ namespace runtime {
             put_char(message[i]);
     }
 
+    void ConsoleIO::put_int(int32_t value) noexcept {
+
+        if (value < 0) {
+
+            put_char('-');
+            value = -value;
+        }
+
+        runtime::Array<char, 12> buffer;
+        uint32_t index = 0;
+        while (value > 0) [[likely]] {
+
+            buffer[index++] = '0' + (value % 10);
+            value /= 10;
+        }
+
+        for (int32_t i = index - 1; i >= 0; i--) [[likely]]
+            put_char(buffer[i]);
+    }
+
+    void ConsoleIO::put_uint(uint32_t value) noexcept {
+
+        if (value == 0) [[unlikely]] {
+    
+            put_char('0');
+            return;
+        }
+    
+        runtime::Array<char, 12> buffer;
+        uint32_t index = 0;
+        while (value > 0) [[likely]] {
+
+            buffer[index++] = '0' + (value % 10);
+            value /= 10;
+        }
+
+        for (int32_t i = index - 1; i >= 0; i--) [[likely]]
+            put_char(buffer[i]);
+    }
+
     void ConsoleIO::put_hex(uint32_t value) noexcept {
 
         put_char('0');
@@ -79,6 +119,51 @@ namespace runtime {
             put_char(buffer[i]);
     }
 
+    void ConsoleIO::put_bin(uint32_t value) noexcept {
+    
+        put_char('0');
+        put_char('b');
+        if (value == 0) [[unlikely]] {
+
+            put_char('0');
+            return;
+        }
+
+        runtime::Array<char, 33> buffer;
+        uint32_t index = 0;
+        while (value > 0) [[likely]] {
+
+            buffer[index++] = (value & 1) ? '1' : '0';
+            value >>= 1;
+        }
+
+        for (int32_t i = index - 1; i >= 0; i--) [[likely]]
+            put_char(buffer[i]);
+    }
+
+    void ConsoleIO::put_ptr(uint32_t value) noexcept {
+    
+        put_char('0');
+        put_char('x');
+        if (value == 0) {
+    
+            put_char('0');
+            return;
+        }
+    
+        runtime::Array<char, 9> pointer_buffer;
+        uint32_t pointer_index = 0;
+        while (value > 0) [[likely]] {
+
+            uint8_t digit = value & 0xF;
+            pointer_buffer[value++] = (digit < 10) ? ('0' + digit) : ('A' + digit - 10);
+            value >>= 4;
+        }
+                
+        for (int32_t i = pointer_index - 1; i >= 0; i--) [[likely]]
+            put_char(pointer_buffer[i]);
+    }
+
     void ConsoleIO::printf(const char* format, ...) noexcept {
 
         // variadic arguments list
@@ -95,128 +180,49 @@ namespace runtime {
             i++;
 
             switch (format[i]) {
-            
+    
                 // print Char
-                case 'c': {
-    
-                    const char char_argument = static_cast<char>(va_arg(args, int));
-                    put_char(char_argument);
+                case 'c': 
+                    put_char(static_cast<char>(va_arg(args, int))); 
                     break;
-                }
-
+                
                 // print String
-                case 's': {
-    
-                    const char* string_argument = va_arg(args, const char*);
-                    put_string(string_argument);
+                case 's': 
+                    put_string(va_arg(args, const char*)); 
                     break;
-                }
-
+                
                 // print Signed-Integer
-                case 'd': {
-    
-                    int32_t value = va_arg(args, int32_t);
-                    if (value < 0) {
-
-                        put_char('-');
-                        value = -value;
-                    }
-
-                    runtime::Array<char, 12> buffer;
-                    uint32_t index = 0;
-                    while (value > 0) [[likely]] {
-
-                        buffer[index++] = '0' + (value % 10);
-                        value /= 10;
-                    }
-
-                    for (int32_t i = index - 1; i >= 0; i--) [[likely]]
-                        put_char(buffer[i]);
+                case 'd': 
+                    put_int(va_arg(args, int32_t)); 
                     break;
-                }
 
                 // print Unsigned-Integer
-                case 'u': {
-    
-                    uint32_t unsigned_value = va_arg(args, uint32_t);
-                    if (unsigned_value == 0) [[unlikely]] {
+                case 'u': 
+                    put_uint(va_arg(args, uint32_t)); 
+                    break; 
 
-                        put_char('0');
-                        break;
-                    }
-    
-                    runtime::Array<char, 12> buffer;
-                    uint32_t index = 0;
-                    while (unsigned_value > 0) [[likely]] {
-
-                        buffer[index++] = '0' + (unsigned_value % 10);
-                        unsigned_value /= 10;
-                    }
-
-                    for (int32_t i = index - 1; i >= 0; i--) [[likely]]
-                        put_char(buffer[i]);
-                    break;
-                }
-
-                // print Hexadecimal
-                case 'x':
-                    put_hex(va_arg(args, uint32_t));
+                // print Hexadecimal 
+                case 'x': 
+                    put_hex(va_arg(args, uint32_t)); 
                     break;
 
-                case 'b': {
-
-                    put_char('0');
-                    put_char('b');
-                    uint32_t binary_value = va_arg(args, uint32_t);
-                    if (binary_value == 0) [[unlikely]] {
-            
-                        put_char('0');
-                        break;
-                    }
-
-                    runtime::Array<char, 33> buffer;
-                    uint32_t index = 0;
-                    while (binary_value > 0) [[likely]] {
-            
-                        buffer[index++] = (binary_value & 1) ? '1' : '0';
-                        binary_value >>= 1;
-                    }
-                    for (int32_t i = index - 1; i >= 0; i--) [[likely]]
-                        put_char(buffer[i]);
+                // print Binary
+                case 'b': 
+                    put_bin(va_arg(args, uint32_t)); 
                     break;
-                }
-    
-                case 'p': {
-    
-                    put_char('0');
-                    put_char('x');
-                    uint32_t pointer_value = va_arg(args, uint32_t);
-                    if (pointer_value == 0) {
-        
-                        put_char('0');
-                        break;
-                    }
-    
-                    runtime::Array<char, 9> pointer_buffer;
-                    uint32_t pointer_index = 0;
-                    while (pointer_value > 0) [[likely]] {
-
-                        uint8_t digit = pointer_value & 0xF;
-                        pointer_buffer[pointer_index++] = (digit < 10) ? ('0' + digit) : ('A' + digit - 10);
-                        pointer_value >>= 4;
-                    }
                 
-                    for (int32_t i = pointer_index - 1; i >= 0; i--) [[likely]]
-                        put_char(pointer_buffer[i]);
+                // print Pointer
+                case 'p': 
+                    put_ptr(va_arg(args, uint32_t)); 
                     break;
-                }
-
+                
+                // print '%
                 case '%': 
-                    put_char('%');
+                    put_char('%'); 
                     break;
 
-                default:
-                    put_char(format[i]);
+                default: 
+                    put_char(format[i]); 
                     break;
             }
         }

@@ -1,6 +1,6 @@
 #include "IDT/ISR/isr_common_handler.hpp"
 
-extern "C" void isr_common_handler(RegisterDump* red_dump) {
+extern "C" void isr_common_handler(RegisterDump* register_dump) {
 
     runtime::console.reset();
     runtime::console.set_char_colors(
@@ -8,35 +8,35 @@ extern "C" void isr_common_handler(RegisterDump* red_dump) {
         drivers::vga::VGAColors::BLACK
     );
 
-    runtime::console.put_string(">>>>>>>>>> !KERNEL PANIC! <<<<<<<<<<\n");
+    runtime::console.put_string(">>>>>>>>>> !KERNEL PANIC! <<<<<<<<<<");
 
-    runtime::console.put_string("\nException: ");
-    runtime::console.put_string(exception_names[red_dump->interrupt_number]);
+    runtime::console.put_string("\n\nException: ");
+    runtime::console.put_string(exception_names[register_dump->interrupt_number]);
     runtime::console.put_string(" (");
-    runtime::console.put_hex(red_dump->interrupt_number);
+    runtime::console.put_hex(register_dump->interrupt_number);
     runtime::console.put_string(")");
 
     runtime::console.put_string("\n\nCPU State:");
-    runtime::console.put_string("\n  EIP: "); runtime::console.put_hex(red_dump->eip); 
-    runtime::console.put_string("\n  EFLAGS: "); runtime::console.put_hex(red_dump->eflags); 
+    print_register_dump("\n  EIP: ",    register_dump->eip);
+    runtime::console.put_string("\n  EFLAGS: ");
+    runtime::console.put_bin(register_dump->eflags);
 
     runtime::console.put_string("\n\nGeneral Registers:");
-    runtime::console.put_string("\n  EAX: "); runtime::console.put_hex(red_dump->eax);
-    runtime::console.put_string("\n  EBX: "); runtime::console.put_hex(red_dump->ebx);
-    runtime::console.put_string("\n  ECX: "); runtime::console.put_hex(red_dump->ecx);
-    runtime::console.put_string("\n  EDX: "); runtime::console.put_hex(red_dump->edx); 
-
-    runtime::console.put_string("\n  ESI: "); runtime::console.put_hex(red_dump->esi);
-    runtime::console.put_string("\n  EDI: "); runtime::console.put_hex(red_dump->edi);
-    runtime::console.put_string("\n  EBP: "); runtime::console.put_hex(red_dump->ebp); 
+    print_register_dump("\n  EAX: ", register_dump->eax);
+    print_register_dump("\n  EBX: ", register_dump->ebx);
+    print_register_dump("\n  ECX: ", register_dump->ecx);
+    print_register_dump("\n  EDX: ", register_dump->edx);
+    print_register_dump("\n  ESI: ", register_dump->esi);
+    print_register_dump("\n  EDI: ", register_dump->edi);
+    print_register_dump("\n  EBP: ", register_dump->ebp);
 
     runtime::console.put_string("\n\nSegment Registers:");
-    runtime::console.put_string("\n  DS: "); runtime::console.put_hex(red_dump->ds);
-    runtime::console.put_string("\n  ES: "); runtime::console.put_hex(red_dump->es);
-    runtime::console.put_string("\n  FS: "); runtime::console.put_hex(red_dump->fs);
-    runtime::console.put_string("\n  GS: "); runtime::console.put_hex(red_dump->gs); 
+    print_register_dump("\n  DS: ", register_dump->ds);
+    print_register_dump("\n  ES: ", register_dump->es);
+    print_register_dump("\n  FS: ", register_dump->fs);
+    print_register_dump("\n  GS: ", register_dump->gs);
 
-    runtime::console.put_string("\n\n>>>>>>>>>> !SYSTEM HALTED! <<<<<<<<<<\n");
+    runtime::console.put_string("\n\n>>>>>>>>>> !SYSTEM HALTED! <<<<<<<<<<");
 
     while (true)
         __asm__ volatile("cli \n hlt");

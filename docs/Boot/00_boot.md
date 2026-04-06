@@ -215,8 +215,7 @@ This master document links to all detailed MoleculeOS documentation:
 - [04 – Protected-Mode initialisation](Stage1/04_protected-mode.md)
 - [05 – Protected-Mode entry](Stage1/05_protected-mode-entry.md)
 - [01 – Loader](Stage2/01_loader.md)
-- [02 – Kernel stack](02_kernel-stack.md)
-- [03 – Kenel Entry](Stage2/03_kernel-entry.md)
+- [02 – Kernel stack](Stage2/02_kernel-stack.md)
 
 ---
 

@@ -16,7 +16,7 @@ namespace runtime {
             // default Cursor-Position & Color
             static constexpr uint8_t DEFAULT_CURSOR_POS = 0x00;
             static constexpr uint8_t DEFAULT_COLOR =
-                drivers::vga::VGA::make_color(
+                vga_driver.make_color(
                     drivers::vga::VGAColors::LIGHT_GREY,
                     drivers::vga::VGAColors::BLACK
                 );
@@ -35,7 +35,11 @@ namespace runtime {
 
             void put_char(const char symbol) noexcept;
             void put_string(const char* message) noexcept;
+            void put_int(int32_t value) noexcept;
+            void put_uint(uint32_t value) noexcept;
             void put_hex(uint32_t value) noexcept;
+            void put_bin(uint32_t value) noexcept;
+            void put_ptr(uint32_t value) noexcept;
 
             void printf(const char* format, ...) noexcept;
 

@@ -3,8 +3,6 @@
 -o build/bin/kernel.elf
 
 build/bin/loader.o
-build/bin/kernelentry.o
-build/bin/stack.o
 build/bin/main.o
 build/bin/idt.o
 build/bin/isr_common_handler.o
