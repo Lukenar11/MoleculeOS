@@ -8,7 +8,7 @@ namespace runtime {
         cursor_y = DEFAULT_CURSOR_POS;
         cursor_color = DEFAULT_COLOR;
 
-        vga_driver.clear_screen(drivers::vga::VGAColors::BLACK);
+        drivers::vga::vga_driver.clear_screen(drivers::vga::VGAColors::BLACK);
     }
 
     void ConsoleIO::set_char_colors(
@@ -43,7 +43,7 @@ namespace runtime {
             return;
         }
 
-        vga_driver.put_char_at(symbol, cursor_color, cursor_x, cursor_y);
+        drivers::vga::vga_driver.put_char_at(symbol, cursor_color, cursor_x, cursor_y);
         cursor_x++;
 
         if (cursor_x >= drivers::vga::VGA_WIDTH) [[unlikely]]
@@ -64,6 +64,12 @@ namespace runtime {
             value = -value;
         }
 
+        if (value == 0) [[unlikely]] {
+        
+            put_char('0');
+            return;
+        }
+
         runtime::Array<char, 12> buffer;
         uint32_t index = 0;
         while (value > 0) [[likely]] {
@@ -78,12 +84,18 @@ namespace runtime {
 
     void ConsoleIO::put_uint(uint32_t value) noexcept {
 
+        if (value < 0) {
+
+            put_char('-');
+            value = -value;
+        }
+
         if (value == 0) [[unlikely]] {
     
             put_char('0');
             return;
         }
-    
+
         runtime::Array<char, 12> buffer;
         uint32_t index = 0;
         while (value > 0) [[likely]] {
@@ -142,26 +154,27 @@ namespace runtime {
     }
 
     void ConsoleIO::put_ptr(uint32_t value) noexcept {
-    
+
         put_char('0');
         put_char('x');
         if (value == 0) {
-    
+
             put_char('0');
             return;
         }
-    
-        runtime::Array<char, 9> pointer_buffer;
-        uint32_t pointer_index = 0;
-        while (value > 0) [[likely]] {
+
+        runtime::Array<char, 9> buffer;
+        uint32_t index = 0;
+
+        while (value > 0) {
 
             uint8_t digit = value & 0xF;
-            pointer_buffer[value++] = (digit < 10) ? ('0' + digit) : ('A' + digit - 10);
+            buffer[index++] = (digit < 10) ? ('0' + digit) : ('A' + digit - 10);
             value >>= 4;
         }
-                
-        for (int32_t i = pointer_index - 1; i >= 0; i--) [[likely]]
-            put_char(pointer_buffer[i]);
+
+        for (int32_t i = index - 1; i >= 0; i--)
+            put_char(buffer[i]);
     }
 
     void ConsoleIO::printf(const char* format, ...) noexcept {
@@ -230,6 +243,6 @@ namespace runtime {
         // clean variadic arguments list
         va_end(args);
     }
-} // namespace runtime
 
-runtime::ConsoleIO console;
+    ConsoleIO console;
+} // namespace runtime

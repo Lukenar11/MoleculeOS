@@ -9,12 +9,13 @@ namespace drivers::vga {
         const int32_t y) const noexcept {
             
             // VGA-Area Over/Underflow gurard
-            if ((x < 0 || x >= VGA_WIDTH) || 
-                (y < 0 || y >= VGA_HEIGHT)) [[unlikely]]
+            if (x < 0 || x >= VGA_WIDTH || 
+                y < 0 || y >= VGA_HEIGHT) [[unlikely]]
                 return;
 
-            VGA_BUFFER[y * VGA_WIDTH + x] = 
-                make_symbol_entry(symbol, color);
+            const uint32_t index = 
+                static_cast<uint32_t>(y) * VGA_WIDTH + static_cast<uint32_t>(x);
+            VGA_BUFFER[index] = make_symbol_entry(symbol, color);
     }
 
     void VGA::clear_screen(const VGAColors background) const noexcept {
@@ -26,4 +27,6 @@ namespace drivers::vga {
             for (uint32_t x = 0; x < VGA_WIDTH; x++)
                 VGA_BUFFER[y * VGA_WIDTH + x] = entry;
     }
+    
+    VGA vga_driver;
 } // namespace drivers::vga

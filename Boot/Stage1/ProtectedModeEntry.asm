@@ -8,6 +8,6 @@ ProtectedModeEntry:
     mov gs, ax      ; General-Purpose segment
     mov ss, ax      ; new Stack-Segment (32-bit)
 
-    ; _start_ Loader (Stage 2) (fully 32-Bit Mode)
+    ; _start_ Loader (Stage2) (fully 32-Bit Mode)
     jmp 0x08:0x10000
     

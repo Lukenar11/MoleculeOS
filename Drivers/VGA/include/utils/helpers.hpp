@@ -5,8 +5,8 @@
 namespace drivers::vga {
 
     // Screen Dimensions
-    constexpr uint32_t VGA_WIDTH = 80;
-    constexpr uint32_t VGA_HEIGHT = 25;
+    static constexpr uint32_t VGA_WIDTH = 80;
+    static constexpr uint32_t VGA_HEIGHT = 25;
 
     // VGA Textmode-Buffer
     volatile uint16_t* const VGA_BUFFER =

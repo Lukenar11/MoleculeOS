@@ -15,7 +15,7 @@ namespace runtime {
         public:
             // Data access
             inline constexpr T& operator[](
-                uint32_t index) noexcept { return data[index]; }
+                const uint32_t index) noexcept { return data[index]; }
     
             inline constexpr const T& operator[](
                 const uint32_t index) const noexcept { return data[index]; }
@@ -46,10 +46,11 @@ namespace runtime {
     
             // _construct_ (for "atom::Array<...> name(...);")
             template<class... Args>
-            constexpr Array(Args... args) noexcept : data { static_cast<T>(args)... } {
-    
+            constexpr Array(Args... args) noexcept 
+                : data{ static_cast<T>(args)... } {
+                
                 static_assert(
-                    sizeof...(Args) == S, 
+                    sizeof...(Args) == S,
                     "Number of constructor arguments must match array size"
                 );
             }

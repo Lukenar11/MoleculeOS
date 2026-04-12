@@ -10,13 +10,10 @@ namespace runtime {
     class ConsoleIO {
 
         private:
-            // VGA-Driver
-            static constexpr drivers::vga::VGA vga_driver;
-
             // default Cursor-Position & Color
             static constexpr uint8_t DEFAULT_CURSOR_POS = 0x00;
             static constexpr uint8_t DEFAULT_COLOR =
-                vga_driver.make_color(
+                drivers::vga::vga_driver.make_color(
                     drivers::vga::VGAColors::LIGHT_GREY,
                     drivers::vga::VGAColors::BLACK
                 );
@@ -47,5 +44,5 @@ namespace runtime {
             ~ConsoleIO() noexcept = default;
     };
 
-    static ConsoleIO console;
+    extern ConsoleIO console;
 } // namespace runtime

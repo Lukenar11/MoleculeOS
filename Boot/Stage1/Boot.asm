@@ -22,11 +22,12 @@ BootProcedure:
     ; _start_ A20-Line
     call GetA20State
     test ax, ax
-    jnz .a20_done   ; if (AX != 0) goto: .a20_done
 
-    in al, 0x92     ; Control Port A => AL
+    jnz .a20_done   ; if (Accumulator != 0) goto: .a20_done
+
+    in al, 0x92     ; Control Port A => Accumulator
     or al, 0x02     ; set A20 Enable
-    out 0x92, al    ; AL => Control Port A
+    out 0x92, al    ; Accumulator => Control Port A
 
     .a20_done:
 

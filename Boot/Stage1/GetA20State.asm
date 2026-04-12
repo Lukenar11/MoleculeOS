@@ -1,8 +1,8 @@
 GetA20State:
-    ; save Flags
+    ; Falgs => Stack
     pushf
 
-    ; save Register
+    ; Register => Stack
     push ds
     push es
     push di
@@ -12,12 +12,12 @@ GetA20State:
     cli
 
     ; pointer to [0x00000]
-    xor ax, ax  ; AX = 0
-    mov es, ax  ; AX => ES
+    xor ax, ax  ; Accumulator = 0
+    mov es, ax  ; Accumulator => ExtraSegment
 
-    ; DS = 0xFFFF -> points to [0xFFFF0] (16 bytes below 1 MiB)
-    not ax      ; AX = 0xFFFF
-    mov ds, ax  ; DS = 0xFFFF -> if (A20Enabled) DS = 0xFFFF0
+    ; DataSegment = 0xFFFF -> points to [0xFFFF0] (16 bytes below 1 MiB)
+    not ax      ; Accumulator = 0xFFFF
+    mov ds, ax  ; DataSegment = 0xFFFF -> if (A20Enabled) DataSegment = 0xFFFF0
 
     ; Choose two test addresses
     mov di, 0x0500  ; Address below 1 MiB
@@ -25,10 +25,10 @@ GetA20State:
 
     ; 4. Save original bytes at both addresses
     mov al, [es:di] ; Read Byte at 0x0500
-    push ax         ; save Byte
+    push ax         ; Accumulator => Stack
 
-    mov al, [ds:si] ; Read Byte at [0x100000]
-    push ax         ; save Byte
+    mov al, [ds:si] ; read Byte <= [0x100000]
+    push ax         ; Accumulator => Stack
 
     ; Write test pattern
     mov byte [es:di], 0x00  ; write 0x00 => [0x0500]
@@ -38,12 +38,11 @@ GetA20State:
     cmp byte [es:di], 0xFF
 
     ; reset Bytes
-    pop ax                  ; Stack => AX
-    mov byte [ds:si], al    ; AL => [DS:SI]
+    pop ax                  ; Stack => Accumulator
+    mov byte [ds:si], al    ; write Accumulator => [DS:SI]
 
-    pop ax                  ; Stack => AX
-    mov byte [es:di], al    ; AL => [ES:SI]
-
+    pop ax                  ; Stack => Accumulator
+    mov byte [es:di], al    ; write Accumulator => [ES:SI]
 
     ; return (!A20Enabled) ? 0 : 1
     mov ax, 0
@@ -51,13 +50,13 @@ GetA20State:
     mov ax, 1   ; else return 1
 
 done:
-    ; reset Register
+    ; Stack => Register
     pop si
     pop di
     pop es
     pop ds
 
-    ; reset Falgs
+    ; Stack => Falgs
     popf
 
     ret

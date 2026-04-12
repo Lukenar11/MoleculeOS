@@ -23,4 +23,4 @@ namespace kernel::idt {
 
         LoadIDT(reinterpret_cast<uint32_t>(&idt_ptr));
     }
-} // kernel::idt
+} // namespache kernel::idt

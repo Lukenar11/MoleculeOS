@@ -7,17 +7,23 @@ namespace drivers::vga {
     // VGA-Driver
     class VGA final {
 
+        private:
+            static constexpr uint8_t COLOR_SHIFT = 4;
+            static constexpr uint8_t SYMBOL_SHIFT = COLOR_SHIFT << 1;
+
         public:
             static constexpr uint8_t make_color(
                 const VGAColors foreground, const VGAColors background) noexcept {
 
-                return static_cast<uint8_t>(background) << 4 | static_cast<uint8_t>(foreground);
+                return static_cast<uint8_t>(background) << COLOR_SHIFT | 
+                       static_cast<uint8_t>(foreground);
             }
 
             static constexpr uint16_t make_symbol_entry(
                 const char symbol, const uint8_t color) noexcept {
                 
-                return static_cast<uint16_t>(color) << 8 | static_cast<uint16_t>(symbol);
+                return static_cast<uint16_t>(color) << SYMBOL_SHIFT | 
+                       static_cast<uint16_t>(symbol);
             }
 
             void put_char_at(
@@ -31,4 +37,6 @@ namespace drivers::vga {
             VGA() noexcept = default;
             ~VGA() noexcept = default;
     };
+
+    extern VGA vga_driver;
 } // namespace drivers::vga

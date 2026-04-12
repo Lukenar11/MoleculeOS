@@ -28,4 +28,6 @@ namespace kernel::idt {
             IDT() noexcept;
             ~IDT() noexcept = default;
     };
-} // namespace kernel
+
+    extern IDT idt;
+} // namespace kernel::idt

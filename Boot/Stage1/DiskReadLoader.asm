@@ -1,7 +1,7 @@
 [bits 16]
 
 DiskReadLoader:
-    ; save Register
+    ; Register => Stack
     push ax
     push bx
     push cx
@@ -36,7 +36,7 @@ DiskReadLoader:
         jmp disk_error
 
     .disk_ok:
-        ; reset Register
+        ; Stack => Register
         pop es
         pop dx
         pop cx
