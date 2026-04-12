@@ -39,10 +39,10 @@ static const char* exception_names[32] = {
     "Reserved"
 };
 
-static inline void print_register_dump(const char* label, uint32_t value) {
+static inline void print_reg_dump(const char* label, uint32_t value) {
 
     runtime::console.put_string(label);
     runtime::console.put_hex(value);
 }
 
-extern "C" void isr_common_handler(RegisterDump* registers);
+extern "C" void isr_common_handler(RegisterDump* reg_dump);
