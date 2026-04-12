@@ -15,9 +15,9 @@ GetA20State:
     xor ax, ax  ; Accumulator = 0
     mov es, ax  ; Accumulator => ExtraSegment
 
-    ; DataSegment = 0xFFFF -> points to [0xFFFF0] (16 bytes below 1 MiB)
+    ; Data-Segment = 0xFFFF -> points to [0xFFFF0] (16 bytes below 1 MiB)
     not ax      ; Accumulator = 0xFFFF
-    mov ds, ax  ; DataSegment = 0xFFFF -> if (A20Enabled) DataSegment = 0xFFFF0
+    mov ds, ax  ; Data-Segment = 0xFFFF -> if (A20Enabled) Data-Segment = 0xFFFF0
 
     ; Choose two test addresses
     mov di, 0x0500  ; Address below 1 MiB

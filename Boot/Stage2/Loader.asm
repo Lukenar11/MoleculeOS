@@ -14,11 +14,6 @@ section .text
         and esp, 0xFFFFFFF0     ; align to 16 bytes
 
         ; _start_ Kernel
-        call kernel_main
-
-        .hang:
-            cli
-            hlt
-            jmp .hang
+        jmp kernel_main
     
 %include "Boot/Stage2/KernelStack.asm"
