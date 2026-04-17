@@ -7,7 +7,10 @@ section .text
         ; Interrupts off
         cli
 
-        mov dword [0xB8000], 0x1F004B41
+        mov dword [0xB8004], 0x1F004C
+
+        .hang:
+            jmp .hang
         
         ; _init_ Kernel-Stack
         mov esp, KernelStackTop ; [StackAddress] => StackPointer

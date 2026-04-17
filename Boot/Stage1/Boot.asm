@@ -3,15 +3,21 @@
 
 jmp BootProcedure
 
+BOOT_DRIVE: db 0
+
 BootProcedure:
     ; Interrupts off
     cli
 
+    mov [BOOT_DRIVE], dl
+
     ; _init_ Stack
     xor ax, ax      ; clear Accumulator
+    mov ds, ax      ; set Data-Segment
     mov ss, ax      ; set Stack-Segment
-    mov sp, 0x7BFE  ; set Stack-Size (~7 KiB)
+    mov sp, 0xF000  ; set Stack-Size
     mov ax, ax      ; nop
+
 
     ; _init_ Disk-Loader
     call DiskReadLoader
@@ -30,14 +36,13 @@ BootProcedure:
     out 0x92, al    ; Accumulator => Control-Port A
 
     .a20_done:
+        ; _init_ Protected-Mode
+        mov eax, cr0    ; Control => Accumulator (32-bit)
+        or eax, 0x01    ; set Protection Enable
+        mov cr0, eax    ; Protection Enable => Control
 
-    ; _init_ Protected-Mode
-    mov eax, cr0    ; Control => Accumulator (32-bit)
-    or eax, 0x01    ; set Protection Enable
-    mov cr0, eax    ; Protection Enable => Control
-
-    ; _start_ Protected-Mode
-    jmp 0x08:ProtectedModeEntry
+        ; _start_ Protected-Mode
+        jmp 0x08:ProtectedModeEntry
 
 %include "Boot/Stage1/GDT.asm"
 %include "Boot/Stage1/GetA20State.asm"

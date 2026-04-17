@@ -62,12 +62,12 @@ const OTHER_TASKS = [
     task("create disk image", () => 
         `dd if=/dev/zero of=${OS_IMG} bs=512 count=2880`),
 
-    task("write bootloader", () => 
+    task("write bootloader", () =>
         `dd if=${BOOT_BIN} of=${OS_IMG} bs=512 seek=0 conv=notrunc`),
-
-    task("write kernel", () => 
+    
+    task("write kernel", () =>
         `dd if=${KERNEL_BIN} of=${OS_IMG} bs=512 seek=1 conv=notrunc`),
-
+    
     task("run qemu", () => 
         `qemu-system-i386 --accel tcg,thread=single -drive format=raw,file=${OS_IMG},if=floppy`)
 ];

@@ -1,4 +1,3 @@
-[bits 16]
 align 8
 
 gdt: 
