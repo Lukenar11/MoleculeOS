@@ -1,5 +1,0 @@
--I.
--I Runtime
--I Kernel/include
--c
-Runtime/C/string.c

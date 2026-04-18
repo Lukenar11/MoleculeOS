@@ -1,0 +1,48 @@
+# Compiler + Flags
+cflags = -m32 -ffreestanding -fno-exceptions -fno-rtti -Os -target i386-pc-linux-gnu
+includes = -I. -I Runtime -I Kernel/include -I Terminal/include -I Drivers/VGA/include
+
+rule cc
+ command = clang $cflags $includes -c $in -o $out
+
+rule cxx
+ command = clang++ $cflags $includes -c $in -o $out
+
+rule asm
+ command = nasm -f elf32 $in -o $out
+
+rule link
+ command = ld.lld -m elf_i386 -T build/linker.ld -o $out $in
+
+# ASM files
+build build/bin/multiboot.o: asm Boot/MultibootHeader.asm
+build build/bin/loader.o: asm Boot/Boot.asm
+build build/bin/isr.o: asm Kernel/src/IDT/ISR/ISR.asm
+build build/bin/loadidt.o: asm Kernel/src/IDT/LoadIDT.asm
+
+# C files
+build build/bin/string.o: cc Runtime/C/string.c
+
+# C++ files
+build build/bin/main.o: cxx Kernel/src/main.cpp
+build build/bin/idt.o: cxx Kernel/src/IDT/IDT.cpp
+build build/bin/isr_common_handler.o: cxx Kernel/src/IDT/ISR/isr_common_handler.cpp
+build build/bin/vga.o: cxx Drivers/VGA/src/VGA.cpp
+build build/bin/terminal.o: cxx Terminal/src/Terminal.cpp
+build build/bin/consoleio.o: cxx Runtime/CPP/ConsoleIO.cpp
+
+# Link kernel
+build/bin/kernel.elf: link \
+ build/bin/multiboot.o \
+ build/bin/loader.o \
+ build/bin/main.o \
+ build/bin/idt.o \
+ build/bin/isr_common_handler.o \
+ build/bin/isr.o \
+ build/bin/loadidt.o \
+ build/bin/string.o \
+ build/bin/vga.o \
+ build/bin/terminal.o \
+ build/bin/consoleio.o
+
+default build/bin/kernel.elf
