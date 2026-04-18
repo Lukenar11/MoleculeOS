@@ -22,7 +22,7 @@ extern "C" void kernel_main() {
         "https://github.com/Lukenar11/MoleculeOS\n"
     );
 
-    volatile int a = 10;
-    volatile int b = 0;
-    volatile int c = a / b;
+    // volatile int a = 10;
+    // volatile int b = 0;
+    // volatile int c = a / b;
 }

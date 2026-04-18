@@ -1,27 +1,32 @@
-ENTRY(Loader)
+ENTRY(Boot)
 
-SECTIONS
+SECTIONS 
 {
-  . = 0x00010000;
+  . = 0x00100000;
 
-  .text :
-  {
-    *(.text*)
+  .multiboot : 
+  { 
+    *(.multiboot) 
   }
 
-  .rodata :
-  {
-    *(.rodata*)
+  .text : 
+  { 
+    *(.text*) 
   }
 
-  .data :
-  {
-    *(.data*)
+  .rodata : 
+  { 
+    *(.rodata*) 
   }
 
-  .bss :
-  {
-    *(.bss*)
-    *(COMMON)
+  .data : 
+  { 
+    *(.data*) 
+  }
+
+  .bss : 
+  { 
+    *(.bss*) 
+    *(COMMON) 
   }
 }

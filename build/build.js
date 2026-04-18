@@ -7,155 +7,122 @@ const ROOT = path.join(__dirname, "..");
 const BUILD = path.join(ROOT, "build");
 const BIN = path.join(BUILD, "bin");
 
-// Helper: define tasks compactly
+// Helper
 const task = (name, command) => ({ name, command });
 
 // Sources
-const BOOT_SRC = path.join(ROOT, "Boot", "Stage1", "Boot.asm");
-const BOOT_BIN = path.join(BIN, "boot.bin");
-
-const OSLOADER_SRC = path.join(ROOT, "Boot", "Stage2", "Loader.asm");
+const OSLOADER_SRC = path.join(ROOT, "Boot", "Boot.asm");
 const OSLOADER_OBJ = path.join(BIN, "loader.o");
 
 const KERNEL_ELF = path.join(BIN, "kernel.elf");
 const KERNEL_BIN = path.join(BIN, "kernel.bin");
 
-const OS_IMG = path.join(BIN, "MoleculeOS.img");
 const COMPILER_FLAGS = "-Os -ffreestanding -fno-exceptions -fno-rtti -m32 -target i386-pc-linux-gnu";
+
+const MULTIBOOT_SRC = path.join(ROOT, "Boot", "MultibootHeader.asm");
+const MULTIBOOT_OBJ = path.join(BIN, "multiboot.o");
 
 // Build-Steps
 const ASM_TASKS = [
 
-    task("bootloader", () => 
-        `nasm -f bin ${BOOT_SRC} -o ${BOOT_BIN}`),
+  task("multiboot header", () =>
+    `nasm -f elf32 ${MULTIBOOT_SRC} -o ${MULTIBOOT_OBJ}`),
 
-    task("osloader", () => 
-        `nasm -f elf32 ${OSLOADER_SRC} -o ${OSLOADER_OBJ}`),
+  task("loader", () =>
+    `nasm -f elf32 ${OSLOADER_SRC} -o ${OSLOADER_OBJ}`),
 
-    task("isr", () => 
-        `nasm -f elf32 ${path.join(ROOT, "Kernel", "src", "IDT", "ISR", "ISR.asm")} -o ${path.join(BIN, "isr.o")}`),
+  task("isr", () =>
+    `nasm -f elf32 ${path.join(ROOT, "Kernel", "src", "IDT", "ISR", "ISR.asm")} -o ${path.join(BIN, "isr.o")}`),
 
-    task("loadidt", () => 
-        `nasm -f elf32 ${path.join(ROOT, "Kernel", "src", "IDT", "LoadIDT.asm")} -o ${path.join(BIN, "loadidt.o")}`),
+  task("loadidt", () =>
+    `nasm -f elf32 ${path.join(ROOT, "Kernel", "src", "IDT", "LoadIDT.asm")} -o ${path.join(BIN, "loadidt.o")}`),
 ];
 
-const C_TASKS = [
 
-    task("kernel C runtime", () => 
-        `clang ${COMPILER_FLAGS} ${path.join("@build", "c.rsp")} -o ${path.join(BIN, "string.o")}`)
+const C_TASKS = [
+  task("kernel C runtime", () =>
+    `clang ${COMPILER_FLAGS} ${path.join("@build", "c.rsp")} -o ${path.join(BIN, "string.o")}`)
 ];
 
 const CPP_TASKS = [
-    
-    task("kernel C++", () => 
-        `clang++ ${COMPILER_FLAGS} ${path.join("@build", "cpp.rsp")}`)
+  task("kernel C++", () =>
+    `clang++ ${COMPILER_FLAGS} ${path.join("@build", "cpp.rsp")}`)
 ];
 
 const OTHER_TASKS = [
+  task("link kernel", () =>
+    `ld.lld @build/link.rsp`),
 
-    task("link kernel", () => 
-        `ld.lld ${path.join("@build", "link.rsp")}`),
-
-    task("convert kernel", () => 
-        `llvm-objcopy -O binary ${KERNEL_ELF} ${KERNEL_BIN}`),
-
-    task("create disk image", () => 
-        `dd if=/dev/zero of=${OS_IMG} bs=512 count=2880`),
-
-    task("write bootloader", () =>
-        `dd if=${BOOT_BIN} of=${OS_IMG} bs=512 seek=0 conv=notrunc`),
-    
-    task("write kernel", () =>
-        `dd if=${KERNEL_BIN} of=${OS_IMG} bs=512 seek=1 conv=notrunc`),
-    
-    task("run qemu", () => 
-        `qemu-system-i386 --accel tcg,thread=single -drive format=raw,file=${OS_IMG},if=floppy`)
+  task("run qemu", () =>
+    `qemu-system-i386 -kernel ${KERNEL_ELF}`)
 ];
+
 
 // Core classes
 class BuildTask {
-
-    constructor(name, commandFunction) {
-
-        this.name = name;
-        this.commandFunction = commandFunction;
-    }
-
-    run() {
-
-        console.log(`\n[${this.name}]`);
-
-        const cmd = this.commandFunction();
-        console.log(">", cmd);
-        execSync(cmd, {stdio: "inherit"});
-    }
+  constructor(name, commandFunction) {
+    this.name = name;
+    this.commandFunction = commandFunction;
+  }
+  run() {
+    console.log(`\n[${this.name}]`);
+    const cmd = this.commandFunction();
+    console.log(">", cmd);
+    execSync(cmd, { stdio: "inherit" });
+  }
 }
 
 class TaskGroup {
-
-    constructor(name, tasks = []) {
-
-        this.name = name;
-        this.tasks = tasks;
-    }
-
-    run() {
-
-        console.log(`\n=== ${this.name} ===`);
-        for (const task of this.tasks) task.run();
-    }
+  constructor(name, tasks = []) {
+    this.name = name;
+    this.tasks = tasks;
+  }
+  run() {
+    console.log(`\n=== ${this.name} ===`);
+    for (const task of this.tasks) task.run();
+  }
 }
 
 class BuildSystem {
-
-    constructor(root) {
-
-        this.root = root;
-        this.build = path.join(root, "build");
-        this.bin = path.join(this.build, "bin");
-    }
-
-    ensureDirs() {
-
-        if (!fs.existsSync(this.build)) fs.mkdirSync(this.build);
-        if (!fs.existsSync(this.bin)) fs.mkdirSync(this.bin);
-    }
-
-    moveObjectsToLowercase() {
-
-        const files = fs.readdirSync(this.root);
-        for (const file of files)
-            if (file.endsWith(".o")) {
-
-                const lower = file.toLowerCase();
-                fs.renameSync(
-                    path.join(this.root, file),
-                    path.join(this.bin, lower)
-                );
-            }
-    }
-
-    runGroup(name, tasks) {
-
-        new TaskGroup(
-            name, 
-            tasks.map(task => new BuildTask(task.name, task.command)
-        )).run();
-    }
+  constructor(root) {
+    this.root = root;
+    this.build = path.join(root, "build");
+    this.bin = path.join(this.build, "bin");
+  }
+  ensureDirs() {
+    if (!fs.existsSync(this.build)) fs.mkdirSync(this.build);
+    if (!fs.existsSync(this.bin)) fs.mkdirSync(this.bin);
+  }
+  moveObjectsToLowercase() {
+    const files = fs.readdirSync(this.root);
+    for (const file of files)
+      if (file.endsWith(".o")) {
+        const lower = file.toLowerCase();
+        fs.renameSync(
+          path.join(this.root, file),
+          path.join(this.bin, lower)
+        );
+      }
+  }
+  runGroup(name, tasks) {
+    new TaskGroup(
+      name,
+      tasks.map(task => new BuildTask(task.name, task.command))
+    ).run();
+  }
 }
 
 (function main() {
+  const build = new BuildSystem(ROOT);
+  build.ensureDirs();
 
-    const build = new BuildSystem(ROOT);
-    build.ensureDirs();
+  build.runGroup("ASM", ASM_TASKS);
+  build.runGroup("C Runtime", C_TASKS);
+  build.runGroup("C++ Kernel", CPP_TASKS);
 
-    build.runGroup("ASM", ASM_TASKS);
-    build.runGroup("C Runtime", C_TASKS);
-    build.runGroup("C++ Kernel", CPP_TASKS);
+  build.moveObjectsToLowercase();
 
-    build.moveObjectsToLowercase();
+  build.runGroup("Linking & Image", OTHER_TASKS);
 
-    build.runGroup("Linking & Image", OTHER_TASKS);
-
-    console.log("\nBuild complete.");
+  console.log("\nBuild complete.");
 })();
