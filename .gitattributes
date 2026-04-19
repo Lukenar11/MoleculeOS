@@ -19,6 +19,9 @@
 # Ninja Build
 *.ninja linguist-detectable=true
 
+# Config Files
+*.cfg linguist-detectable=true
+
 # Batch/CMD Skripte
 *.sh linguist-detectable=true
 *.bat linguist-detectable=true

@@ -1,3 +1,5 @@
+[bits 32]
+
 global Boot
 extern kernel_main
 
@@ -7,5 +9,10 @@ Boot:
 
     mov esp, 0x90000
     and esp, 0xFFFFFFF0
-    
-    jmp kernel_main
+
+    call kernel_main
+
+    .hang:
+        cli
+        hlt
+        jmp .hang
