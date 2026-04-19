@@ -13,28 +13,8 @@
 # Linker Script
 *.ld linguist-detectable=true
 
-# Response File
-*.rsp linguist-detectable=true
-
-# Ninja Build
-*.ninja linguist-detectable=true
-
-# Config Files
-*.cfg linguist-detectable=true
-
-# Batch/CMD Skripte
-*.sh linguist-detectable=true
-*.bat linguist-detectable=true
-*.cmd linguist-detectable=true
-
-# JavaScript
-*.js   linguist-detectable=true
-*.mjs  linguist-detectable=true
-*.cjs  linguist-detectable=true
-*.jsx  linguist-detectable=true
-*.ts   linguist-detectable=true
-*.tsx  linguist-detectable=true
-*.json linguist-detectable=true
+# Makefile
+Makefile linguist-detectable=true
 
 # end of line
 * text eol=lf
