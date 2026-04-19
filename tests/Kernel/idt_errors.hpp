@@ -57,12 +57,22 @@
         }
     }
 
+    // General Protection Fault (ISR 13)
+    static void general_protection_fault() {
+
+        __asm__ volatile(
+            "mov $0x1234, %ax\n"
+            "mov %ax, %ds"
+        );
+    }
+    
     static inline void run_exception_tests() {
 
         test_divide_error();
         test_breakpoint();
         test_overflow();
         test_invalid_opcode();
+        general_protection_fault();
     }
 #ifdef __cplusplus
     }

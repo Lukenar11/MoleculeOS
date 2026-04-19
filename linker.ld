@@ -4,9 +4,9 @@ SECTIONS
 {
   . = 0x00100000;
 
-  .multiboot : 
-  { 
-    *(.multiboot) 
+  .multiboot :
+  {
+    KEEP(*(.multiboot))
   }
 
   .text : 

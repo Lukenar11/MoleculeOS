@@ -18,14 +18,13 @@ namespace drivers::vga {
             VGA_BUFFER[index] = make_symbol_entry(symbol, color);
     }
 
-    void VGA::clear_screen(const VGAColors background) const noexcept {
+    void VGA::clear_screen(const VGAColors& background) const noexcept {
 
         const uint8_t color = make_color(VGAColors::BLACK, background);
         const uint16_t entry = make_symbol_entry(' ', color);
 
-        for (uint32_t y = 0; y < VGA_HEIGHT; y++)
-            for (uint32_t x = 0; x < VGA_WIDTH; x++)
-                VGA_BUFFER[y * VGA_WIDTH + x] = entry;
+        for (uint32_t i = 0; i < VGA_WIDTH * VGA_HEIGHT; i++)
+            VGA_BUFFER[i] = entry;
     }
     
     VGA vga_driver;

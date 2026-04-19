@@ -4,35 +4,51 @@ namespace runtime {
 
     void ConsoleIO::reset() noexcept {
 
-        cursor_x = DEFAULT_CURSOR_POS;
-        cursor_y = DEFAULT_CURSOR_POS;
-        cursor_color = DEFAULT_COLOR;
+        cursor_x = 0;
+        cursor_y = 0;
 
         drivers::vga::vga_driver.clear_screen(drivers::vga::VGAColors::BLACK);
     }
 
     void ConsoleIO::set_char_colors(
-        const drivers::vga::VGAColors color, 
-        const drivers::vga::VGAColors background) noexcept {
+        const drivers::vga::VGAColors& color,
+        const drivers::vga::VGAColors& background) noexcept {
 
-        // Guard against invalid color values
-        constexpr uint8_t MAX_COLOR = 
-            static_cast<uint8_t>(drivers::vga::VGAColors::WHITE);
-    
-        if (static_cast<uint8_t>(color) > MAX_COLOR ||
-            static_cast<uint8_t>(background) > MAX_COLOR)
-            return;
-
-        cursor_color = drivers::vga::VGA::make_color(color, background);
+        cursor_color = drivers::vga::vga_driver.make_color(color, background);
     }
 
     void ConsoleIO::new_line() noexcept {
 
-        cursor_x = DEFAULT_CURSOR_POS;
+        cursor_x = 0;
         cursor_y++;
 
         if (cursor_y >= drivers::vga::VGA_HEIGHT) [[unlikely]]
-            reset();
+            cursor_y = drivers::vga::VGA_HEIGHT - 1;
+    }
+
+    void ConsoleIO::put_base(uint32_t value, const uint32_t base) noexcept {
+
+        if (value == 0) [[unlikely]] {
+
+            put_char('0');
+            return;
+        }
+
+        if (base < 2 || base > 16) [[unlikely]]
+            return;
+
+        runtime::Array<char, 32> buffer;
+        uint32_t i = 0;
+
+        while (value) [[likely]] {
+
+            const uint8_t number = value % base;
+            buffer[i++] = (number < 10) ? ('0' + number) : ('A' + number - 10);
+            value /= base;
+        }
+
+        while (i--) [[likely]]
+            put_char(buffer[i]);
     }
 
     void ConsoleIO::put_char(const char symbol) noexcept {
@@ -45,202 +61,149 @@ namespace runtime {
 
         drivers::vga::vga_driver.put_char_at(symbol, cursor_color, cursor_x, cursor_y);
         cursor_x++;
-
         if (cursor_x >= drivers::vga::VGA_WIDTH) [[unlikely]]
             new_line();
     }
 
     void ConsoleIO::put_string(const char* message) noexcept {
 
-        for (uint32_t i = 0; message[i] != '\0'; i++) [[likely]]
-            put_char(message[i]);
+        while (*message) [[likely]]
+            put_char(*message++);
     }
 
     void ConsoleIO::put_int(int32_t value) noexcept {
 
-        if (value < 0) {
+        if (value < 0) [[unlikely]] {
 
             put_char('-');
-            value = -value;
-        }
-
-        if (value == 0) [[unlikely]] {
-        
-            put_char('0');
+            value = static_cast<uint32_t>(-(value + 1)) + 1;
+            put_uint(value);
             return;
         }
 
-        runtime::Array<char, 12> buffer;
-        uint32_t index = 0;
-        while (value > 0) [[likely]] {
-
-            buffer[index++] = '0' + (value % 10);
-            value /= 10;
-        }
-
-        for (int32_t i = index - 1; i >= 0; i--) [[likely]]
-            put_char(buffer[i]);
+        put_uint(value);
     }
 
     void ConsoleIO::put_uint(uint32_t value) noexcept {
 
-        if (value < 0) {
-
-            put_char('-');
-            value = -value;
-        }
-
         if (value == 0) [[unlikely]] {
-    
+
             put_char('0');
             return;
         }
 
         runtime::Array<char, 12> buffer;
-        uint32_t index = 0;
-        while (value > 0) [[likely]] {
+        uint32_t i = 0;
 
-            buffer[index++] = '0' + (value % 10);
+        while (value) [[likely]] {
+        
+            buffer[i++] = '0' + (value % 10);
             value /= 10;
         }
 
-        for (int32_t i = index - 1; i >= 0; i--) [[likely]]
+        while (i--) [[likely]]
             put_char(buffer[i]);
     }
 
-    void ConsoleIO::put_hex(uint32_t value) noexcept {
+    void ConsoleIO::put_hex(const uint32_t value) noexcept {
 
-        put_char('0');
+        put_char('0'); 
         put_char('x');
-        if (value == 0) [[unlikely]] {
-
-            put_char('0');
-            return;
-        }
-
-        runtime::Array<char, 9> buffer;
-        uint32_t index = 0;
-        while (value > 0) [[likely]] {
-
-            uint8_t digit = value & 0xF;
-            buffer[index++] = (digit < 10) ? ('0' + digit) : ('A' + digit - 10);
-            value >>= 4;
-        }
-    
-        for (int32_t i = index - 1; i >= 0; i--) [[likely]]
-            put_char(buffer[i]);
+        put_base(value, 16);
     }
 
-    void ConsoleIO::put_bin(uint32_t value) noexcept {
-    
-        put_char('0');
+    void ConsoleIO::put_bin(const uint32_t value) noexcept {
+
+        put_char('0'); 
         put_char('b');
-        if (value == 0) [[unlikely]] {
-
-            put_char('0');
-            return;
-        }
-
-        runtime::Array<char, 33> buffer;
-        uint32_t index = 0;
-        while (value > 0) [[likely]] {
-
-            buffer[index++] = (value & 1) ? '1' : '0';
-            value >>= 1;
-        }
-
-        for (int32_t i = index - 1; i >= 0; i--) [[likely]]
-            put_char(buffer[i]);
+        put_base(value, 2);
     }
 
-    void ConsoleIO::put_ptr(uint32_t value) noexcept {
-
-        put_char('0');
+    void ConsoleIO::put_ptr(const uint32_t value) noexcept {
+        
+        put_char('0'); 
         put_char('x');
-        if (value == 0) {
-
-            put_char('0');
-            return;
-        }
-
-        runtime::Array<char, 9> buffer;
-        uint32_t index = 0;
-
-        while (value > 0) {
-
-            uint8_t digit = value & 0xF;
-            buffer[index++] = (digit < 10) ? ('0' + digit) : ('A' + digit - 10);
-            value >>= 4;
-        }
-
-        for (int32_t i = index - 1; i >= 0; i--)
-            put_char(buffer[i]);
+        put_base(value, 16);
     }
 
     void ConsoleIO::printf(const char* format, ...) noexcept {
 
-        // variadic arguments list
         va_list args;
         va_start(args, format);
 
-        for (uint32_t i = 0; format[i] != '\0'; i++) [[likely]] {
+        while (*format) {
 
-            if (format[i] != '%') [[likely]] {
+            if (*format != '%') [[likely]] {
 
-                put_char(format[i]);
+                put_char(*format++);
                 continue;
             }
-            i++;
 
-            switch (format[i]) {
-    
-                // print Char
-                case 'c': 
-                    put_char(static_cast<char>(va_arg(args, int))); 
+            format++;
+
+            switch (*format) {
+
+                case 'c': {
+
+                    const char argument = static_cast<char>(va_arg(args, int));
+                    put_char(argument);
                     break;
-                
-                // print String
-                case 's': 
-                    put_string(va_arg(args, const char*)); 
+                }
+
+                case 's': {
+
+                    const char* argument = va_arg(args, const char*);
+                    put_string(argument);
                     break;
-                
-                // print Signed-Integer
-                case 'd': 
-                    put_int(va_arg(args, int32_t)); 
+                }
+
+                case 'd': {
+
+                    const int32_t argument = static_cast<int32_t>(va_arg(args, int));
+                    put_int(argument);
+                    break;
+                }
+
+                case 'u': {
+
+                    const uint32_t argument = va_arg(args, uint32_t);
+                    put_uint(argument);
+                    break;
+                }
+
+                case 'x': {
+
+                    const uint32_t argument = va_arg(args, uint32_t);
+                    put_hex(argument);
+                    break;
+                }
+
+                case 'b':{
+
+                    const uint32_t argument = va_arg(args, uint32_t);
+                    put_bin(argument);
+                    break;
+                }
+
+                case 'p':{
+
+                    const uint32_t argument = reinterpret_cast<uint32_t>(va_arg(args, void*));
+                    put_ptr(argument);
+                    break;
+                }
+
+                case '%':
+                    put_char('%');
                     break;
 
-                // print Unsigned-Integer
-                case 'u': 
-                    put_uint(va_arg(args, uint32_t)); 
-                    break; 
-
-                // print Hexadecimal 
-                case 'x': 
-                    put_hex(va_arg(args, uint32_t)); 
-                    break;
-
-                // print Binary
-                case 'b': 
-                    put_bin(va_arg(args, uint32_t)); 
-                    break;
-                
-                // print Pointer
-                case 'p': 
-                    put_ptr(va_arg(args, uint32_t)); 
-                    break;
-                
-                // print '%
-                case '%': 
-                    put_char('%'); 
-                    break;
-
-                default: 
-                    put_char(format[i]); 
+                default:
+                    put_char(*format);
                     break;
             }
+
+            format++;
         }
-    
-        // clean variadic arguments list
+
         va_end(args);
     }
 

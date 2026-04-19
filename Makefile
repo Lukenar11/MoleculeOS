@@ -23,28 +23,19 @@ ASMFLAGS = -f elf32
 
 LDFLAGS  = -T $(LINKER) -m elf_i386 -nostdlib -static
 
-SRCS_C = \
-Runtime/C/string.c
-
-SRCS_CPP = \
-Kernel/src/kernel_main.cpp \
-Kernel/src/IDT/IDT.cpp \
-Kernel/src/IDT/ISR/isr_common_handler.cpp \
-Drivers/VGA/src/VGA.cpp \
-Terminal/src/Terminal.cpp \
-Runtime/CPP/ConsoleIO.cpp
-
-SRCS_ASM = \
-Boot/Boot.asm \
-Boot/MultibootHeader.asm \
-Kernel/src/IDT/ISR/ISR.asm \
-Kernel/src/IDT/LoadIDT.asm
-
-C_OBJ   = $(SRCS_C:%.c=$(BUILD)/%.o)
-CPP_OBJ = $(SRCS_CPP:%.cpp=$(BUILD)/%.o)
-ASM_OBJ = $(SRCS_ASM:%.asm=$(BUILD)/%.o)
-
-OBJS = $(C_OBJ) $(CPP_OBJ) $(ASM_OBJ)
+OBJS = \
+$(BUILD)/string.o \
+$(BUILD)/kernel_main.o \
+$(BUILD)/IDT.o \
+$(BUILD)/isr_common_handler.o \
+$(BUILD)/VGA.o \
+$(BUILD)/Terminal.o \
+$(BUILD)/ConsoleIO.o \
+$(BUILD)/Boot.o \
+$(BUILD)/StackTop.o \
+$(BUILD)/MultibootHeader.o \
+$(BUILD)/isr.o \
+$(BUILD)/LoadIDT.o
 
 all: dirs $(KERNEL)
 
@@ -54,19 +45,35 @@ dirs:
 $(KERNEL): $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $^
 
-# C
-$(BUILD)/%.o: %.c
-	@mkdir -p $(dir $@)
+$(BUILD)/%.o: Runtime/C/%.c
 	$(CC) $(CFLAGS) $< -o $@
 
-# C++
-$(BUILD)/%.o: %.cpp
-	@mkdir -p $(dir $@)
+$(BUILD)/%.o: Kernel/src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-# ASM
-$(BUILD)/%.o: %.asm
-	@mkdir -p $(dir $@)
+$(BUILD)/%.o: Kernel/src/IDT/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD)/%.o: Kernel/src/IDT/ISR/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD)/%.o: Runtime/CPP/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD)/%.o: Drivers/VGA/src/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD)/%.o: Terminal/src/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD)/%.o: Boot/%.asm
+	nasm $(ASMFLAGS) $< -o $@
+
+
+$(BUILD)/%.o: Kernel/src/IDT/ISR/%.asm
+	nasm $(ASMFLAGS) $< -o $@
+
+$(BUILD)/%.o: Kernel/src/IDT/%.asm
 	nasm $(ASMFLAGS) $< -o $@
 
 run: all

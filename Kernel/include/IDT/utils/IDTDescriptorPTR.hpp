@@ -4,7 +4,7 @@
 
 namespace kernel::idt {
 
-    // IDT-Descriptor Pointer (needed for "lidt[...]")
+    // needed for "lidt[...]"
     struct IDTDescriptorPTR final {
 
         uint16_t limit;

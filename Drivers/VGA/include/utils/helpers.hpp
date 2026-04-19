@@ -8,10 +8,6 @@ namespace drivers::vga {
     static constexpr int32_t VGA_WIDTH = 80;
     static constexpr int32_t VGA_HEIGHT = 25;
 
-    // VGA Textmode-Buffer
-    volatile uint16_t* const VGA_BUFFER =
-        reinterpret_cast<volatile uint16_t*>(0xB8000);
-
     // Char/Symbol Color-Definition
     enum class VGAColors : uint8_t {
 

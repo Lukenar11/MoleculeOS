@@ -8,22 +8,25 @@ namespace drivers::vga {
     class VGA final {
 
         private:
-            static constexpr uint8_t COLOR_SHIFT = 4;
-            static constexpr uint8_t SYMBOL_SHIFT = COLOR_SHIFT << 1;
+            static constexpr uint8_t COLOR_SHIFT = 0x04;
+            static constexpr uint8_t SYMBOL_SHIFT = 0x08;
+
+            inline static volatile uint16_t* const VGA_BUFFER = 
+                reinterpret_cast<volatile uint16_t*>(0xB8000);
 
         public:
             static constexpr uint8_t make_color(
-                const VGAColors foreground, const VGAColors background) noexcept {
+                const VGAColors& foreground, const VGAColors& background) noexcept {
 
-                return static_cast<uint8_t>(background) << COLOR_SHIFT | 
-                       static_cast<uint8_t>(foreground);
+                return (static_cast<uint8_t>(background) << COLOR_SHIFT ) | 
+                        static_cast<uint8_t>(foreground);
             }
 
             static constexpr uint16_t make_symbol_entry(
                 const char symbol, const uint8_t color) noexcept {
                 
-                return static_cast<uint16_t>(color) << SYMBOL_SHIFT | 
-                       static_cast<uint16_t>(symbol);
+                return (static_cast<uint16_t>(color) << SYMBOL_SHIFT) | 
+                        static_cast<uint16_t>(symbol);
             }
 
             void put_char_at(
@@ -32,7 +35,7 @@ namespace drivers::vga {
                 const int32_t x, 
                 const int32_t y) const noexcept;
 
-            void clear_screen(const VGAColors color) const noexcept;
+            void clear_screen(const VGAColors& color) const noexcept;
 
             VGA() noexcept = default;
             ~VGA() noexcept = default;

@@ -2,16 +2,20 @@
 
 global Boot
 extern kernel_main
+extern StackTop
 
 section .text
+
 Boot:
+    ; Interrupts off
     cli
 
-    mov esp, 0x90000
+    ; _init_ Kernel-Stack
+    mov esp, StackTop
     and esp, 0xFFFFFFF0
 
     call kernel_main
-
+    
     .hang:
         cli
         hlt

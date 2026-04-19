@@ -1,6 +1,11 @@
 #ifndef ISR_H
 #define ISR_H
 
+/*
+    Note: 
+    I deliberately wrote this code in C instead of C++ to be maximally compatible with the ISR Assembly components.
+*/
+
 // Interrupt Service Routines (ISRs) for CPU exceptions (ISR.asm)
 #ifdef __cplusplus
     extern "C" {

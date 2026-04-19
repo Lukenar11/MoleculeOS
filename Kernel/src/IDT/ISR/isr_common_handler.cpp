@@ -10,7 +10,8 @@ extern "C" void isr_common_handler(RegisterDump* reg_dump) {
 
     runtime::console.put_string(">>>>>>>>>> !KERNEL PANIC! <<<<<<<<<<");
 
-    runtime::console.put_string("\n\nException: ");
+    print_reg_dump("\n\nError Code: ", reg_dump->error_code);
+    runtime::console.put_string("\nException: ");
     runtime::console.put_string(exception_names[reg_dump->interrupt_number]);
     runtime::console.put_char(' ');
     runtime::console.put_char('(');
@@ -18,7 +19,8 @@ extern "C" void isr_common_handler(RegisterDump* reg_dump) {
     runtime::console.put_char(')');
 
     runtime::console.put_string("\n\nCPU State:");
-    print_reg_dump("\n  EIP: ",    reg_dump->eip);
+    print_reg_dump("\n  EIP: ", reg_dump->eip);
+    print_reg_dump("\n  CS: ", reg_dump->cs);
     runtime::console.put_string("\n  EFLAGS: ");
     runtime::console.put_bin(reg_dump->eflags);
 
@@ -30,6 +32,7 @@ extern "C" void isr_common_handler(RegisterDump* reg_dump) {
     print_reg_dump("\n  ESI: ", reg_dump->esi);
     print_reg_dump("\n  EDI: ", reg_dump->edi);
     print_reg_dump("\n  EBP: ", reg_dump->ebp);
+    print_reg_dump("\n  ESP: ", reg_dump->esp_dummy);
 
     runtime::console.put_string("\n\nSegment Registers:");
     print_reg_dump("\n  DS: ", reg_dump->ds);
@@ -37,8 +40,9 @@ extern "C" void isr_common_handler(RegisterDump* reg_dump) {
     print_reg_dump("\n  FS: ", reg_dump->fs);
     print_reg_dump("\n  GS: ", reg_dump->gs);
 
-    runtime::console.put_string("\n\n>>>>>>>>>> !SYSTEM HALTED! <<<<<<<<<<");
-
     while (true)
-        __asm__ volatile("cli \n hlt");
+        __asm__ volatile(
+            "cli\n"
+            "hlt\n"
+        );
 }
