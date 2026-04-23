@@ -54,8 +54,6 @@ To build and run MoleculeOS, the following software is required:
 - **Make** (for Building and running the Project)
 - **QEMU** (for running the OS in a virtual machine)
 
-All build scripts are located in the `build/` directory and are executed via Node.js.
-
 ---
 
 ## Build & Run
