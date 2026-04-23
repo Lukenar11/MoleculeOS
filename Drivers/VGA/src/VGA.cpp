@@ -14,7 +14,8 @@ namespace drivers::vga {
                 return;
 
             const uint32_t index = 
-                static_cast<uint32_t>(y) * VGA_WIDTH + static_cast<uint32_t>(x);
+                static_cast<uint32_t>(y) * VGA_WIDTH + 
+                static_cast<uint32_t>(x);
             VGA_BUFFER[index] = make_symbol_entry(symbol, color);
     }
 

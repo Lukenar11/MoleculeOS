@@ -4,6 +4,7 @@
 #include <Runtime/C/stdint.h>
 
 /*
+    Note:
     "__attribute__((packed))" prevents the compiler from filling the structure
     with padding bytes. 
     The IDT entries must exactly match the layout defined by

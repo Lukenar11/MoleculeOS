@@ -1,0 +1,21 @@
+#ifndef HEAP_POS_MARKER
+#define HEAP_POS_MARKER
+
+/*
+    Note:
+    I deliberately wrote this code in C instead of C++ to be maximally compatible 
+    with the Linker Script. 
+*/
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+    
+extern uintptr_t heap_start;
+extern uintptr_t heap_end;
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif // HEAP_POS_MARKER

@@ -1,7 +1,7 @@
 [bits 32]
+align 4
 
 section .multiboot
-align 4
 
 MB_MAGIC equ 0x1BADB002
 MB_FLAGS equ 0x00000003

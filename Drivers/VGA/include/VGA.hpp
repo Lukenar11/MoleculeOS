@@ -15,14 +15,14 @@ namespace drivers::vga {
                 reinterpret_cast<volatile uint16_t*>(0xB8000);
 
         public:
-            static constexpr uint8_t make_color(
+            static inline constexpr uint8_t make_color(
                 const VGAColors& foreground, const VGAColors& background) noexcept {
 
-                return (static_cast<uint8_t>(background) << COLOR_SHIFT ) | 
+                return (static_cast<uint8_t>(background) << COLOR_SHIFT) | 
                         static_cast<uint8_t>(foreground);
             }
 
-            static constexpr uint16_t make_symbol_entry(
+            static inline constexpr uint16_t make_symbol_entry(
                 const char symbol, const uint8_t color) noexcept {
                 
                 return (static_cast<uint16_t>(color) << SYMBOL_SHIFT) | 

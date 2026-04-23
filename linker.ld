@@ -29,4 +29,10 @@ SECTIONS
     *(.bss*) 
     *(COMMON) 
   }
+
+  kernel_end = .;
+
+  heap_start = .;
+  . += 512K;
+  heap_end = .;
 }

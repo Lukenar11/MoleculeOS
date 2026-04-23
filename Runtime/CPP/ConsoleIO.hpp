@@ -39,7 +39,7 @@ namespace runtime {
             void put_hex(const uint32_t value) noexcept;
             void put_bin(const uint32_t value) noexcept;
             
-            void put_ptr(const uint32_t value) noexcept;
+            void put_ptr(const uintptr_t value) noexcept;
             
             void printf(const char* format, ...) noexcept;
             

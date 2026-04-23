@@ -19,8 +19,8 @@ namespace kernel::idt {
             static constexpr uint8_t FLAGS = 0x8E;
 
         public:
-            inline IDTEntry& operator[](uint32_t index) noexcept { return idt[index]; }
-            inline const IDTEntry& operator[](const uint32_t index) const noexcept { return idt[index]; }
+            inline IDTEntry& operator[](uint32_t i) noexcept { return idt[i]; }
+            inline const IDTEntry& operator[](const uint32_t i) const noexcept { return idt[i]; }
 
             IDT() noexcept;
             ~IDT() noexcept = default;

@@ -35,7 +35,8 @@ $(BUILD)/Boot.o \
 $(BUILD)/StackTop.o \
 $(BUILD)/MultibootHeader.o \
 $(BUILD)/isr.o \
-$(BUILD)/LoadIDT.o
+$(BUILD)/LoadIDT.o \
+$(BUILD)/Heap.o
 
 all: dirs $(KERNEL)
 
@@ -55,6 +56,9 @@ $(BUILD)/%.o: Kernel/src/IDT/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD)/%.o: Kernel/src/IDT/ISR/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD)/%.o: Kernel/src/Heap/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD)/%.o: Runtime/CPP/%.cpp

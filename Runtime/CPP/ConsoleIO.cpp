@@ -119,7 +119,7 @@ namespace runtime {
         put_base(value, 2);
     }
 
-    void ConsoleIO::put_ptr(const uint32_t value) noexcept {
+    void ConsoleIO::put_ptr(const uintptr_t value) noexcept {
         
         put_char('0'); 
         put_char('x');
@@ -187,7 +187,10 @@ namespace runtime {
 
                 case 'p':{
 
-                    const uint32_t argument = reinterpret_cast<uint32_t>(va_arg(args, void*));
+                    const uintptr_t argument = 
+                        reinterpret_cast<uintptr_t>(
+                            va_arg(args, void*)
+                        );
                     put_ptr(argument);
                     break;
                 }
