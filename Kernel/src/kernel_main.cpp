@@ -1,5 +1,6 @@
 #include "IDT/IDT.hpp"
 #include "Heap/Heap.hpp"
+#include "tests/Kernel/test_reg_dump.h"
 #include <Runtime/CPP/ConsoleIO.hpp>
 #include <Runtime/CPP/memory.hpp>
 
@@ -67,4 +68,5 @@ extern "C" void kernel_main() {
 
     test_heap_raw();
     test_heap_new_delete();
+    test_reg_dump();
 }

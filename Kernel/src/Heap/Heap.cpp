@@ -4,11 +4,11 @@ namespace kernel::heap {
 
     Heap::Heap() noexcept {
 
-        const auto start = reinterpret_cast<uintptr_t>(&heap_start);
-        const auto end = reinterpret_cast<uintptr_t>(&heap_end);
+        const uintptr_t start = reinterpret_cast<uintptr_t>(&heap_start);
+        const uintptr_t end = reinterpret_cast<uintptr_t>(&heap_end);
 
         first_block = reinterpret_cast<HeapBlock*>(start);
-        first_block->size = (end - start) - sizeof(HeapBlock);
+        first_block->size = (start - end) + sizeof(HeapBlock);
         first_block->is_free = true;
         first_block->next = nullptr;
     }

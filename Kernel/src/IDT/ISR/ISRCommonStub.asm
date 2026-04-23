@@ -2,43 +2,51 @@ global ISRCommonStub
 extern isr_common_handler
 
 section .text
-
+    
 ISRCommonStub:
-    cli
+    ; General Purpose Register => Stack
+    push eax
+    push ecx
+    push edx
+    push ebx
+    push ebp
+    push esi
+    push edi
 
-    ; Save segments
-    push ds
-    push es
-    push fs
+    ; Segmentregister => Stack
     push gs
+    push fs
+    push es
+    push ds
 
-    ; Load kernel data segment
+    ; set Kernel Data Segment
     mov ax, 0x10
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
 
-    ; Save general purpose registers
-    pusha
-
-    ; Pass pointer to TrapFrame
-    mov eax, esp
-    push eax
-
+    ; Pointer to RegisterDump
+    push esp
     call isr_common_handler
     add esp, 4
 
-    ; restore registers
-    popa
-
-    ; restore segments
-    pop gs
-    pop fs
-    pop es
+    ; Stack => Segmentregister
     pop ds
+    pop es
+    pop fs
+    pop gs
 
-    ; remove error_code + interrupt_number
+    ; Stack => General Purpose Register
+    pop edi
+    pop esi
+    pop ebp
+    pop ebx
+    pop edx
+    pop ecx
+    pop eax
+
+    ; remove interrupt_number + error_code
     add esp, 8
 
     iretd

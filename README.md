@@ -1,6 +1,6 @@
 # MoleculeOS
 
-**MoleculeOS** is a minimalist, text-based *i368* monolitic operating system, <br>
+**MoleculeOS** is a minimalist, text-based *i386* monolitic operating system, <br>
 developed in C++ by GitHub user *Lukenar11 (Luke Matthes)*.
 
 The goal of this project is to create a clearly structured, <br>

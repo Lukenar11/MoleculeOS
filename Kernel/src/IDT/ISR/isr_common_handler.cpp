@@ -32,7 +32,7 @@ extern "C" void isr_common_handler(RegisterDump* reg_dump) {
     print_reg_dump("\n  ESI: ", reg_dump->esi);
     print_reg_dump("\n  EDI: ", reg_dump->edi);
     print_reg_dump("\n  EBP: ", reg_dump->ebp);
-    print_reg_dump("\n  ESP: ", reg_dump->esp_dummy);
+    // print_reg_dump("\n  ESP: ", reg_dump->esp_dummy);
 
     runtime::console.put_string("\n\nSegment Registers:");
     print_reg_dump("\n  DS: ", reg_dump->ds);

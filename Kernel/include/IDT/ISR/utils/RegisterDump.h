@@ -23,20 +23,9 @@ extern "C" {
 typedef struct RegisterDump RegisterDump;
 struct RegisterDump {
 
-    uint32_t gs, fs, es, ds;
-
-    uint32_t eax;
-    uint32_t ecx;
-    uint32_t edx;
-    uint32_t ebx;
-    uint32_t esp_dummy;
-    uint32_t ebp;
-    uint32_t esi;
-    uint32_t edi;
-
-    uint32_t interrupt_number;
-    uint32_t error_code;
-
+    uint32_t ds, es, fs, gs;
+    uint32_t edi, esi, ebp, ebx, edx, ecx, eax;
+    uint32_t interrupt_number, error_code;
     uint32_t eip, cs, eflags;
 } __attribute__((packed));
 

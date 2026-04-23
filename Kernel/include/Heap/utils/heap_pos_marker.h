@@ -1,5 +1,7 @@
-#ifndef HEAP_POS_MARKER
-#define HEAP_POS_MARKER
+#ifndef HEAP_POS_MARKER_H
+#define HEAP_POS_MARKER_H
+
+#include <Runtime/C/stdint.h>
 
 /*
     Note:
@@ -11,11 +13,11 @@
 extern "C" {
 #endif
     
-extern uintptr_t heap_start;
-extern uintptr_t heap_end;
+extern uint8_t heap_start;
+extern uint8_t heap_end;
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif // HEAP_POS_MARKER
+#endif // HEAP_POS_MARKER_H
