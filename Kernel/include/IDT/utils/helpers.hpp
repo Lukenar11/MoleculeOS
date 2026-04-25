@@ -2,8 +2,8 @@
 
 #include <Runtime/C/stdint.h>
 
-namespace kernel::idt {
-    
+namespace kernel::idt 
+{
     #define IDT_NULL 0x00
 
     static constexpr uint8_t SHIFT_16 = 0x10;

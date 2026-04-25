@@ -3,18 +3,14 @@
 #include "IDT/ISR/isr.h"
 #include <Runtime/C/stdint.h>
 
-namespace kernel::idt {
-
-    // Helper structure to initialize IDT entries
+namespace kernel::idt 
+{
     struct IDTInitEntry final {
-
         uint32_t index;
         void (*handler)();
     };
 
-    // _init_ IDT
     inline static constexpr IDTInitEntry idt_init_table[32] = {
-
         { 0, isr_0 }, { 1, isr_1 }, { 2, isr_2 }, { 3, isr_3 }, 
         { 4, isr_4 }, { 5, isr_5 }, { 6, isr_6 }, { 7, isr_7 }, 
         { 8, isr_8 }, { 9, isr_9 }, {10, isr_10}, {11, isr_11}, 

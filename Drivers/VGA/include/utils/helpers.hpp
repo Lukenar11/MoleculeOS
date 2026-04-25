@@ -2,7 +2,8 @@
 
 #include <Runtime/C/stdint.h>
 
-namespace drivers::vga {
+namespace drivers::vga 
+{
 
     // Screen Dimensions
     static constexpr int32_t VGA_WIDTH = 80;
@@ -10,7 +11,6 @@ namespace drivers::vga {
 
     // Char/Symbol Color-Definition
     enum class VGAColors : uint8_t {
-
         BLACK = 0x00,
         BLUE = 0x01,
         GREEN = 0x02,

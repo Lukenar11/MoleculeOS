@@ -3,8 +3,8 @@
 #include "utils/RegisterDump.h"
 #include <Runtime/CPP/ConsoleIO.hpp>
 
-static const char* exception_names[32] = {
-
+static const char* exception_names[32] =
+{
     "Division by Zero",
     "Debug",
     "Non-Maskable Interrupt",
@@ -39,8 +39,8 @@ static const char* exception_names[32] = {
     "Reserved"
 };
 
-static inline void print_reg_dump(const char* label, uint32_t value) {
-
+static inline void print_reg_dump(const char* label, uint32_t value)
+{
     runtime::console.put_string(label);
     runtime::console.put_hex(value);
 }

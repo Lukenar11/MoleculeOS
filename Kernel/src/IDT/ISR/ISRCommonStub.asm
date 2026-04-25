@@ -4,7 +4,7 @@ extern isr_common_handler
 section .text
     
 ISRCommonStub:
-    ; General Purpose Register => Stack
+    ; Save: general purpose register
     push eax
     push ecx
     push edx
@@ -13,31 +13,31 @@ ISRCommonStub:
     push esi
     push edi
 
-    ; Segmentregister => Stack
+    ; Save: segmentregister
     push gs
     push fs
     push es
     push ds
 
-    ; set Kernel Data Segment
+    ; set: kernel data segment
     mov ax, 0x10
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
 
-    ; Pointer to RegisterDump
+    ; pointer to RegisterDump
     push esp
     call isr_common_handler
     add esp, 4
 
-    ; Stack => Segmentregister
+    ; reset: segmentregister
     pop ds
     pop es
     pop fs
     pop gs
 
-    ; Stack => General Purpose Register
+    ; reset: general purpose register
     pop edi
     pop esi
     pop ebp
@@ -46,7 +46,7 @@ ISRCommonStub:
     pop ecx
     pop eax
 
-    ; remove interrupt_number + error_code
+    ; remove: interrupt_number + error_code
     add esp, 8
 
     iretd

@@ -11,8 +11,8 @@ section .text
         ; Interrupts off
         cli
 
-        push dword 0    ; Error-Code => Stack
-        push dword %1   ; Interrupt-Number => Stack
+        push dword 0    ; error code
+        push dword %1   ; interrupt number
         jmp ISRCommonStub
 %endmacro
     
@@ -21,11 +21,10 @@ section .text
         ; Interrupts off
         cli
 
-        push dword %1   ; Interrupt-Number => Stack
+        push dword %1   ; interrupt number
         jmp ISRCommonStub
 %endmacro
-    
-; _init_ ISR
+
 NO_ISR_ERROR 0  ; (isr_0 ) Divide Error
 NO_ISR_ERROR 1  ; (isr_1 ) Debug
 NO_ISR_ERROR 2  ; (isr_2 ) NMI

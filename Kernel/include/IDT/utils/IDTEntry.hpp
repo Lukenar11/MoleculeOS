@@ -14,11 +14,10 @@
     Therefore, "packed" is absolutely necessary here.
 */
 
-namespace kernel::idt {
-
+namespace kernel::idt 
+{
     // Interrupt Descriptor (IDT) Entry structure
     struct IDTEntry final {
-
         uint16_t base_low;
         uint16_t selector;
         uint8_t always_0;
@@ -26,11 +25,9 @@ namespace kernel::idt {
         uint16_t base_high;
 
         // _init_
-        inline constexpr void set_gate(
-            const uint32_t base, 
-            const uint16_t selector, 
-            const uint8_t flags) noexcept {
-
+        inline constexpr void set_gate(const uint32_t base, 
+                                       const uint16_t selector, 
+                                       const uint8_t flags) noexcept {
             base_low = base & WORD_MASK;
             base_high = base >> SHIFT_16 & WORD_MASK;
             this->selector = selector;

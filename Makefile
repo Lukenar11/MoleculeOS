@@ -28,7 +28,7 @@ $(BUILD)/string.o \
 $(BUILD)/kernel_main.o \
 $(BUILD)/IDT.o \
 $(BUILD)/isr_common_handler.o \
-$(BUILD)/VGA.o \
+$(BUILD)/VGADriver.o \
 $(BUILD)/Terminal.o \
 $(BUILD)/ConsoleIO.o \
 $(BUILD)/Boot.o \

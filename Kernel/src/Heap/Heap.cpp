@@ -1,11 +1,12 @@
 #include "Heap/Heap.hpp"
 
-namespace kernel::heap {
-
-    Heap::Heap() noexcept { current = reinterpret_cast<uintptr_t>(&heap_start); }
+namespace kernel::heap 
+{
+    Heap::Heap() noexcept { 
+        current = reinterpret_cast<uintptr_t>(&heap_start); 
+    }
 
     void* Heap::allocate(uintptr_t size) {
-    
         if (size == 0)
             return nullptr;
     

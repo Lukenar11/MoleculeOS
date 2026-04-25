@@ -2,11 +2,10 @@
 
 #include <C/stdint.h>
 
-namespace runtime {
-
+namespace runtime 
+{
     template<class T, uint32_t S>
     class Array final {
-
         private:
             static_assert(S > 0, "Array size must be greater than zero");
 
@@ -36,7 +35,6 @@ namespace runtime {
 
             // Repace array-data with "value"
             constexpr void fill(const T& value) noexcept {
-
                 for (uint32_t i = 0; i < S; i++)
                     data[i] = value; 
             }

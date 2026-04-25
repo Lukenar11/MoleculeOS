@@ -3,10 +3,10 @@
 #include "utils/heap_pos_marker.h"
 #include <Runtime/C/stdint.h>
 
-namespace kernel::heap {
+namespace kernel::heap 
+{
 
     class Heap {
-
         private:
             uintptr_t current;
 
@@ -15,8 +15,13 @@ namespace kernel::heap {
         public:
             void* allocate(uintptr_t size);
 
-            inline uintptr_t used() const { return current - reinterpret_cast<uintptr_t>(&heap_start); }
-            inline uintptr_t remaining() const { return reinterpret_cast<uintptr_t>(&heap_end) - current; }
+            inline uintptr_t used() const noexcept { 
+                return current - reinterpret_cast<uintptr_t>(&heap_start); 
+            }
+
+            inline uintptr_t remaining() const noexcept { 
+                return reinterpret_cast<uintptr_t>(&heap_end) - current; 
+            }
 
             Heap() noexcept;
             ~Heap() noexcept = default;

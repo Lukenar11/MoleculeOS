@@ -9,11 +9,9 @@
     Any deviation (e.g., due to alignment) would result in the wrong address being loaded. 
     Therefore, "packed" is absolutely necessary here.
 */
-namespace kernel::idt {
-
-    // needed for "lidt[...]"
+namespace kernel::idt 
+{
     struct IDTDescriptorPTR final {
-
         uint16_t limit;
         uint32_t base;
     } __attribute__((packed));

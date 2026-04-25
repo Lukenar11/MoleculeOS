@@ -3,8 +3,8 @@
 #include "tests/Kernel/test_heap.hpp"
 #include <Runtime/CPP/ConsoleIO.hpp>
 
-extern "C" void kernel_main() {
-
+extern "C" void kernel_main() 
+{
     kernel::idt::IDT idt;
 
     runtime::console.reset();

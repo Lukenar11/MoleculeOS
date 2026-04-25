@@ -7,10 +7,9 @@
 #include <Runtime/C/stdint.h>
 #include <Runtime/CPP/Array.hpp>
 
-namespace kernel::idt {
-
+namespace kernel::idt 
+{
     class IDT final {
-
         private:
             runtime::Array<IDTEntry, 256> idt;
             IDTDescriptorPTR idt_ptr;
