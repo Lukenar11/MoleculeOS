@@ -4,26 +4,26 @@
 
 namespace drivers::vga 
 {
-    // VGA-Driver
     class VGADriver final {
         private:
+            static constexpr uint8_t SHIFT_4 = 0x08;
+            static constexpr uint8_t SHIFT_8 = 0x08;
+            
             static inline volatile uint16_t* const VGA_BUFFER = 
                 reinterpret_cast<volatile uint16_t*>(0xB8000);
 
         public:
             [[nodiscard]]
             static inline constexpr uint8_t make_color(const VGAColors& foreground, 
-                                                       const VGAColors& background) noexcept
-            {
-                return (static_cast<uint8_t>(background) << 0x04) | 
+                                                       const VGAColors& background) noexcept {
+                return (static_cast<uint8_t>(background) << SHIFT_4) | 
                         static_cast<uint8_t>(foreground);
             }
 
             [[nodiscard]]
             static inline constexpr uint16_t make_symbol_entry(const char symbol, 
-                                                               const uint8_t color) noexcept 
-            {
-                return (static_cast<uint16_t>(color) << 0x08) | 
+                                                               const uint8_t color) noexcept{
+                return (static_cast<uint16_t>(color) << SHIFT_8) | 
                         static_cast<uint16_t>(symbol);
             }
 

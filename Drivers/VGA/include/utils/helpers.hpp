@@ -4,7 +4,6 @@
 
 namespace drivers::vga 
 {
-
     // Screen Dimensions
     static constexpr int32_t VGA_WIDTH = 80;
     static constexpr int32_t VGA_HEIGHT = 25;

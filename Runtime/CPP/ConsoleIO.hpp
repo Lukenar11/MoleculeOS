@@ -9,8 +9,10 @@ namespace runtime
 {
     class ConsoleIO {
         private:
-            int32_t cursor_x = 0;
-            int32_t cursor_y = 0;
+            static constexpr uint32_t DEFAULT_NULL = 0x00;
+            
+            int32_t cursor_x = DEFAULT_NULL;
+            int32_t cursor_y = DEFAULT_NULL;
         
             uint8_t cursor_color = 
                 drivers::vga::vga_driver.make_color(

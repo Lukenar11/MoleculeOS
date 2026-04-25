@@ -9,6 +9,7 @@
     Any deviation (e.g., due to alignment) would result in the wrong address being loaded. 
     Therefore, "packed" is absolutely necessary here.
 */
+
 namespace kernel::idt 
 {
     struct IDTDescriptorPTR final {

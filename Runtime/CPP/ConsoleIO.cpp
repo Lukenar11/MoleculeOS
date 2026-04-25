@@ -3,19 +3,20 @@
 namespace runtime 
 {
     void ConsoleIO::reset() noexcept {
-        cursor_x = 0;
-        cursor_y = 0;
+        cursor_x = DEFAULT_NULL;
+        cursor_y = DEFAULT_NULL;
 
         drivers::vga::vga_driver.clear_screen(drivers::vga::VGAColors::BLACK);
     }
 
     void ConsoleIO::set_char_colors(const drivers::vga::VGAColors& color,
-                                    const drivers::vga::VGAColors& background) noexcept {
+                                    const drivers::vga::VGAColors& background) noexcept 
+    {
         cursor_color = drivers::vga::vga_driver.make_color(color, background);
     }
 
     void ConsoleIO::new_line() noexcept {
-        cursor_x = 0;
+        cursor_x = DEFAULT_NULL;
         cursor_y++;
 
         if (cursor_y >= drivers::vga::VGA_HEIGHT) [[unlikely]]
@@ -23,8 +24,7 @@ namespace runtime
     }
 
     void ConsoleIO::put_base(uint32_t value, const uint32_t base) noexcept {
-
-        if (value == 0) [[unlikely]] {
+        if (value == DEFAULT_NULL) [[unlikely]] {
             put_char('0');
             return;
         }
@@ -33,7 +33,7 @@ namespace runtime
             return;
 
         runtime::Array<char, 32> buffer;
-        uint32_t i = 0;
+        uint32_t i = DEFAULT_NULL;
 
         while (value) {
             const uint8_t number = value % base;
@@ -63,7 +63,7 @@ namespace runtime
     }
 
     void ConsoleIO::put_int(int32_t value) noexcept {
-        if (value < 0) [[unlikely]] {
+        if (value < DEFAULT_NULL) [[unlikely]] {
             put_char('-');
             value = static_cast<uint32_t>(-(value + 1)) + 1;
             put_uint(value);
@@ -74,13 +74,13 @@ namespace runtime
     }
 
     void ConsoleIO::put_uint(uint32_t value) noexcept {
-        if (value == 0) [[unlikely]] {
+        if (value == DEFAULT_NULL) [[unlikely]] {
             put_char('0');
             return;
         }
 
         runtime::Array<char, 12> buffer;
-        uint32_t i = 0;
+        uint32_t i = DEFAULT_NULL;
 
         while (value) {
             buffer[i++] = '0' + (value % 10);

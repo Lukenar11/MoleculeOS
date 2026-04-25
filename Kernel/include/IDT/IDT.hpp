@@ -14,7 +14,7 @@ namespace kernel::idt
             runtime::Array<IDTEntry, 256> idt;
             IDTDescriptorPTR idt_ptr;
 
-            static constexpr uint16_t CODE_SEGMENT_SELECTOR = 0x08;
+            static constexpr uint8_t CODE_SEGMENT_SELECTOR = 0x08;
             static constexpr uint8_t FLAGS = 0x8E;
 
         public:

@@ -10,7 +10,7 @@ namespace kernel::idt
         void (*handler)();
     };
 
-    inline static constexpr IDTInitEntry idt_init_table[32] = {
+    static inline constexpr IDTInitEntry idt_init_table[32] = {
         { 0, isr_0 }, { 1, isr_1 }, { 2, isr_2 }, { 3, isr_3 }, 
         { 4, isr_4 }, { 5, isr_5 }, { 6, isr_6 }, { 7, isr_7 }, 
         { 8, isr_8 }, { 9, isr_9 }, {10, isr_10}, {11, isr_11}, 

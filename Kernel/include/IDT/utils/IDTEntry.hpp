@@ -27,7 +27,8 @@ namespace kernel::idt
         // _init_
         inline constexpr void set_gate(const uint32_t base, 
                                        const uint16_t selector, 
-                                       const uint8_t flags) noexcept {
+                                       const uint8_t flags) noexcept 
+        {
             base_low = base & WORD_MASK;
             base_high = base >> SHIFT_16 & WORD_MASK;
             this->selector = selector;
