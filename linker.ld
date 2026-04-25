@@ -30,8 +30,7 @@ SECTIONS
     *(COMMON) 
   }
 
-  kernel_end = .;
-
+  . = ALIGN(8);
   heap_start = .;
   . += 512K;
   heap_end = .;

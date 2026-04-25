@@ -2,48 +2,24 @@
 
 namespace kernel::heap {
 
-    Heap::Heap() noexcept {
+    Heap::Heap() noexcept { current = reinterpret_cast<uintptr_t>(&heap_start); }
 
-        const uintptr_t start = reinterpret_cast<uintptr_t>(&heap_start);
-        const uintptr_t end = reinterpret_cast<uintptr_t>(&heap_end);
-
-        first_block = reinterpret_cast<HeapBlock*>(start);
-        first_block->size = (start - end) + sizeof(HeapBlock);
-        first_block->is_free = true;
-        first_block->next = nullptr;
+    void* Heap::allocate(uintptr_t size) {
+    
+        if (size == 0)
+            return nullptr;
+    
+        size = (size + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
+        uintptr_t aligned = (current + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
+    
+        // if (aligned + size > reinterpret_cast<uintptr_t>(&heap_end)) {
+        //     kernel_panic("Out of heap memory");
+        // }
+    
+        void* result = reinterpret_cast<void*>(aligned);
+        current = aligned + size;
+        return result;
     }
-
-    void* Heap::allocate(const uint32_t size) noexcept {
-
-        HeapBlock* current_block = first_block;
-        while (current_block) {
-
-            if (current_block->is_free && current_block->size >= size) {
-
-                current_block->is_free = false;
-                return reinterpret_cast<void*>(
-                    reinterpret_cast<uint8_t*>(current_block) + sizeof(HeapBlock)
-                );
-            }
-            
-            current_block = current_block->next;
-        }
-
-        // no place (heap full)
-        return nullptr;
-    }
-
-    void Heap::deallocate(void* block_ptr) noexcept { 
-
-        if (!block_ptr) 
-            return;
-
-        HeapBlock* current_block = reinterpret_cast<HeapBlock*>(
-            reinterpret_cast<uint8_t*>(block_ptr) - sizeof(HeapBlock)
-        );
-        
-        current_block->is_free = true;
-    }
-
+    
     Heap heap;
 } // namespace kernel::heap

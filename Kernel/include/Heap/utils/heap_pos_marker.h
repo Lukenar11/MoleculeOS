@@ -13,8 +13,8 @@
 extern "C" {
 #endif
     
-extern uint8_t heap_start;
-extern uint8_t heap_end;
+extern uintptr_t heap_start;
+extern uintptr_t heap_end;
 
 #ifdef __cplusplus
 }
