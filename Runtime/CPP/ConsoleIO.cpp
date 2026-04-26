@@ -47,15 +47,41 @@ namespace runtime
     }
 
     void ConsoleIO::put_char(const char symbol) noexcept {
-        if (symbol == '\n') [[unlikely]] {
-            new_line();
-            return;
-        }
+        switch (symbol) {
+            case '\r':
+                cursor_x = DEFAULT_NULL;
+                return;
 
-        drivers::vga::vga_driver.put_char_at(symbol, cursor_color, cursor_x, cursor_y);
-        cursor_x++;
-        if (cursor_x >= drivers::vga::VGA_WIDTH) [[unlikely]]
-            new_line();
+            case '\t': 
+                for (uint32_t i = DEFAULT_NULL; i < 4; i++) {
+                    drivers::vga::vga_driver.put_char_at(
+                        ' ', cursor_color, cursor_x, cursor_y
+                    );
+                    cursor_x++;
+                    if (cursor_x >= drivers::vga::VGA_WIDTH) [[unlikely]]
+                        new_line();
+                }
+                return;
+    
+            case '\n':
+                new_line();
+                return;
+
+            case '\"': 
+                drivers::vga::vga_driver.put_char_at(
+                    34, cursor_color, cursor_x, cursor_y
+                );
+                return;
+
+            default:
+                drivers::vga::vga_driver.put_char_at(
+                    symbol, cursor_color, cursor_x, cursor_y
+                );
+                cursor_x++;
+                if (cursor_x >= drivers::vga::VGA_WIDTH) [[unlikely]]
+                    new_line();
+                return;
+        }
     }
 
     void ConsoleIO::put_string(const char* message) noexcept {

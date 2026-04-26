@@ -24,8 +24,13 @@ extern "C" void kernel_main()
         "https://github.com/Lukenar11/MoleculeOS\n"
     );
 
+    runtime::console.put_string("\tTest\n\"");
+    runtime::console.put_string("\tTest2\rTest3");
+
+    kernel_panic("This is a test panic message", "This is a test troubleshooting message");
+
     // test_bump_raw();
-    test_new_raw();
+    // test_new_raw();
 
     while (true)
         __asm__ volatile ("nop");
