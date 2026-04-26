@@ -4,7 +4,8 @@ $(BUILD)/IDT.o \
 $(BUILD)/isr_common_handler.o \
 $(BUILD)/isr.o \
 $(BUILD)/LoadIDT.o \
-$(BUILD)/Heap.o
+$(BUILD)/Heap.o \
+$(BUILD)/kernel_panic.o
 
 $(BUILD)/kernel_main.o: Kernel/src/kernel_main.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
@@ -23,3 +24,7 @@ $(BUILD)/%.o: Kernel/src/IDT/ISR/%.asm
 
 $(BUILD)/Heap.o: Kernel/src/Heap/Heap.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD)/kernel_panic.o: Kernel/src/Panic/kernel_panic.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+	

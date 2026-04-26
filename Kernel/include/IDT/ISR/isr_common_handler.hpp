@@ -45,4 +45,5 @@ static inline void print_reg_dump(const char* label, uint32_t value)
     runtime::console.put_hex(value);
 }
 
-extern "C" void isr_common_handler(RegisterDump* reg_dump);
+extern "C" [[noreturn]]
+void isr_common_handler(RegisterDump* reg_dump);

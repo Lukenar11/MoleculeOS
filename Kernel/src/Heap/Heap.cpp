@@ -13,9 +13,9 @@ namespace kernel::heap
         size = (size + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
         uintptr_t aligned = (current + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
     
-        // if (aligned + size > reinterpret_cast<uintptr_t>(&heap_end)) {
-        //     kernel_panic("Out of heap memory");
-        // }
+        if (aligned + size > reinterpret_cast<uintptr_t>(&heap_end)) {
+            kernel_panic("Out of heap memory");
+        }
     
         void* result = reinterpret_cast<void*>(aligned);
         current = aligned + size;

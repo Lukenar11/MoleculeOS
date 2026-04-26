@@ -26,4 +26,7 @@ extern "C" void kernel_main()
 
     // test_bump_raw();
     test_new_raw();
+
+    while (true)
+        __asm__ volatile ("nop");
 }

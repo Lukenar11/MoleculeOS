@@ -1,11 +1,11 @@
 #pragma once
 
 #include "utils/heap_pos_marker.h"
+#include "Panic/kernel_panic.hpp"
 #include <Runtime/C/stdint.h>
 
 namespace kernel::heap 
 {
-
     class Heap {
         private:
             uintptr_t current;

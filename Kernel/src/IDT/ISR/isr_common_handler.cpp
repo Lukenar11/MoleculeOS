@@ -1,6 +1,7 @@
 #include "IDT/ISR/isr_common_handler.hpp"
 
-extern "C" void isr_common_handler(RegisterDump* reg_dump) 
+extern "C" [[noreturn]]
+void isr_common_handler(RegisterDump* reg_dump) 
 {
     runtime::console.reset();
     runtime::console.set_char_colors(
