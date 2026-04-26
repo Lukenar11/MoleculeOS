@@ -10,8 +10,7 @@ namespace runtime
     }
 
     void ConsoleIO::set_char_colors(const drivers::vga::VGAColors& color,
-                                    const drivers::vga::VGAColors& background) noexcept 
-    {
+                                    const drivers::vga::VGAColors& background) noexcept {
         cursor_color = drivers::vga::vga_driver.make_color(color, background);
     }
 
@@ -19,8 +18,10 @@ namespace runtime
         cursor_x = DEFAULT_NULL;
         cursor_y++;
 
-        if (cursor_y >= drivers::vga::VGA_HEIGHT) [[unlikely]]
+        if (cursor_y >= drivers::vga::VGA_HEIGHT) [[unlikely]] {
             cursor_y = drivers::vga::VGA_HEIGHT - 1;
+            reset();
+        }
     }
 
     void ConsoleIO::put_base(uint32_t value, const uint32_t base) noexcept {
@@ -94,19 +95,25 @@ namespace runtime
     void ConsoleIO::put_hex(const uint32_t value) noexcept {
         put_char('0'); 
         put_char('x');
-        put_base(value, 16);
+
+        const uint32_t base = 16;
+        put_base(value, base);
     }
 
     void ConsoleIO::put_bin(const uint32_t value) noexcept {
         put_char('0'); 
         put_char('b');
-        put_base(value, 2);
+
+        const uint32_t base = 2;
+        put_base(value, base);
     }
 
     void ConsoleIO::put_ptr(const uintptr_t value) noexcept {
         put_char('0'); 
         put_char('x');
-        put_base(value, 16);
+
+        const uint32_t base = 16;
+        put_base(value, base);
     }
 
     void ConsoleIO::printf(const char* format, ...) noexcept {

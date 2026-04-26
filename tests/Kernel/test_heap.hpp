@@ -3,27 +3,50 @@
 #include <Runtime/CPP/ConsoleIO.hpp>
 #include <Runtime/CPP/memory.hpp>
 
-void test_bump_raw() {
+void test_bump_raw() 
+{
+    runtime::console.reset();
 
-    runtime::console.put_string("=== BUMP RAW TEST ===\n");
+    runtime::console.printf("heap_start: %p\n", &heap_start);
+    for (uint32_t size = 1; size < 23; size++) {
+        void* ptr = kernel::heap::heap.allocate(size);
+        uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
+        
+        bool is_aligned = (addr % 8) == 0;
+        runtime::console.printf(
+            "Size: %d -> Ptr: %p -> Aligned: %s (addr %% 8 = %d) | Used: %d\n", 
+            size, 
+            ptr, 
+            is_aligned ? "YES" : "NO", 
+            addr % 8, 
+            kernel::heap::heap.used()
+        );
+    }
 
-    void* a = kernel::heap::heap.allocate(9);
-    runtime::console.printf("A = %p\n", a);
-
-    runtime::console.printf("Used: %p bytes\n", kernel::heap::heap.used());
-    runtime::console.printf("Remaining: %p bytes\n", kernel::heap::heap.remaining());
+    runtime::console.printf("heap_end: %p\n", &heap_end);
+    runtime::console.printf("Remaining: %p bytes", kernel::heap::heap.remaining());
 }
 
-void test_bump_new_delete() {
+void test_new_raw()
+{
+    runtime::console.reset();
 
-    runtime::console.put_string("=== BUMP NEW/DELETE TEST ===\n");
+    runtime::console.printf("heap_start: %p\n", &heap_start);
+    for (uint32_t size = 1; size < 23; size++) {
+        uint8_t* ptr = new uint8_t[size];
+        uintptr_t addr = reinterpret_cast<uintptr_t>(ptr);
 
-    uint32_t* x = new uint32_t(123);
-    runtime::console.printf("x = %p, *x = %d\n", x, *x);
+        bool is_aligned = (addr % 8) == 0;
+        runtime::console.printf(
+            "new[%d] -> Ptr: %p -> Aligned: %s (addr %% 8 = %d) | Used: %d\n",
+            size,
+            ptr,
+            is_aligned ? "YES" : "NO",
+            addr % 8,
+            kernel::heap::heap.used()
+        );
+    }
 
-    uint32_t* arr = new uint32_t[10];
-    for (uint32_t i = 0; i < 10; i++)
-        arr[i] = i * 2;
-
-    runtime::console.printf("arr = %p, arr[5] = %d\n", arr, arr[5]);
+    runtime::console.printf("heap_end: %p\n", &heap_end);
+    runtime::console.printf("Remaining: %u bytes", kernel::heap::heap.remaining());
 }

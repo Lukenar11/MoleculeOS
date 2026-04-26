@@ -6,7 +6,7 @@ namespace drivers::vga
 {
     class VGADriver final {
         private:
-            static constexpr uint8_t SHIFT_4 = 0x08;
+            static constexpr uint8_t SHIFT_4 = 0x04;
             static constexpr uint8_t SHIFT_8 = 0x08;
             
             static inline volatile uint16_t* const VGA_BUFFER = 

@@ -24,5 +24,6 @@ extern "C" void kernel_main()
         "https://github.com/Lukenar11/MoleculeOS\n"
     );
 
-    test_bump_raw();
+    // test_bump_raw();
+    test_new_raw();
 }

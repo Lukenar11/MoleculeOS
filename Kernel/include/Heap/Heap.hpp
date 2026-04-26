@@ -15,10 +15,12 @@ namespace kernel::heap
         public:
             void* allocate(uintptr_t size);
 
+            [[nodiscard]]
             inline uintptr_t used() const noexcept { 
                 return current - reinterpret_cast<uintptr_t>(&heap_start); 
             }
 
+            [[nodiscard]]
             inline uintptr_t remaining() const noexcept { 
                 return reinterpret_cast<uintptr_t>(&heap_end) - current; 
             }

@@ -5,8 +5,8 @@
 extern "C" {
 #endif
 
-void test_reg_dump() {
-
+void test_reg_dump() 
+{
     __asm__ volatile (
         "movl $0x01, %eax\n"
         "movl $0x02, %ebx\n"
