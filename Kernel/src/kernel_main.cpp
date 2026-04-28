@@ -1,6 +1,7 @@
 #include "IDT/IDT.hpp"
 #include "Heap/Heap.hpp"
 #include "tests/Kernel/test_heap.hpp"
+#include "tests/Kernel/idt_errors.h"
 #include <Runtime/CPP/ConsoleIO.hpp>
 
 extern "C" void kernel_main() 
@@ -27,10 +28,11 @@ extern "C" void kernel_main()
     runtime::console.put_string("\tTest\n\"");
     runtime::console.put_string("\tTest2\rTest3");
 
-    kernel_panic("This is a test panic message", "This is a test troubleshooting message");
+    // kernel_panic("This is a test panic message", "This is a test troubleshooting message");
 
     // test_bump_raw();
     // test_new_raw();
+    run_exception_tests();
 
     while (true)
         __asm__ volatile ("nop");

@@ -22,7 +22,7 @@ namespace drivers::vga
 
             [[nodiscard]]
             static inline constexpr uint16_t make_symbol_entry(const char symbol, 
-                                                               const uint8_t color) noexcept{
+                                                               const uint8_t color) noexcept {
                 return (static_cast<uint16_t>(color) << SHIFT_8) | 
                         static_cast<uint16_t>(symbol);
             }
