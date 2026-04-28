@@ -9,14 +9,7 @@
         to be maximally compatible with the Assembly componentes.
 */
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
+extern "C"
 void HaltSystem(void);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // HALT_SYSTEM_H
