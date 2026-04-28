@@ -1,6 +1,6 @@
 #include "IDT/ISR/isr_common_handler.hpp"
 
-extern "C" [[noreturn]]
+extern "C" 
 void isr_common_handler(RegisterDump* reg_dump) 
 {
     runtime::console.reset();
@@ -40,9 +40,5 @@ void isr_common_handler(RegisterDump* reg_dump)
     print_reg_dump("\n  FS: ", reg_dump->fs);
     print_reg_dump("\n  GS: ", reg_dump->gs);
 
-    while (true)
-        __asm__ volatile(
-            "cli\n"
-            "hlt\n"
-        );
+    HaltSystem();
 }

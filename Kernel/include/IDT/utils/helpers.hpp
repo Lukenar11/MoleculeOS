@@ -8,6 +8,4 @@ namespace kernel::idt
 
     constexpr auto WORD_MASK = 0xFFFF;
     constexpr auto SHIFT_16 = 0x10;
-
-    extern "C" void LoadIDT(uint32_t);
 } // namespace kernel::idt

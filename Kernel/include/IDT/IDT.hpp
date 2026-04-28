@@ -4,6 +4,7 @@
 #include "utils/IDTDescriptorPTR.hpp"
 #include "utils/IDTInitEntry.hpp"
 #include "utils/helpers.hpp"
+#include "utils/LoadIDT.h"
 #include <Runtime/C/stdint.h>
 #include <Runtime/CPP/Array.hpp>
 
