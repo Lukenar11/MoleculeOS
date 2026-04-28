@@ -11,7 +11,7 @@ section .text
 
         push dword 0    ; error code
         push dword %2   ; interrupt number
-        jmp IRQommonStub
+        jmp IRQCommonStub
 %endmacro
 
 IRQ 0, 32   ; (irq_0) Timer Interrupt
@@ -31,4 +31,4 @@ IRQ 13, 45  ; (irq_13) FPU Interrupt (Math Coprocessor)
 IRQ 14, 46  ; (irq_14) Primary ATA Hard Disk Interrupt
 IRQ 15, 47  ; (irq_15) Secondary ATA Hard Disk Interrupt
 
-%include "Kernel/src/IDT/ISR/IRQCommonStub.asm"
+%include "Kernel/src/IDT/IRQ/IRQCommonStub.asm"

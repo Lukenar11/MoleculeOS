@@ -1,18 +1,19 @@
 OBJS += \
 $(BUILD)/HaltSystem.o \
-$(BUILD)/io.o \
 $(BUILD)/kernel_main.o \
 $(BUILD)/IDT.o \
 $(BUILD)/isr_common_handler.o \
+$(BUILD)/irq_common_handler.o \
 $(BUILD)/isr.o \
+$(BUILD)/irq.o \
 $(BUILD)/LoadIDT.o \
 $(BUILD)/Heap.o \
 $(BUILD)/kernel_panic.o
 
-$(BUILD)/HaltSystem.o: Kernel/src/utils/HaltSystem.asm
+$(BUILD)/%.o: Kernel/src/utils/%.asm
 	nasm $(ASMFLAGS) $< -o $@
 
-$(BUILD)/io.o: Kernel/src/utils/io.cpp
+$(BUILD)/%.o: Kernel/src/utils/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD)/kernel_main.o: Kernel/src/kernel_main.cpp
@@ -28,6 +29,12 @@ $(BUILD)/%.o: Kernel/src/IDT/ISR/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD)/%.o: Kernel/src/IDT/ISR/%.asm
+	nasm $(ASMFLAGS) $< -o $@
+
+$(BUILD)/%.o: Kernel/src/IDT/IRQ/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD)/%.o: Kernel/src/IDT/IRQ/%.asm
 	nasm $(ASMFLAGS) $< -o $@
 
 $(BUILD)/Heap.o: Kernel/src/Heap/Heap.cpp

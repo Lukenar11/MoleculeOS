@@ -24,8 +24,5 @@ extern "C" void kernel_main()
         "https://github.com/Lukenar11/MoleculeOS\n"
     );
 
-    runtime::console.put_string("\tTest\n\"");
-    runtime::console.put_string("\tTest2\rTest3");
-
     HaltSystem();
 }

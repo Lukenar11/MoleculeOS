@@ -2,6 +2,5 @@
 
 extern "C"
 void irq_common_handler(RegisterDump* reg_dump) {
-
+    HaltSystem();
 }
-
