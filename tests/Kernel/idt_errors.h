@@ -62,7 +62,7 @@ static void general_protection_fault()
     );
 }
 
-// Custom Syscall (ISR 0x69)
+// Syscall Test (ISR 0x69)
 static void test_syscall_0x69() 
 {
     __asm__ volatile(

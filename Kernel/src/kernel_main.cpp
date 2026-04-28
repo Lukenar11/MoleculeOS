@@ -2,6 +2,7 @@
 #include "Heap/Heap.hpp"
 #include "tests/Kernel/test_heap.hpp"
 #include "tests/Kernel/idt_errors.h"
+#include "utils/HaltSystem.h"
 #include <Runtime/CPP/ConsoleIO.hpp>
 
 extern "C" void kernel_main() 
@@ -32,8 +33,7 @@ extern "C" void kernel_main()
 
     // test_bump_raw();
     // test_new_raw();
-    run_exception_tests();
+    // run_exception_tests();
 
-    while (true)
-        __asm__ volatile ("nop");
+    HaltSystem();
 }

@@ -1,5 +1,6 @@
 OBJS += \
 $(BUILD)/HaltSystem.o \
+$(BUILD)/inb.o \
 $(BUILD)/kernel_main.o \
 $(BUILD)/IDT.o \
 $(BUILD)/isr_common_handler.o \
@@ -10,6 +11,9 @@ $(BUILD)/kernel_panic.o
 
 $(BUILD)/HaltSystem.o: Kernel/src/utils/HaltSystem.asm
 	nasm $(ASMFLAGS) $< -o $@
+
+$(BUILD)/inb.o: Kernel/src/utils/inb.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD)/kernel_main.o: Kernel/src/kernel_main.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

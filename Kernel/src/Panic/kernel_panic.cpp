@@ -1,6 +1,6 @@
 #include "Panic/kernel_panic.hpp"
 
-extern "C" [[noreturn]]
+extern "C"
 void kernel_panic(const char* error_message, const char* troubleshooting_message) noexcept
 {
     runtime::console.reset();
@@ -9,19 +9,17 @@ void kernel_panic(const char* error_message, const char* troubleshooting_message
         drivers::vga::VGAColors::BLACK
     );
 
-    runtime::console.put_string(">>>>>>>>>>> KERNEL PANIC <<<<<<<<<<<\n\n");
+    runtime::console.printf(
+        "%s%s%s%s%s%s%s%s\n",
+        "\n",
+        "Error:\n\t",
+        error_message,
+        "\n",
+        "\nTroubleshooting:\n\t",
+        troubleshooting_message,
+        "\n",
+        "\n>>>>>>>>>>> SYSTEM HALTED <<<<<<<<<<\n"
+    );
 
-    runtime::console.put_string("Error:\n\t");
-    runtime::console.put_string(error_message);
-
-    runtime::console.put_string("\n\nTroubleshooting:\n\t");
-    runtime::console.put_string(troubleshooting_message);
-
-    runtime::console.put_string("\n\n>>>>>>>>>>> SYSTEM HALTED <<<<<<<<<<\n");
-
-    while (true)
-        __asm__ volatile(
-            "cli\n"
-            "hlt\n"
-        );
+    HaltSystem();
 }
