@@ -1,5 +1,6 @@
 OBJS += \
 $(BUILD)/HaltSystem.o \
+$(BUILD)/io.o \
 $(BUILD)/kernel_main.o \
 $(BUILD)/IDT.o \
 $(BUILD)/isr_common_handler.o \
