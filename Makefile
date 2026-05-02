@@ -10,7 +10,7 @@ LINKER = linker.ld
 TARGET = -target i386-pc-none-elf
 
 COMMON_FLAGS = $(TARGET) \
-	-I. -IRuntime -IKernel/include -IDrivers/VGA/include \
+	-I. -IRuntime -IKernel/include -IDrivers/VGA/include -IDrivers/Keyboard/include \
 	-ffreestanding -fno-builtin \
 	-fno-stack-protector \
 	-fno-rtti -fno-exceptions \

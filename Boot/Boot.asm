@@ -18,6 +18,7 @@ Boot:
     mov esp, StackTop
     and esp, 0xFFFFFFF0
 
+    sti
     call kernel_main
 
     .hang:

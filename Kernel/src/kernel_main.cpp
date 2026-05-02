@@ -1,9 +1,12 @@
 #include "IDT/IDT.hpp"
+#include "IDT/IRQ/irq_common_handler.hpp"
 #include "Heap/Heap.hpp"
 #include "utils/HaltSystem.h"
+#include "Kernel/include/utils/io.hpp"
 #include <Runtime/CPP/ConsoleIO.hpp>
 
-extern "C" void kernel_main() 
+extern "C" 
+void kernel_main() 
 {
     kernel::idt::IDT idt;
 
