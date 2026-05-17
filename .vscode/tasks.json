@@ -1,0 +1,39 @@
+/*
+    LICENSE:
+        Copyright (c) 2026 Lukenar11 (Luke Matthes)
+        MIT Licensed
+        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+
+    DESCRIPTION:
+        Separate build and run tasks for MoleculeOS using WSL.
+*/
+
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build MoleculeOS (WSL)",
+            "type": "shell",
+            "command": "./tools/build.sh",
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "shell": {
+                    "executable": "wsl.exe"
+                }
+            },
+            "group": "build",
+            "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Run MoleculeOS (WSL)",
+            "type": "shell",
+            "command": "./tools/run.sh",
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "shell": {
+                    "executable": "wsl.exe"
+                }
+            }
+        }
+    ]
+}

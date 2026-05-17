@@ -1,0 +1,34 @@
+/*
+    LICENSE:
+        Copyright (c) 2026 Lukenar11 (Luke Matthes)
+        MIT Licensed
+        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+
+    DESCRIPTION:
+        VS Code launch configuration to run MoleculeOS in QEMU via WSL.
+*/
+
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run MoleculeOS in QEMU (WSL)",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "/usr/bin/qemu-system-i386",
+            "args": [
+                "-cdrom",
+                "${workspaceFolder}/build/MoleculeOS.iso"
+            ],
+            "cwd": "${workspaceFolder}",
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "pipeTransport": {
+                "pipeProgram": "wsl.exe",
+                "pipeArgs": [],
+                "debuggerPath": "/usr/bin/gdb"
+            }
+        }
+    ]
+}

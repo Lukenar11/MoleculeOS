@@ -1,0 +1,25 @@
+/*
+    LICENSE:
+        Copyright (c) 2026 Lukenar11 (Luke Matthes)
+        MIT Licensed
+        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+
+    DESCRIPTION:
+        This is the VS Code editor configuration.
+*/
+
+{
+    "files.eol": "\n",
+
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.formatOnSave": false,
+    "editor.detectIndentation": false,
+        "files.associations": {
+        "*.asm": "nasm"
+    },
+
+    "search.exclude": {
+        "build": true
+    }
+}

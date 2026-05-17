@@ -1,0 +1,30 @@
+{
+    "version": 4,
+    "configurations": [
+        {
+            "name": "MoleculeOS",
+            "compilerPath": "clang++",
+            "intelliSenseMode": "clang-x86",
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "includePath": [
+                "${workspaceFolder}",
+                "${workspaceFolder}/kernel/include",
+                "${workspaceFolder}/kernel/include/heap",
+                "${workspaceFolder}/kernel/include/idt",
+                "${workspaceFolder}/runtime/c/include",
+                "${workspaceFolder}/runtime/cpp/include",
+                "${workspaceFolder}/drivers/ps2/keyboard_input/include",
+                "${workspaceFolder}/drivers/ps2/keyboard_input/include/utils",
+                "${workspaceFolder}/drivers/vga/textmode/include",
+                "${workspaceFolder}/drivers/vga/textmode/include/utils",
+                "${workspaceFolder}/shell/include",
+                "${workspaceFolder}/shell/include/interpreter"
+            ],
+            "defines": [
+                "__MOLECULE_OS__",
+                "__KERNEL__"
+            ]
+        }
+    ]
+}

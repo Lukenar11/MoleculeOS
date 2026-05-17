@@ -1,0 +1,90 @@
+/*
+    LICENSE:
+        Copyright (c) 2026 Lukenar11 (Luke Matthes)
+        MIT Licensed
+        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+
+    DESCRIPTION:
+        This is the command interpreter used by the MoleculeOS shell. 
+            
+        The interpreter receives raw keyboard input, 
+        tokenizes the input string, separates command and arguments,
+        and dispatches the appropriate handler based on a compile‑time hash lookup table.
+    
+    NOTES:
+        The "make_hash" function and the "shell_command_table" 
+        are intentionally declared only in the header 
+        to ensure that the hash lookup table can be created at compile time.
+
+        The method "append_char" is only in the header because it uses a template, 
+        and templates must be inline in the header.
+*/
+
+#pragma once
+
+#include "utils/command_entry.hpp"   
+#include "commands.hpp"
+#include "kernel/include/system/panic.hpp"
+#include <stdint.h>
+#include <text_output.hpp>
+#include <array.hpp>
+#include <string.h>
+
+namespace shell::commands
+{
+    [[nodiscard]]
+    static inline constexpr uint32_t make_hash(const char* command) noexcept {
+        const uint32_t mul_32 = 5;
+        uint32_t hash = NULL;
+        while (*command) {
+            hash = (hash << mul_32) - hash + static_cast<char>(*command);
+            command++;
+        }
+        return hash;
+    }
+
+    constexpr CommandEntry shell_command_table[] = {
+        { make_hash("help"), [](auto&) -> void { help(); } },
+        { make_hash("info"), [](auto&) -> void { info(); } },
+        { make_hash("clear"), [](auto&) -> void { clear(); } },
+        { make_hash("reboot"), [](auto&) -> void { reboot(); } },
+        { make_hash("shutdown"), [](auto&) -> void { shutdown(); } },
+        { make_hash("echo"), [](auto& argumentes) -> void { echo(argumentes); } },
+    };
+
+    class Interpreter final {
+    private:
+        runtime::Array<char, 128> input_buffer;
+        runtime::Array<char, 64> commands;
+        runtime::Array<char, 64> arguments;
+
+        uint32_t input_buffer_index = 0;
+        uint32_t commands_index = 0;
+        uint32_t arguments_index = 0;
+
+        template <typename Arr>
+        bool append_char(Arr& buffer, uint32_t& index, const char symbol) noexcept {
+            if (index < buffer.size()) {
+                buffer[index++] = symbol;
+                return true;
+            }
+            return false;
+        }
+
+        void print_overflow_error(const char* error_message_for, 
+                                  uint32_t max_buffer_size) const noexcept;
+
+        bool validate_tokens() const noexcept;
+
+        bool tokenize_input_buffer();
+        void parse_commands() noexcept;
+            
+        constexpr void flush_interpreter_pipeline() noexcept;
+
+    public:
+        void main(const char& key);
+
+        Interpreter() noexcept = default;
+        ~Interpreter() noexcept = default;
+    };
+} // namespace shell::commands

@@ -1,0 +1,18 @@
+# 
+#    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+#    MIT Licensed
+#    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+# 
+
+COMMON_FLAGS += \
+	-Ikernel/include
+
+include kernel/src/heap/Makefile
+include kernel/src/idt/Makefile
+include kernel/src/irq/Makefile
+include kernel/src/isr/Makefile
+include kernel/src/system/Makefile
+include kernel/src/Makefile
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)

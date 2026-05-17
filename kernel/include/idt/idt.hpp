@@ -1,0 +1,49 @@
+/*
+    LICENSE:
+        Copyright (c) 2026 Lukenar11 (Luke Matthes)
+        MIT Licensed
+        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+
+    DESCRIPTION:
+        Class for creating and loading the Interrupt Descriptor Table (IDT). 
+
+        This class reserves a 256-entry IDT,
+        initializes all interrupt gates using the "IDTInitEntry" table and
+        loads the final descriptor into the CPU using the "load_idt" function.
+
+    NOTES:
+        The global 'idt' object is created in "kernel_main" 
+        and not directly like other system components in the source file, 
+        otherwise the compiler would remove it 
+        since it does not see any direct usage related to other components.
+*/
+
+#pragma once
+
+#include "idt_entry.hpp"
+#include "idt_descriptor_ptr.hpp"
+#include "idt_init_entry.hpp"
+#include "load_idt.h"
+#include "utils/helpers.hpp"
+#include <stdint.h>
+#include <array.hpp>
+#include <stddef.h>
+
+namespace kernel::idt 
+{
+    class IDT final {
+    private:
+        static constexpr uint8_t CODE_SEGMENT_SELECTOR = 0x08;
+        static constexpr uint8_t FLAGS = 0x8E;
+
+        runtime::Array<IDTEntry, 256> idt;
+        IDTDescriptorPTR idt_ptr;
+        
+    public:
+        IDT() noexcept;
+        ~IDT() noexcept = default;
+    };
+
+    // GLOBAL Idt-Object
+    extern IDT idt;
+} // namespace kernel::idt

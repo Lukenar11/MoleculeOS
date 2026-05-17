@@ -1,0 +1,65 @@
+/*
+    LICENSE:
+        Copyright (c) 2026 Lukenar11 (Luke Matthes)
+        MIT Licensed
+        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+    
+    DESCRIPTION:
+        This is a VGA text mode driver, which provides a
+        low‑level interface for writing characters and colors directly to
+        the VGA text buffer located at physical address 0xB8000.
+    
+        The driver offers utilities for constructing color attributes,
+        composing character entries, and writing text to specific screen
+        coordinates, as well as clearing the entire display.
+    
+    NOTES:
+        All writes must follow the VGA text mode layout of 80×25 characters.
+*/
+
+#pragma once
+
+#include "utils/helpers.hpp"
+#include <stdint.h>
+#include <stddef.h>
+
+namespace drivers::vga 
+{
+    class Textmode final {
+    private:
+        static inline volatile uint16_t* const VGA_TEXMODE_BUFFER = 
+            reinterpret_cast<volatile uint16_t*>(0xB8000);
+
+    public:
+        [[nodiscard]]
+        static inline constexpr uint8_t make_color(const VGATextmodeColors& foreground, 
+                                                   const VGATextmodeColors& background) 
+                                                   noexcept {
+            const uint8_t shift_4 = 4;
+            return (static_cast<uint8_t>(background) << shift_4) | 
+                    static_cast<uint8_t>(foreground);
+        }
+
+        [[nodiscard]]
+        static inline constexpr uint16_t make_symbol_entry(const char symbol, 
+                                                           const uint8_t color) 
+                                                           noexcept {
+            const uint8_t shift_8 = 8;
+            return (static_cast<uint16_t>(color) << shift_8) | 
+                    static_cast<uint16_t>(symbol);
+        }
+
+        void put_char_at(const char symbol, 
+                         const uint8_t color, 
+                         const uint32_t x, 
+                         const uint32_t y) const noexcept;
+
+        void clear_screen(const VGATextmodeColors& color) const noexcept;
+
+        Textmode() noexcept = default;
+        ~Textmode() noexcept = default;
+    };
+
+    // GLOBAL VGA-textmode object
+    extern Textmode texmode;
+} // namespace drivers::vga
