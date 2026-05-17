@@ -699,3 +699,6 @@ spinlock_acquire(&lock);
 spinlock_release(&lock);
 sti();
 Für später, aber wichtig.
+
+
+Alter GitHub Code 154 oder 254 Commits 
