@@ -24,13 +24,11 @@
 #include "shell.hpp"
 #include "system/panic.hpp"
 
-#include "tests/kernel/test_heap.hpp"
-
 extern "C" 
 void kernel_main() 
 {
     static kernel::idt::IDT idt;
-    
+
     shell::shell.run();
 
     kernel::system::panic(

@@ -26,25 +26,22 @@ namespace kernel::heap
     class Bump final {
     private:
         static constexpr uintptr_t ALIGNMENT = 8;
+    
+        static inline const uintptr_t start = reinterpret_cast<uintptr_t>(&heap_start);
+        static inline const uintptr_t end = reinterpret_cast<uintptr_t>(&heap_end);
         uintptr_t current;
     
     public:
         [[nodiscard]]
-            void* allocate(uintptr_t size);
+        void* allocate(uintptr_t allocated_bytes);
 
-        [[nodiscard]]
-        inline uintptr_t used() const noexcept { 
-            return current - reinterpret_cast<uintptr_t>(&heap_start); 
-        }
+        void rewind(const uintptr_t marker) noexcept;
 
-        [[nodiscard]]
-        inline uintptr_t remaining() const noexcept { 
-            return reinterpret_cast<uintptr_t>(&heap_end) - current;
-        }
+        [[nodiscard]] inline uintptr_t mark() const noexcept { return current; }
+        [[nodiscard]] inline uintptr_t used() const noexcept { return current - start; }
+        [[nodiscard]] inline uintptr_t remaining() const noexcept { return end - current; }
 
-        inline Bump() noexcept { 
-            current = reinterpret_cast<uintptr_t>(&heap_start); 
-        }
+        inline Bump() noexcept { current = start; }
         ~Bump() noexcept = default;
     };
 
