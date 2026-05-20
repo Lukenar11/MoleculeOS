@@ -93,6 +93,7 @@ namespace shell::commands
             const char symbol = arguments[i];
             if (symbol == '\0')
                 break;
+            
             runtime::text_output.put_char(symbol);
         }
 

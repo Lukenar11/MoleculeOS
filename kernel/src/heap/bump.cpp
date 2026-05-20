@@ -15,12 +15,12 @@
         Since this is a simple bump allocator, freeing a memory region is not possible.
 */
 
-#include "heap/heap.hpp"
+#include "heap/bump.hpp"
 
 namespace kernel::heap 
 {
     [[nodiscard]]
-    void* Heap::allocate(uintptr_t size) {
+    void* Bump::allocate(uintptr_t size) {
         if (size == 0)
             return nullptr;
     
@@ -28,12 +28,11 @@ namespace kernel::heap
         size = (size + (ALIGNMENT - one)) & ~(ALIGNMENT - one);
         uintptr_t aligned = (current + (ALIGNMENT - one)) & ~(ALIGNMENT - one);
     
-        if (aligned + size > reinterpret_cast<uintptr_t>(&heap_end)) {
+        if (aligned + size > reinterpret_cast<uintptr_t>(&heap_end))
             system::panic(
-                "Out of heap memory", 
-                "Consider increasing the heap size or optimizing memory usage."
+                "Out of heap memory",
+                "optimize your memory usage"
             );
-        }
     
         void* result = reinterpret_cast<void*>(aligned);
         current = aligned + size;
@@ -41,5 +40,5 @@ namespace kernel::heap
     }
     
     // GLOBAL Heap object
-    Heap heap;
+    Bump bump;
 } // namespace kernel::heap

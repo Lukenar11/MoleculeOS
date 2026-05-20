@@ -20,16 +20,17 @@
         it is declared as "extern "C"" to ensure compatibility.
 */
 
-#include "drivers/vga/textmode/include/textmode.hpp"
 #include "idt/idt.hpp"
 #include "shell.hpp"
 #include "system/panic.hpp"
+
+#include "tests/kernel/test_heap.hpp"
 
 extern "C" 
 void kernel_main() 
 {
     static kernel::idt::IDT idt;
-
+    
     shell::shell.run();
 
     kernel::system::panic(

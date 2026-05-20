@@ -20,4 +20,4 @@
         (typically a triple fault).
 */
 
-#include "IDTDescriptorPTR.hpp"
+#include "idt_descriptor_ptr.hpp"

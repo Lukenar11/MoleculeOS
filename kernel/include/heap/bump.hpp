@@ -23,7 +23,7 @@
 
 namespace kernel::heap 
 {
-    class Heap final {
+    class Bump final {
     private:
         static constexpr uintptr_t ALIGNMENT = 8;
         uintptr_t current;
@@ -39,15 +39,15 @@ namespace kernel::heap
 
         [[nodiscard]]
         inline uintptr_t remaining() const noexcept { 
-            return reinterpret_cast<uintptr_t>(&heap_end) - current; 
+            return reinterpret_cast<uintptr_t>(&heap_end) - current;
         }
 
-        inline Heap() noexcept { 
+        inline Bump() noexcept { 
             current = reinterpret_cast<uintptr_t>(&heap_start); 
         }
-        ~Heap() noexcept = default;
+        ~Bump() noexcept = default;
     };
 
     // GLOBAL Heap object
-    extern Heap heap;
+    extern Bump bump;
 } // namespace kernel::heap

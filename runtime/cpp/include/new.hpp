@@ -15,12 +15,12 @@
 
 #pragma once
 
-#include "Heap/Heap.hpp"
+#include "Heap/bump.hpp"
 #include <stddef.h>
 
 void* operator new(size_t size)
 {
-    void* ptr = kernel::heap::heap.allocate(size);
+    void* ptr = kernel::heap::bump.allocate(size);
     if (!ptr)
         kernel::system::panic("Out of memory", "Heap exhausted in operator \'new\'");
 
@@ -29,7 +29,7 @@ void* operator new(size_t size)
 
 void* operator new[](size_t size)
 {
-    void* ptr = kernel::heap::heap.allocate(size);
+    void* ptr = kernel::heap::bump.allocate(size);
     if (!ptr)
         kernel::system::panic("Out of memory", "Heap exhausted in operator \'new[]\'");
 

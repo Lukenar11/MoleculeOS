@@ -19,4 +19,4 @@
         may result in an immediate triple fault.
 */
 
-#include "IDTEntry.hpp"
+#include "idt_entry.hpp"

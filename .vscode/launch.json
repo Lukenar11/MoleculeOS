@@ -12,7 +12,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run MoleculeOS in QEMU (WSL)",
+            "name": "Run MoleculeOS in QEMU",
             "type": "cppdbg",
             "request": "launch",
             "program": "/usr/bin/qemu-system-i386",

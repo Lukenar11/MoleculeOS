@@ -12,7 +12,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build MoleculeOS (WSL)",
+            "label": "Build MoleculeOS",
             "type": "shell",
             "command": "./tools/build.sh",
             "options": {
@@ -25,7 +25,7 @@
             "problemMatcher": ["$gcc"]
         },
         {
-            "label": "Run MoleculeOS (WSL)",
+            "label": "Run MoleculeOS",
             "type": "shell",
             "command": "./tools/run.sh",
             "options": {

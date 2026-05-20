@@ -5,7 +5,7 @@
 # 
 
 OBJS += \
-	$(BUILD)/heap.o
+	$(BUILD)/bump.o
 
-$(BUILD)/heap.o: kernel/src/heap/heap.cpp
+$(BUILD)/bump.o: kernel/src/heap/bump.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

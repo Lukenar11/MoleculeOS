@@ -18,4 +18,4 @@
         through a C-compatible interface.
 */
 
-#include "IDTInitEntry.hpp"
+#include "idt_init_entry.hpp"
