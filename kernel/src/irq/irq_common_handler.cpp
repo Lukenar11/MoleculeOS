@@ -22,5 +22,6 @@
 extern "C"
 void irq_common_handler(RegisterDump* reg_dump)
 {
+    (void)reg_dump;
     halt();
 }
