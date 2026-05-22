@@ -19,6 +19,7 @@
 #pragma once
 
 #include "system/panic.hpp"
+#include "cpu_flags.h"
 #include <stdint.h>
 #include <port_io.h>
 
@@ -36,16 +37,6 @@ namespace
         { .port=0xB004, .value=0x2000, .is_8bit_mode=false },   // Bochs shutdown
         { .port=0x4004, .value=0x3400, .is_8bit_mode=false }    // VirtualBox shutdown
     };
-
-    inline uint32_t save_eflags() noexcept {
-        uint32_t flags;
-        __asm__ volatile("pushf\n pop %0" : "=r"(flags));
-        return flags;
-    }
-
-    inline void restore_eflags(uint32_t flags) noexcept {
-        __asm__ volatile("push %0\n popf" :: "r"(flags));
-    }
 }
 
 namespace kernel::system

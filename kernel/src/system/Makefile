@@ -5,6 +5,7 @@
 # 
 
 OBJS += \
+	$(BUILD)/cpu_flags.o \
 	$(BUILD)/halt.o \
 	$(BUILD)/panic.o \
 	$(BUILD)/reboot.o \
@@ -20,4 +21,7 @@ $(BUILD)/shutdown.o: kernel/src/system/shutdown.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD)/halt.o: kernel/src/system/halt.asm
+	nasm $(ASMFLAGS) $< -o $@
+
+$(BUILD)/cpu_flags.o: kernel/src/system/cpu_flags.asm
 	nasm $(ASMFLAGS) $< -o $@
