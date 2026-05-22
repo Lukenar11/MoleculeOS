@@ -22,7 +22,8 @@ namespace kernel::system
         const uint8_t rboot_command = static_cast<uint8_t>(REBOOT_COMMAND);
         const uint8_t input_buffer_full = 0x02;
 
-        while (true) {
+        uint32_t timeout = 100'000;
+        while (timeout--) {
             const uint8_t status = inb(keyboard_ctrl);
             if ((status & input_buffer_full) == NULL)
                 break;
@@ -32,8 +33,10 @@ namespace kernel::system
         outb(keyboard_ctrl, rboot_command);
 
         panic(
-            "Rebbot failed", 
-            "This should never happen.\nPlease report this to the developer."
+            "Reboot failed",
+            "The keyboard controller did not trigger a hardware reset.\n"
+            "This should never happen.\n"
+            "Please report this to the developer."
         );
     }
 } // namespace kernel::system

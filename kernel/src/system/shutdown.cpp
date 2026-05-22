@@ -13,7 +13,7 @@
         which is why the shutdown routine is emulator-specific 
         or works on real hardware but is extremely complex to implement.
 
-        This routine is emulator-specific and only works on QEMU.
+        This routine is emulator-specific and only works on QEMU, Bochs and VirtualBox.
 */
 
 #include "system/shutdown.hpp"
@@ -21,13 +21,29 @@
 namespace kernel::system
 {
     void shutdown() noexcept {
-        const uint16_t qemu_acpi_power_management_port = 0x0604;
-        const uint16_t slp_en_bit = 0x2000;
-        outw(qemu_acpi_power_management_port, slp_en_bit);
+        const uint32_t cpu_flags = save_eflags();
+        for (const auto& entry : shutdown_try_values) {
+            if (entry.is_8bit_mode) [[unlikely]] {
+                const uint16_t byte_mask = 0x00FF;
+
+                const uint8_t port = entry.port & byte_mask;
+                const uint8_t value = entry.value & byte_mask;
+
+                outb(port, value);
+            } else {
+                const uint16_t port = entry.port;
+                const uint16_t value = entry.value;
+
+                outw(port, value);
+            }
+
+            restore_eflags(cpu_flags);
+        }
 
         panic(
-            "Shutdown failed", 
-            "The shutdown methode is emulator spacific and works only on QEMU"
+            "Shutdown failed",
+            "No supported emulator-specific shutdown method worked.\n"
+            "This system may not be running in a supported emulator."
         );
     }
 } // namespace kernel::system

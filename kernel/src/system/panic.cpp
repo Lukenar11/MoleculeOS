@@ -26,19 +26,18 @@ namespace kernel::system
             drivers::vga::VGATextmodeColors::BLACK
         );
 
-        static const char* kernel_panic_text_output[] = {
-            ">>>>>>>>>>> KERNEL PANIC <<<<<<<<<<<\n",
-            "\nError:\n",
-            "\n\n--------- Troubleshooting ---------\n\n",
-            "\n\n>>>>>>>>>> SYSTEM HALTED <<<<<<<<<<\n"
-        };
+        if (!error_message)
+            error_message = "Unknown fatal error.";
 
-        runtime::text_output.put_string(kernel_panic_text_output[0]);
-        runtime::text_output.put_string(kernel_panic_text_output[1]);
+        if (!troubleshooting_message)
+            troubleshooting_message = "No troubleshooting information available.";
+
+        runtime::text_output.put_string(">>>>>>>>>>> KERNEL PANIC <<<<<<<<<<<\n");
+        runtime::text_output.put_string("\nError:\n");
         runtime::text_output.put_string(error_message);
-        runtime::text_output.put_string(kernel_panic_text_output[2]);
+        runtime::text_output.put_string("\n\n--------- Troubleshooting ---------\n\n");
         runtime::text_output.put_string(troubleshooting_message);
-        runtime::text_output.put_string(kernel_panic_text_output[3]);
+        runtime::text_output.put_string("\n\n>>>>>>>>>> SYSTEM HALTED <<<<<<<<<<\n");
 
         halt();
     }
