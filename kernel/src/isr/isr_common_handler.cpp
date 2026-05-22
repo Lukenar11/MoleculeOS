@@ -26,12 +26,18 @@ void isr_common_handler(RegisterDump* reg_dump)
         drivers::vga::VGATextmodeColors::RED,
         drivers::vga::VGATextmodeColors::BLACK
     );
+    
+    const uint32_t n = reg_dump->interrupt_number;
+    const uint32_t all_available_expectations = 0x6A;
+    const char* exception = (n < all_available_expectations)
+                            ? exception_names[n]
+                            : "Unknown Exception";
 
     runtime::text_output.put_string(">>>>>>>>>> !KERNEL PANIC! <<<<<<<<<<");
-
     print_reg_dump("\n\nError Code: ", reg_dump->error_code);
+
     runtime::text_output.put_string("\nException: ");
-    runtime::text_output.put_string(exception_names[reg_dump->interrupt_number]);
+    runtime::text_output.put_string(exception);
     runtime::text_output.put_char(' ');
     runtime::text_output.put_char('(');
     runtime::text_output.put_hex(reg_dump->interrupt_number);
