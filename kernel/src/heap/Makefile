@@ -5,7 +5,7 @@
 # 
 
 OBJS += \
-	$(BUILD)/bump.o
+	$(BUILD)/linear_area.o
 
-$(BUILD)/bump.o: kernel/src/heap/bump.cpp
+$(BUILD)/linear_area.o: kernel/src/heap/linear_area.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

@@ -5,14 +5,15 @@
         https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
     DESCRIPTION:
-        This class defines the kernel's bump allocator.
+        This class defines the entire system heap using a linear-area allocator.
 
-        The allocator uses linker-defined symbols ('heap_start' and 'heap_end')
-        to determine the valid heap region and moves a single pointer on each allocation, 
+        The allocator uses linker-defined symbols ("heap_start" and "heap_end")
+        to determine the valid heap area and moves a single pointer with each allocation
         by the amount x.
 
     NOTES:
-        Since this is a simple bump allocator, freeing a memory region is not possible.
+        Always use "mark()" before allocating memory 
+        so that you can free the memory again using (rewind).
 */
 
 #pragma once
@@ -23,7 +24,7 @@
 
 namespace kernel::heap 
 {
-    class Bump final {
+    class LinearArea final {
     private:
         static constexpr uintptr_t ALIGNMENT = 8;
     
@@ -41,10 +42,10 @@ namespace kernel::heap
         [[nodiscard]] inline uintptr_t used() const noexcept { return current - start; }
         [[nodiscard]] inline uintptr_t remaining() const noexcept { return end - current; }
 
-        inline Bump() noexcept { current = start; }
-        ~Bump() noexcept = default;
+        inline LinearArea() noexcept { current = start; }
+        ~LinearArea() noexcept = default;
     };
 
     // GLOBAL Heap object
-    extern Bump bump;
+    extern LinearArea linear_area;
 } // namespace kernel::heap
