@@ -22,22 +22,33 @@
 
 namespace kernel::idt 
 {
+    void IDT::set_gate(const uint8_t index, void (*handler)()) noexcept {
+        if (index >= idt.size())
+            system::panic("IDT index out of range", "Check \"idt_init_table\"");
+        
+        const uint32_t base = reinterpret_cast<uint32_t>(handler);
+        const uint16_t word_mask = 0xFFFF;
+
+        IDTEntry& idt_entry = idt[index];
+        idt_entry.base_low = base & word_mask;
+        idt_entry.base_high = (base >> 16) & word_mask;
+        idt_entry.selector = CODE_SEGMENT_SELECTOR;
+        idt_entry.always_0 = NULL;
+        idt_entry.flags = FLAGS;
+    }
+
     IDT::IDT() noexcept {
         // fill IDT-Descriptor
         idt_ptr.limit = (sizeof(IDTEntry) * idt.size()) - 1;
         idt_ptr.base = reinterpret_cast<uintptr_t>(idt.begin());
 
-        // Clear table
-        for (uint32_t i = NULL; i < idt.size(); i++)
-            idt[i].set_gate(NULL, NULL, NULL);
+        // clear table
+        for (auto& idt_entry : idt)
+            idt_entry = {};
 
-        // _build_ IDT
+        // build IDT
         for (const auto& entry : idt_init_table)
-            idt[entry.index].set_gate(
-                reinterpret_cast<uintptr_t>(entry.handler),                     
-                CODE_SEGMENT_SELECTOR,   
-                FLAGS
-            );
+            set_gate(entry.index, entry.handler);
 
         load_idt(reinterpret_cast<uintptr_t>(&idt_ptr));
     }

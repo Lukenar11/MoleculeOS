@@ -12,7 +12,7 @@
         loads the final descriptor into the CPU using the "load_idt" function.
 
     NOTES:
-        The global 'idt' object is created in "kernel_main" 
+        The global "idt" object is created in "kernel_main" 
         and not directly like other system components in the source file, 
         otherwise the compiler would remove it 
         since it does not see any direct usage related to other components.
@@ -24,7 +24,7 @@
 #include "idt_descriptor_ptr.hpp"
 #include "idt_init_entry.hpp"
 #include "load_idt.h"
-#include "utils/helpers.hpp"
+#include "kernel/include/system/panic.hpp"
 #include <stdint.h>
 #include <array.hpp>
 #include <stddef.h>
@@ -38,7 +38,9 @@ namespace kernel::idt
 
         runtime::Array<IDTEntry, 256> idt;
         IDTDescriptorPTR idt_ptr;
-        
+
+        void set_gate(const uint8_t index, void (*handler)()) noexcept;
+
     public:
         IDT() noexcept;
         ~IDT() noexcept = default;

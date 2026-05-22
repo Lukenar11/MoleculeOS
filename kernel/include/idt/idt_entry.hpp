@@ -33,19 +33,5 @@ namespace kernel::idt
         uint8_t always_0;
         uint8_t flags;
         uint16_t base_high;
-
-        // _init_
-        inline constexpr void set_gate(const uint32_t base, 
-                                       const uint16_t selector, 
-                                       const uint8_t flags) noexcept {
-            const uint32_t word_mask = 0xFFFF;
-            const uint32_t shift_16 = 0x10;
-
-            base_low = base & word_mask;
-            base_high = base >> shift_16 & word_mask;
-            this->selector = selector;
-            this->always_0 = NULL;
-            this->flags = flags;
-        }
     } __attribute__((packed));
 } // namespace kernel::idt 

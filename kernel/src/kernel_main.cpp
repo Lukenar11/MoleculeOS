@@ -28,7 +28,7 @@ extern "C"
 void kernel_main() 
 {
     static kernel::idt::IDT idt;
-
+    
     shell::shell.run();
 
     kernel::system::panic(

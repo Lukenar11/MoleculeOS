@@ -19,7 +19,7 @@ KERNEL = $(BUILD)/MoleculeOS.elf
 ISO_KERNEL = $(ISO)/boot/kernel.elf
 ISO_OUT = build/MoleculeOS.iso
 
-LINKER = linker.ld
+LINKER = tools/linker.ld
 TARGET = -target i386-pc-none-elf
 
 COMMON_FLAGS = $(TARGET) \

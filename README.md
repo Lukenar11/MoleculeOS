@@ -73,7 +73,7 @@ To build and run MoleculeOS, the following software is required:
 ## if you using the shell
 ``` bash
     chmod +x build.sh
-    ./build.sh
+    ./tools/build.sh
 ```
 
 This will:

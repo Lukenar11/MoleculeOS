@@ -27,7 +27,7 @@
 extern "C" {
 #endif
 
-void load_idt(uint32_t);
+void load_idt(uintptr_t);
 
 #ifdef __cplusplus
 }
