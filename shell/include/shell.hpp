@@ -48,12 +48,11 @@ namespace shell
         void erase_user_cursor() const noexcept;
 
     public:
-        void run() noexcept;
+        void step() noexcept;
 
-        Shell() noexcept = default;
+        Shell() noexcept;
         ~Shell() noexcept = default;
     };
 
-    // GLOBAL Shell object
     extern Shell shell;
 } // namespace shell

@@ -28,11 +28,13 @@ extern "C"
 void kernel_main() 
 {
     static kernel::idt::IDT idt;
-    
-    shell::shell.run();
+
+    shell::Shell shell;
+    while (true)
+        shell.step();
 
     kernel::system::panic(
-        "Unexpected return from \'shell.run()\'",
+        "Unexpected return from the kernel main loop",
         "This should never happen.\nPlease report this to the developer."
     );
 }

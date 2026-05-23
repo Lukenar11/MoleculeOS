@@ -36,14 +36,14 @@ namespace shell::commands
             "Command syntax:\n"
             "\t- [Command]\n"
             "\t- [Command] [Argument]\n"
-            "\n"
-            "Available commands:\n"
+            "\nAvailable commands:\n"
             "\t- help (displays a command-line explanation) | help\n"
             "\t- info (displays the MoleculeOS startup screen) | info\n"
             "\t- clear (clears the screen) | clear\n"
             "\t- reboot (restart the Computer) | reboot\n"
             "\t- shutdown (turn the Computer off) | shutdown\n"
             "\t- echo (displays a message) | echo [Message]\n"
+            "\n\n"
         };
 
         runtime::text_output.put_string(help_message);
@@ -89,14 +89,11 @@ namespace shell::commands
         }
 
         runtime::text_output.put_char('\n');
-        for (uint32_t i = NULL; i < arguments.size(); ++i) {
-            const char symbol = arguments[i];
+        for (const auto& symbol : arguments) {
             if (symbol == '\0')
                 break;
             
             runtime::text_output.put_char(symbol);
         }
-
-        runtime::text_output.put_char('\n');
     }
 } // namespace shell::commands

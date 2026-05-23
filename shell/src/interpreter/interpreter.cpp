@@ -62,8 +62,8 @@ namespace shell::commands
                 static const char* argument_buffer_error_message = "Argument buffer";
 
                 const char* overflow_error_message = (tokenize_commands) 
-                    ? command_buffer_error_message
-                    : argument_buffer_error_message;
+                                                     ? command_buffer_error_message
+                                                     : argument_buffer_error_message;
                     
                 print_overflow_error(overflow_error_message, target_buffer.size());
                 return false;
@@ -124,7 +124,7 @@ namespace shell::commands
         arguments_index = null;
     }
 
-    void Interpreter::main(const char& key) {
+    void Interpreter::step(const char& key) {
         if (key == '\b') {
             if (input_buffer_index > 0) {
                 --input_buffer_index;

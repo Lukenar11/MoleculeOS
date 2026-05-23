@@ -82,7 +82,7 @@ namespace shell::commands
         constexpr void flush_interpreter_pipeline() noexcept;
 
     public:
-        void main(const char& key);
+        void step(const char& key);
 
         Interpreter() noexcept = default;
         ~Interpreter() noexcept = default;

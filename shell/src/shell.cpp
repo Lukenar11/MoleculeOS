@@ -29,6 +29,11 @@
 
 namespace shell 
 {
+    Shell::Shell() noexcept {
+        commands::info();
+        draw_user_cursor();
+    }
+
     void Shell::draw_user_cursor() const noexcept {
         if (!user_cursor_is_visible)
             return;
@@ -68,34 +73,27 @@ namespace shell
         drivers::vga::texmode.put_char_at(' ', user_cursor_color, x, y);
     }
 
-    void Shell::run() noexcept {
-        commands::info();
-        draw_user_cursor();
-
-        while (true) {
-            user_cursor_blink_counter++;
-            if (user_cursor_blink_counter >= USER_CURSOR_BLINK_SPEED) {
-                user_cursor_blink_counter = NULL;
-                user_cursor_is_visible = !user_cursor_is_visible;
-                erase_user_cursor();
-                draw_user_cursor();
-            }
-
-            const char key = drivers::ps2::keyboard_input.get_key();
-            if (!key)
-                continue;
-
-            // delete cursor, if not user-input (for cursor blink)
-            erase_user_cursor();
-            user_cursor_is_visible = true;
+    void Shell::step() noexcept {
+        user_cursor_blink_counter++;
+        if (user_cursor_blink_counter >= USER_CURSOR_BLINK_SPEED) {
             user_cursor_blink_counter = NULL;
-
-            interpreter.main(key);
-            runtime::text_output.put_char(key);
+            user_cursor_is_visible = !user_cursor_is_visible;
+            erase_user_cursor();
             draw_user_cursor();
         }
-    }
 
-    // GLOBAL Shell object
-    Shell shell;
+        const char key = drivers::ps2::keyboard_input.get_key();
+        if (!key)
+            return;
+
+        // delete cursor, if not user-input (for cursor blink)
+        erase_user_cursor();
+        user_cursor_is_visible = true;
+        user_cursor_blink_counter = NULL;
+
+        runtime::text_output.put_char(key);
+        interpreter.step(key);
+
+        draw_user_cursor();
+    }
 }
