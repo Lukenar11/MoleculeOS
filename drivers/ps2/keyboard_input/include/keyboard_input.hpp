@@ -35,6 +35,10 @@ namespace drivers::ps2
         bool capslock_is_enabled = false;
 
     public:
+        inline bool has_pending_scancode() const noexcept {
+            return inb(KEYBOARD_STATUS_PORT) & LOWEST_BIT;
+        }
+
         char get_key() noexcept;
     
         KeyboardInput() noexcept = default;

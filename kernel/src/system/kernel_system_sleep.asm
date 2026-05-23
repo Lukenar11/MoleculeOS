@@ -11,13 +11,13 @@
 ;        to stop the CPU until an interrupt occurs.
 ;
 ;    NOTES:
-;        The C interface is a header file called "kernel_system_hang.h"
+;        The C interface is a header file called "kernel_system_sleep.h"
 ;
 
-global kernel_system_hang
+global kernel_system_sleep
 
 section .text
 
-kernel_system_hang:
-    halt
+kernel_system_sleep:
+    hlt
     ret

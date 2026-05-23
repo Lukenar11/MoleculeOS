@@ -71,7 +71,7 @@ namespace shell
     }
 
     void Shell::step() noexcept {
-        while (true) {
+        while (drivers::ps2::keyboard_input.has_pending_scancode()) {
             const char key = drivers::ps2::keyboard_input.get_key();
             if (!key)
                 break;
