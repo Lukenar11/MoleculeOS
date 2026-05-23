@@ -74,7 +74,7 @@ namespace shell
         while (drivers::ps2::keyboard_input.has_pending_scancode()) {
             const char key = drivers::ps2::keyboard_input.get_key();
             if (!key)
-                break;
+                continue;
 
             erase_user_cursor();
 
