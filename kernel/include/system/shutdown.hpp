@@ -19,7 +19,7 @@
 #pragma once
 
 #include "system/panic.hpp"
-#include "cpu_flags.h"
+#include "kernel_system_cpu_flags.h"
 #include <stdint.h>
 #include <port_io.h>
 

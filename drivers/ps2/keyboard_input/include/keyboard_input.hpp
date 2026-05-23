@@ -13,6 +13,9 @@
         character to other components like the shell.
 
     NOTES:
+        The function "has_pending_scancode" is intentionally in the header because 
+        the compiler can see and optimize header files better than source files; 
+        since this function is so small, the compiler can therefore probably inline it.
 */
 
 #pragma once

@@ -27,6 +27,8 @@
 
 #include "shell.hpp"
 
+#include "kernel/include/system/kernel_system_sleep.h"
+
 namespace shell 
 {
     Shell::Shell() noexcept {

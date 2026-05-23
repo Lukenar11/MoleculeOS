@@ -5,10 +5,11 @@
         https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
     DESCRIPTION:
-        C/C++ interface for the general IRQ handler, which is called by "irq_common_stub".
+        C interface for the general IRQ handler, which is called by "irq_common_stub".
 
         All hardware interruptstubs (irq_0–irq_15) 
-        pass their register state to this function, which performs uniform processing before the required
+        pass their register state to this function, 
+        which performs uniform processing before the required
         End-of-Interrupt (EOI) signal is sent to the PIC.
 
     NOTES:

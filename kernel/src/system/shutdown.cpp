@@ -21,7 +21,7 @@
 namespace kernel::system
 {
     void shutdown() noexcept {
-        const uint32_t cpu_flags = save_eflags();
+        const uint32_t cpu_flags = kernel_system_save_eflags();
         for (const auto& entry : shutdown_try_values) {
             if (entry.is_8bit_mode) [[unlikely]] {
                 const uint16_t byte_mask = 0x00FF;
@@ -37,7 +37,7 @@ namespace kernel::system
                 outw(port, value);
             }
 
-            restore_eflags(cpu_flags);
+            kernel_system_restore_eflags(cpu_flags);
         }
 
         panic(

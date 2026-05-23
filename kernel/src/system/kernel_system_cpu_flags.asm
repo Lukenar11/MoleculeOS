@@ -7,24 +7,24 @@
 ;    DESCRIPTION:
 ;    	This file contains 2 simple assembly routines that work using stack operations.
 ;
-;        The function "save_eflags" saves the current CPU flags (flag register).
-;        The function "restore_eflags" restores the CPU flags (flag register).
+;        The function "kernel_system_save_eflags" saves the current CPU flags (flag register).
+;        The function "kernel_system_restore_eflags" restores the CPU flags (flag register).
 ;    
 ;    NOTES:
 ;    	The C interface is a header file called "cpu_flags.h".
 ;
 
-global save_eflags
-global restore_eflags
+global kernel_system_save_eflags
+global kernel_system_restore_eflags
 
 section .text
 
-save_eflags:
+kernel_system_save_eflags:
     pushf
     pop eax
     ret
 
-restore_eflags:
+kernel_system_restore_eflags:
     push dword [esp+4]  ; Parameter: 1
     popf
     ret

@@ -5,10 +5,11 @@
 # 
 
 OBJS += \
-	$(BUILD)/cpu_flags.o \
+	$(BUILD)/kernel_system_cpu_flags.o \
 	$(BUILD)/panic.o \
 	$(BUILD)/reboot.o \
 	$(BUILD)/shutdown.o \
+	$(BUILD)/kernel_system_enable_interrupts.o \
 	$(BUILD)/kernel_system_sleep.o \
 	$(BUILD)/kernel_system_hang.o \
 

@@ -21,44 +21,46 @@
 */
 
 #include "idt/idt.hpp"
+#include "system/kernel_system_enable_interrupts.h"
 #include "shell.hpp"
 #include "system/kernel_system_sleep.h"
 #include "system/panic.hpp"
 
-inline void remap_pic() noexcept 
+void remap_pic() noexcept 
 {
-    const uint16_t pic1_command = 0x20;
-    const uint16_t pic1_data = 0x21;
-    const uint16_t pic2_command = 0xA0;
-    const uint16_t pic2_data = 0xA1;
-    const uint8_t icw1_init = 0x11;
-    const uint8_t icw4_8086 = 0x01;
+    struct PICMapping {
+        uint16_t port;
+        uint8_t value;
+    };
 
-    outb(pic1_command, icw1_init);
-    outb(pic2_command, icw1_init);
+    const PICMapping pic_mappings[] = {
+        { .port=0x0020, .value=0x11 },  // init master IPC
+        { .port=0x00A0, .value=0x11 },  // init slave IPC
+        { .port=0x0021, .value=0x20 },  // set master interrupt vector offsets
+        { .port=0x00A1, .value=0x28 },  // set slave interrupt vector offsets
+        { .port=0x0021, .value=0x04 },  // Tell master where the slave is connected
+        { .port=0x00A1, .value=0x02 },  // Tell slave its cascade identity
+        { .port=0x0021, .value=0x01 },  // Set master 8086/88 mode
+        { .port=0x00A1, .value=0x01 }   // Set slave 8086/88 mode
+    };
 
-    outb(pic1_data, 0x20);
-    outb(pic2_data, 0x28);
+    for (const auto& entry : pic_mappings) {
+        const uint16_t port = entry.port;
+        const uint8_t value = entry.value;
 
-    outb(pic1_data, 0x04);
-    outb(pic2_data, 0x02);
-
-    outb(pic1_data, icw4_8086);
-    outb(pic2_data, icw4_8086);
-
-    outb(pic1_data, 0xFD); // only IRQ1 unmasked on master
-    outb(pic2_data, 0xFF); // all slave IRQs masked
+        outb(port, value);
+    }
 }
 
-extern "C" 
+extern "C"
 void kernel_main() 
 {
     static kernel::idt::IDT idt;
 
     remap_pic();
-    __asm__ volatile ("sti");
+    kernel_system_enable_interrupts();
 
-    // schedul MoleculeOS
+    // schedule MoleculeOS
     shell::Shell sh;
     while (true) {
         kernel_system_sleep();
@@ -66,7 +68,7 @@ void kernel_main()
     }
 
     kernel::system::panic(
-        "Unexpected return from the kernel main loop",
+        "Unexpected return from the \"kernel_main\" scheduler main loop",
         "This should never happen.\nPlease report this to the developer."
     );
 }

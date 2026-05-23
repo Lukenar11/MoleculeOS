@@ -27,7 +27,7 @@ namespace shell::commands
     void Interpreter::print_overflow_error(const char* error_message_for, 
                                            uint32_t max_buffer_size) const noexcept {
         static const char* error_messages[] = {
-            "SHELL ERROR:\n\t",
+            "\nSHELL ERROR:\n\t",
             " overflow. Max size: ",
             " symbols\n\n"
         };
