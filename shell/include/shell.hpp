@@ -23,12 +23,17 @@ NOTES:
 
     The shell itself contains no parsing logic 
     and serves solely as a control layer and provides a cursor.
+
+    Since "draw_user_cursor" and "erase_user_cursor" are quite simple, 
+    I only declared them in the header so that the compiler can inline them, 
+    because the compiler can see and optimize headers more easily than source files.
 */
 
 #pragma once
 
 #include "kernel/include/heap/linear_area.hpp"
 #include "drivers/ps2/keyboardin/include/keyboard_input.hpp"
+#include "drivers/vga/textmode/include/textmode.hpp"
 #include "interpreter/interpreter.hpp"
 #include <stddef.h>
 #include <stdint.h>
@@ -40,8 +45,23 @@ namespace shell
     private:
         commands::Interpreter interpreter;
 
-        void draw_user_cursor() const noexcept;
-        void erase_user_cursor() const noexcept;
+        void draw_user_cursor_with_color(drivers::vga::VGATextmodeColors foreground,
+                                         drivers::vga::VGATextmodeColors background) 
+                                         const noexcept;
+
+        inline void draw_user_cursor() const noexcept {
+            draw_user_cursor_with_color(
+                drivers::vga::VGATextmodeColors::LIGHT_GREY,
+                drivers::vga::VGATextmodeColors::LIGHT_GREY
+            );
+        }
+
+        inline void erase_user_cursor() const noexcept {
+            draw_user_cursor_with_color(
+                drivers::vga::VGATextmodeColors::LIGHT_GREY,
+                drivers::vga::VGATextmodeColors::BLACK
+            );
+        }
 
     public:
         void step() noexcept;

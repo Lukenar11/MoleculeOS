@@ -23,6 +23,10 @@ NOTES:
 
     The shell itself contains no parsing logic 
     and serves solely as a control layer and provides a cursor.
+
+    Since "draw_user_cursor" and "erase_user_cursor" are quite simple, 
+    I only declared them in the header so that the compiler can inline them, 
+    because the compiler can see and optimize headers more easily than source files.
 */
 
 #include "shell.hpp"
@@ -36,7 +40,9 @@ namespace shell
         draw_user_cursor();
     }
 
-    void Shell::draw_user_cursor() const noexcept {
+    void Shell::draw_user_cursor_with_color(drivers::vga::VGATextmodeColors foreground,
+                                            drivers::vga::VGATextmodeColors background) 
+                                            const noexcept {
         uint32_t x = runtime::text_output.get_cursor_x();
         if (x >= drivers::vga::VGA_TEXMODE_SCREEN_WIDTH)
             x = drivers::vga::VGA_TEXMODE_SCREEN_WIDTH - 1;
@@ -46,30 +52,12 @@ namespace shell
             y = drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT - 1;
 
         runtime::text_output.set_text_color(
-            drivers::vga::VGATextmodeColors::LIGHT_GREY, 
-            drivers::vga::VGATextmodeColors::LIGHT_GREY
+            static_cast<drivers::vga::VGATextmodeColors>(foreground),
+            static_cast<drivers::vga::VGATextmodeColors>(background)
         );
 
-        const uint8_t user_cursor_color = runtime::text_output.get_text_color();
-        drivers::vga::texmode.put_char_at(' ', user_cursor_color, x, y);
-    }
-
-    void Shell::erase_user_cursor() const noexcept {
-        uint32_t x = runtime::text_output.get_cursor_x();
-        if (x >= drivers::vga::VGA_TEXMODE_SCREEN_WIDTH)
-            x = drivers::vga::VGA_TEXMODE_SCREEN_WIDTH - 1;
-
-        uint32_t y = runtime::text_output.get_cursor_y();
-        if (y >= drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT)
-            y = drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT - 1;
-
-        runtime::text_output.set_text_color(
-            drivers::vga::VGATextmodeColors::LIGHT_GREY, 
-            drivers::vga::VGATextmodeColors::BLACK
-        );
-
-        const uint8_t user_cursor_color = runtime::text_output.get_text_color();
-        drivers::vga::texmode.put_char_at(' ', user_cursor_color, x, y);
+        const uint8_t color = runtime::text_output.get_text_color();
+        drivers::vga::texmode.put_char_at(' ', color, x, y);
     }
 
     void Shell::step() noexcept {

@@ -16,6 +16,7 @@ understandable and transparent - hence the name *MoleculeOS*.
 - Basic hardware initialization
 - Interrupt Descriptor Table (IDT)
 - Global Descriptor Table (GDT)
+- Simple IRQ and endless-loop scheduling
 - linear-area-allocator System Heap
 - PS/2 Keyboard input
 - Shell Interpreter
