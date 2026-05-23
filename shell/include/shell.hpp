@@ -28,7 +28,7 @@ NOTES:
 #pragma once
 
 #include "kernel/include/heap/linear_area.hpp"
-#include "drivers/ps2/keyboard_input/include/keyboard_input.hpp"
+#include "drivers/ps2/keyboardin/include/keyboard_input.hpp"
 #include "interpreter/interpreter.hpp"
 #include <stddef.h>
 #include <stdint.h>

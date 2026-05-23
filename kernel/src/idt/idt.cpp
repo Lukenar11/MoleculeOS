@@ -43,8 +43,8 @@ namespace kernel::idt
         idt_ptr.base = reinterpret_cast<uintptr_t>(idt.begin());
 
         // clear table
-        for (const auto& idt_entry : idt)
-            idt_entry = {};
+        for (auto& idt_entry : idt)
+            idt_entry = IDTEntry{};
 
         // build IDT
         for (const auto& idt_entry : idt_init_table)

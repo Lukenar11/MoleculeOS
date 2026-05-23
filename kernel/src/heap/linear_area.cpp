@@ -38,7 +38,7 @@ namespace kernel::heap
     }
 
     void LinearArea::rewind(const uintptr_t marker) noexcept {
-        static const char* invalid_heap_rewind_panic_message[] = "Invalid heap rewind";
+        static const char* invalid_heap_rewind_panic_message = "Invalid heap rewind";
 
         if ((marker < start) || (marker > current) || (marker > end))
             system::panic(

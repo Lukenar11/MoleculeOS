@@ -5,10 +5,10 @@
 # 
 
 COMMON_FLAGS += \
-	-Idrivers/ps2/keyboard_input/include \
+	-Idrivers/ps2/keyboardin/include \
 	-Idrivers/vga/textmode/include
 
-include drivers/ps2/keyboard_input/src/Makefile
+include drivers/ps2/keyboardin/src/Makefile
 include drivers/vga/textmode/src/Makefile
 
 $(BUILD_DIR):
