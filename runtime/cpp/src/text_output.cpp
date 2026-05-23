@@ -29,11 +29,11 @@ namespace runtime
         cursor_x = NULL;
         cursor_y = NULL;
 
-        drivers::vga::texmode.clear_screen(drivers::vga::VGATextmodeColors::BLACK);
+        drivers::vga::texmode.clear_screen(drivers::vga::VGA_Textmode_Colors::BLACK);
     }
 
-    void TextOutput::set_text_color(const drivers::vga::VGATextmodeColors& color,
-                                    const drivers::vga::VGATextmodeColors& background) 
+    void TextOutput::set_text_color(const drivers::vga::VGA_Textmode_Colors& color,
+                                    const drivers::vga::VGA_Textmode_Colors& background) 
                                     noexcept {
         cursor_color = drivers::vga::texmode.make_color(color, background);
     }

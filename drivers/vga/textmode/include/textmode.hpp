@@ -32,8 +32,8 @@ namespace drivers::vga
 
     public:
         [[nodiscard]]
-        static inline constexpr uint8_t make_color(const VGATextmodeColors& foreground, 
-                                                   const VGATextmodeColors& background) 
+        static inline constexpr uint8_t make_color(const VGA_Textmode_Colors& foreground, 
+                                                   const VGA_Textmode_Colors& background) 
                                                    noexcept {
             return (static_cast<uint8_t>(background) << 4) | 
                     static_cast<uint8_t>(foreground);
@@ -52,7 +52,7 @@ namespace drivers::vga
                          const uint32_t x, 
                          const uint32_t y) const noexcept;
 
-        void clear_screen(const VGATextmodeColors& color) const noexcept;
+        void clear_screen(const VGA_Textmode_Colors& color) const noexcept;
 
         Textmode() noexcept = default;
         ~Textmode() noexcept = default;

@@ -26,10 +26,10 @@ NOTES:
 
 namespace drivers::ps2 
 {
-    class KeyboardInput final {
+    class Keyboard_Input final {
     private:
         static constexpr uint8_t LOWEST_BIT = 0x01;
-            static constexpr uint8_t ALOWED_SCANCODE_SIZE = 128;
+        static constexpr uint8_t ALOWED_SCANCODE_SIZE = 128;
 
         static constexpr uint16_t KEYBOARD_STATUS_PORT = 0x64;
         static constexpr uint16_t KEYBOARD_DATA_PORT = 0x60;
@@ -44,10 +44,10 @@ namespace drivers::ps2
 
         char get_key() noexcept;
     
-        KeyboardInput() noexcept = default;
-        ~KeyboardInput() noexcept = default;
+        Keyboard_Input() noexcept = default;
+        ~Keyboard_Input() noexcept = default;
     };
 
     // GLOBAL Keyboard-Input object
-    extern KeyboardInput keyboard_input;
+    extern Keyboard_Input keyboard_input;
 } // namespace drivers::ps2

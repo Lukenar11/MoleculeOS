@@ -40,8 +40,8 @@ namespace shell
         draw_user_cursor();
     }
 
-    void Shell::draw_user_cursor_with_color(drivers::vga::VGATextmodeColors foreground,
-                                            drivers::vga::VGATextmodeColors background) 
+    void Shell::draw_user_cursor_with_color(drivers::vga::VGA_Textmode_Colors foreground,
+                                            drivers::vga::VGA_Textmode_Colors background) 
                                             const noexcept {
         uint32_t x = runtime::text_output.get_cursor_x();
         if (x >= drivers::vga::VGA_TEXMODE_SCREEN_WIDTH)
@@ -52,8 +52,8 @@ namespace shell
             y = drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT - 1;
 
         runtime::text_output.set_text_color(
-            static_cast<drivers::vga::VGATextmodeColors>(foreground),
-            static_cast<drivers::vga::VGATextmodeColors>(background)
+            static_cast<drivers::vga::VGA_Textmode_Colors>(foreground),
+            static_cast<drivers::vga::VGA_Textmode_Colors>(background)
         );
 
         const uint8_t color = runtime::text_output.get_text_color();

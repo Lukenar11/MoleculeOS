@@ -45,21 +45,21 @@ namespace shell
     private:
         commands::Interpreter interpreter;
 
-        void draw_user_cursor_with_color(drivers::vga::VGATextmodeColors foreground,
-                                         drivers::vga::VGATextmodeColors background) 
+        void draw_user_cursor_with_color(drivers::vga::VGA_Textmode_Colors foreground,
+                                         drivers::vga::VGA_Textmode_Colors background) 
                                          const noexcept;
 
         inline void draw_user_cursor() const noexcept {
             draw_user_cursor_with_color(
-                drivers::vga::VGATextmodeColors::LIGHT_GREY,
-                drivers::vga::VGATextmodeColors::LIGHT_GREY
+                drivers::vga::VGA_Textmode_Colors::LIGHT_GREY,
+                drivers::vga::VGA_Textmode_Colors::LIGHT_GREY
             );
         }
 
         inline void erase_user_cursor() const noexcept {
             draw_user_cursor_with_color(
-                drivers::vga::VGATextmodeColors::LIGHT_GREY,
-                drivers::vga::VGATextmodeColors::BLACK
+                drivers::vga::VGA_Textmode_Colors::LIGHT_GREY,
+                drivers::vga::VGA_Textmode_Colors::BLACK
             );
         }
 

@@ -16,7 +16,7 @@ NOTES:
 namespace kernel::system
 {
     void reboot() noexcept {
-        using enum drivers::ps2::KeyboardSpecialKeys;
+        using enum drivers::ps2::Special_Keyboard_Keys;
 
         const uint8_t keyboard_ctrl = static_cast<uint8_t>(CTRL);
         const uint8_t rboot_command = static_cast<uint8_t>(REBOOT_COMMAND);

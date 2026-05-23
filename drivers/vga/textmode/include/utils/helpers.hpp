@@ -27,7 +27,7 @@ namespace drivers::vga
     constexpr uint32_t VGA_TEXMODE_SCREEN_WIDTH = 80;
     constexpr uint32_t VGA_TEXMODE_SCREEN_HEIGHT = 25;
 
-    enum class VGATextmodeColors : uint8_t {
+    enum class VGA_Textmode_Colors : uint8_t {
         BLACK = 0x00,
         BLUE = 0x01,
         GREEN = 0x02,

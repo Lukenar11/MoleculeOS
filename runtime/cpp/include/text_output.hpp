@@ -36,8 +36,8 @@ namespace runtime
         uint32_t cursor_y = NULL;
         
         uint8_t cursor_color = drivers::vga::texmode.make_color(
-            drivers::vga::VGATextmodeColors::LIGHT_GREY, 
-            drivers::vga::VGATextmodeColors::BLACK
+            drivers::vga::VGA_Textmode_Colors::LIGHT_GREY, 
+            drivers::vga::VGA_Textmode_Colors::BLACK
         );
 
         void new_line() noexcept;
@@ -47,8 +47,8 @@ namespace runtime
             
     public:
         void reset() noexcept;
-        void set_text_color(const drivers::vga::VGATextmodeColors& color,
-                            const drivers::vga::VGATextmodeColors& background) 
+        void set_text_color(const drivers::vga::VGA_Textmode_Colors& color,
+                            const drivers::vga::VGA_Textmode_Colors& background) 
                             noexcept;
         
         void put_char(const char symbol) noexcept;

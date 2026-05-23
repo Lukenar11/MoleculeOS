@@ -35,8 +35,8 @@ namespace drivers::vga
         VGA_TEXMODE_BUFFER[index] = make_symbol_entry(symbol, color);
     }
 
-    void Textmode::clear_screen(const VGATextmodeColors& background) const noexcept {
-        const uint8_t color = make_color(VGATextmodeColors::BLACK, background);
+    void Textmode::clear_screen(const VGA_Textmode_Colors& background) const noexcept {
+        const uint8_t color = make_color(VGA_Textmode_Colors::BLACK, background);
         const uint16_t entry = make_symbol_entry(' ', color);
 
         const uint32_t n = VGA_TEXMODE_SCREEN_WIDTH * VGA_TEXMODE_SCREEN_HEIGHT;

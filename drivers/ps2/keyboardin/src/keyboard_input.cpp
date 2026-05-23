@@ -22,29 +22,29 @@ NOTES:
 
 namespace drivers::ps2
 {
-    char KeyboardInput::get_key() noexcept {
+    char Keyboard_Input::get_key() noexcept {
         if (!(inb(KEYBOARD_STATUS_PORT) & LOWEST_BIT))
             return '\0';
     
         const uint8_t scancode = inb(KEYBOARD_DATA_PORT);
     
         switch (scancode) {
-        case static_cast<uint8_t>(KeyboardSpecialKeys::LEFT_SHIFT):
-        case static_cast<uint8_t>(KeyboardSpecialKeys::RIGHT_SHIFT):
+        case static_cast<uint8_t>(Special_Keyboard_Keys::LEFT_SHIFT):
+        case static_cast<uint8_t>(Special_Keyboard_Keys::RIGHT_SHIFT):
             shift_is_pressed = true;
             return '\0';
         
-        case static_cast<uint8_t>(KeyboardSpecialKeys::LEFT_SHIFT_RELEASE):
-        case static_cast<uint8_t>(KeyboardSpecialKeys::RIGHT_SHIFT_RELEASE):
+        case static_cast<uint8_t>(Special_Keyboard_Keys::LEFT_SHIFT_RELEASE):
+        case static_cast<uint8_t>(Special_Keyboard_Keys::RIGHT_SHIFT_RELEASE):
             shift_is_pressed = false;
             return '\0';
         
-        case static_cast<uint8_t>(KeyboardSpecialKeys::CAPSLOCK):
+        case static_cast<uint8_t>(Special_Keyboard_Keys::CAPSLOCK):
             capslock_is_enabled = !capslock_is_enabled;
             return '\0';
         }
     
-        if (scancode & static_cast<uint8_t>(KeyboardSpecialKeys::KEYBOARD_RELEASE))
+        if (scancode & static_cast<uint8_t>(Special_Keyboard_Keys::KEYBOARD_RELEASE))
             return '\0';
     
         if (scancode >= ALOWED_SCANCODE_SIZE)
@@ -65,5 +65,5 @@ namespace drivers::ps2
     }
 
     // GLOBAL Keyboard-Input object
-    KeyboardInput keyboard_input;
+    Keyboard_Input keyboard_input;
 } // namespace drivers::ps2

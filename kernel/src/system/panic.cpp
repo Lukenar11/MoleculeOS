@@ -22,8 +22,8 @@ namespace kernel::system
                const char* troubleshooting_message) noexcept {
         runtime::text_output.reset();
         runtime::text_output.set_text_color(
-            drivers::vga::VGATextmodeColors::RED,
-            drivers::vga::VGATextmodeColors::BLACK
+            drivers::vga::VGA_Textmode_Colors::RED,
+            drivers::vga::VGA_Textmode_Colors::BLACK
         );
 
         if (!error_message)

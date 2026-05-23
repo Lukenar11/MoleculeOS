@@ -43,7 +43,7 @@ namespace drivers::ps2
         'Z','X','C','V','B','N','M','<','>','?', 0, '*', 0, ' ',
     };
 
-    enum class KeyboardSpecialKeys : uint8_t {
+    enum class Special_Keyboard_Keys : uint8_t {
         LEFT_SHIFT = 0x2A,
         RIGHT_SHIFT = 0x36,
         KEYBOARD_RELEASE = 0x80,
