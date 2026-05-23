@@ -43,7 +43,7 @@ namespace shell::commands
             "\t- reboot (restart the Computer) | reboot\n"
             "\t- shutdown (turn the Computer off) | shutdown\n"
             "\t- echo (displays a message) | echo [Message]\n"
-            "\n\n"
+            "\n"
         };
 
         runtime::text_output.put_string(help_message);
@@ -63,7 +63,7 @@ namespace shell::commands
             "\nCopyright (c) 2026 Lukenar11 (Luke Matthes)\n"
             "MIT Licensed\n"
             "https://github.com/Lukenar11/MoleculeOS\n"
-            "\n\n"
+            "\n"
         };
 
         runtime::text_output.put_string(info_message);
@@ -83,17 +83,19 @@ namespace shell::commands
 
     inline void echo(const runtime::Array<char, 64>& arguments) noexcept {
         if (arguments[NULL] == '\0') {
-            static const char* error_message = "\necho: missing argument\n";
+            static const char* error_message = "echo: missing argument\n\n";
             runtime::text_output.put_string(error_message);
             return;
         }
 
-        runtime::text_output.put_char('\n');
         for (const auto& symbol : arguments) {
             if (symbol == '\0')
                 break;
             
             runtime::text_output.put_char(symbol);
         }
+
+        runtime::text_output.put_char('\n');
+        runtime::text_output.put_char('\n');
     }
 } // namespace shell::commands

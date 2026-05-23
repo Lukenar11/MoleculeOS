@@ -29,7 +29,7 @@ namespace shell::commands
         static const char* error_messages[] = {
             "\nSHELL ERROR:\n\t",
             " overflow. Max size: ",
-            " symbols\n"
+            " symbols\n\n"
         };
 
         runtime::text_output.put_string(error_messages[0]);
@@ -78,14 +78,14 @@ namespace shell::commands
 
     bool Interpreter::validate_tokens() const noexcept {
         if (commands_index == 0 && arguments_index > 0) {
-            static const char* error_message = "Error: arguments without command.\n";
+            static const char* error_message = "Error: arguments without command.\n\n";
             runtime::text_output.put_string(error_message);
 
             return false;
         }
 
         if (commands_index == 0 || commands[0] == '\0') {
-            static const char* error_message = "No command entered.\n";
+            static const char* error_message = "No command entered.\n\n";
             runtime::text_output.put_string(error_message);
 
             return false;
@@ -103,9 +103,9 @@ namespace shell::commands
             }
 
         static const char error_messages[] = {
-            "\nCOMMAND ERROR:\n"
+            "COMMAND ERROR:\n"
             "\tThe command was either misspelled or does not exist!\n"
-            "\tType \'help\' to see a list of commands.\n"
+            "\tType \'help\' to see a list of commands.\n\n"
         };
         
         runtime::text_output.put_string(error_messages);
