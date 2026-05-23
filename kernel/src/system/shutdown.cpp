@@ -26,7 +26,7 @@ namespace kernel::system
             if (entry.is_8bit_mode) [[unlikely]] {
                 const uint16_t byte_mask = 0x00FF;
 
-                const uint8_t port = entry.port & byte_mask;
+                const uint16_t port = entry.port;
                 const uint8_t value = entry.value & byte_mask;
 
                 outb(port, value);

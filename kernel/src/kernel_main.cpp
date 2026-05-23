@@ -22,16 +22,48 @@
 
 #include "idt/idt.hpp"
 #include "shell.hpp"
+#include "system/kernel_system_sleep.h"
 #include "system/panic.hpp"
+
+inline void remap_pic() noexcept 
+{
+    const uint16_t pic1_command = 0x20;
+    const uint16_t pic1_data = 0x21;
+    const uint16_t pic2_command = 0xA0;
+    const uint16_t pic2_data = 0xA1;
+    const uint8_t icw1_init = 0x11;
+    const uint8_t icw4_8086 = 0x01;
+
+    outb(pic1_command, icw1_init);
+    outb(pic2_command, icw1_init);
+
+    outb(pic1_data, 0x20);
+    outb(pic2_data, 0x28);
+
+    outb(pic1_data, 0x04);
+    outb(pic2_data, 0x02);
+
+    outb(pic1_data, icw4_8086);
+    outb(pic2_data, icw4_8086);
+
+    outb(pic1_data, 0xFD); // only IRQ1 unmasked on master
+    outb(pic2_data, 0xFF); // all slave IRQs masked
+}
 
 extern "C" 
 void kernel_main() 
 {
     static kernel::idt::IDT idt;
 
-    shell::Shell shell;
-    while (true)
-        shell.step();
+    remap_pic();
+    __asm__ volatile ("sti");
+
+    // schedul MoleculeOS
+    shell::Shell sh;
+    while (true) {
+        kernel_system_sleep();
+        sh.step();
+    }
 
     kernel::system::panic(
         "Unexpected return from the kernel main loop",

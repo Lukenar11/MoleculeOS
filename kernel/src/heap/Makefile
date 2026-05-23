@@ -7,5 +7,5 @@
 OBJS += \
 	$(BUILD)/linear_area.o
 
-$(BUILD)/linear_area.o: kernel/src/heap/linear_area.cpp
+$(BUILD)/%.o: kernel/src/heap/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

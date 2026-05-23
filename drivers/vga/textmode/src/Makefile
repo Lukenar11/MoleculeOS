@@ -7,5 +7,5 @@
 OBJS += \
 	$(BUILD)/textmode.o
 
-$(BUILD)/textmode.o: drivers/vga/textmode/src/textmode.cpp
+$(BUILD)/%.o: drivers/vga/textmode/src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

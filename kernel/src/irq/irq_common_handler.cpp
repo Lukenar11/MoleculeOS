@@ -22,6 +22,11 @@
 extern "C"
 void irq_common_handler(RegisterDump* reg_dump)
 {
-    (void)reg_dump;
-    halt();
+    const uint8_t interrupt = reg_dump->interrupt_number;
+    const uint8_t max_interrupt_size = 40;
+    if (interrupt >= max_interrupt_size) {
+        outb(0xA0, 0x20);
+    }
+
+    outb(0x20, 0x20);
 }

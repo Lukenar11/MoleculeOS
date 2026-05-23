@@ -10,14 +10,5 @@ OBJS += \
 	$(BUILD)/multiboot.o \
 	$(BUILD)/gdt.o
 
-$(BUILD)/_start.o: boot/_start.asm
-	nasm $(ASMFLAGS) $< -o $@
-
-$(BUILD)/kernel_stack.o: boot/kernel_stack.asm
-	nasm $(ASMFLAGS) $< -o $@
-
-$(BUILD)/multiboot.o: boot/multiboot.asm
-	nasm $(ASMFLAGS) $< -o $@
-
-$(BUILD)/gdt.o: boot/gdt.asm
+$(BUILD)/%.o: boot/%.asm
 	nasm $(ASMFLAGS) $< -o $@

@@ -9,11 +9,8 @@ OBJS += \
 	$(BUILD)/isr_common_stub.o \
 	$(BUILD)/isr.o
 
-$(BUILD)/isr_common_handler.o: kernel/src/isr/isr_common_handler.cpp
+$(BUILD)/%.o: kernel/src/isr/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(BUILD)/isr_common_stub.o: kernel/src/isr/isr_common_stub.asm
-	nasm $(ASMFLAGS) $< -o $@
-
-$(BUILD)/isr.o: kernel/src/isr/isr.asm
+$(BUILD)/%.o: kernel/src/isr/%.asm
 	nasm $(ASMFLAGS) $< -o $@

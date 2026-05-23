@@ -19,7 +19,6 @@
 #pragma once
 
 #include "kernel/include/utils/register_dump.h"
-#include "system/halt.h"
 #include <port_io.h>
 
 extern "C"

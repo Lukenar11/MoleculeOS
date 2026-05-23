@@ -9,11 +9,8 @@ OBJS += \
 	$(BUILD)/irq_common_stub.o \
 	$(BUILD)/irq.o
 
-$(BUILD)/irq_common_handler.o: kernel/src/irq/irq_common_handler.cpp
+$(BUILD)/%.o: kernel/src/irq/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(BUILD)/irq_common_stub.o: kernel/src/irq/irq_common_stub.asm
-	nasm $(ASMFLAGS) $< -o $@
-
-$(BUILD)/irq.o: kernel/src/irq/irq.asm
+$(BUILD)/%.o: kernel/src/irq/%.asm
 	nasm $(ASMFLAGS) $< -o $@

@@ -27,6 +27,7 @@
 
 #pragma once
 
+#include "kernel/include/heap/linear_area.hpp"
 #include "drivers/ps2/keyboard_input/include/keyboard_input.hpp"
 #include "interpreter/interpreter.hpp"
 #include <stddef.h>
@@ -37,12 +38,7 @@ namespace shell
 {
     class Shell final {
     private:
-        static constexpr uint32_t USER_CURSOR_BLINK_SPEED = 2'500'000;
-        
         commands::Interpreter interpreter;
-
-        bool user_cursor_is_visible = true;
-        uint32_t user_cursor_blink_counter = NULL;
 
         void draw_user_cursor() const noexcept;
         void erase_user_cursor() const noexcept;

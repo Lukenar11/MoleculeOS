@@ -8,8 +8,8 @@ OBJS += \
 	$(BUILD)/port_io.o \
 	$(BUILD)/string.o \
 
-$(BUILD)/string.o: runtime/c/src/string.c
+$(BUILD)/%.o: runtime/c/src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD)/port_io.o: runtime/c/src/port_io.asm
+$(BUILD)/%.o: runtime/c/src/%.asm
 	nasm $(ASMFLAGS) $< -o $@

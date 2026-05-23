@@ -6,22 +6,14 @@
 
 OBJS += \
 	$(BUILD)/cpu_flags.o \
-	$(BUILD)/halt.o \
 	$(BUILD)/panic.o \
 	$(BUILD)/reboot.o \
 	$(BUILD)/shutdown.o \
+	$(BUILD)/kernel_system_sleep.o \
+	$(BUILD)/kernel_system_hang.o \
 
-$(BUILD)/panic.o: kernel/src/system/panic.cpp
+$(BUILD)/%.o: kernel/src/system/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(BUILD)/reboot.o: kernel/src/system/reboot.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-$(BUILD)/shutdown.o: kernel/src/system/shutdown.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-$(BUILD)/halt.o: kernel/src/system/halt.asm
-	nasm $(ASMFLAGS) $< -o $@
-
-$(BUILD)/cpu_flags.o: kernel/src/system/cpu_flags.asm
+$(BUILD)/%.o: kernel/src/system/%.asm
 	nasm $(ASMFLAGS) $< -o $@

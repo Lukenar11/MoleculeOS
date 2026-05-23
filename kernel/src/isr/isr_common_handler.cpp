@@ -64,5 +64,5 @@ void isr_common_handler(RegisterDump* reg_dump)
     print_reg_dump("\n  FS: ", reg_dump->fs);
     print_reg_dump("\n  GS: ", reg_dump->gs);
 
-    halt();
+    kernel_system_hang();
 }

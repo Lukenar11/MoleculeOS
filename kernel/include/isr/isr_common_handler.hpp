@@ -20,7 +20,7 @@
 
 #include "utils/exception_names.h"
 #include "kernel/include/utils/register_dump.h"
-#include "system/halt.h"
+#include "system/kernel_system_hang.h"
 #include <text_output.hpp>
 
 static inline constexpr void print_reg_dump(const char* label, 

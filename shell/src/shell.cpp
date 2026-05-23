@@ -35,9 +35,6 @@ namespace shell
     }
 
     void Shell::draw_user_cursor() const noexcept {
-        if (!user_cursor_is_visible)
-            return;
-
         uint32_t x = runtime::text_output.get_cursor_x();
         if (x >= drivers::vga::VGA_TEXMODE_SCREEN_WIDTH)
             x = drivers::vga::VGA_TEXMODE_SCREEN_WIDTH - 1;
@@ -74,26 +71,20 @@ namespace shell
     }
 
     void Shell::step() noexcept {
-        user_cursor_blink_counter++;
-        if (user_cursor_blink_counter >= USER_CURSOR_BLINK_SPEED) {
-            user_cursor_blink_counter = NULL;
-            user_cursor_is_visible = !user_cursor_is_visible;
+        while (true) {
+            const char key = drivers::ps2::keyboard_input.get_key();
+            if (!key)
+                break;
+
             erase_user_cursor();
+
+            runtime::text_output.put_char(key);
+            interpreter.step(key);
+
             draw_user_cursor();
+
+            if (key == '\n')
+                break;
         }
-
-        const char key = drivers::ps2::keyboard_input.get_key();
-        if (!key)
-            return;
-
-        // delete cursor, if not user-input (for cursor blink)
-        erase_user_cursor();
-        user_cursor_is_visible = true;
-        user_cursor_blink_counter = NULL;
-
-        runtime::text_output.put_char(key);
-        interpreter.step(key);
-
-        draw_user_cursor();
     }
 }

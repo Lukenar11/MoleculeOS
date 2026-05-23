@@ -7,5 +7,5 @@
 OBJS += \
 	$(BUILD)/kernel_main.o \
 
-$(BUILD)/kernel_main.o: kernel/src/kernel_main.cpp
+$(BUILD)/%.o: kernel/src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

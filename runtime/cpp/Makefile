@@ -7,5 +7,5 @@
 OBJS += \
 	$(BUILD)/text_output.o
 
-$(BUILD)/text_output.o: runtime/cpp/src/text_output.cpp
+$(BUILD)/%.o: runtime/cpp/src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

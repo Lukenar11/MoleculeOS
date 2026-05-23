@@ -11,14 +11,14 @@
 ;        ensuring that the CPU remains in a safe, non-executing state.
 ;
 ;    NOTES:
-;        The C interface is a header file called "halt.asm"
+;        The C interface is a header file called "kernel_system_hang.h"
 ;
 
-global halt
+global kernel_system_hang
 
 section .text
 
-halt:
+kernel_system_hang:
 .hang:
     cli
     hlt

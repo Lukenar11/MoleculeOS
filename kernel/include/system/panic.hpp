@@ -16,7 +16,7 @@
 
 #pragma once
 
-#include "system/halt.h"
+#include "system/kernel_system_hang.h"
 #include <text_output.hpp>
 
 namespace kernel::system
