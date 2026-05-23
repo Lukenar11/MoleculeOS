@@ -1,14 +1,13 @@
 /*
-    LICENSE:
-        Copyright (c) 2026 Lukenar11 (Luke Matthes)
-        MIT Licensed
-        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+LICENSE:
+    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+    MIT Licensed
+    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
-    DESCRIPTION:
-        This defines the basic type "size_t", 
-        which is only used by the operator overloads "new" and "new[]".
+DESCRIPTION:
+    This defines the basic constant "NULL".
 
-    NOTES:
+NOTES:
 */
 
 #include <stddef.h>

@@ -1,19 +1,23 @@
 /*
-    LICENSE:
-        Copyright (c) 2026 Lukenar11 (Luke Matthes)
-        MIT Licensed
-        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+LICENSE:
+    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+    MIT Licensed
+    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
-    DESCRIPTION:
-        C/C++ interface for the common IRQ handler, which is called by "isr_common_stub".
+DESCRIPTION:
+    C/C++ interface for the common IRQ handler, which is called by "isr_common_stub".
 
-        This function receives a complete "RegisterDump" structure and
-        performs uniform exception processing, including diagnostic output
-        and system halt.
+    This function receives a complete "RegisterDump" structure and
+    performs uniform exception processing, including diagnostic output
+    and system halt.
 
-    NOTES:
-        Since this function is called by an assembly routine, 
-        it is declared as "extern "C"" to ensure compatibility.
+NOTES:
+    Since this function is called by an assembly routine, 
+    it is declared as "extern "C"" to ensure compatibility.
+
+    The function "print_reg_dump" is deliberately only in the header 
+    because it is quite small, so that the compiler can inline it, 
+    since the compiler can better recognize and optimize headers.
 */
 
 #include "isr/isr_common_handler.hpp"

@@ -1,16 +1,16 @@
 /*
-    LICENSE:
-        Copyright (c) 2026 Lukenar11 (Luke Matthes)
-        MIT Licensed
-        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+LICENSE:
+    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+    MIT Licensed
+    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
-    DESCRIPTION:
-        This header defines a minimal, fixed-size array template.
+DESCRIPTION:
+    This header defines a minimal, fixed-size array template.
 
-        Unlike "std::array", this implementation avoids dependencies on the
-        C++ standard library, which is unavailable in kernel mode.
+    Unlike "std::array", this implementation avoids dependencies on the
+    C++ standard library, which is unavailable in kernel mode.
 
-    NOTES:
+NOTES:
 */
 
 #pragma once
@@ -37,24 +37,24 @@ namespace runtime
             return buffer[index]; 
         }
 
-        // _get_ array-size
+        // ge_ array-size
         inline constexpr uint32_t size() const noexcept { return S; }
 
-        // Iterators
+        // iterators
         inline constexpr T* begin() noexcept { return buffer; }
         inline constexpr T* end() noexcept { return buffer + S; }
 
         inline constexpr const T* begin() const noexcept { return buffer; }
         inline constexpr const T* end() const noexcept { return buffer + S; }
 
-        // _get_ first/last array-elememt
+        // get first/last array-elememt
         inline constexpr T& front() noexcept { return buffer[0]; }
         inline constexpr T& back() noexcept { return buffer[S - 1]; }
 
         inline constexpr const T& front() const noexcept { return buffer[0]; }
         inline constexpr const T& back() const noexcept { return buffer[S - 1]; }
 
-        // _get_ array-content
+        // get array-content
         inline constexpr T* data() noexcept { return buffer; }
         inline constexpr const T* data() const noexcept { return buffer; }
 

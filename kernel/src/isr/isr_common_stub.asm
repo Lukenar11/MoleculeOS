@@ -1,22 +1,22 @@
 ;
-;   LICENSE:
-;       Copyright (c) 2026 Lukenar11 (Luke Matthes)
-;       MIT License
-;       https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+; LICENSE:
+;     Copyright (c) 2026 Lukenar11 (Luke Matthes)
+;     MIT License
+;     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 ;
-;   DESCRIPTION:
-;        This routine saves the full CPU register state, switches to the kernel
-;        data segment, and forwards control to the "isr_common_handler".
+; DESCRIPTION:
+;      This routine saves the full CPU register state, switches to the kernel
+;      data segment, and forwards control to the "isr_common_handler".
 ;
-;   NOTES:
-;       The stack layout created here must match the "RegisterDump" structure
-;       exactly. 
+; NOTES:
+;     The stack layout created here must match the "RegisterDump" structure
+;     exactly. 
 ;
-;       Any deviation will corrupt the register dump and may cause
-;       undefined behavior or a triple fault.
+;     Any deviation will corrupt the register dump and may cause
+;     undefined behavior or a triple fault.
 ;
-;       After the handler returns, this stub restores all registers, removes
-;       the pushed interrupt number and error code, and returns using "iretd".
+;     After the handler returns, this stub restores all registers, removes
+;     the pushed interrupt number and error code, and returns using "iretd".
 ;
 
 global isr_common_stub
@@ -26,7 +26,7 @@ extern isr_common_handler
 section .text
     
 isr_common_stub:
-    ; Save: general purpose register
+    ; save general purpose register
     push eax
     push ecx
     push edx
@@ -35,31 +35,31 @@ isr_common_stub:
     push esi
     push edi
 
-    ; Save: segmentregister
+    ; save segmentregister
     push gs
     push fs
     push es
     push ds
 
-    ; set: kernel data segment
+    ; set kernel data segment
     mov ax, 0x10
     mov ds, ax
     mov es, ax
     mov fs, ax
     mov gs, ax
 
-    ; pointer to RegisterDump
+    ; pointer to "RegisterDump"
     push esp
     call isr_common_handler
     add esp, 4
 
-    ; reset: segmentregister
+    ; reset segmentregister
     pop ds
     pop es
     pop fs
     pop gs
 
-    ; reset: general purpose register
+    ; reset general purpose register
     pop edi
     pop esi
     pop ebp
@@ -68,7 +68,7 @@ isr_common_stub:
     pop ecx
     pop eax
 
-    ; remove: interrupt_number + error_code
+    ; remove "interrupt_number" + "error_code"
     add esp, 8
 
     iretd

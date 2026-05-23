@@ -1,25 +1,25 @@
 /*
-    LICENSE:
-        Copyright (c) 2026 Lukenar11 (Luke Matthes)
-        MIT Licensed
-        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-    
-    DESCRIPTION:
-        This header declares the low-level routines for performing x86 port
-        I/O operations. 
-        
-        These functions provide byte- and word-level access
-        to hardware I/O ports and are used by drivers such as the PS/2
-        controller, PIC, PIT, and VGA hardware.
+LICENSE:
+    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+    MIT Licensed
+    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
-        The routines are using the i386 instructions "in" and "out".
+DESCRIPTION:
+    This header declares the low-level routines for performing x86 port
+    I/O operations. 
     
-    NOTES:
-        The internal implementation is located in "load_idt.asm".
-    
-        This header is written in C rather than C++
-        to ensure maximum compatibility, 
-        as Assembly provides a C interface, but not a C++ interface.
+    These functions provide byte- and word-level access
+    to hardware I/O ports and are used by drivers such as the PS/2
+    controller, PIC, PIT, and VGA hardware.
+
+    The routines are using the i386 instructions "in" and "out".
+
+NOTES:
+    The internal implementation is located in "load_idt.asm".
+
+    This header is written in C rather than C++
+    to ensure maximum compatibility, 
+    as Assembly provides a C interface, but not a C++ interface.
 */
 
 #ifndef PORT_IO_H

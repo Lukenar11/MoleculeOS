@@ -1,21 +1,21 @@
 /*
-    LICENSE:
-        Copyright (c) 2026 Lukenar11 (Luke Matthes)
-        MIT Licensed
-        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+LICENSE:
+    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+    MIT Licensed
+    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
-    DESCRIPTION:
-        Class for creating and loading the Interrupt Descriptor Table (IDT). 
+DESCRIPTION:
+    Class for creating and loading the Interrupt Descriptor Table (IDT). 
 
-        This class reserves a 49-entry IDT,
-        initializes all interrupt gates using the "IDTInitEntry" table and
-        loads the final descriptor into the CPU using the "load_idt" function.
+    This class reserves a 49-entry IDT,
+    initializes all interrupt gates using the "IDTInitEntry" table and
+    loads the final descriptor into the CPU using the "load_idt" function.
 
-    NOTES:
-        The global 'idt' object is created in "kernel_main" 
-        and not directly like other system components in the source file, 
-        otherwise the compiler would remove it 
-        since it does not see any direct usage related to other components.
+NOTES:
+    The global 'idt' object is created in "kernel_main" 
+    and not directly like other system components in the source file, 
+    otherwise the compiler would remove it 
+    since it does not see any direct usage related to other components.
 */
 
 #include "idt/idt.hpp"
@@ -43,12 +43,12 @@ namespace kernel::idt
         idt_ptr.base = reinterpret_cast<uintptr_t>(idt.begin());
 
         // clear table
-        for (auto& idt_entry : idt)
+        for (const auto& idt_entry : idt)
             idt_entry = {};
 
         // build IDT
-        for (const auto& entry : idt_init_table)
-            set_gate(entry.index, entry.handler);
+        for (const auto& idt_entry : idt_init_table)
+            set_gate(idt_entry.index, idt_entry.handler);
 
         load_idt(reinterpret_cast<uintptr_t>(&idt_ptr));
     }

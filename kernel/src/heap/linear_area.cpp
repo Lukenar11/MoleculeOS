@@ -1,19 +1,19 @@
 /*
-    LICENSE:
-        Copyright (c) 2026 Lukenar11 (Luke Matthes)
-        MIT licensed
-        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+LICENSE:
+    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+    MIT licensed
+    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
-    DESCRIPTION:
-        This class defines the entire system heap using a linear-area allocator.
+DESCRIPTION:
+    This class defines the entire system heap using a linear-area allocator.
 
-        The allocator uses linker-defined symbols ("heap_start" and "heap_end")
-        to determine the valid heap area and moves a single pointer with each allocation
-        by the amount x.
+    The allocator uses linker-defined symbols ("heap_start" and "heap_end")
+    to determine the valid heap area and moves a single pointer with each allocation
+    by the amount x.
 
-    NOTES:
-        Always use "mark()" before allocating memory 
-        so that you can free the memory again using (rewind).
+NOTES:
+    Always use "mark()" before allocating memory 
+    so that you can free the memory again using (rewind).
 */
 
 #include "heap/linear_area.hpp"
@@ -38,17 +38,19 @@ namespace kernel::heap
     }
 
     void LinearArea::rewind(const uintptr_t marker) noexcept {
-        static const char* rewind_panic_messages[3] = {
-            "Invalid heap rewind",
-            "Marker is outside the valid heap range or not aligned.",
-            "Marker is not aligned to allocator alignment."
-        };
+        static const char* invalid_heap_rewind_panic_message[] = "Invalid heap rewind";
 
         if ((marker < start) || (marker > current) || (marker > end))
-            system::panic(rewind_panic_messages[0], rewind_panic_messages[1]);
+            system::panic(
+                invalid_heap_rewind_panic_message,
+                "Marker is outside the valid heap range or not aligned."
+            );
 
         if (marker % ALIGNMENT != 0)
-            system::panic(rewind_panic_messages[0], rewind_panic_messages[2]);
+            system::panic(
+                invalid_heap_rewind_panic_message,
+                "Marker is not aligned to allocator alignment."
+            );
 
         current = marker;
     }

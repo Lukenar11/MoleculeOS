@@ -1,24 +1,24 @@
 /*
-    LICENSE:
-        Copyright (c) 2026 Lukenar11 (Luke Matthes)
-        MIT Licensed
-        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+LICENSE:
+    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+    MIT Licensed
+    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
-    DESCRIPTION:
-        This file contains the high-level text output system, 
-        which provides formatted and unformatted print functions 
-        on the VGA text mode driver.
+DESCRIPTION:
+    This file contains the high-level text output system, 
+    which provides formatted and unformatted print functions 
+    on the VGA text mode driver.
 
-        It provides character output, string output, 
-        integer formatting, hexadecimal and binary print output, 
-        pointer formatting, as well as a lightweight printf implementation 
-        and supports setting various text colors.
+    It provides character output, string output, 
+    integer formatting, hexadecimal and binary print output, 
+    pointer formatting, as well as a lightweight printf implementation 
+    and supports setting various text colors.
 
-        The "TextOutput" class manages its own cursor state, 
-        color configuration, and line management, 
-        allowing structured and readable output during runtime.
+    The "TextOutput" class manages its own cursor state, 
+    color configuration, and line management, 
+    allowing structured and readable output during runtime.
     
-    NOTES:
+NOTES:
 */
 
 #pragma once

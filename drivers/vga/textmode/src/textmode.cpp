@@ -1,20 +1,20 @@
 /*
-    LICENSE:
-        Copyright (c) 2026 Lukenar11 (Luke Matthes)
-        MIT Licensed
-        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+LICENSE:
+    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+    MIT Licensed
+    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
     
-    DESCRIPTION:
-        This is a VGA text mode driver, which provides a
-        low‑level interface for writing characters and colors directly to
-        the VGA text buffer located at physical address 0xB8000.
+DESCRIPTION:
+    This is a VGA text mode driver, which provides a
+    low‑level interface for writing characters and colors directly to
+    the VGA text buffer located at physical address 0xB8000.
     
-        The driver offers utilities for constructing color attributes,
-        composing character entries, and writing text to specific screen
-        coordinates, as well as clearing the entire display.
+    The driver offers utilities for constructing color attributes,
+    composing character entries, and writing text to specific screen
+    coordinates, as well as clearing the entire display.
     
-    NOTES:
-        All writes must follow the VGA text mode layout of 80×25 characters.
+NOTES:
+    All writes must follow the VGA text mode layout of 80×25 characters.
 */
 
 #include "textmode.hpp"

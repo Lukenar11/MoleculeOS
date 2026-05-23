@@ -1,28 +1,28 @@
 /*
-    LICENSE:
-        Copyright (c) 2026 Lukenar11 (Luke Matthes)
-        MIT licensed
-        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+LICENSE:
+    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+    MIT licensed
+    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
     
-    DESCRIPTION:
-        This is the main shell class that provides the
-        high-quality command interface for interacting with the kernel.
+DESCRIPTION:
+    This is the main shell class that provides the
+    high-quality command interface for interacting with the kernel.
+
+    The shell reads keyboard input, forwards characters to the command interpreter, 
+    and manages the execution flow of user commands.
     
-        The shell reads keyboard input, forwards characters to the command interpreter, 
-        and manages the execution flow of user commands.
-        
-        The shell acts as a central, 
-        user-visible system element that coordinates input processing, 
-        command parsing, and output through the kernel's text output subsystem.
-        
-        The shell also provides a cursor and cursor blink for the user.
-        
-    NOTES:
-        The implementation is based on the PS/2 keyboard driver 
-        for input and the interpreter class for command processing.
+    The shell acts as a central, 
+    user-visible system element that coordinates input processing, 
+    command parsing, and output through the kernel's text output subsystem.
     
-        The shell itself contains no parsing logic 
-        and serves solely as a control layer and provides a cursor.
+    The shell also provides a cursor and cursor blink for the user.
+        
+NOTES:
+    The implementation is based on the PS/2 keyboard driver 
+    for input and the interpreter class for command processing.
+
+    The shell itself contains no parsing logic 
+    and serves solely as a control layer and provides a cursor.
 */
 
 #pragma once

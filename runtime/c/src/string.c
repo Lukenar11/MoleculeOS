@@ -1,21 +1,21 @@
 /*
-    LICENSE:
-        Copyright (c) 2026 Lukenar11 (Luke Matthes)
-        MIT Licensed
-        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-    
-    DESCRIPTION:
-        This library declares the basic C-like memory and string
-        manipulation routines that can be used throughout the system.
-    
-        The routines include memory copy, move, compare, fill
-        and basic string comparisons, all manually implemented to
-        ensure deterministic behavior in a freestanding kernel environment.
-    
-    NOTES:
-        This header is written in C to guarantee compatibility with both
-        C and C++ kernel components, particularly
-        those that interact with low-level memory and buffer utilities.
+LICENSE:
+    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+    MIT Licensed
+    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+
+DESCRIPTION:
+    This library declares the basic C-like memory and string
+    manipulation routines that can be used throughout the system.
+
+    The routines include memory copy, move, compare, fill
+    and basic string comparisons, all manually implemented to
+    ensure deterministic behavior in a freestanding kernel environment.
+
+NOTES:
+    This header is written in C to guarantee compatibility with both
+    C and C++ kernel components, particularly
+    those that interact with low-level memory and buffer utilities.
 */
 
 #include "string.h"

@@ -1,19 +1,19 @@
 /*
-    LICENSE:
-        Copyright (c) 2026 Lukenar11 (Luke Matthes)
-        MIT License
-        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+LICENSE:
+    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+    MIT Licensed
+    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
-    DESCRIPTION:
-        Each function corresponds to a specific hardware interrupt line 
-        of the Programmable Interrupt Controller (PIC).
+DESCRIPTION:
+    Each function corresponds to a specific hardware interrupt line 
+    of the Programmable Interrupt Controller (PIC).
 
-    NOTES:
-        The internal implementation is located in "isr.asm".
+NOTES:
+    The internal implementation is located in "isr.asm".
 
-        This header is written in C rather than C++
-        to ensure maximum compatibility,
-        as Assembly provides a C interface, but not a C++ interface.
+    This header is written in C rather than C++
+    to ensure maximum compatibility,
+    as Assembly provides a C interface, but not a C++ interface.
 */
 
 #ifndef ISR_H

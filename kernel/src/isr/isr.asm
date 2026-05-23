@@ -1,15 +1,15 @@
 ;
-;   LICENSE:
-;       Copyright (c) 2026 Lukenar11 (Luke Matthes)
-;       MIT License
-;       https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+; LICENSE:
+;     Copyright (c) 2026 Lukenar11 (Luke Matthes)
+;     MIT License
+;     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 ;
-;   DESCRIPTION:
-;       Each function corresponds to a specific hardware interrupt line 
-;       of the Programmable Interrupt Controller (PIC).
+; DESCRIPTION:
+;     Each function corresponds to a specific hardware interrupt line 
+;     of the Programmable Interrupt Controller (PIC).
 ;
-;   NOTES:
-;       The C interface is a header file called "isr.h".
+; NOTES:
+;     The C interface is a header file called "isr.h".
 ;
 
 global isr_0, isr_1, isr_2, isr_3, isr_4, isr_5, isr_6, isr_7, \

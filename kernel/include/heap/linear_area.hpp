@@ -1,19 +1,18 @@
 /*
-    LICENSE:
-        Copyright (c) 2026 Lukenar11 (Luke Matthes)
-        MIT licensed
-        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+LICENSE:
+    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+    MIT Licensed
+    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
-    DESCRIPTION:
-        This class defines the entire system heap using a linear-area allocator.
+DESCRIPTION:
+    This class defines the entire system heap using a linear-area allocator.
+    The allocator uses linker-defined symbols ("heap_start" and "heap_end")
+    to determine the valid heap area and moves a single pointer with each allocation
+    by the amount x.
 
-        The allocator uses linker-defined symbols ("heap_start" and "heap_end")
-        to determine the valid heap area and moves a single pointer with each allocation
-        by the amount x.
-
-    NOTES:
-        Always use "mark()" before allocating memory 
-        so that you can free the memory again using (rewind).
+NOTES:
+    Always use "mark()" before allocating memory 
+    so that you can free the memory again using (rewind).
 */
 
 #pragma once

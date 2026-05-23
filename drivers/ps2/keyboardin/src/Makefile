@@ -5,7 +5,7 @@
 # 
 
 OBJS += \
-	$(BUILD)/text_output.o
+	$(BUILD)/keyboard_input.o 
 
-$(BUILD)/%.o: runtime/cpp/src/%.cpp
+$(BUILD)/%.o: drivers/ps2/keyboardin/src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

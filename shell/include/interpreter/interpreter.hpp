@@ -1,23 +1,23 @@
 /*
-    LICENSE:
-        Copyright (c) 2026 Lukenar11 (Luke Matthes)
-        MIT Licensed
-        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+LICENSE:
+    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+    MIT Licensed
+    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
-    DESCRIPTION:
-        This is the command interpreter used by the MoleculeOS shell. 
-            
-        The interpreter receives raw keyboard input, 
-        tokenizes the input string, separates command and arguments,
-        and dispatches the appropriate handler based on a compile‑time hash lookup table.
+DESCRIPTION:
+    This is the command interpreter used by the MoleculeOS shell. 
+        
+    The interpreter receives raw keyboard input, 
+    tokenizes the input string, separates command and arguments,
+    and dispatches the appropriate handler based on a compile‑time hash lookup table.
     
-    NOTES:
-        The "make_hash" function and the "shell_command_table" 
-        are intentionally declared only in the header 
-        to ensure that the hash lookup table can be created at compile time.
+NOTES:
+    The "make_hash" function and the "shell_command_table" 
+    are intentionally declared only in the header 
+    to ensure that the hash lookup table can be created at compile time.
 
-        The method "append_char" is only in the header because it uses a template, 
-        and templates must be inline in the header.
+    The method "append_char" is only in the header because it uses a template, 
+    and templates must be inline in the header.
 */
 
 #pragma once

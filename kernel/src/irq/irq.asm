@@ -1,15 +1,15 @@
 ;
-;    LICENSE:
-;        Copyright (c) 2026 Lukenar11 (Luke Matthes)
-;        MIT License
-;        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+; LICENSE:
+;     Copyright (c) 2026 Lukenar11 (Luke Matthes)
+;     MIT License
+;     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 ;
-;    DESCRIPTION:
-;        Each function corresponds to a specific hardware interrupt line 
-;        of the Programmable Interrupt Controller (PIC).
+; DESCRIPTION:
+;     Each function corresponds to a specific hardware interrupt line 
+;     of the Programmable Interrupt Controller (PIC).
 ;
-;    NOTES:
-;        The C interface is a header file called "irq.h".
+; NOTES:
+;     The C interface is a header file called "irq.h".
 ;
 
 global irq_0, irq_1, irq_2, irq_3, irq_4, irq_5, irq_6, irq_7, \

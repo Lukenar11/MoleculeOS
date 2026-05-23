@@ -1,20 +1,20 @@
 /*
-    LICENSE:
-        Copyright (c) 2026 Lukenar11 (Luke Matthes)
-        MIT Licensed
-        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-    
-    DESCRIPTION:
-        This is a VGA text mode driver, which provides a
-        low‑level interface for writing characters and colors directly to
-        the VGA text buffer located at physical address 0xB8000.
-    
-        The driver offers utilities for constructing color attributes,
-        composing character entries, and writing text to specific screen
-        coordinates, as well as clearing the entire display.
-    
-    NOTES:
-        All writes must follow the VGA text mode layout of 80×25 characters.
+LICENSE:
+    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+    MIT Licensed
+    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+
+DESCRIPTION:
+    This is a VGA text mode driver, which provides a
+    low‑level interface for writing characters and colors directly to
+    the VGA text buffer located at physical address 0xB8000.
+
+    The driver offers utilities for constructing color attributes,
+    composing character entries, and writing text to specific screen
+    coordinates, as well as clearing the entire display.
+
+NOTES:
+    All writes must follow the VGA text mode layout of 80×25 characters.
 */
 
 #pragma once
@@ -35,8 +35,7 @@ namespace drivers::vga
         static inline constexpr uint8_t make_color(const VGATextmodeColors& foreground, 
                                                    const VGATextmodeColors& background) 
                                                    noexcept {
-            const uint8_t shift_4 = 4;
-            return (static_cast<uint8_t>(background) << shift_4) | 
+            return (static_cast<uint8_t>(background) << 4) | 
                     static_cast<uint8_t>(foreground);
         }
 
@@ -44,8 +43,7 @@ namespace drivers::vga
         static inline constexpr uint16_t make_symbol_entry(const char symbol, 
                                                            const uint8_t color) 
                                                            noexcept {
-            const uint8_t shift_8 = 8;
-            return (static_cast<uint16_t>(color) << shift_8) | 
+            return (static_cast<uint16_t>(color) << 8) | 
                     static_cast<uint16_t>(symbol);
         }
 
