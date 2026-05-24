@@ -23,7 +23,7 @@ NOTES:
 
 namespace kernel::heap 
 {
-    class LinearArea final {
+    class Linear_Area final {
     private:
         static constexpr uintptr_t ALIGNMENT = 8;
     
@@ -41,10 +41,10 @@ namespace kernel::heap
         [[nodiscard]] inline uintptr_t used() const noexcept { return current - start; }
         [[nodiscard]] inline uintptr_t remaining() const noexcept { return end - current; }
 
-        inline LinearArea() noexcept { current = start; }
-        ~LinearArea() noexcept = default;
+        inline Linear_Area() noexcept { current = start; }
+        ~Linear_Area() noexcept = default;
     };
 
     // GLOBAL Heap object
-    extern LinearArea linear_area;
+    extern Linear_Area linear_area;
 } // namespace kernel::heap

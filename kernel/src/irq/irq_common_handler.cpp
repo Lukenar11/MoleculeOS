@@ -20,7 +20,7 @@ NOTES:
 #include "irq/irq_common_handler.hpp"
 
 extern "C"
-void irq_common_handler(RegisterDump* reg_dump)
+void irq_common_handler(Register_Dump* reg_dump)
 {
     const uint8_t interrupt_vector = reg_dump->interrupt_number;
     const uint8_t eoi = 0x20;

@@ -29,7 +29,7 @@ namespace kernel::idt
         const uint32_t base = reinterpret_cast<uint32_t>(handler);
         const uint16_t word_mask = 0xFFFF;
 
-        IDTEntry& idt_entry = idt[index];
+        IDT_Entry& idt_entry = idt[index];
         idt_entry.base_low = base & word_mask;
         idt_entry.base_high = (base >> 16) & word_mask;
         idt_entry.selector = CODE_SEGMENT_SELECTOR;
@@ -39,12 +39,12 @@ namespace kernel::idt
 
     IDT::IDT() noexcept {
         // fill IDT-Descriptor
-        idt_ptr.limit = (sizeof(IDTEntry) * idt.size()) - 1;
+        idt_ptr.limit = (sizeof(IDT_Entry) * idt.size()) - 1;
         idt_ptr.base = reinterpret_cast<uintptr_t>(idt.begin());
 
         // clear table
         for (auto& idt_entry : idt)
-            idt_entry = IDTEntry{};
+            idt_entry = IDT_Entry{};
 
         // build IDT
         for (const auto& idt_entry : idt_init_table)

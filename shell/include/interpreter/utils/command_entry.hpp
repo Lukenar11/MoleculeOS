@@ -24,7 +24,7 @@ NOTES:
 
 namespace shell::commands
 {
-    struct CommandEntry final {
+    struct Command_Entry final {
         uint32_t hash;
         void (*function)(const runtime::Array<char, 64>& argumentes);
     };

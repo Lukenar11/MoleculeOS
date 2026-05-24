@@ -27,7 +27,7 @@ NOTES:
 namespace kernel::idt 
 {
     // Interrupt Descriptor (IDT) Entry structure
-    struct IDTEntry final {
+    struct IDT_Entry final {
         uint16_t base_low;
         uint16_t selector;
         uint8_t always_0;

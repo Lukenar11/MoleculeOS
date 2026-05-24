@@ -27,8 +27,8 @@ NOTES:
 extern "C" {
 #endif
 
-typedef struct RegisterDump RegisterDump;
-struct RegisterDump 
+typedef struct Register_Dump Register_Dump;
+struct Register_Dump 
 {
     uint32_t ds, es, fs, gs;
     uint32_t edi, esi, ebp, ebx, edx, ecx, eax;

@@ -26,12 +26,12 @@ NOTES:
 
 namespace kernel::idt 
 {
-    struct IDTInitEntry final {
+    struct IDT_INIT_Entry final {
         uint8_t index;
         void (*handler)();
     };
 
-    static inline constexpr IDTInitEntry idt_init_table[] = {
+    static inline constexpr IDT_INIT_Entry idt_init_table[] = {
         { 0, isr_0 }, { 1, isr_1 }, { 2, isr_2 }, { 3, isr_3 }, 
         { 4, isr_4 }, { 5, isr_5 }, { 6, isr_6 }, { 7, isr_7 }, 
         { 8, isr_8 }, { 9, isr_9 }, {10, isr_10}, {11, isr_11}, 

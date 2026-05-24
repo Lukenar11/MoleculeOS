@@ -23,4 +23,4 @@ NOTES:
 #include <port_io.h>
 
 extern "C"
-void irq_common_handler(RegisterDump* reg_dump);
+void irq_common_handler(Register_Dump* reg_dump);

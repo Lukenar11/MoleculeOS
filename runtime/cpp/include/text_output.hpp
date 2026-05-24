@@ -30,7 +30,7 @@ NOTES:
 
 namespace runtime 
 {
-    class TextOutput final {
+    class Text_Output final {
     private:
         uint32_t cursor_x = NULL;
         uint32_t cursor_y = NULL;
@@ -71,10 +71,10 @@ namespace runtime
             cursor_y = y;
         }
     
-        TextOutput() noexcept = default;
-        ~TextOutput() noexcept = default;
+        Text_Output() noexcept = default;
+        ~Text_Output() noexcept = default;
     };
 
     // GLOBAL Screen-Output objekt
-    extern TextOutput text_output;
+    extern Text_Output text_output;
 } // namespace runtime

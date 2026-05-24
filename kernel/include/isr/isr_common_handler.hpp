@@ -35,4 +35,4 @@ static inline constexpr void print_reg_dump(const char* label,
 }
 
 extern "C"
-void isr_common_handler(RegisterDump* reg_dump);
+void isr_common_handler(Register_Dump* reg_dump);

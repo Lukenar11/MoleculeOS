@@ -36,8 +36,8 @@ namespace kernel::idt
         static constexpr uint8_t CODE_SEGMENT_SELECTOR = 0x08;
         static constexpr uint8_t FLAGS = 0x8E;
 
-        runtime::Array<IDTEntry, 256> idt;
-        IDTDescriptorPTR idt_ptr;
+        runtime::Array<IDT_Entry, 256> idt;
+        IDT_Descriptor_PTR idt_ptr;
 
         void set_gate(const uint8_t index, void (*handler)()) noexcept;
 

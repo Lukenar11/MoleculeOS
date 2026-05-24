@@ -14,7 +14,7 @@ DESCRIPTION:
     pointer formatting, as well as a lightweight printf implementation 
     and supports setting various text colors.
 
-    The "TextOutput" class manages its own cursor state, 
+    The "Text_Output" class manages its own cursor state, 
     color configuration, and line management, 
     allowing structured and readable output during runtime.
     
@@ -25,20 +25,20 @@ NOTES:
 
 namespace runtime
 {
-    void TextOutput::reset() noexcept {
+    void Text_Output::reset() noexcept {
         cursor_x = NULL;
         cursor_y = NULL;
 
         drivers::vga::texmode.clear_screen(drivers::vga::VGA_Textmode_Colors::BLACK);
     }
 
-    void TextOutput::set_text_color(const drivers::vga::VGA_Textmode_Colors& color,
+    void Text_Output::set_text_color(const drivers::vga::VGA_Textmode_Colors& color,
                                     const drivers::vga::VGA_Textmode_Colors& background) 
                                     noexcept {
         cursor_color = drivers::vga::texmode.make_color(color, background);
     }
 
-    void TextOutput::new_line() noexcept {
+    void Text_Output::new_line() noexcept {
         cursor_x = NULL;
         cursor_y++;
 
@@ -48,7 +48,7 @@ namespace runtime
         }
     }
 
-    uint32_t TextOutput::calculate_needed_lines(const char* text) noexcept {
+    uint32_t Text_Output::calculate_needed_lines(const char* text) noexcept {
         uint32_t needed_lines = 1;
         uint32_t x = cursor_x;
 
@@ -70,7 +70,7 @@ namespace runtime
         return needed_lines;
     }
 
-    void TextOutput::put_base(uint32_t value, const uint32_t base) noexcept {
+    void Text_Output::put_base(uint32_t value, const uint32_t base) noexcept {
         if (value == NULL) [[unlikely]] {
             put_char('0');
             return;
@@ -94,7 +94,7 @@ namespace runtime
             put_char(buffer[i]);
     }
 
-    void TextOutput::put_char(const char symbol) noexcept {
+    void Text_Output::put_char(const char symbol) noexcept {
         switch (symbol) {
         case '\r':
             cursor_x = NULL;
@@ -131,7 +131,7 @@ namespace runtime
         }
     }
 
-    void TextOutput::put_string(const char* message) noexcept {
+    void Text_Output::put_string(const char* message) noexcept {
         const uint32_t needed_lines = calculate_needed_lines(message);
         const uint32_t remaining = drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT - cursor_y;
         if (needed_lines >= remaining) [[unlikely]]
@@ -141,7 +141,7 @@ namespace runtime
             put_char(*message++);
     }
 
-    void TextOutput::put_int(int32_t value) noexcept {
+    void Text_Output::put_int(int32_t value) noexcept {
         if (value < NULL) [[unlikely]] {
             put_char('-');
 
@@ -155,7 +155,7 @@ namespace runtime
         put_uint(value);
     }
 
-    void TextOutput::put_uint(uint32_t value) noexcept {
+    void Text_Output::put_uint(uint32_t value) noexcept {
         if (value == NULL) [[unlikely]] {
             put_char('0');
             return;
@@ -173,7 +173,7 @@ namespace runtime
             put_char(buffer[i]);
     }
 
-    void TextOutput::put_hex(const uint32_t value) noexcept {
+    void Text_Output::put_hex(const uint32_t value) noexcept {
         put_char('0'); 
         put_char('x');
 
@@ -181,7 +181,7 @@ namespace runtime
         put_base(value, base);
     }
 
-    void TextOutput::put_bin(const uint32_t value) noexcept {
+    void Text_Output::put_bin(const uint32_t value) noexcept {
         put_char('0'); 
         put_char('b');
 
@@ -189,7 +189,7 @@ namespace runtime
         put_base(value, base);
     }
 
-    void TextOutput::put_ptr(const uintptr_t value) noexcept {
+    void Text_Output::put_ptr(const uintptr_t value) noexcept {
         put_char('0'); 
         put_char('x');
 
@@ -198,5 +198,5 @@ namespace runtime
     }
 
     // GLOBAL Screen-Output objekt
-    TextOutput text_output;
+    Text_Output text_output;
 } // namespace runtime

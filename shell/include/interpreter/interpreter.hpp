@@ -43,7 +43,7 @@ namespace shell::commands
         return hash;
     }
 
-    constexpr CommandEntry shell_command_table[] = {
+    constexpr Command_Entry shell_command_table[] = {
         { make_hash("help"), [](auto&) -> void { help(); } },
         { make_hash("info"), [](auto&) -> void { info(); } },
         { make_hash("clear"), [](auto&) -> void { clear(); } },

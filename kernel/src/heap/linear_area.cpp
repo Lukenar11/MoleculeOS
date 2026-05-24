@@ -21,7 +21,7 @@ NOTES:
 namespace kernel::heap 
 {
     [[nodiscard]]
-    void* LinearArea::allocate(uintptr_t allocated_bytes) {
+    void* Linear_Area::allocate(uintptr_t allocated_bytes) {
         if (allocated_bytes == 0)
             return nullptr;
     
@@ -37,7 +37,7 @@ namespace kernel::heap
         return result;
     }
 
-    void LinearArea::rewind(const uintptr_t marker) noexcept {
+    void Linear_Area::rewind(const uintptr_t marker) noexcept {
         static const char* invalid_heap_rewind_panic_message = "Invalid heap rewind";
 
         if ((marker < start) || (marker > current) || (marker > end))
@@ -56,5 +56,5 @@ namespace kernel::heap
     }
     
     // GLOBAL Heap object
-    LinearArea linear_area;
+    Linear_Area linear_area;
 } // namespace kernel::heap

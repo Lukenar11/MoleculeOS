@@ -48,7 +48,7 @@ isr_common_stub:
     mov fs, ax
     mov gs, ax
 
-    ; pointer to "RegisterDump"
+    ; pointer to "Register_Dump"
     push esp
     call isr_common_handler
     add esp, 4

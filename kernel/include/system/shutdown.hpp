@@ -25,13 +25,13 @@ NOTES:
 
 namespace
 {
-    struct TryShutdownValues {
+    struct Try_Shutdown_Values {
         uint16_t port = 0x0000;
         uint16_t value = 0x0000;
         bool is_8bit_mode = false;
     };
 
-    constexpr TryShutdownValues shutdown_try_values[] = {
+    constexpr Try_Shutdown_Values shutdown_try_values[] = {
         { .port=0x0604, .value=0x2000, .is_8bit_mode=false },   // QEMU ACPI shutdown
         { .port=0x00F4, .value=0x0000, .is_8bit_mode=true  },   // QEMU ISA exit
         { .port=0xB004, .value=0x2000, .is_8bit_mode=false },   // Bochs shutdown

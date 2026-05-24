@@ -20,4 +20,4 @@ NOTES:
 
 #include "utils/register_dump.h"
 
-static_assert(sizeof(RegisterDump) == 17 * 4, "RegisterDump size mismatch!");
+static_assert(sizeof(Register_Dump) == 17 * 4, "RegisterDump size mismatch!");

@@ -27,12 +27,12 @@ NOTES:
 
 void remap_pic() noexcept 
 {
-    struct PICMapping {
+    struct PIC_Mapping {
         uint16_t port;
         uint8_t value;
     };
 
-    const PICMapping pic_mappings[] = {
+    const PIC_Mapping pic_mappings[] = {
         { .port=0x0020, .value=0x11 },  // init master IPC
         { .port=0x00A0, .value=0x11 },  // init slave IPC
         { .port=0x0021, .value=0x20 },  // set master interrupt vector offsets
