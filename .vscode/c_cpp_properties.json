@@ -1,3 +1,13 @@
+// 
+// LICENSE:
+//     Copyright (c) 2026 Lukenar11 (Luke Matthes)
+//     MIT Licensed
+//     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+// 
+// DESCRIPTION:
+//     This makes VS Code know under which paths the files are located.
+//
+
 {
     "version": 4,
     "configurations": [
@@ -14,8 +24,8 @@
                 "${workspaceFolder}/kernel/include/idt",
                 "${workspaceFolder}/runtime/c/include",
                 "${workspaceFolder}/runtime/cpp/include",
-                "${workspaceFolder}/drivers/ps2/keyboard_input/include",
-                "${workspaceFolder}/drivers/ps2/keyboard_input/include/utils",
+                "${workspaceFolder}/drivers/ps2/keyboardin/include",
+                "${workspaceFolder}/drivers/ps2/keyboardin/include/utils",
                 "${workspaceFolder}/drivers/vga/textmode/include",
                 "${workspaceFolder}/drivers/vga/textmode/include/utils",
                 "${workspaceFolder}/shell/include",

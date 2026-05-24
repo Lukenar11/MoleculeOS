@@ -1,12 +1,12 @@
-/*
-    LICENSE:
-        Copyright (c) 2026 Lukenar11 (Luke Matthes)
-        MIT Licensed
-        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-
-    DESCRIPTION:
-        VS Code launch configuration to run MoleculeOS in QEMU via WSL.
-*/
+// 
+// LICENSE:
+//     Copyright (c) 2026 Lukenar11 (Luke Matthes)
+//     MIT Licensed
+//     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+// 
+// DESCRIPTION:
+//     VS Code launch configuration to run MoleculeOS in QEMU via WSL.
+// 
 
 {
     "version": "0.2.0",
