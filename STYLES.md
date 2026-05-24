@@ -3,7 +3,6 @@ MoleculeOS Coding & Naming Style Guide
 Valid for all kernel, driver, runtime, and for C, C++ & Assembly
 
 ---
----
 
 ## 1. Naming Conventions
 
@@ -23,7 +22,7 @@ Examples:
 
 Examples:
 - `drivers`
-- `runtime`
+- `vga`
 - `kernel`
 - `ps2`
 
@@ -71,7 +70,6 @@ Examples:
 - `interpreter/`
 
 ---
----
 
 # 2. Formatting Conventions
 
@@ -86,8 +84,9 @@ Examples:
 ## 2.2 Brace Style (Hybrid: Allman + K&R)
 
 ### Outer Blocks → Allman Style
+### Inner Blocks → K&R Style
 
-Example:
+Examples:
 
 ```cpp
     namespace shell
@@ -105,10 +104,6 @@ Example:
         };
     }
 ```
-
-### Inner Blocks → K&R Style
-
-Examples:
 
 ```cpp
     void Shell::step() noexcept
@@ -139,6 +134,7 @@ Examples:
         }
     }
 ```
+
 ---
 
 ## 2.3 Optional Braces
@@ -182,13 +178,21 @@ If there are many single-line if statements one below the other, single-line blo
 - Do not exceed the character limit  
 - No fall-through without an explicit comment
 
-Example (single-line):
+Examples (single-line):
 
 ```cpp
     switch (scancode) {
     case static_cast<char>(Spechial_keys::NEW_LINE): return '\n';
     case static_cast<char>(Spechial_keys::SPACE): return ' ';
     default: return 0;
+    }
+```
+
+```cpp
+    switch (scancode) {
+    case contidtion: do_something(); break;
+    case contidtion: do_something_else(); break;
+    default: hero_of_whatever(); break;
     }
 ```
 
@@ -413,7 +417,7 @@ This improves visual structure and makes switch blocks extremely easy to scan.
             /* ... */
             /* ... */
         };
-    }// namespace namespacename
+    } // namespace namespacename
 ```
 
 ```cpp
