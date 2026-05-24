@@ -28,8 +28,8 @@ NOTES:
 void remap_pic() noexcept 
 {
     struct PIC_Mapping {
-        uint16_t port;
-        uint8_t value;
+        uint16_t port = 0x0000;
+        uint8_t value = 0x00;
     };
 
     const PIC_Mapping pic_mappings[] = {
