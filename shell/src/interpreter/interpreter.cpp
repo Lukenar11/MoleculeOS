@@ -117,7 +117,7 @@ namespace shell::commands
         static const char error_messages[] = {
             "COMMAND ERROR:\n"
             "\tThe command was either misspelled or does not exist!\n"
-            "\tType \'help\' to see a list of commands.\n\n"
+            "\tType \"help\" to see a list of commands.\n\n"
         };
 
         set_error_message_text_color();
