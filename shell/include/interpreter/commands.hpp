@@ -82,7 +82,9 @@ namespace shell::commands
     }
 
     inline void echo(const runtime::Array<char, 64>& arguments) noexcept {
-        if (arguments[NULL] == '\0') {
+        const char null_terminator = '\0';
+
+        if (arguments[NULL] == null_terminator) [[unlikely]] {
             runtime::text_output.set_text_color(
                 drivers::vga::VGA_Textmode_Colors::YELLOW,
                 drivers::vga::VGA_Textmode_Colors::BLACK
@@ -99,14 +101,15 @@ namespace shell::commands
             return;
         }
 
-        for (const auto& symbol : arguments) {
-            if (symbol == '\0')
+        for (const auto& symbol : arguments) [[likely]] {
+            if (symbol == null_terminator)
                 break;
             
             runtime::text_output.put_char(symbol);
         }
 
-        runtime::text_output.put_char('\n');
-        runtime::text_output.put_char('\n');
+        const char new_line = '\n';
+        runtime::text_output.put_char(new_line);
+        runtime::text_output.put_char(new_line);
     }
 } // namespace shell::commands

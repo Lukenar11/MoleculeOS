@@ -23,7 +23,7 @@ NOTES:
 namespace kernel::idt 
 {
     void IDT::set_gate(const uint8_t index, void (*handler)()) noexcept {
-        if (index >= idt.size())
+        if (index >= idt.size()) [[unlikely]]
             system::panic("IDT index out of range", "Check \"idt_init_table\"");
         
         const uint32_t base = reinterpret_cast<uint32_t>(handler);
@@ -43,11 +43,11 @@ namespace kernel::idt
         idt_ptr.base = reinterpret_cast<uintptr_t>(idt.begin());
 
         // clear table
-        for (auto& idt_entry : idt)
+        for (auto& idt_entry : idt) [[likely]]
             idt_entry = IDT_Entry{};
 
         // build IDT
-        for (const auto& idt_entry : idt_init_table)
+        for (const auto& idt_entry : idt_init_table) [[likely]]
             set_gate(idt_entry.index, idt_entry.handler);
 
         load_idt(reinterpret_cast<uintptr_t>(&idt_ptr));

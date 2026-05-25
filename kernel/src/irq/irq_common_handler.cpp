@@ -29,7 +29,7 @@ void irq_common_handler(Register_Dump* reg_dump)
     const uint8_t max_interrupt_vector = 0x2F;
 
     if ((interrupt_vector >= min_interrupt_vector) && 
-        (interrupt_vector <= max_interrupt_vector)) {
+        (interrupt_vector <= max_interrupt_vector)) [[likely]] {
         const uint16_t slave_pic_command_port = 0xA0;
         outb(slave_pic_command_port, eoi);
     }

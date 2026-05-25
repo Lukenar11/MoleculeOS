@@ -24,12 +24,14 @@ NOTES:
 #include "shell.hpp"
 #include "system/kernel_system_sleep.h"
 #include "system/panic.hpp"
+#include <stdint.h>
+#include <stddef.h>
 
 void remap_pic() noexcept 
 {
     struct PIC_Mapping {
-        uint16_t port = 0x0000;
-        uint8_t value = 0x00;
+        uint16_t port = NULL;
+        uint8_t value = NULL;
     };
 
     const PIC_Mapping pic_mappings[] = {
@@ -43,7 +45,7 @@ void remap_pic() noexcept
         { .port=0x00A1, .value=0x01 }   // Set slave 8086/88 mode
     };
 
-    for (const auto& entry : pic_mappings)
+    for (const auto& entry : pic_mappings) [[likely]]
         outb(entry.port, entry.value);
 }
 

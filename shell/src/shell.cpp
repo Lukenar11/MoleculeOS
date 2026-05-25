@@ -31,8 +31,6 @@ NOTES:
 
 #include "shell.hpp"
 
-#include "kernel/include/system/kernel_system_sleep.h"
-
 namespace shell 
 {
     Shell::Shell() noexcept {
@@ -44,11 +42,11 @@ namespace shell
                                             drivers::vga::VGA_Textmode_Colors background) 
                                             const noexcept {
         uint32_t x = runtime::text_output.get_cursor_x();
-        if (x >= drivers::vga::VGA_TEXMODE_SCREEN_WIDTH)
+        if (x >= drivers::vga::VGA_TEXMODE_SCREEN_WIDTH) [[unlikely]]
             x = drivers::vga::VGA_TEXMODE_SCREEN_WIDTH - 1;
 
         uint32_t y = runtime::text_output.get_cursor_y();
-        if (y >= drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT)
+        if (y >= drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT) [[unlikely]]
             y = drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT - 1;
 
         runtime::text_output.set_text_color(
@@ -61,7 +59,7 @@ namespace shell
     }
 
     void Shell::step() noexcept {
-        while (drivers::ps2::keyboard_input.has_pending_scancode()) {
+        while (drivers::ps2::keyboard_input.has_pending_scancode()) [[likely]] {
             const char key = drivers::ps2::keyboard_input.get_key();
             if (!key)
                 continue;
@@ -73,7 +71,7 @@ namespace shell
 
             draw_user_cursor();
 
-            if (key == '\n')
+            if (key == '\n') [[unlikely]]
                 break;
         }
     }

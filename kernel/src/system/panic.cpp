@@ -26,10 +26,10 @@ namespace kernel::system
             drivers::vga::VGA_Textmode_Colors::BLACK
         );
 
-        if (!error_message)
+        if (!error_message) [[unlikely]]
             error_message = "Unknown fatal error.";
 
-        if (!troubleshooting_message)
+        if (!troubleshooting_message) [[unlikely]]
             troubleshooting_message = "No troubleshooting information available.";
 
         runtime::text_output.put_string(">>>>>>>>>>> KERNEL PANIC <<<<<<<<<<<\n");

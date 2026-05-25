@@ -23,7 +23,7 @@ NOTES:
 namespace drivers::ps2
 {
     char Keyboard_Input::get_key() noexcept {
-        const uint8_t null_terminator = '\0';
+        const char null_terminator = '\0';
 
         if (!(inb(KEYBOARD_STATUS_PORT) & LOWEST_BIT))
             return null_terminator;
@@ -56,11 +56,12 @@ namespace drivers::ps2
                          ? us_qwerty_shift_key_mapping[scancode] 
                          : us_qwerty_std_key_mapping[scancode]; 
 
-        if (capslock_is_enabled) {
+        if (capslock_is_enabled) [[unlikely]] {
+            const uint32_t _32 = 32;
             if ((character >= 'a') && (character <= 'z'))
-                character -= 32;
+                character -= _32;
             else if ((character >= 'A') && (character <= 'Z'))
-                character += 32;
+                character += _32;
         }
 
         return character;

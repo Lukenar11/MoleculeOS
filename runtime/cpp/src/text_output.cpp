@@ -52,7 +52,7 @@ namespace runtime
         uint32_t needed_lines = 1;
         uint32_t x = cursor_x;
 
-        while (*text) {
+        while (*text) [[likely]] {
             const char symbol = *text++;
             if (symbol == '\n') {
                 needed_lines++;
@@ -82,7 +82,7 @@ namespace runtime
         runtime::Array<char, 32> buffer;
         uint32_t i = NULL;
 
-        while (value) {
+        while (value) [[likely]] {
             const uint32_t ten = 10;
 
             const uint8_t number = value % base;
@@ -90,7 +90,7 @@ namespace runtime
             value /= base;
         }
 
-        while (i--)
+        while (i--) [[likely]]
             put_char(buffer[i]);
     }
 
@@ -137,7 +137,7 @@ namespace runtime
         if (needed_lines >= remaining) [[unlikely]]
             reset();
 
-        while (*message)
+        while (*message) [[likely]]
             put_char(*message++);
     }
 
@@ -164,12 +164,13 @@ namespace runtime
         runtime::Array<char, 12> buffer;
         uint32_t i = NULL;
 
-        while (value) {
-            buffer[i++] = '0' + (value % 10);
-            value /= 10;
+        while (value) [[likely]] {
+            const uint32_t ten = 10;
+            buffer[i++] = '0' + (value % ten);
+            value /= ten;
         }
 
-        while (i--)
+        while (i--) [[likely]]
             put_char(buffer[i]);
     }
 

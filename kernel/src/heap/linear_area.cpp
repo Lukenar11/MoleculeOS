@@ -22,14 +22,14 @@ namespace kernel::heap
 {
     [[nodiscard]]
     void* Linear_Area::allocate(uintptr_t allocated_bytes) {
-        if (allocated_bytes == 0)
+        if (allocated_bytes == NULL) [[unlikely]]
             return nullptr;
     
         const uint32_t one = 1;
         allocated_bytes = (allocated_bytes + (ALIGNMENT - one)) & ~(ALIGNMENT - one);
         uintptr_t aligned = (current + (ALIGNMENT - one)) & ~(ALIGNMENT - one);
     
-        if (aligned + allocated_bytes > end)
+        if (aligned + allocated_bytes > end) [[unlikely]]
             system::panic("Out of heap memory", "optimize your memory usage");
     
         void* result = reinterpret_cast<void*>(aligned);
@@ -40,13 +40,13 @@ namespace kernel::heap
     void Linear_Area::rewind(const uintptr_t marker) noexcept {
         static const char* invalid_heap_rewind_panic_message = "Invalid heap rewind";
 
-        if ((marker < start) || (marker > current) || (marker > end))
+        if ((marker < start) || (marker > current) || (marker > end)) [[unlikely]]
             system::panic(
                 invalid_heap_rewind_panic_message,
                 "Marker is outside the valid heap range or not aligned."
             );
 
-        if (marker % ALIGNMENT != 0)
+        if (marker % ALIGNMENT != NULL) [[unlikely]]
             system::panic(
                 invalid_heap_rewind_panic_message,
                 "Marker is not aligned to allocator alignment."

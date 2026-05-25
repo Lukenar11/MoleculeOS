@@ -16,6 +16,10 @@ NOTES:
     are intentionally declared only in the header 
     to ensure that the hash lookup table can be created at compile time.
 
+    Since the functions "set_error_message_text_color" and 
+    "set_error_message_text_color" are so short, 
+    I put them in the header so the compiler can inline them.
+
     The method "append_char" is only in the header because it uses a template, 
     and templates must be inline in the header.
 */
@@ -36,7 +40,7 @@ namespace
     inline constexpr uint32_t make_hash(const char* command) noexcept {
         const uint32_t mul_32 = 5;
         uint32_t hash = NULL;
-        while (*command) {
+        while (*command) [[likely]] {
             hash = (hash << mul_32) - hash + static_cast<char>(*command);
             command++;
         }
@@ -57,13 +61,15 @@ namespace shell::commands
 {
     class Interpreter final {
     private:
+        static constexpr char NULL_TERMINATOR = '\0';
+
         runtime::Array<char, 128> input_buffer;
         runtime::Array<char, 64> commands;
         runtime::Array<char, 64> arguments;
 
-        uint32_t input_buffer_index = 0;
-        uint32_t commands_index = 0;
-        uint32_t arguments_index = 0;
+        uint32_t input_buffer_index = NULL;
+        uint32_t commands_index = NULL;
+        uint32_t arguments_index = NULL;
 
         static inline void set_error_message_text_color() {
             runtime::text_output.set_text_color(
@@ -81,7 +87,7 @@ namespace shell::commands
 
         template <typename Arr>
         bool append_char(Arr& buffer, uint32_t& index, const char symbol) noexcept {
-            if (index < buffer.size()) {
+            if (index < buffer.size()) [[likely]] {
                 buffer[index++] = symbol;
                 return true;
             }
@@ -89,7 +95,7 @@ namespace shell::commands
         }
 
         void print_overflow_error(const char* error_message_for, 
-                                  uint32_t max_buffer_size) const noexcept;
+                                  const uint32_t max_buffer_size) const noexcept;
 
         bool validate_tokens() const noexcept;
 

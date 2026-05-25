@@ -27,8 +27,8 @@ namespace kernel::heap
     private:
         static constexpr uintptr_t ALIGNMENT = 8;
     
-        static inline const uintptr_t start = reinterpret_cast<uintptr_t>(&heap_start);
-        static inline const uintptr_t end = reinterpret_cast<uintptr_t>(&heap_end);
+        const uintptr_t start = reinterpret_cast<uintptr_t>(&heap_start);
+        const uintptr_t end = reinterpret_cast<uintptr_t>(&heap_end);
         uintptr_t current;
     
     public:

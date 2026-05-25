@@ -16,6 +16,10 @@ NOTES:
     are intentionally declared only in the header 
     to ensure that the hash lookup table can be created at compile time.
 
+    Since the functions "set_error_message_text_color" and 
+    "set_error_message_text_color" are so short, 
+    I put them in the header so the compiler can inline them.
+
     The method "append_char" is only in the header because it uses a template, 
     and templates must be inline in the header.
 */
@@ -25,7 +29,7 @@ NOTES:
 namespace shell::commands
 {
     void Interpreter::print_overflow_error(const char* error_message_for, 
-                                           uint32_t max_buffer_size) const noexcept {
+                                           const uint32_t max_buffer_size) const noexcept {
         static const char* error_messages[] = {
             "\nSHELL ERROR:\n\t",
             " overflow. Max size: ",
@@ -45,16 +49,16 @@ namespace shell::commands
 
     bool Interpreter::tokenize_input_buffer() {
         bool tokenize_commands = true;
-        for (uint32_t i = 0; i < input_buffer_index; ++i) {
+        for (uint32_t i = NULL; i < input_buffer_index; ++i) [[likely]] {
             const char key = input_buffer[i];
 
-            if (key == '\0')
+            if (key == NULL_TERMINATOR)
                 break;
 
-            if (tokenize_commands && commands_index == 0 && key == ' ')
+            if (tokenize_commands && commands_index == NULL && key == ' ')
                 continue;
 
-            if (key == ' ' && arguments_index == 0) {
+            if (key == ' ' && arguments_index == NULL) {
                 tokenize_commands = false;
                 continue;
             }
@@ -74,14 +78,14 @@ namespace shell::commands
             }
         }
 
-        commands[commands_index] = '\0';
-        arguments[arguments_index] = '\0';
+        commands[commands_index] = NULL_TERMINATOR;
+        arguments[arguments_index] = NULL_TERMINATOR;
 
         return true;
     }
 
     bool Interpreter::validate_tokens() const noexcept {
-        if (commands_index == 0 && arguments_index > 0) {
+        if (commands_index == NULL && arguments_index > NULL) [[unlikely]] {
             set_error_message_text_color();
 
             static const char* error_message = "Error: arguments without command.\n\n";
@@ -92,7 +96,7 @@ namespace shell::commands
             return false;
         }
 
-        if (commands_index == 0 || commands[0] == '\0') {
+        if (commands_index == NULL || commands[NULL] == NULL_TERMINATOR) [[unlikely]] {
             static const char* error_message = "No command entered.\n\n";
             runtime::text_output.put_string(error_message);
 
@@ -104,7 +108,7 @@ namespace shell::commands
 
     void Interpreter::parse_commands() noexcept {
         const uint32_t command_hash = make_hash(commands.data());
-        for (const auto& entry : shell_command_table)
+        for (const auto& entry : shell_command_table) [[likely]]
             if (entry.hash == command_hash) {
                 entry.function(arguments);
                 return;
@@ -122,23 +126,21 @@ namespace shell::commands
     }
 
     constexpr void Interpreter::flush_interpreter_pipeline() noexcept {
-        const char null_terminator = '\0';
-        const uint32_t null = 0;
-
+        const char null_terminator = NULL_TERMINATOR;
         input_buffer.fill(null_terminator);
         commands.fill(null_terminator);
         arguments.fill(null_terminator);
 
-        input_buffer_index = null;
-        commands_index = null;
-        arguments_index = null;
+        input_buffer_index = NULL;
+        commands_index = NULL;
+        arguments_index = NULL;
     }
 
     void Interpreter::step(const char& key) {
         if (key == '\b') {
-            if (input_buffer_index > 0) {
+            if (input_buffer_index > NULL) {
                 --input_buffer_index;
-                input_buffer[input_buffer_index] = '\0';
+                input_buffer[input_buffer_index] = NULL_TERMINATOR;
             }
             return;
         }

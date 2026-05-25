@@ -22,11 +22,11 @@ namespace kernel::system
 {
     void shutdown() noexcept {
         const uint32_t cpu_flags = kernel_system_save_eflags();
-        for (const auto& entry : shutdown_try_values) {
+        for (const auto& entry : shutdown_try_values) [[likely]] {
             if (entry.is_8bit_mode) [[unlikely]] {
                 const uint8_t value = entry.value & 0xFF;
                 outb(entry.port, value);
-            } else {
+            } else [[likely]] {
                 outw(entry.port, entry.value);
             }
 
