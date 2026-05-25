@@ -48,6 +48,10 @@ Below is the current state of MoleculeOS running in QEMU (deliberately triggered
 
 ![MoleculeOS panic screenshot](docs/images/kernel-panic.png)
 
+## Demo Preview
+
+![Demo Preview](docs/videos/molecule-os-using.gif)
+
 ---
 
 ## Requirements
