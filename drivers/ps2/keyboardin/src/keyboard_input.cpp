@@ -23,8 +23,10 @@ NOTES:
 namespace drivers::ps2
 {
     char Keyboard_Input::get_key() noexcept {
+        const uint8_t null_terminator = '\0';
+
         if (!(inb(KEYBOARD_STATUS_PORT) & LOWEST_BIT))
-            return '\0';
+            return null_terminator;
     
         const uint8_t scancode = inb(KEYBOARD_DATA_PORT);
     
@@ -32,23 +34,23 @@ namespace drivers::ps2
         case static_cast<uint8_t>(Special_Keyboard_Keys::LEFT_SHIFT):
         case static_cast<uint8_t>(Special_Keyboard_Keys::RIGHT_SHIFT):
             shift_is_pressed = true;
-            return '\0';
+            return null_terminator;
         
         case static_cast<uint8_t>(Special_Keyboard_Keys::LEFT_SHIFT_RELEASE):
         case static_cast<uint8_t>(Special_Keyboard_Keys::RIGHT_SHIFT_RELEASE):
             shift_is_pressed = false;
-            return '\0';
+            return null_terminator;
         
         case static_cast<uint8_t>(Special_Keyboard_Keys::CAPSLOCK):
             capslock_is_enabled = !capslock_is_enabled;
-            return '\0';
+            return null_terminator;
         }
     
         if (scancode & static_cast<uint8_t>(Special_Keyboard_Keys::KEYBOARD_RELEASE))
-            return '\0';
+            return null_terminator;
     
         if (scancode >= ALOWED_SCANCODE_SIZE)
-            return '\0';
+            return null_terminator;
     
         char character = (shift_is_pressed) 
                          ? us_qwerty_shift_key_mapping[scancode] 
