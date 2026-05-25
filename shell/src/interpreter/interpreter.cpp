@@ -32,11 +32,15 @@ namespace shell::commands
             " symbols\n\n"
         };
 
+        set_error_message_text_color();
+
         runtime::text_output.put_string(error_messages[0]);
         runtime::text_output.put_string(error_message_for);
         runtime::text_output.put_string(error_messages[1]);
         runtime::text_output.put_uint(max_buffer_size);
         runtime::text_output.put_string(error_messages[2]);
+
+        set_default_text_color();
     };
 
     bool Interpreter::tokenize_input_buffer() {
@@ -78,8 +82,12 @@ namespace shell::commands
 
     bool Interpreter::validate_tokens() const noexcept {
         if (commands_index == 0 && arguments_index > 0) {
+            set_error_message_text_color();
+
             static const char* error_message = "Error: arguments without command.\n\n";
             runtime::text_output.put_string(error_message);
+            
+            set_default_text_color();
 
             return false;
         }
@@ -107,17 +115,19 @@ namespace shell::commands
             "\tThe command was either misspelled or does not exist!\n"
             "\tType \'help\' to see a list of commands.\n\n"
         };
-        
+
+        set_error_message_text_color();
         runtime::text_output.put_string(error_messages);
+        set_default_text_color();
     }
 
     constexpr void Interpreter::flush_interpreter_pipeline() noexcept {
-        const char nullterminator = '\0';
+        const char null_terminator = '\0';
         const uint32_t null = 0;
 
-        input_buffer.fill(nullterminator);
-        commands.fill(nullterminator);
-        arguments.fill(nullterminator);
+        input_buffer.fill(null_terminator);
+        commands.fill(null_terminator);
+        arguments.fill(null_terminator);
 
         input_buffer_index = null;
         commands_index = null;

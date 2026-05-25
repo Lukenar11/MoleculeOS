@@ -30,10 +30,10 @@ NOTES:
 #include <array.hpp>
 #include <string.h>
 
-namespace shell::commands
+namespace
 {
     [[nodiscard]]
-    static inline constexpr uint32_t make_hash(const char* command) noexcept {
+    inline constexpr uint32_t make_hash(const char* command) noexcept {
         const uint32_t mul_32 = 5;
         uint32_t hash = NULL;
         while (*command) {
@@ -43,15 +43,18 @@ namespace shell::commands
         return hash;
     }
 
-    constexpr Command_Entry shell_command_table[] = {
-        { make_hash("help"), [](auto&) -> void { help(); } },
-        { make_hash("info"), [](auto&) -> void { info(); } },
-        { make_hash("clear"), [](auto&) -> void { clear(); } },
-        { make_hash("reboot"), [](auto&) -> void { reboot(); } },
-        { make_hash("shutdown"), [](auto&) -> void { shutdown(); } },
-        { make_hash("echo"), [](auto& argumentes) -> void { echo(argumentes); } },
+    constexpr shell::commands::Command_Entry shell_command_table[] = {
+        { make_hash("help"), [](auto&) -> void { shell::commands::help(); } },
+        { make_hash("info"), [](auto&) -> void { shell::commands::info(); } },
+        { make_hash("clear"), [](auto&) -> void { shell::commands::clear(); } },
+        { make_hash("reboot"), [](auto&) -> void { shell::commands::reboot(); } },
+        { make_hash("shutdown"), [](auto&) -> void { shell::commands::shutdown(); } },
+        { make_hash("echo"), [](auto& argumentes) -> void { shell::commands::echo(argumentes); } },
     };
+}
 
+namespace shell::commands
+{
     class Interpreter final {
     private:
         runtime::Array<char, 128> input_buffer;
@@ -61,6 +64,20 @@ namespace shell::commands
         uint32_t input_buffer_index = 0;
         uint32_t commands_index = 0;
         uint32_t arguments_index = 0;
+
+        static inline void set_error_message_text_color() {
+            runtime::text_output.set_text_color(
+                drivers::vga::VGA_Textmode_Colors::LIGHT_MAGENTA,
+                drivers::vga::VGA_Textmode_Colors::BLACK
+            );
+        }
+
+        static inline void set_default_text_color() {
+            runtime::text_output.set_text_color(
+                drivers::vga::VGA_Textmode_Colors::LIGHT_GREY,
+                drivers::vga::VGA_Textmode_Colors::BLACK
+            );
+        }
 
         template <typename Arr>
         bool append_char(Arr& buffer, uint32_t& index, const char symbol) noexcept {

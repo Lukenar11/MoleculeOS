@@ -1,6 +1,5 @@
-# MoleculeOS – STYLE.md (v1.0)
+# MoleculeOS – STYLE.md
 MoleculeOS Coding & Naming Style Guide
-Valid for all kernel, driver, runtime, and for C, C++ & Assembly
 
 ---
 
@@ -196,43 +195,12 @@ Examples (single-line):
     }
 ```
 
-Example (multi-line):
-
-```cpp
-    switch (symbol) {
-    case '\r':
-        /* ... */
-        /* ... */
-        break;
-            
-    case '\b':
-        /* ... */
-        /* ... */
-        break;
-
-    case '\t':
-        /* ... */
-        /* ... */
-        break;
-    
-    case '\n':
-        /* ... */
-        /* ... */
-        break;
-
-    default:
-        /* ... */
-        /* ... */
-        break;
-    }
-```
-
 ---
 
 ## 2.5 Line Length
 
 - **Soft Limit:** 80 characters  
-- **Hard Limit:** 95 characters  
+- **Hard Limit:** 100 characters  
 - If exceeded → Wrap lines
 
 ## 2.6 Includes
@@ -359,11 +327,10 @@ Example (with long arguments):
     );
 ```
 
-
 Example (with short arguments):
 
 ```cpp
-    runtime::text_output.put_string(“Hello, World!\n”);
+    runtime::text_output.put_string("Hello, World!\n");
 ```
 
 ---
@@ -421,25 +388,18 @@ This improves visual structure and makes switch blocks extremely easy to scan.
 ```
 
 ```cpp
-    /*
+    /* 
     LICENSE:
-        Copyright (c) 2026 Lukenar11 (Luke Matthes)
-        MIT Licensed
-        https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+        ...
+        ...
 
     DESCRIPTION:
-        This file contains the kernel entry point "kernel_main," which
-        is called directly after the bootloader hands control over to the kernel.
-
-        The function initializes core subsystems such as the IDT,
-        performs a simple interrupt- and endless-loop-driven scheduling, and starts the shell.
+        ...
+        ...
 
     NOTES:
-        This "kernel_main" function must never return. If execution reaches the end of
-        "kernel_main," a kernel panic is triggered to prevent undefined behavior.
-
-        Since this function is called by an assembly routine,
-        it is declared as "extern C" to ensure compatibility.
+        ...
+        ...
     */
 ```
 
@@ -453,7 +413,7 @@ This improves visual structure and makes switch blocks extremely easy to scan.
 
 ### Also applies to C/C++ labels:
 
-```cpp
+```c
     loop_start:
     	/* ... */
         /* ... */

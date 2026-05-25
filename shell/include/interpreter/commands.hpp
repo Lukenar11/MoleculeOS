@@ -83,8 +83,19 @@ namespace shell::commands
 
     inline void echo(const runtime::Array<char, 64>& arguments) noexcept {
         if (arguments[NULL] == '\0') {
+            runtime::text_output.set_text_color(
+                drivers::vga::VGA_Textmode_Colors::YELLOW,
+                drivers::vga::VGA_Textmode_Colors::BLACK
+            );
+
             static const char* error_message = "echo: missing argument\n\n";
             runtime::text_output.put_string(error_message);
+
+            runtime::text_output.set_text_color(
+                drivers::vga::VGA_Textmode_Colors::LIGHT_GREY,
+                drivers::vga::VGA_Textmode_Colors::BLACK
+            );
+
             return;
         }
 
