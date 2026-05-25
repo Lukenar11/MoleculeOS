@@ -71,7 +71,7 @@ namespace shell
 
             draw_user_cursor();
 
-            if (key == '\n') [[unlikely]]
+            if (key == '\n')
                 break;
         }
     }
