@@ -48,12 +48,12 @@ namespace
     }
 
     constexpr shell::commands::Command_Entry shell_command_table[] = {
-        { make_hash("help"), [](auto&) -> void { shell::commands::help(); } },
-        { make_hash("info"), [](auto&) -> void { shell::commands::info(); } },
-        { make_hash("clear"), [](auto&) -> void { shell::commands::clear(); } },
-        { make_hash("reboot"), [](auto&) -> void { shell::commands::reboot(); } },
-        { make_hash("shutdown"), [](auto&) -> void { shell::commands::shutdown(); } },
-        { make_hash("echo"), [](auto& argumentes) -> void { shell::commands::echo(argumentes); } },
+        { make_hash("help"), [](auto& _) -> void { shell::commands::help(); } },
+        { make_hash("info"), [](auto& _) -> void { shell::commands::info(); } },
+        { make_hash("clear"), [](auto& _) -> void { shell::commands::clear(); } },
+        { make_hash("reboot"), [](auto& _) -> void { shell::commands::reboot(); } },
+        { make_hash("shutdown"), [](auto& _) -> void { shell::commands::shutdown(); } },
+        { make_hash("echo"), [](auto& arguments) -> void { shell::commands::echo(arguments); } },
     };
 }
 
@@ -71,14 +71,14 @@ namespace shell::commands
         uint32_t commands_index = NULL;
         uint32_t arguments_index = NULL;
 
-        static inline void set_error_message_text_color() {
+        static inline void set_error_message_text_color() noexcept {
             runtime::text_output.set_text_color(
                 drivers::vga::VGA_Textmode_Colors::LIGHT_MAGENTA,
                 drivers::vga::VGA_Textmode_Colors::BLACK
             );
         }
 
-        static inline void set_default_text_color() {
+        static inline void set_default_text_color() noexcept {
             runtime::text_output.set_text_color(
                 drivers::vga::VGA_Textmode_Colors::LIGHT_GREY,
                 drivers::vga::VGA_Textmode_Colors::BLACK
@@ -86,7 +86,9 @@ namespace shell::commands
         }
 
         template <typename Arr>
-        bool append_char(Arr& buffer, uint32_t& index, const char symbol) noexcept {
+        inline constexpr bool append_char(Arr& buffer, 
+                                          uint32_t& index,
+                                          const char symbol) noexcept {
             if (index < buffer.size()) [[likely]] {
                 buffer[index++] = symbol;
                 return true;
@@ -97,7 +99,7 @@ namespace shell::commands
         void print_overflow_error(const char* error_message_for, 
                                   const uint32_t max_buffer_size) const noexcept;
 
-        bool validate_tokens() const noexcept;
+        bool validate_tokens() noexcept;
 
         bool tokenize_input_buffer();
         void parse_commands() noexcept;

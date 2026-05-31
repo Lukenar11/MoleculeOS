@@ -37,7 +37,7 @@ namespace runtime
             return buffer[index]; 
         }
 
-        // ge_ array-size
+        // get array-size
         inline constexpr uint32_t size() const noexcept { return S; }
 
         // iterators

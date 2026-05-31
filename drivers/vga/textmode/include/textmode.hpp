@@ -35,16 +35,14 @@ namespace drivers::vga
         static inline constexpr uint8_t make_color(const VGA_Textmode_Colors& foreground, 
                                                    const VGA_Textmode_Colors& background) 
                                                    noexcept {
-            return (static_cast<uint8_t>(background) << 4) | 
-                    static_cast<uint8_t>(foreground);
+            return (static_cast<uint8_t>(background) << 4) | static_cast<uint8_t>(foreground);
         }
 
         [[nodiscard]]
         static inline constexpr uint16_t make_symbol_entry(const char symbol, 
                                                            const uint8_t color) 
                                                            noexcept {
-            return (static_cast<uint16_t>(color) << 8) | 
-                    static_cast<uint16_t>(symbol);
+            return (static_cast<uint16_t>(color) << 8) | static_cast<uint16_t>(symbol);
         }
 
         void put_char_at(const char symbol, 

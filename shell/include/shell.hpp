@@ -49,14 +49,14 @@ namespace shell
                                          drivers::vga::VGA_Textmode_Colors background) 
                                          const noexcept;
 
-        inline void draw_user_cursor() const noexcept {
+        inline constexpr void draw_user_cursor() const noexcept {
             draw_user_cursor_with_color(
                 drivers::vga::VGA_Textmode_Colors::LIGHT_GREY,
                 drivers::vga::VGA_Textmode_Colors::LIGHT_GREY
             );
         }
 
-        inline void erase_user_cursor() const noexcept {
+        inline constexpr void erase_user_cursor() const noexcept {
             draw_user_cursor_with_color(
                 drivers::vga::VGA_Textmode_Colors::LIGHT_GREY,
                 drivers::vga::VGA_Textmode_Colors::BLACK

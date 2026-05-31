@@ -25,9 +25,9 @@ namespace kernel::heap
         if (allocated_bytes == NULL) [[unlikely]]
             return nullptr;
     
-        const uint32_t one = 1;
-        allocated_bytes = (allocated_bytes + (ALIGNMENT - one)) & ~(ALIGNMENT - one);
-        uintptr_t aligned = (current + (ALIGNMENT - one)) & ~(ALIGNMENT - one);
+        const uint32_t _1 = 1;
+        allocated_bytes = (allocated_bytes + (ALIGNMENT - _1)) & ~(ALIGNMENT - _1);
+        uintptr_t aligned = (current + (ALIGNMENT - _1)) & ~(ALIGNMENT - _1);
     
         if (aligned + allocated_bytes > end) [[unlikely]]
             system::panic("Out of heap memory", "optimize your memory usage");

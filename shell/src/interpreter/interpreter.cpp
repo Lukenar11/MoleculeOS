@@ -52,7 +52,7 @@ namespace shell::commands
         for (uint32_t i = NULL; i < input_buffer_index; ++i) [[likely]] {
             const char key = input_buffer[i];
 
-            if (key == NULL_TERMINATOR)
+            if (key == NULL_TERMINATOR) [[unlikely]]
                 break;
 
             if (tokenize_commands && commands_index == NULL && key == ' ')
@@ -65,7 +65,7 @@ namespace shell::commands
 
             auto& target_buffer = (tokenize_commands) ? commands : arguments;
             auto& target_index = (tokenize_commands) ? commands_index : arguments_index;
-            if (!append_char(target_buffer, target_index, key)) {
+            if (!append_char(target_buffer, target_index, key)) [[unlikely]] {
                 static const char* command_buffer_error_message = "Command buffer";
                 static const char* argument_buffer_error_message = "Argument buffer";
 
@@ -84,7 +84,7 @@ namespace shell::commands
         return true;
     }
 
-    bool Interpreter::validate_tokens() const noexcept {
+    bool Interpreter::validate_tokens() noexcept {
         if (commands_index == NULL && arguments_index > NULL) [[unlikely]] {
             set_error_message_text_color();
 
@@ -145,7 +145,7 @@ namespace shell::commands
             return;
         }
 
-        if (key == '\n') {
+        if (key == '\n') [[unlikely]] {
             const bool is_tokenized = tokenize_input_buffer();
             if (is_tokenized && validate_tokens())
                 parse_commands();
@@ -158,7 +158,9 @@ namespace shell::commands
             return;
 
         static const char* error_message = "Input buffer";
+        runtime::text_output.put_char('\n');
         print_overflow_error(error_message, input_buffer.size());
+
         flush_interpreter_pipeline();
     }
 } // namespace shell::commands

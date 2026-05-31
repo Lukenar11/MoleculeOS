@@ -83,10 +83,10 @@ namespace runtime
         uint32_t i = NULL;
 
         while (value) [[likely]] {
-            const uint32_t ten = 10;
+            const uint32_t _10 = 10;
 
             const uint8_t number = value % base;
-            buffer[i++] = (number < ten) ? ('0' + number) : ('A' + number - ten);
+            buffer[i++] = (number < _10) ? ('0' + number) : ('A' + number - _10);
             value /= base;
         }
 
@@ -145,8 +145,8 @@ namespace runtime
         if (value < NULL) [[unlikely]] {
             put_char('-');
 
-            const uint32_t one = 1;
-            value = static_cast<uint32_t>(-(value + one)) + one;
+            const uint32_t _1 = 1;
+            value = static_cast<uint32_t>(-(value + _1)) + _1;
             put_uint(value);
 
             return;
@@ -165,9 +165,9 @@ namespace runtime
         uint32_t i = NULL;
 
         while (value) [[likely]] {
-            const uint32_t ten = 10;
-            buffer[i++] = '0' + (value % ten);
-            value /= ten;
+            const uint32_t _10 = 10;
+            buffer[i++] = '0' + (value % _10);
+            value /= _10;
         }
 
         while (i--) [[likely]]
