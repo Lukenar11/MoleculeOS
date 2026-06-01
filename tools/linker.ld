@@ -37,6 +37,6 @@ SECTIONS
 
   . = ALIGN(8);
   heap_start = .;
-  . += 128K;
+  . += 64;
   heap_end = .;
 }

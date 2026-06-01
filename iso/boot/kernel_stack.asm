@@ -28,7 +28,5 @@ section .bss
 align 16
 
 stack_bottom:
-
     resb KERNEL_STACK_SIZE
-
 kernel_stack_top:

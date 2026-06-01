@@ -10,5 +10,5 @@ OBJS += \
 	$(BUILD)/multiboot.o \
 	$(BUILD)/gdt.o
 
-$(BUILD)/%.o: boot/%.asm
+$(BUILD)/%.o: iso/boot/%.asm
 	nasm $(ASMFLAGS) $< -o $@

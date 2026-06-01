@@ -63,6 +63,7 @@ To build and run MoleculeOS, the following software is required:
 - **Clang++** (for compiling the 32‑bit kernel and the C++ runtime, requires i386 target support)
 - **Clang** (for compiling the C Runtime and C komponentes in the Kernel, requires i386 target support)
 - **Make** (for Building and running the Project)
+- **ld.lld** (for the linking)
 - **QEMU** (for running the OS in a virtual machine)
 - **WSL** (Windows Subsystem for Linux, if you work under Windows) (for using Grub and run Shell Skripts)
 

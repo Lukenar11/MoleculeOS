@@ -41,7 +41,7 @@ ASMFLAGS = -f elf32
 
 LDFLAGS  = -T $(LINKER) -m elf_i386 -nostdlib -static
 
-include boot/Makefile
+include iso/boot/Makefile
 include drivers/Makefile
 include runtime/Makefile
 include kernel/Makefile

@@ -22,11 +22,9 @@ global load_gdt
 section .gdt
 
 gdt_start:
-
     dq 0x0000000000000000   ; Null Descriptor
     dq 0x00CF9A000000FFFF   ; Kernel Code Segment
     dq 0x00CF92000000FFFF   ; Kernel Data Segment
-
 gdt_end:
 
 gdt_descriptor:
