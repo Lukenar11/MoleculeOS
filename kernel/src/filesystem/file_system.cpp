@@ -51,7 +51,7 @@ namespace kernel::filesystem
 
         uint32_t i = _0;
         while (i < MAX_PATH_LENGTH) [[likely]] {
-            const char symbol = path[i];
+            const char symbol = absolute_path[i];
             if (symbol == '.' || symbol == null_char) {
                 path_token[path_token_index] = null_char;
 

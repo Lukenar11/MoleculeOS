@@ -28,7 +28,7 @@ namespace kernel::filesystem
 
     struct Inode final {
         char name[MAX_FILENAME_LENGTH] = {'\0'};
-        Inode_Type type = Inode_Type::INODE_FILE;
+        Inode_Type type = static_cast<Inode_Type>(Inode_Type::INODE_FILE);
         uint32_t size = NULL;
         uint8_t data[MAX_FILE_SIZE] = {};
         Inode* parent = nullptr;
