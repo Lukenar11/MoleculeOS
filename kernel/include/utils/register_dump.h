@@ -30,10 +30,10 @@ extern "C" {
 typedef struct Register_Dump Register_Dump;
 struct Register_Dump 
 {
-    uint32_t ds, es, fs, gs;
-    uint32_t edi, esi, ebp, ebx, edx, ecx, eax;
-    uint32_t interrupt_number, error_code;
-    uint32_t eip, cs, eflags;
+    uint32_t ds = 0, es = 0, fs = 0, gs = 0;
+    uint32_t edi = 0, esi = 0, ebp = 0, ebx = 0, edx = 0, ecx = 0, eax = 0;
+    uint32_t interrupt_number = 0, error_code = 0;
+    uint32_t eip = 0, cs = 0, eflags = 0;
 } __attribute__((packed));
 
 #ifdef __cplusplus

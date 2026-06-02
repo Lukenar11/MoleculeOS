@@ -16,7 +16,6 @@ NOTES:
 #pragma once
 
 #include <stdint.h>
-#include <stddef.h>
 
 namespace runtime 
 {
@@ -48,10 +47,10 @@ namespace runtime
         inline constexpr const T* end() const noexcept { return buffer + S; }
 
         // get first/last array-elememt
-        inline constexpr T& front() noexcept { return buffer[NULL]; }
+        inline constexpr T& front() noexcept { return buffer[0]; }
         inline constexpr T& back() noexcept { return buffer[S - 1]; }
 
-        inline constexpr const T& front() const noexcept { return buffer[NULL]; }
+        inline constexpr const T& front() const noexcept { return buffer[0]; }
         inline constexpr const T& back() const noexcept { return buffer[S - 1]; }
 
         // get array-content

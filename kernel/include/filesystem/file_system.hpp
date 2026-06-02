@@ -22,8 +22,8 @@ namespace kernel::filesystem
     class File_System final {
     private:
         runtime::Array<Inode, MAX_FILES_PER_DIRECTORY> inodes;
-        Inode* root_directory = NULL;
-        Inode* current_working_directory = NULL;
+        Inode* root_directory = nullptr;
+        Inode* current_working_directory = nullptr;
 
     public:
         Inode* allocate_inode() noexcept;

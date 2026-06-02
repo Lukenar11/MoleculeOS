@@ -26,8 +26,8 @@ NOTES:
 namespace
 {
     struct Try_Shutdown_Values {
-        uint16_t port = NULL;
-        uint16_t value = NULL;
+        uint16_t port = 0;
+        uint16_t value = 0;
         bool is_8bit_mode = false;
     };
 
