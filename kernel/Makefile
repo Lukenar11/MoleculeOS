@@ -7,6 +7,7 @@
 COMMON_FLAGS += \
 	-Ikernel/include
 
+include kernel/src/filesystem/Makefile
 include kernel/src/heap/Makefile
 include kernel/src/idt/Makefile
 include kernel/src/irq/Makefile
