@@ -25,10 +25,9 @@ namespace kernel::heap
 {
     class Linear_Area final {
     private:
-        static constexpr uintptr_t ALIGNMENT = 8;
-    
         const uintptr_t start = reinterpret_cast<uintptr_t>(&heap_start);
         const uintptr_t end = reinterpret_cast<uintptr_t>(&heap_end);
+        
         uintptr_t current;
     
     public:

@@ -35,7 +35,6 @@ NOTES:
 #include "drivers/ps2/keyboardin/include/keyboard_input.hpp"
 #include "drivers/vga/textmode/include/textmode.hpp"
 #include "interpreter/interpreter.hpp"
-#include <stddef.h>
 #include <stdint.h>
 #include <text_output.hpp>
 

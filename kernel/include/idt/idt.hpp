@@ -27,7 +27,6 @@ NOTES:
 #include "kernel/include/system/panic.hpp"
 #include <stdint.h>
 #include <array.hpp>
-#include <stddef.h>
 
 namespace kernel::idt 
 {

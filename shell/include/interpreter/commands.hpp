@@ -84,7 +84,7 @@ namespace shell::commands
     inline void echo(const runtime::Array<char, 64>& arguments) noexcept {
         const char null_terminator = '\0';
 
-        if (arguments[NULL] == null_terminator) [[unlikely]] {
+        if (arguments[0] == null_terminator) [[unlikely]] {
             runtime::text_output.set_text_color(
                 drivers::vga::VGA_Textmode_Colors::YELLOW,
                 drivers::vga::VGA_Textmode_Colors::BLACK

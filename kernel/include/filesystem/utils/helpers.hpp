@@ -12,7 +12,6 @@ NOTES:
 #pragma once
 
 #include <stdint.h>
-#include <stddef.h>
 
 namespace kernel::filesystem
 {
@@ -22,18 +21,18 @@ namespace kernel::filesystem
     constexpr uint32_t MAX_PATH_LENGTH = 256;
 
     enum class Inode_Type : uint8_t {
-        INODE_FILE = NULL,
+        INODE_FILE = 0,
         INODE_DIRECTORY = 1
     };
 
     struct Inode final {
         char name[MAX_FILENAME_LENGTH] = {'\0'};
-        Inode_Type type = static_cast<Inode_Type>(Inode_Type::INODE_FILE);
-        uint32_t size = NULL;
+        Inode_Type type = Inode_Type::INODE_FILE;
+        uint32_t size = 0;
         uint8_t data[MAX_FILE_SIZE] = {};
         Inode* parent = nullptr;
         Inode* children[MAX_FILES_PER_DIRECTORY] = {nullptr};
-        uint32_t child_count = NULL;
+        uint32_t child_count = 0;
         bool in_use = false;
     };
 } // namespace kernel::filesystem

@@ -33,7 +33,7 @@ namespace kernel::idt
         idt_entry.base_low = base & word_mask;
         idt_entry.base_high = (base >> 16) & word_mask;
         idt_entry.selector = CODE_SEGMENT_SELECTOR;
-        idt_entry.always_0 = NULL;
+        idt_entry.always_0 = 0;
         idt_entry.flags = FLAGS;
     }
 
@@ -52,4 +52,4 @@ namespace kernel::idt
 
         load_idt(reinterpret_cast<uintptr_t>(&idt_ptr));
     }
-} // namespache kernel::idt
+} // namespace kernel::idt

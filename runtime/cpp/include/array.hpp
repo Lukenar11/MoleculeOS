@@ -23,7 +23,7 @@ namespace runtime
     template<class T, uint32_t S>
     class Array final {
     private:
-        static_assert(S > NULL, "Array size must be greater than zero");
+        static_assert(S > 0, "Array size must be greater than zero");
 
         T buffer[S] = {};
 
@@ -60,7 +60,7 @@ namespace runtime
 
         // Repace array-data with "value"
         inline constexpr void fill(const T& value) noexcept {
-            for (uint32_t i = NULL; i < S; i++) [[likely]]
+            for (uint32_t i = 0; i < S; i++) [[likely]]
                 buffer[i] = value; 
         }
 

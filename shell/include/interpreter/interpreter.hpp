@@ -39,7 +39,7 @@ namespace
     [[nodiscard]]
     inline constexpr uint32_t make_hash(const char* command) noexcept {
         const uint32_t mul_32 = 5;
-        uint32_t hash = NULL;
+        uint32_t hash = 0;
         while (*command) [[likely]] {
             hash = (hash << mul_32) - hash + static_cast<char>(*command);
             command++;
@@ -67,9 +67,9 @@ namespace shell::commands
         runtime::Array<char, 64> commands;
         runtime::Array<char, 64> arguments;
 
-        uint32_t input_buffer_index = NULL;
-        uint32_t commands_index = NULL;
-        uint32_t arguments_index = NULL;
+        uint32_t input_buffer_index = 0;
+        uint32_t commands_index = 0;
+        uint32_t arguments_index = 0;
 
         static inline void set_error_message_text_color() noexcept {
             runtime::text_output.set_text_color(

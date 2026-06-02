@@ -40,7 +40,7 @@ namespace drivers::vga
         const uint16_t entry = make_symbol_entry(' ', color);
 
         const uint32_t n = VGA_TEXMODE_SCREEN_WIDTH * VGA_TEXMODE_SCREEN_HEIGHT;
-        for (uint32_t i = NULL; i < n; i++) [[likely]]
+        for (uint32_t i = 0; i < n; i++) [[likely]]
             VGA_TEXMODE_BUFFER[i] = entry;
     }
 

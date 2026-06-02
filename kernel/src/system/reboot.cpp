@@ -25,7 +25,7 @@ namespace kernel::system
         uint32_t timeout = 100'000;
         while (timeout--) [[likely]] {
             const uint8_t status = inb(keyboard_ctrl);
-            if ((status & input_buffer_full) == NULL)
+            if ((status & input_buffer_full) == 0)
                 break;
         }
 

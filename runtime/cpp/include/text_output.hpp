@@ -25,15 +25,14 @@ NOTES:
 
 #include "drivers/vga/textmode/include/textmode.hpp"
 #include <stdint.h>
-#include <stdarg.h>
 #include <array.hpp>
 
 namespace runtime 
 {
     class Text_Output final {
     private:
-        uint32_t cursor_x = NULL;
-        uint32_t cursor_y = NULL;
+        uint32_t cursor_x = 0;
+        uint32_t cursor_y = 0;
         
         uint8_t cursor_color = drivers::vga::texmode.make_color(
             drivers::vga::VGA_Textmode_Colors::LIGHT_GREY, 

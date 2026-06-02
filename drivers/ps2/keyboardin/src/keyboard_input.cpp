@@ -56,12 +56,12 @@ namespace drivers::ps2
                          ? us_qwerty_shift_key_mapping[scancode] 
                          : us_qwerty_std_key_mapping[scancode]; 
 
+        const uint32_t thirty_two = 32;
         if (capslock_is_enabled) [[unlikely]] {
-            const uint32_t _32 = 32;
             if ((character >= 'a') && (character <= 'z'))
-                character -= _32;
+                character -= thirty_two;
             else if ((character >= 'A') && (character <= 'Z'))
-                character += _32;
+                character += thirty_two;
         }
 
         return character;

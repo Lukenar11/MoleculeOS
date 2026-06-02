@@ -14,14 +14,14 @@ NOTES:
 namespace kernel::filesystem
 {
     File_System::File_System() noexcept {
-        const uint32_t _0 = NULL;
+        const uint32_t null = 0;
 
-        root_directory = &inodes[_0];
-        root_directory->name[_0] = '.';
-        root_directory->type = static_cast<Inode_Type>(Inode_Type::INODE_DIRECTORY);
-        root_directory->size = _0;
+        root_directory = &inodes[null];
+        root_directory->name[null] = '.';
+        root_directory->type = Inode_Type::INODE_DIRECTORY;
+        root_directory->size = null;
         root_directory->parent = nullptr;
-        root_directory->child_count = _0;
+        root_directory->child_count = null;
         root_directory->in_use = true;
 
         current_working_directory = root_directory;
@@ -38,26 +38,26 @@ namespace kernel::filesystem
     }
 
     Inode* File_System::get_inode_by_path(const char* absolute_path) noexcept {
-        const uint32_t _0 = NULL;
+        const uint32_t null = 0;
         const char null_char = '\0';
 
-        if (!absolute_path || absolute_path[_0] == null_char)
+        if (!absolute_path || absolute_path[null] == null_char)
             return nullptr;
 
         Inode* current_inode = current_working_directory;
 
         runtime::Array<char, MAX_FILENAME_LENGTH> path_token;
-        uint32_t path_token_index = _0;
-
-        uint32_t i = _0;
+        uint32_t path_token_index = null;
+        uint32_t i = null;
+        
         while (i < MAX_PATH_LENGTH) [[likely]] {
             const char symbol = absolute_path[i];
             if (symbol == '.' || symbol == null_char) {
                 path_token[path_token_index] = null_char;
 
                 bool inode_found = false;
-                for (uint32_t j = _0; j < current_inode->child_count; j++) {
-                    if (strcmp(current_inode->children[j]->name, path_token.data()) == _0) {
+                for (uint32_t j = null; j < current_inode->child_count; j++) {
+                    if (strcmp(current_inode->children[j]->name, path_token.data()) == null) {
                         current_inode = current_inode->children[j];
                         inode_found = true;
                         break;
@@ -67,7 +67,7 @@ namespace kernel::filesystem
                 if (!inode_found)
                     return nullptr;
 
-                path_token_index = _0;
+                path_token_index = null;
 
                 if (symbol == null_char)
                     return current_inode;
@@ -84,11 +84,11 @@ namespace kernel::filesystem
     }
 
     bool File_System::create_file(const char* absolute_path) noexcept {
-        const uint32_t _0 = NULL;
+        const uint32_t null = 0;
         const char null_char = '\0';
-
         const char* last_dot = nullptr;
-        for (uint32_t i = _0; absolute_path[i] != null_char; i++) {
+
+        for (uint32_t i = null; absolute_path[i] != null_char; i++) {
             if (absolute_path[i] == '.')
                 last_dot = &absolute_path[i];
         }
@@ -98,7 +98,7 @@ namespace kernel::filesystem
 
         runtime::Array<char, MAX_PATH_LENGTH> parent_path;
         uint32_t parent_length = last_dot - absolute_path;
-        for (uint32_t i = _0; i < parent_length; i++)
+        for (uint32_t i = null; i < parent_length; i++)
             parent_path[i] = absolute_path[i];
         parent_path[parent_length] = null_char;
 
@@ -114,7 +114,7 @@ namespace kernel::filesystem
 
         strncpy(new_inode->name, file_name, MAX_FILENAME_LENGTH);
         new_inode->type = static_cast<Inode_Type>(Inode_Type::INODE_FILE);
-        new_inode->size = _0;
+        new_inode->size = null;
         new_inode->parent = parent_inode;
 
         parent_inode->children[parent_inode->child_count++] = new_inode;

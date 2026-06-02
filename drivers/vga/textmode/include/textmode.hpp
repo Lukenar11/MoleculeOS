@@ -21,7 +21,6 @@ NOTES:
 
 #include "utils/helpers.hpp"
 #include <stdint.h>
-#include <stddef.h>
 
 namespace drivers::vga 
 {

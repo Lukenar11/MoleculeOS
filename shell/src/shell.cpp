@@ -41,13 +41,15 @@ namespace shell
     void Shell::draw_user_cursor_with_color(drivers::vga::VGA_Textmode_Colors foreground,
                                             drivers::vga::VGA_Textmode_Colors background) 
                                             const noexcept {
+        const uint32_t one = 1;
+
         uint32_t x = runtime::text_output.get_cursor_x();
         if (x >= drivers::vga::VGA_TEXMODE_SCREEN_WIDTH) [[unlikely]]
-            x = drivers::vga::VGA_TEXMODE_SCREEN_WIDTH - 1;
+            x = drivers::vga::VGA_TEXMODE_SCREEN_WIDTH - one;
 
         uint32_t y = runtime::text_output.get_cursor_y();
         if (y >= drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT) [[unlikely]]
-            y = drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT - 1;
+            y = drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT - one;
 
         runtime::text_output.set_text_color(
             static_cast<drivers::vga::VGA_Textmode_Colors>(foreground),

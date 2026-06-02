@@ -22,12 +22,14 @@ namespace kernel::heap
 {
     [[nodiscard]]
     void* Linear_Area::allocate(uintptr_t allocated_bytes) {
-        if (allocated_bytes == NULL) [[unlikely]]
+        const uint32_t one = 1;
+        const uintptr_t alignment = 8;
+
+        if (allocated_bytes == 0) [[unlikely]]
             return nullptr;
     
-        const uint32_t _1 = 1;
-        allocated_bytes = (allocated_bytes + (ALIGNMENT - _1)) & ~(ALIGNMENT - _1);
-        uintptr_t aligned = (current + (ALIGNMENT - _1)) & ~(ALIGNMENT - _1);
+        allocated_bytes = (allocated_bytes + (alignment - one)) & ~(alignment - one);
+        uintptr_t aligned = (current + (alignment - one)) & ~(alignment - one);
     
         if (aligned + allocated_bytes > end) [[unlikely]]
             system::panic("Out of heap memory", "optimize your memory usage");
@@ -46,7 +48,8 @@ namespace kernel::heap
                 "Marker is outside the valid heap range or not aligned."
             );
 
-        if (marker % ALIGNMENT != NULL) [[unlikely]]
+        const uintptr_t alignment = 8;
+        if ((marker % alignment) != 0) [[unlikely]]
             system::panic(
                 invalid_heap_rewind_panic_message,
                 "Marker is not aligned to allocator alignment."

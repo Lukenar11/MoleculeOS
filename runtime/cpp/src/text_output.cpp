@@ -26,8 +26,10 @@ NOTES:
 namespace runtime
 {
     void Text_Output::reset() noexcept {
-        cursor_x = NULL;
-        cursor_y = NULL;
+        const uint32_t null = 0;
+
+        cursor_x = null;
+        cursor_y = null;
 
         drivers::vga::texmode.clear_screen(drivers::vga::VGA_Textmode_Colors::BLACK);
     }
@@ -39,7 +41,7 @@ namespace runtime
     }
 
     void Text_Output::new_line() noexcept {
-        cursor_x = NULL;
+        cursor_x = 0;
         cursor_y++;
 
         if (cursor_y >= drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT) [[unlikely]] {
@@ -49,6 +51,8 @@ namespace runtime
     }
 
     uint32_t Text_Output::calculate_needed_lines(const char* text) noexcept {
+        const uint32_t null = 0;
+
         uint32_t needed_lines = 1;
         uint32_t x = cursor_x;
 
@@ -56,14 +60,14 @@ namespace runtime
             const char symbol = *text++;
             if (symbol == '\n') {
                 needed_lines++;
-                x = NULL;
+                x = null;
                 continue;
             }
 
             x++;
             if (x >= drivers::vga::VGA_TEXMODE_SCREEN_WIDTH) {
                 needed_lines++;
-                x = NULL;
+                x = null;
             }
         }
 
@@ -71,22 +75,24 @@ namespace runtime
     }
 
     void Text_Output::put_base(uint32_t value, const uint32_t base) noexcept {
-        if (value == NULL) [[unlikely]] {
+        const uint32_t null = 0;
+        const uint32_t ten = 10;
+        const char char_null = '0';
+        const char char_a = 'A';
+
+        if (value == null) [[unlikely]] {
             put_char('0');
             return;
         }
 
         if (base < 2 || base > 16) [[unlikely]]
             return;
-
+        
         runtime::Array<char, 32> buffer;
-        uint32_t i = NULL;
-
+        uint32_t i = null;
         while (value) [[likely]] {
-            const uint32_t _10 = 10;
-
             const uint8_t number = value % base;
-            buffer[i++] = (number < _10) ? ('0' + number) : ('A' + number - _10);
+            buffer[i++] = (number < ten) ? (char_null + number) : (char_a + number - ten);
             value /= base;
         }
 
@@ -95,20 +101,21 @@ namespace runtime
     }
 
     void Text_Output::put_char(const char symbol) noexcept {
+        const uint32_t null = 0;
         switch (symbol) {
         case '\r':
-            cursor_x = NULL;
+            cursor_x = null;
             break;
             
         case '\b':
-            if (cursor_x > NULL) {
+            if (cursor_x > null) {
                 cursor_x--;
                 drivers::vga::texmode.put_char_at(' ', cursor_color, cursor_x, cursor_y);
             }
             break;
 
         case '\t':
-            for (uint32_t i = NULL; i < 4; ++i) {
+            for (uint32_t i = null; i < 4; ++i) {
                 drivers::vga::texmode.put_char_at(' ', cursor_color, cursor_x, cursor_y);
                 cursor_x++;
 
@@ -142,11 +149,11 @@ namespace runtime
     }
 
     void Text_Output::put_int(int32_t value) noexcept {
-        if (value < NULL) [[unlikely]] {
+        const uint32_t one = 1;
+        if (value < 0) [[unlikely]] {
             put_char('-');
 
-            const uint32_t _1 = 1;
-            value = static_cast<uint32_t>(-(value + _1)) + _1;
+            value = static_cast<uint32_t>(-(value + one)) + one;
             put_uint(value);
 
             return;
@@ -156,18 +163,20 @@ namespace runtime
     }
 
     void Text_Output::put_uint(uint32_t value) noexcept {
-        if (value == NULL) [[unlikely]] {
+        const uint32_t null = 0;
+        const uint32_t ten = 10;
+        const char null_char = '0';
+
+        if (value == null) [[unlikely]] {
             put_char('0');
             return;
         }
 
         runtime::Array<char, 12> buffer;
-        uint32_t i = NULL;
-
+        uint32_t i = null;
         while (value) [[likely]] {
-            const uint32_t _10 = 10;
-            buffer[i++] = '0' + (value % _10);
-            value /= _10;
+            buffer[i++] = null_char + (value % ten);
+            value /= ten;
         }
 
         while (i--) [[likely]]
