@@ -25,13 +25,14 @@ NOTES:
 #include "system/kernel_system_sleep.h"
 #include "system/panic.hpp"
 #include <stdint.h>
-#include <stddef.h>
+
+#include "tests/kernel/file_system.hpp"
 
 void remap_pic() noexcept 
 {
     struct PIC_Mapping {
-        uint16_t port = NULL;
-        uint8_t value = NULL;
+        uint16_t port = 0;
+        uint8_t value = 0;
     };
 
     const PIC_Mapping pic_mappings[] = {
