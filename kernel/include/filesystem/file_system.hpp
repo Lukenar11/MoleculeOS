@@ -14,6 +14,7 @@ NOTES:
 #include "utils/helpers.hpp"
 #include <textmode.hpp>
 #include <array.hpp>
+#include <string.h>
 #include <stdint.h>
 
 namespace kernel::filesystem
@@ -25,6 +26,9 @@ namespace kernel::filesystem
         Inode* current_working_directory = NULL;
 
     public:
+        const Inode* allocate_inode() noexcept;
+        const Inode* get_inode_by_path(const char* path) noexcept;
+
         // bool create_file(const char* file_path, const char* file_name);
         // bool create_directory(const char* dir_path, const char* dir_name);
         // void delete_file(const char* file_path);
@@ -34,13 +38,7 @@ namespace kernel::filesystem
         // write_file(const char* path, const uint8_t* data, uint32_t size);
         // list_directory(const char* path);
 
-        inline constexpr void set_current_working_directory(Inode* new_cwd) noexcept {
-            current_working_directory = new_cwd; 
-        }
-        
-        inline constexpr void set_current_root_directory(Inode* new_root) noexcept {
-            root_directory = new_root; 
-        }
+        void set_current_working_directory(Inode* new_cwd) noexcept;
 
         inline constexpr const Inode* get_current_working_directory() const noexcept { 
             return current_working_directory; 
@@ -50,7 +48,7 @@ namespace kernel::filesystem
             return root_directory; 
         }
         
-        File_System();
+        File_System() noexcept;
         ~File_System() noexcept = default;
     };
 
