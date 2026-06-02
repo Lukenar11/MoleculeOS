@@ -37,7 +37,7 @@ namespace kernel::filesystem
         return nullptr;
     }
 
-    Inode* File_System::get_inode_by_path(const char* path) noexcept {
+    const Inode* File_System::get_inode_by_path(const char* path) noexcept {
         const char _0 = NULL;
         const char null_char = '\0';
 
@@ -48,7 +48,7 @@ namespace kernel::filesystem
 
         runtime::Array<char, MAX_FILENAME_LENGTH> path_token;
         uint32_t path_token_index = _0;
-^
+
         uint32_t i = _0;
         while (i < MAX_PATH_LENGTH) [[likely]] {
             const char symbol = path[i];
