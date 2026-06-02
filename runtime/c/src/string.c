@@ -57,6 +57,21 @@ void* memset(void* dest_ptr, int32_t value, uint32_t size)
     return dest_ptr;
 }
 
+void strncpy(char* dest, const char* src, uint32_t size)
+{
+    const char null_char = '\0';
+
+    for (uint32_t i = 0; i < size; i++) {
+        if (src[i] == null_char) {
+            dest[i] = null_char;
+            return;
+        }
+
+        dest[i] = src[i];
+    }
+
+    dest[size - 1] = null_char;
+}
 
 int32_t memcmp(const void* a_ptr, const void* b_ptr, uint32_t size)
 {

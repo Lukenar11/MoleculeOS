@@ -27,7 +27,7 @@ namespace kernel::filesystem
         current_working_directory = root_directory;
     }
 
-    const Inode* File_System::allocate_inode() noexcept {
+    Inode* File_System::allocate_inode() noexcept {
         for (auto& inode : inodes) [[likely]]
             if (!inode.in_use) {
                 inode.in_use = true;
@@ -37,11 +37,11 @@ namespace kernel::filesystem
         return nullptr;
     }
 
-    const Inode* File_System::get_inode_by_path(const char* path) noexcept {
-        const char _0 = NULL;
+    Inode* File_System::get_inode_by_path(const char* absolute_path) noexcept {
+        const uint32_t _0 = NULL;
         const char null_char = '\0';
 
-        if (!path || path[_0] == null_char)
+        if (!absolute_path || absolute_path[_0] == null_char)
             return nullptr;
 
         Inode* current_inode = current_working_directory;
@@ -52,7 +52,6 @@ namespace kernel::filesystem
         uint32_t i = _0;
         while (i < MAX_PATH_LENGTH) [[likely]] {
             const char symbol = path[i];
-
             if (symbol == '.' || symbol == null_char) {
                 path_token[path_token_index] = null_char;
 
@@ -81,8 +80,48 @@ namespace kernel::filesystem
 
             i++;
         }
+        return nullptr;
     }
 
+    bool File_System::create_file(const char* absolute_path) noexcept {
+        const uint32_t _0 = NULL;
+        const char null_char = '\0';
+
+        const char* last_dot = nullptr;
+        for (uint32_t i = _0; absolute_path[i] != null_char; i++) {
+            if (absolute_path[i] == '.')
+                last_dot = &absolute_path[i];
+        }
+
+        if (!last_dot)
+            return false;
+
+        runtime::Array<char, MAX_PATH_LENGTH> parent_path;
+        uint32_t parent_length = last_dot - absolute_path;
+        for (uint32_t i = _0; i < parent_length; i++)
+            parent_path[i] = absolute_path[i];
+        parent_path[parent_length] = null_char;
+
+        const char* file_name = last_dot + 1;
+
+        Inode* parent_inode = get_inode_by_path(parent_path.data());
+        if (!parent_inode || parent_inode->type != Inode_Type::INODE_DIRECTORY)
+            return false;
+
+        Inode* new_inode = allocate_inode();
+        if (!new_inode)
+            return false;
+
+        strncpy(new_inode->name, file_name, MAX_FILENAME_LENGTH);
+        new_inode->type = static_cast<Inode_Type>(Inode_Type::INODE_FILE);
+        new_inode->size = _0;
+        new_inode->parent = parent_inode;
+
+        parent_inode->children[parent_inode->child_count++] = new_inode;
+
+        return true;
+    }
+    
     void File_System::set_current_working_directory(Inode* new_cwd) noexcept {
         if (new_cwd == nullptr || 
             !new_cwd->in_use || 
@@ -91,7 +130,7 @@ namespace kernel::filesystem
             
         current_working_directory = new_cwd; 
     }
-    
+
     // "mofs" = "MoleculeOS File System"
     File_System mofs;
 } // namespace kernel::filesystem

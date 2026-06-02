@@ -26,8 +26,9 @@ namespace kernel::filesystem
         Inode* current_working_directory = NULL;
 
     public:
-        const Inode* allocate_inode() noexcept;
-        const Inode* get_inode_by_path(const char* path) noexcept;
+        Inode* allocate_inode() noexcept;
+        Inode* get_inode_by_path(const char* absolute_path) noexcept;
+        bool create_file(const char* absolute_path) noexcept;
 
         // bool create_file(const char* file_path, const char* file_name);
         // bool create_directory(const char* dir_path, const char* dir_name);
