@@ -21,7 +21,7 @@ understandable and transparent - hence the name *MoleculeOS*.
 - PS/2 Keyboard input
 - Shell Interpreter
 - grub Boot-Setup
-- More subsystems to follow
+- inode-based custom direct RAM flat file-system
 
 ---
 

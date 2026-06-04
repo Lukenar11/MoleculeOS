@@ -5,8 +5,12 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
+    This file contains the internal implementation of the file system.
+    The file system is a flat, inode-based, custom file system residing directly in RAM.
 
 NOTES:
+    Since the file system resides directly in RAM, 
+    all files—along with their contents—are deleted upon shutting down or restarting the system.
 */
 
 #pragma once
@@ -29,7 +33,7 @@ namespace kernel::filesystem
         Inode* get_inode_by_filename(const char* filename) const noexcept;
         Inode* create_file(const char* filename, const char* format) noexcept;
 
-        inline const runtime::Array<Inode, MAX_FILES_PER_DIRECTORY>& get_inodes() noexcept {
+        inline const runtime::Array<Inode, MAX_FILES_PER_DIRECTORY>& get_inodes() const noexcept {
             return inodes;
         }
 
