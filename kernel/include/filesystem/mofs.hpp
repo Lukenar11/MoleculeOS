@@ -29,6 +29,10 @@ namespace kernel::filesystem
         Inode* get_inode_by_filename(const char* filename) const noexcept;
         Inode* create_file(const char* filename, const char* format) noexcept;
 
+        inline const runtime::Array<Inode, MAX_FILES_PER_DIRECTORY>& get_inodes() noexcept {
+            return inodes;
+        }
+
         MoleculeOS_File_System() noexcept = default;
         ~MoleculeOS_File_System() noexcept = default;
     };

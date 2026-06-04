@@ -45,6 +45,7 @@ namespace shell::commands
             "\t- shutdown (turn the Computer off) | shutdown\n"
             "\t- echo (displays a message) | echo [Message]\n"
             "\t- create (creates a file) | create [FileName].[FileFormat]\n"
+            "\t- list (list all files) | list\n"
             "\n"
         };
 
@@ -157,6 +158,28 @@ namespace shell::commands
         }
 
         kernel::filesystem::mofs.create_file(file_name.data(), file_format.data());
+
+        runtime::text_output.put_char('\n');
+    }
+
+    inline void list() noexcept {
+        runtime::text_output.put_string("Files:\n");
+
+        auto& inodes = kernel::filesystem::mofs.get_inodes();
+        for (auto& inode : inodes) {
+            if (!inode.in_use)
+                continue;
+
+            runtime::text_output.put_string("\t- ");
+            runtime::text_output.put_string(inode.name);
+
+            if (inode.format[0] != '\0') {
+                runtime::text_output.put_char('.');
+                runtime::text_output.put_string(inode.format);
+            }
+
+            runtime::text_output.put_char('\n');
+        }
 
         runtime::text_output.put_char('\n');
     }
