@@ -123,6 +123,7 @@ namespace shell::commands
 
         uint32_t file_name_index = null;
         uint32_t file_format_index = null;
+        uint32_t max_file_format_length = 3;
         bool is_file_name = true;
     
         for (uint32_t i = null; arguments[i] != null_terminator; i++) [[likely]] {
@@ -140,7 +141,8 @@ namespace shell::commands
                 return;
             }
             
-            if (!(is_file_name || append_char(file_format, file_format_index, arguments[i]))) {
+            if (!(is_file_name || append_char(file_format, file_format_index, arguments[i])) || 
+                !(file_format_index <= max_file_format_length)) {
                 static const char* error_message = "create: format too long\n\n";
                 print_command_error(error_message);
                 return;
