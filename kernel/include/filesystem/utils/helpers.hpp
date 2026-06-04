@@ -15,24 +15,16 @@ NOTES:
 
 namespace kernel::filesystem
 {
-    constexpr uint32_t MAX_FILENAME_LENGTH = 16;
-    constexpr uint32_t MAX_FILE_SIZE = 4096;
-    constexpr uint32_t MAX_FILES_PER_DIRECTORY = 16;
-    constexpr uint32_t MAX_PATH_LENGTH = 256;
-
-    enum class Inode_Type : uint8_t {
-        INODE_FILE = 0,
-        INODE_DIRECTORY = 1
-    };
+    constexpr uint32_t MAX_FILENAME_LENGTH = 128;
+    constexpr uint32_t MAX_FILE_FORMAT_NAME_LENGTH = 4;
+    constexpr uint32_t MAX_FILE_SIZE = 2048;
+    constexpr uint32_t MAX_FILES_PER_DIRECTORY = 512;
 
     struct Inode final {
         char name[MAX_FILENAME_LENGTH] = {'\0'};
-        Inode_Type type = Inode_Type::INODE_FILE;
+        char format[MAX_FILE_FORMAT_NAME_LENGTH] = {'\0'};
+        bool in_use = false;
         uint32_t size = 0;
         uint8_t data[MAX_FILE_SIZE] = {};
-        Inode* parent = nullptr;
-        Inode* children[MAX_FILES_PER_DIRECTORY] = {nullptr};
-        uint32_t child_count = 0;
-        bool in_use = false;
     };
 } // namespace kernel::filesystem

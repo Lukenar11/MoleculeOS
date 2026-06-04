@@ -5,7 +5,7 @@
 # 
 
 OBJS += \
-	$(BUILD)/file_system.o
+	$(BUILD)/mofs.o
 
 $(BUILD)/%.o: kernel/src/filesystem/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

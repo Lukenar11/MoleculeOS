@@ -26,8 +26,6 @@ NOTES:
 #include "system/panic.hpp"
 #include <stdint.h>
 
-#include "tests/kernel/file_system.hpp"
-
 void remap_pic() noexcept 
 {
     struct PIC_Mapping {

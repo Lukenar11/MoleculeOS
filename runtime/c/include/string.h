@@ -30,7 +30,8 @@ extern "C" {
 void* memcpy(void* dest_ptr, const void* src_ptr, uint32_t size);
 void* memmove(void* dest_ptr, const void* src_ptr, uint32_t size);
 void* memset(void* dest_ptr, const int32_t value, uint32_t size);
-void strncpy(char* dest, const char* src, uint32_t size);
+void strncpy(char* dest_ptr, const char* src_ptr, uint32_t size);
+uint32_t strlen(char *string);
 int32_t memcmp(const void* a_ptr, const void* b_ptr, uint32_t size);
 int32_t strcmp(const char* a_ptr, const char* b_ptr);
 
