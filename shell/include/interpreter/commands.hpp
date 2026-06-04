@@ -125,7 +125,7 @@ namespace shell::commands
         uint32_t file_format_index = null;
         bool is_file_name = true;
     
-        for (uint32_t i = null; i < arguments.size(); i++) [[likely]] {
+        for (uint32_t i = null; arguments[i] != null_terminator; i++) [[likely]] {
             if (arguments[i] == '.') {
                 is_file_name = false;
                 continue;
