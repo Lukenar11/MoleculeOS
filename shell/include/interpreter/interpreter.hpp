@@ -48,14 +48,14 @@ namespace
     }
 
     constexpr shell::commands::Command_Entry shell_command_table[] = {
-        { make_hash("help"), [](auto& _) -> void { shell::commands::help(); } },
-        { make_hash("info"), [](auto& _) -> void { shell::commands::info(); } },
-        { make_hash("clear"), [](auto& _) -> void { shell::commands::clear(); } },
-        { make_hash("reboot"), [](auto& _) -> void { shell::commands::reboot(); } },
-        { make_hash("shutdown"), [](auto& _) -> void { shell::commands::shutdown(); } },
-        { make_hash("echo"), [](auto& arguments) -> void { shell::commands::echo(arguments); } },
-        { make_hash("create"), [](auto& arguments) -> void { shell::commands::create(arguments); } },
-        { make_hash("list"), [](auto& _) -> void { shell::commands::list(); }}
+        {make_hash("help"), [](auto& _) -> void {shell::commands::help();}},
+        {make_hash("info"), [](auto& _) -> void {shell::commands::info();}},
+        {make_hash("clear"), [](auto& _) -> void {shell::commands::clear();}},
+        {make_hash("reboot"), [](auto& _) -> void {shell::commands::reboot();}},
+        {make_hash("shutdown"), [](auto& _) -> void {shell::commands::shutdown();}},
+        {make_hash("echo"), [](auto& arguments) -> void {shell::commands::echo(arguments);}},
+        {make_hash("create"), [](auto& arguments) -> void {shell::commands::create(arguments);}},
+        {make_hash("list"), [](auto& _) -> void {shell::commands::list();}}
     };
 }
 
