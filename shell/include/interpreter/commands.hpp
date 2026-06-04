@@ -180,6 +180,12 @@ namespace shell::commands
             if (!inode.in_use) [[likely]]
                 continue;
 
+            if (inode.name[0] == '\0') {
+                static const char* error_message = "\t- [INVALID INODE]\n";
+                runtime::text_output.put_string(error_message);
+                continue;
+            }
+
             runtime::text_output.put_string("\t- ");
             runtime::text_output.put_string(inode.name);
 
