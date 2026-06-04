@@ -29,6 +29,7 @@ NOTES:
 #include "utils/command_entry.hpp"   
 #include "commands.hpp"
 #include "kernel/include/system/panic.hpp"
+#include "utils/helpers.hpp"
 #include <stdint.h>
 #include <text_output.hpp>
 #include <array.hpp>

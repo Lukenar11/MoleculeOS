@@ -24,9 +24,11 @@ NOTES:
 #include "kernel/include/system/reboot.hpp"
 #include "kernel/include/system/shutdown.hpp"
 #include "kernel/include/filesystem/mofs.hpp"
+#include "utils/helpers.hpp"
 #include <stdint.h>
 #include <text_output.hpp>
 #include <array.hpp>
+#include <string.h>
 
 namespace shell::commands
 {
@@ -44,7 +46,8 @@ namespace shell::commands
             "\t- reboot (restart the Computer) | reboot\n"
             "\t- shutdown (turn the Computer off) | shutdown\n"
             "\t- echo (displays a message) | echo [Message]\n"
-            "\t- create (creates a file) | create [FileName].[FileFormat]\n"
+            "\t- create (creates a file) | create [FileName] /\n"
+            "\t\t\t\t\t\t\t\tcreate [FileName].[FileFormat]\n"
             "\t- list (list all files) | list\n"
             "\n"
         };
@@ -88,19 +91,8 @@ namespace shell::commands
         const char null_terminator = '\0';
 
         if (arguments[0] == null_terminator) [[unlikely]] {
-            runtime::text_output.set_text_color(
-                drivers::vga::VGA_Textmode_Colors::YELLOW,
-                drivers::vga::VGA_Textmode_Colors::BLACK
-            );
-
             static const char* error_message = "echo: missing argument\n\n";
-            runtime::text_output.put_string(error_message);
-
-            runtime::text_output.set_text_color(
-                drivers::vga::VGA_Textmode_Colors::LIGHT_GREY,
-                drivers::vga::VGA_Textmode_Colors::BLACK
-            );
-
+            print_command_error(error_message);
             return;
         }
 
@@ -118,46 +110,63 @@ namespace shell::commands
 
     inline void create(const runtime::Array<char, 64>& arguments) noexcept {
         const char null_terminator = '\0';
+        const uint32_t null = 0;
 
-        if (arguments[0] == null_terminator) [[unlikely]] {
-            runtime::text_output.set_text_color(
-                drivers::vga::VGA_Textmode_Colors::YELLOW,
-                drivers::vga::VGA_Textmode_Colors::BLACK
-            );
-
-            runtime::text_output.put_string("create: missing argument\n\n");
-
-            runtime::text_output.set_text_color(
-                drivers::vga::VGA_Textmode_Colors::LIGHT_GREY,
-                drivers::vga::VGA_Textmode_Colors::BLACK
-            );
-
+        if (arguments[null] == null_terminator) [[unlikely]] {
+            static const char* error_message = "create: missing argument\n\n";
+            print_command_error(error_message);
             return;
         }
 
-        runtime::Array<char, 59> file_name{};
-        runtime::Array<char, 4> file_format{};
+        static runtime::Array<char, 59> file_name;
+        static runtime::Array<char, 4> file_format;
 
-        uint32_t file_name_index = 0;
-        uint32_t file_format_index = 0;
+        uint32_t file_name_index = null;
+        uint32_t file_format_index = null;
         bool is_file_name = true;
-
-        for (uint32_t i = 0; i < arguments.size(); i++) [[likely]] {
+    
+        for (uint32_t i = null; i < arguments.size(); i++) [[likely]] {
             if (arguments[i] == '.') {
                 is_file_name = false;
                 continue;
             }
 
-            if (arguments[i] == null_terminator)
+            if (arguments[i] == null_terminator) [[unlikely]]
                 break;
 
-            if (is_file_name && (file_name_index < file_name.size()))
-                file_name[file_name_index++] = arguments[i];
-            else if (file_format_index < file_format.size())
-                file_format[file_format_index++] = arguments[i];
+            if (is_file_name && !append_char(file_name, file_name_index, arguments[i])) {
+                static const char* error_message = "create: filename too long\n\n";
+                print_command_error(error_message);
+                return;
+            }
+            
+            if (!(is_file_name || append_char(file_format, file_format_index, arguments[i]))) {
+                static const char* error_message = "create: format too long\n\n";
+                print_command_error(error_message);
+                return;
+            }
+        }
+
+        file_name[file_name_index] = null_terminator;
+        file_format[file_format_index] = null_terminator;
+
+        const auto& inodes = kernel::filesystem::mofs.get_inodes();
+        for (uint32_t i = null; i < inodes.size(); i++) [[likely]] {
+            if (!inodes[i].in_use) [[likely]]
+                continue;
+
+            if ((strcmp(file_name.data(), inodes[i].name) == null) && 
+                (strcmp(file_format.data(), inodes[i].format) == null)) [[unlikely]] {
+                static const char* error_message = "create: file does already exists\n\n";
+                print_command_error(error_message);
+                return;
+            }
         }
 
         kernel::filesystem::mofs.create_file(file_name.data(), file_format.data());
+
+        file_name.fill(null_terminator);
+        file_format.fill(null_terminator);
 
         runtime::text_output.put_char('\n');
     }
@@ -165,9 +174,9 @@ namespace shell::commands
     inline void list() noexcept {
         runtime::text_output.put_string("Files:\n");
 
-        auto& inodes = kernel::filesystem::mofs.get_inodes();
-        for (auto& inode : inodes) {
-            if (!inode.in_use)
+        const auto& inodes = kernel::filesystem::mofs.get_inodes();
+        for (const auto& inode : inodes) {
+            if (!inode.in_use) [[likely]]
                 continue;
 
             runtime::text_output.put_string("\t- ");
