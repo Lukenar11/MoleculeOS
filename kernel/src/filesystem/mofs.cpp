@@ -24,7 +24,7 @@ namespace kernel::filesystem
     }
 
     Inode* MoleculeOS_File_System::get_inode_by_filename(const char* filename) const noexcept {
-        const uint8_t null = 0;
+        const uint32_t null = 0;
         for (auto& inode : inodes) [[likely]]
             if (inode.in_use && (strcmp(inode.name, filename) == null))
                 return const_cast<Inode*>(&inode);
@@ -32,7 +32,7 @@ namespace kernel::filesystem
         return nullptr;        
     }
 
-    Inode* MoleculeOS_File_System::create_file(char* filename, char* format) noexcept {
+    Inode* MoleculeOS_File_System::create_file(const char* filename, const char* format) noexcept {
         Inode* current_inode = allocate_inode();
         if (!current_inode) [[unlikely]]
             return nullptr;

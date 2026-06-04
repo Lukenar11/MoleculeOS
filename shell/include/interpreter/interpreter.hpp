@@ -54,6 +54,7 @@ namespace
         { make_hash("reboot"), [](auto& _) -> void { shell::commands::reboot(); } },
         { make_hash("shutdown"), [](auto& _) -> void { shell::commands::shutdown(); } },
         { make_hash("echo"), [](auto& arguments) -> void { shell::commands::echo(arguments); } },
+        { make_hash("create"), [](auto& arguments) -> void { shell::commands::create(arguments); } }
     };
 }
 

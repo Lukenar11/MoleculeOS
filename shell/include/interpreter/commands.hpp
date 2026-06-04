@@ -23,6 +23,7 @@ NOTES:
 
 #include "kernel/include/system/reboot.hpp"
 #include "kernel/include/system/shutdown.hpp"
+#include "kernel/include/filesystem/mofs.hpp"
 #include <stdint.h>
 #include <text_output.hpp>
 #include <array.hpp>
@@ -43,6 +44,7 @@ namespace shell::commands
             "\t- reboot (restart the Computer) | reboot\n"
             "\t- shutdown (turn the Computer off) | shutdown\n"
             "\t- echo (displays a message) | echo [Message]\n"
+            "\t- create (creates a file) | create [FileName].[FileFormat]\n"
             "\n"
         };
 
@@ -102,7 +104,7 @@ namespace shell::commands
         }
 
         for (const auto& symbol : arguments) [[likely]] {
-            if (symbol == null_terminator)
+            if (symbol == null_terminator) [[unlikely]]
                 break;
             
             runtime::text_output.put_char(symbol);
@@ -111,5 +113,51 @@ namespace shell::commands
         const char new_line = '\n';
         runtime::text_output.put_char(new_line);
         runtime::text_output.put_char(new_line);
+    }
+
+    inline void create(const runtime::Array<char, 64>& arguments) noexcept {
+        const char null_terminator = '\0';
+
+        if (arguments[0] == null_terminator) [[unlikely]] {
+            runtime::text_output.set_text_color(
+                drivers::vga::VGA_Textmode_Colors::YELLOW,
+                drivers::vga::VGA_Textmode_Colors::BLACK
+            );
+
+            runtime::text_output.put_string("create: missing argument\n\n");
+
+            runtime::text_output.set_text_color(
+                drivers::vga::VGA_Textmode_Colors::LIGHT_GREY,
+                drivers::vga::VGA_Textmode_Colors::BLACK
+            );
+
+            return;
+        }
+
+        runtime::Array<char, 59> file_name{};
+        runtime::Array<char, 4> file_format{};
+
+        uint32_t file_name_index = 0;
+        uint32_t file_format_index = 0;
+        bool is_file_name = true;
+
+        for (uint32_t i = 0; i < arguments.size(); i++) [[likely]] {
+            if (arguments[i] == '.') {
+                is_file_name = false;
+                continue;
+            }
+
+            if (arguments[i] == null_terminator)
+                break;
+
+            if (is_file_name && (file_name_index < file_name.size()))
+                file_name[file_name_index++] = arguments[i];
+            else if (file_format_index < file_format.size())
+                file_format[file_format_index++] = arguments[i];
+        }
+
+        kernel::filesystem::mofs.create_file(file_name.data(), file_format.data());
+
+        runtime::text_output.put_char('\n');
     }
 } // namespace shell::commands
