@@ -109,21 +109,37 @@ namespace shell::commands
     }
 
     inline void create(const runtime::Array<char, 64>& arguments) noexcept {
+        static const char* command_name = "create: ";
         const char null_terminator = '\0';
+        const char new_line = '\n';
+        const uint32_t one = 1;
         const uint32_t null = 0;
 
-        if (arguments[null] == null_terminator) [[unlikely]] {
-            static const char* error_message = "create: missing argument\n\n";
-            print_command_error(error_message);
-            return;
-        }
-
-        static runtime::Array<char, 59> file_name;
+        static runtime::Array<char, 60> file_name;
         static runtime::Array<char, 4> file_format;
 
         uint32_t file_name_index = null;
         uint32_t file_format_index = null;
         bool is_file_name = true;
+
+        goto run;
+
+    reset:
+        file_name.fill(null_terminator);
+        file_format.fill(null_terminator);
+
+        runtime::text_output.put_char(new_line);
+        runtime::text_output.put_char(new_line);
+        return;
+
+    run:
+        if (arguments[null] == null_terminator) [[unlikely]] {
+            static const char* error_message = "missing argument";
+            print_command_error(command_name);
+            print_command_error(error_message);
+            
+            goto reset;
+        }
     
         for (uint32_t i = null; arguments[i] != null_terminator; i++) [[likely]] {
             if (arguments[i] == '.') {
@@ -134,42 +150,58 @@ namespace shell::commands
             if (arguments[i] == null_terminator) [[unlikely]]
                 break;
 
-            if (is_file_name && !append_char(file_name, file_name_index, arguments[i])) {
-                static const char* error_message = "create: filename too long\n\n";
+            if ((is_file_name && !append_char(file_name, file_name_index, arguments[i])) || 
+                (file_name_index >= kernel::filesystem::MAX_FILENAME_LENGTH)) {
+                static const char* error_message = "filename too long";
+                print_command_error(command_name);
                 print_command_error(error_message);
-                return;
+
+                goto reset;
             }
             
             if (!(is_file_name || append_char(file_format, file_format_index, arguments[i])) || 
-                !(file_format_index < kernel::filesystem::MAX_FILE_FORMAT_NAME_LENGTH)) {
-                static const char* error_message = "create: format too long\n\n";
+                (file_format_index >= kernel::filesystem::MAX_FILE_FORMAT_NAME_LENGTH)) {
+                static const char* error_message = "format too long";
+                print_command_error(command_name);
                 print_command_error(error_message);
-                return;
+
+                goto reset;
             }
         }
 
-        file_name[file_name_index] = null_terminator;
-        file_format[file_format_index] = null_terminator;
+        file_name[file_name_index + one] = null_terminator;
+        file_format[file_format_index + one] = null_terminator;
 
-        const auto& inodes = kernel::filesystem::mofs.get_inodes();
-        for (uint32_t i = null; i < inodes.size(); i++) [[likely]] {
-            if (!inodes[i].in_use) [[likely]]
-                continue;
-
-            if ((strcmp(file_name.data(), inodes[i].name) == null) && 
-                (strcmp(file_format.data(), inodes[i].format) == null)) [[unlikely]] {
-                static const char* error_message = "create: file does already exists\n\n";
+        for (uint32_t i = null; file_name[i] != '\0'; i++) [[likely]]
+            if (!kernel::filesystem::mofs.is_valid_file_name_or_formant_char(file_name[i])
+               ) [[unlikely]] {
+                static const char* error_message = "not a valid File Name";
+                print_command_error(command_name);
                 print_command_error(error_message);
-                return;
+                
+                goto reset;
             }
+
+        for (uint32_t i = null; file_format[i] != '\0'; i++) [[likely]]
+            if (!kernel::filesystem::mofs.is_valid_file_name_or_formant_char(file_format[i])
+               ) [[unlikely]] {
+                static const char* error_message = "not a valid File Format";
+                print_command_error(command_name);
+                print_command_error(error_message);
+                
+                goto reset;
+            }
+
+        auto* inode = kernel::filesystem::mofs.create_file(file_name.data(), file_format.data());
+        if (!inode) {
+            static const char* error_message = "file does already exists";
+            print_command_error(command_name);
+            print_command_error(error_message);
+
+            goto reset;
         }
 
-        kernel::filesystem::mofs.create_file(file_name.data(), file_format.data());
-
-        file_name.fill(null_terminator);
-        file_format.fill(null_terminator);
-
-        runtime::text_output.put_char('\n');
+        goto reset;
     }
 
     inline void list() noexcept {

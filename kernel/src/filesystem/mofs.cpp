@@ -20,23 +20,40 @@ namespace kernel::filesystem
     Inode* MoleculeOS_File_System::allocate_inode() noexcept {
         for (auto& inode : inodes) [[likely]]
             if (!inode.in_use) {
-                const uint32_t null = 0;
-                memset(&inode, null, sizeof(Inode));
+                memset(&inode, 0, sizeof(Inode));
                 inode.in_use = true;
 
                 return &inode;
             }
-            
+
         return nullptr;
+        system::panic("MOFS: no free inodes available", "dont create to mutch files");
     }
 
-    Inode* MoleculeOS_File_System::get_inode_by_filename(const char* filename) const noexcept {
-        const uint32_t null = 0;
-        for (auto& inode : inodes) [[likely]]
-            if (inode.in_use && (strcmp(inode.name, filename) == null))
-                return const_cast<Inode*>(&inode);
+    bool MoleculeOS_File_System::is_valid_file_name_or_formant_char(const char symbol) 
+                                                                    const noexcept {
+        if (((symbol >= 'A') && (symbol <= 'Z')) ||
+            ((symbol >= 'a') && (symbol <= 'z')) ||
+            ((symbol >= '0') && (symbol <= '9')) ||
+            (symbol == '_') || (symbol == '-'))
+            return true;
 
-        return nullptr;        
+        return false;
+    }
+
+    Inode* MoleculeOS_File_System::get_inode_by_name_and_format(const char* filename, 
+                                                                const char* format) 
+                                                                const noexcept {
+        const uint32_t null = 0;
+        for (auto& inode : inodes) [[likely]] {
+            if (!inode.in_use)
+                continue;
+
+            if ((strcmp(inode.name, filename) == null) && 
+                (strcmp(inode.format, format) == null))
+                return const_cast<Inode*>(&inode);
+        }
+        return nullptr;
     }
 
     Inode* MoleculeOS_File_System::create_file(const char* filename, const char* format) noexcept {
@@ -44,24 +61,31 @@ namespace kernel::filesystem
         const uint32_t one = 1;
         const char null_terminator = '\0';
 
-        if (!filename || (filename[null] == null_terminator)) return nullptr;
-        if (!format || (format[null] == null_terminator)) return nullptr;
+        if (!filename || (filename[null] == null_terminator)) [[unlikely]] return nullptr;
 
-        for (auto& inode : inodes) {
+        for (uint32_t i = null; filename[i] != '\0'; i++) [[likely]]
+            if (!is_valid_file_name_or_formant_char(filename[i]))
+                return nullptr;
+
+        for (uint32_t i = null; format[i] != '\0'; i++) [[likely]]
+            if (!is_valid_file_name_or_formant_char(format[i]))
+                return nullptr;
+
+        for (auto& inode : inodes) [[likely]] {
             if (!inode.in_use)
                 continue;
 
             if ((strcmp(inode.name, filename) == null) &&
-                (strcmp(inode.format, format) == null))
+                (strcmp(inode.format, format) == null)) [[unlikely]]
                 return nullptr;
         }
 
         Inode* inode = allocate_inode();
-        if (!inode)
+        if (!inode) [[unlikely]]
             return nullptr;
 
-        strncpy(inode->name, filename, MAX_FILENAME_LENGTH - one);
-        strncpy(inode->format, format, MAX_FILE_FORMAT_NAME_LENGTH - one);
+        strncpy(inode->name, filename, MAX_FILENAME_LENGTH);
+        strncpy(inode->format, format, MAX_FILE_FORMAT_NAME_LENGTH);
         inode->name[MAX_FILENAME_LENGTH - one] = null_terminator;
         inode->format[MAX_FILE_FORMAT_NAME_LENGTH - one] = null_terminator;
 
