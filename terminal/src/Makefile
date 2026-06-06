@@ -5,8 +5,7 @@
 # 
 
 OBJS += \
-	$(BUILD)/interpreter.o \
-	$(BUILD)/commands.o
+	$(BUILD)/terminal.o
 
-$(BUILD)/%.o: shell/src/interpreter/%.cpp
+$(BUILD)/%.o: terminal/src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

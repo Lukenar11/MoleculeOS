@@ -25,7 +25,7 @@ NOTES:
 
 #include "commands.hpp"
 
-namespace shell::commands
+namespace shell::interpreter
 {
     void help() noexcept {
         static const char help_message[] = {
@@ -213,4 +213,4 @@ namespace shell::commands
 
         runtime::text_output.put_char('\n');
     }
-} // namespace shell::commands
+} // namespace shell::interpreter

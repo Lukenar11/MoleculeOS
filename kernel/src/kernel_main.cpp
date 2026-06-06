@@ -21,7 +21,7 @@ NOTES:
 
 #include "idt/idt.hpp"
 #include "system/kernel_system_enable_interrupts.h"
-#include "shell.hpp"
+#include "terminal.hpp"
 #include "system/kernel_system_sleep.h"
 #include "system/panic.hpp"
 #include <stdint.h>
@@ -57,10 +57,10 @@ void kernel_main()
     kernel_system_enable_interrupts();
 
     // schedul MoleculeOS
-    shell::Shell sh;
+    terminal::Terminal terminal;
     while (true) {
         kernel_system_sleep();
-        sh.step();
+        terminal.step();
     }
 
     kernel::system::panic(

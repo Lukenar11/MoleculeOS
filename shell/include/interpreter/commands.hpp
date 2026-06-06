@@ -34,7 +34,7 @@ NOTES:
 #include <array.hpp>
 #include <string.h>
 
-namespace shell::commands
+namespace shell::interpreter
 {
     void help() noexcept;
     void info() noexcept;
@@ -54,4 +54,4 @@ namespace shell::commands
     void echo(const runtime::Array<char, 64>& arguments) noexcept;
     void create(const runtime::Array<char, 64>& arguments) noexcept;
     void list() noexcept;
-} // namespace shell::commands
+} // namespace shell::interpreter

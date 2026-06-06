@@ -14,7 +14,7 @@ NOTES:
 
 #include <stdint.h>
 
-namespace shell::commands
+namespace shell::interpreter
 {
     template <typename Arr>
     inline constexpr bool append_char(Arr& buffer, 
@@ -40,4 +40,4 @@ namespace shell::commands
             drivers::vga::VGA_Textmode_Colors::BLACK
         );
     }
-} // namespace shell::commands
+} // namespace shell::interpreter

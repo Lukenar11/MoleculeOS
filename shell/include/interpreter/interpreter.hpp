@@ -48,19 +48,19 @@ namespace
         return hash;
     }
 
-    constexpr shell::commands::Command_Entry shell_command_table[] = {
-        {make_hash("help"), [](auto& _) -> void {shell::commands::help();}},
-        {make_hash("info"), [](auto& _) -> void {shell::commands::info();}},
-        {make_hash("clear"), [](auto& _) -> void {shell::commands::clear();}},
-        {make_hash("reboot"), [](auto& _) -> void {shell::commands::reboot();}},
-        {make_hash("shutdown"), [](auto& _) -> void {shell::commands::shutdown();}},
-        {make_hash("echo"), [](auto& arguments) -> void {shell::commands::echo(arguments);}},
-        {make_hash("create"), [](auto& arguments) -> void {shell::commands::create(arguments);}},
-        {make_hash("list"), [](auto& _) -> void {shell::commands::list();}}
+    constexpr shell::interpreter::Command_Entry shell_command_table[] = {
+        {make_hash("help"), [](auto& _) -> void {shell::interpreter::help();}},
+        {make_hash("info"), [](auto& _) -> void {shell::interpreter::info();}},
+        {make_hash("clear"), [](auto& _) -> void {shell::interpreter::clear();}},
+        {make_hash("reboot"), [](auto& _) -> void {shell::interpreter::reboot();}},
+        {make_hash("shutdown"), [](auto& _) -> void {shell::interpreter::shutdown();}},
+        {make_hash("echo"), [](auto& arguments) -> void {shell::interpreter::echo(arguments);}},
+        {make_hash("create"), [](auto& arguments) -> void {shell::interpreter::create(arguments);}},
+        {make_hash("list"), [](auto& _) -> void {shell::interpreter::list();}}
     };
 }
 
-namespace shell::commands
+namespace shell::interpreter
 {
     class Interpreter final {
     private:
@@ -115,4 +115,4 @@ namespace shell::commands
         Interpreter() noexcept = default;
         ~Interpreter() noexcept = default;
     };
-} // namespace shell::commands
+} // namespace shell::interpreter

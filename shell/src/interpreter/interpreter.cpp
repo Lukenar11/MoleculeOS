@@ -26,7 +26,7 @@ NOTES:
 
 #include "interpreter.hpp"
 
-namespace shell::commands
+namespace shell::interpreter
 {
     void Interpreter::print_overflow_error(const char* error_message_for, 
                                            const uint32_t max_buffer_size) const noexcept {
@@ -167,4 +167,4 @@ namespace shell::commands
 
         flush_interpreter_pipeline();
     }
-} // namespace shell::commands
+} // namespace shell::interpreter

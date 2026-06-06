@@ -22,10 +22,10 @@ NOTES:
 #include <stdint.h>
 #include <array.hpp>
 
-namespace shell::commands
+namespace shell::interpreter
 {
     struct Command_Entry final {
         uint32_t hash;
         void (*function)(const runtime::Array<char, 64>& argumentes);
     };
-} // namespace shell::commands
+} // namespace shell::interpreter

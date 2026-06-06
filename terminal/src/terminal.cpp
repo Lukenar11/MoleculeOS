@@ -29,18 +29,18 @@ NOTES:
     because the compiler can see and optimize headers more easily than source files.
 */
 
-#include "shell.hpp"
+#include "terminal.hpp"
 
-namespace shell 
+namespace terminal 
 {
-    Shell::Shell() noexcept {
-        commands::info();
+    Terminal::Terminal() noexcept {
+        shell::interpreter::info();
         draw_user_cursor();
     }
 
-    void Shell::draw_user_cursor_with_color(drivers::vga::VGA_Textmode_Colors foreground,
-                                            drivers::vga::VGA_Textmode_Colors background) 
-                                            const noexcept {
+    void Terminal::draw_user_cursor_with_color(drivers::vga::VGA_Textmode_Colors foreground,
+                                               drivers::vga::VGA_Textmode_Colors background) 
+                                               const noexcept {
         const uint32_t one = 1;
 
         uint32_t x = runtime::text_output.get_cursor_x();
@@ -60,7 +60,7 @@ namespace shell
         drivers::vga::texmode.put_char_at(' ', color, x, y);
     }
 
-    void Shell::step() noexcept {
+    void Terminal::step() noexcept {
         while (drivers::ps2::keyboard_input.has_pending_scancode()) [[likely]] {
             const char key = drivers::ps2::keyboard_input.get_key();
             if (!key)

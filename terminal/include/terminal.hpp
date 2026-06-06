@@ -31,18 +31,17 @@ NOTES:
 
 #pragma once
 
-#include "kernel/include/heap/linear_area.hpp"
 #include "drivers/ps2/keyboardin/include/keyboard_input.hpp"
 #include "drivers/vga/textmode/include/textmode.hpp"
-#include "interpreter/interpreter.hpp"
+#include "shell/include/interpreter/interpreter.hpp"
 #include <stdint.h>
 #include <text_output.hpp>
 
-namespace shell
+namespace terminal
 {
-    class Shell final {
+    class Terminal final {
     private:
-        commands::Interpreter interpreter;
+        shell::interpreter::Interpreter interpreter;
 
         void draw_user_cursor_with_color(drivers::vga::VGA_Textmode_Colors foreground,
                                          drivers::vga::VGA_Textmode_Colors background) 
@@ -65,9 +64,9 @@ namespace shell
     public:
         void step() noexcept;
 
-        Shell() noexcept;
-        ~Shell() noexcept = default;
+        Terminal() noexcept;
+        ~Terminal() noexcept = default;
     };
 
-    extern Shell shell;
-} // namespace shell
+    extern Terminal terminal;
+} // namespace terminal

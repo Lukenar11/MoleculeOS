@@ -45,6 +45,7 @@ include iso/boot/Makefile
 include drivers/Makefile
 include runtime/Makefile
 include kernel/Makefile
+include terminal/Makefile
 include shell/Makefile
 
 all: dirs $(KERNEL)

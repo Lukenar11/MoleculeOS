@@ -4,8 +4,10 @@
 # https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 # 
 
-OBJS += \
-	$(BUILD)/shell.o \
+COMMON_FLAGS += \
+	-Iterminal/include
 
-$(BUILD)/shell.o: shell/src/shell.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+include terminal/src/Makefile
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
