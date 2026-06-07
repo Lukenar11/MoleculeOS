@@ -5,10 +5,12 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This file includes helper functions for the shell-interpreter and the command implementations.
+    This file includes helper functions for the shell-interpreter and 
+    the command implementations.
 
 NOTES:
-    
+    Since some functions are quite small, 
+    they are placed in the header so that the compiler can inline them.
 */
 
 #pragma once
