@@ -73,6 +73,11 @@ void strncpy(char* dest_ptr, const char* src_ptr, uint32_t size)
     dest_ptr[size - 1] = null_char;
 }
 
+void strcpy(char* dest_ptr, const char* src_ptr)
+{
+    while ((*dest_ptr++ = *src_ptr++));
+}
+
 uint32_t strlen(char *string) 
 {
     uint32_t length = 0;

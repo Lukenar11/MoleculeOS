@@ -24,7 +24,7 @@ NOTES:
     and templates must be inline in the header.
 */
 
-#include "interpreter.hpp"
+#include "interpreter/interpreter.hpp"
 
 namespace shell::interpreter
 {

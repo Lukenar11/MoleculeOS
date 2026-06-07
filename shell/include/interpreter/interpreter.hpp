@@ -56,7 +56,8 @@ namespace
         {make_hash("shutdown"), [](auto& _) -> void {shell::interpreter::shutdown();}},
         {make_hash("echo"), [](auto& arguments) -> void {shell::interpreter::echo(arguments);}},
         {make_hash("create"), [](auto& arguments) -> void {shell::interpreter::create(arguments);}},
-        {make_hash("list"), [](auto& _) -> void {shell::interpreter::list();}}
+        {make_hash("list"), [](auto& _) -> void {shell::interpreter::list();}},
+        {make_hash("remove"), [](auto& arguments) -> void {shell::interpreter::remove(arguments);}}
     };
 }
 

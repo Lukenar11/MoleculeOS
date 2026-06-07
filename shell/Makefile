@@ -5,9 +5,10 @@
 # 
 
 COMMON_FLAGS += \
-	-Ishell/include/interpreter
+	-Ishell/include
 
 include shell/src/interpreter/Makefile
+include shell/src/interpreter/utils/Makefile
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)

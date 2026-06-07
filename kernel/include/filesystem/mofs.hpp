@@ -36,6 +36,7 @@ namespace kernel::filesystem
         Inode* get_inode_by_name_and_format(const char* filename, const char* format) 
                                             const noexcept;
         Inode* create_file(const char* filename, const char* format) noexcept;
+        void delete_file(Inode* inode) noexcept;
 
         inline const runtime::Array<Inode, MAX_FILES_PER_DIRECTORY>& get_inodes() const noexcept {
             return inodes;

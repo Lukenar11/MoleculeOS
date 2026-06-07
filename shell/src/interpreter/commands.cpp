@@ -23,7 +23,7 @@ NOTES:
     such as the "create" function with all its "goto" statements.
 */
 
-#include "commands.hpp"
+#include "interpreter/commands.hpp"
 
 namespace shell::interpreter
 {
@@ -41,7 +41,9 @@ namespace shell::interpreter
             "\t- echo (displays a message) | echo [Message]\n"
             "\t- create (creates a file) | create [FileName] /\n"
             "\t\t\t\t\t\t\t\tcreate [FileName].[FileFormat]\n"
-            "\t- list (list all files) | list\n"
+            "\t- list (lists all files) | list\n"
+            "\t- remove (deletes a file) | remove [FileName] /\n"
+            "\t\t\t\t\t\t\t\tremove [FileName].[FileFormat]\n"
             "\n"
         };
 
@@ -91,98 +93,30 @@ namespace shell::interpreter
 
     void create(const runtime::Array<char, 64>& arguments) noexcept {
         static const char* command_name = "create: ";
-        const char null_terminator = '\0';
-        const char new_line = '\n';
-        const uint32_t one = 1;
-        const uint32_t null = 0;
 
-        static runtime::Array<char, 60> file_name;
-        static runtime::Array<char, 4> file_format;
-
-        uint32_t file_name_index = null;
-        uint32_t file_format_index = null;
-        bool is_file_name = true;
-
-        goto run;
-
-    reset:
-        file_name.fill(null_terminator);
-        file_format.fill(null_terminator);
-
-        runtime::text_output.put_char(new_line);
-        runtime::text_output.put_char(new_line);
-        return;
-
-    run:
-        if (arguments[null] == null_terminator) [[unlikely]] {
-            static const char* error_message = "missing argument";
+        Parsed_File_Name parsed = parse_filename(arguments);
+        if (parsed.error.data()[0] != '\0') [[unlikely]] {
             print_command_error(command_name);
-            print_command_error(error_message);
-            
-            goto reset;
-        }
-    
-        for (uint32_t i = null; arguments[i] != null_terminator; i++) [[likely]] {
-            if (arguments[i] == '.') [[unlikely]] {
-                is_file_name = false;
-                continue;
-            }
+            print_command_error(parsed.error.data());
 
-            if (arguments[i] == null_terminator) [[unlikely]]
-                break;
-
-            if ((is_file_name && !append_char(file_name, file_name_index, arguments[i])) || 
-                (file_name_index >= kernel::filesystem::MAX_FILENAME_LENGTH)) [[unlikely]] {
-                static const char* error_message = "filename too long";
-                print_command_error(command_name);
-                print_command_error(error_message);
-
-                goto reset;
-            }
-            
-            if (!(is_file_name || append_char(file_format, file_format_index, arguments[i])) || 
-                (file_format_index >= kernel::filesystem::MAX_FILE_FORMAT_NAME_LENGTH)) [[unlikely]] {
-                static const char* error_message = "format too long";
-                print_command_error(command_name);
-                print_command_error(error_message);
-
-                goto reset;
-            }
+            command_end();
+            return;
         }
 
-        file_name[file_name_index + one] = null_terminator;
-        file_format[file_format_index + one] = null_terminator;
-
-        for (uint32_t i = null; file_name[i] != '\0'; i++) [[likely]]
-            if (!kernel::filesystem::mofs.is_valid_file_name_or_formant_char(file_name[i])
-               ) [[unlikely]] {
-                static const char* error_message = "not a valid File Name";
-                print_command_error(command_name);
-                print_command_error(error_message);
-                
-                goto reset;
-            }
-
-        for (uint32_t i = null; file_format[i] != '\0'; i++) [[likely]]
-            if (!kernel::filesystem::mofs.is_valid_file_name_or_formant_char(file_format[i])
-               ) [[unlikely]] {
-                static const char* error_message = "not a valid File Format";
-                print_command_error(command_name);
-                print_command_error(error_message);
-                
-                goto reset;
-            }
-
-        auto* inode = kernel::filesystem::mofs.create_file(file_name.data(), file_format.data());
+        auto* inode = kernel::filesystem::mofs.create_file(
+            parsed.name.data(), 
+            parsed.format.data()
+        );
         if (!inode) [[unlikely]] {
             static const char* error_message = "file does already exists";
             print_command_error(command_name);
             print_command_error(error_message);
 
-            goto reset;
+            command_end();
+            return;
         }
 
-        goto reset;
+        command_end();
     }
 
     void list() noexcept {
@@ -212,5 +146,36 @@ namespace shell::interpreter
         }
 
         runtime::text_output.put_char('\n');
+    }
+
+    void remove(const runtime::Array<char, 64>& arguments) noexcept {
+        static const char* command_name = "remove: ";
+
+        Parsed_File_Name parsed = parse_filename(arguments);
+        if (parsed.error.data()[0] != '\0') [[unlikely]] {
+            print_command_error(command_name);
+            print_command_error(parsed.error.data());
+
+            command_end();
+            return;
+        }
+
+        auto* inode = kernel::filesystem::mofs.get_inode_by_name_and_format(
+            parsed.name.data(),
+            parsed.format.data()
+        );
+
+        if (!inode) [[unlikely]] {
+            static const char* error_message = "file does not exist";
+            print_command_error(command_name);
+            print_command_error(error_message);
+
+            command_end();
+            return;
+        }
+
+        kernel::filesystem::mofs.delete_file(inode);
+
+        command_end();
     }
 } // namespace shell::interpreter

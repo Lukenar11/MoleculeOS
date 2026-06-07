@@ -94,5 +94,16 @@ namespace kernel::filesystem
         return inode;
     }
 
+    void MoleculeOS_File_System::delete_file(Inode* inode) noexcept {
+        const char null_terminatpr = '\0';
+        const uint8_t null = 0;
+
+        inode->in_use = false;
+        inode->size = null;
+        memset(inode->name, null_terminatpr, MAX_FILENAME_LENGTH);
+        memset(inode->format, null_terminatpr, MAX_FILE_FORMAT_NAME_LENGTH);
+        memset(inode->data, null, MAX_FILE_SIZE);
+    }
+
     MoleculeOS_File_System mofs;
 } // namespace kernel::filesystem

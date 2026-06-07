@@ -54,4 +54,5 @@ namespace shell::interpreter
     void echo(const runtime::Array<char, 64>& arguments) noexcept;
     void create(const runtime::Array<char, 64>& arguments) noexcept;
     void list() noexcept;
+    void remove(const runtime::Array<char, 64>& arguments) noexcept;
 } // namespace shell::interpreter

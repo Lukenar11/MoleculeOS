@@ -5,14 +5,19 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
+    This file includes helper functions for the shell-interpreter and the command implementations.
 
 NOTES:
-
+    
 */
 
 #pragma once
 
+#include "kernel/include/filesystem/mofs.hpp"
 #include <stdint.h>
+#include <array.hpp>
+#include <text_output.hpp>
+#include <string.h>
 
 namespace shell::interpreter
 {
@@ -40,4 +45,18 @@ namespace shell::interpreter
             drivers::vga::VGA_Textmode_Colors::BLACK
         );
     }
+
+    inline void command_end() noexcept {
+        const char new_line = '\n';
+        runtime::text_output.put_char(new_line);
+        runtime::text_output.put_char(new_line);
+    }
+
+    struct Parsed_File_Name final {
+        runtime::Array<char, 60> name;
+        runtime::Array<char, 4> format;
+        runtime::Array<char, 32> error;
+    };
+
+    Parsed_File_Name& parse_filename(const runtime::Array<char, 64>& arguments) noexcept;
 } // namespace shell::interpreter
