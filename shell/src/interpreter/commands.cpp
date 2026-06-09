@@ -17,10 +17,6 @@ NOTES:
     Some shell command implementations are intentionally 
     only implemented in the header, 
     as they are quite small, so that the compiler can inline them.
-
-    Since I want every command to fit into a single function, 
-    I'm sometimes forced to write code that isn't entirely clean, 
-    such as the "create" function with all its "goto" statements.
 */
 
 #include "interpreter/commands.hpp"
