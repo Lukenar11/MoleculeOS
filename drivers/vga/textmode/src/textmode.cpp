@@ -15,6 +15,9 @@ DESCRIPTION:
     
 NOTES:
     All writes must follow the VGA text mode layout of 80×25 characters.
+
+    Some methods are placed in the header 
+    because they are so small that the compiler can inline them.
 */
 
 #include "textmode.hpp"

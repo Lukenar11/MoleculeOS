@@ -43,8 +43,8 @@ namespace terminal
     private:
         shell::interpreter::Interpreter interpreter;
 
-        void draw_user_cursor_with_color(drivers::vga::VGA_Textmode_Colors foreground,
-                                         drivers::vga::VGA_Textmode_Colors background) 
+        void draw_user_cursor_with_color(const drivers::vga::VGA_Textmode_Colors foreground,
+                                         const drivers::vga::VGA_Textmode_Colors background) 
                                          const noexcept;
 
         inline constexpr void draw_user_cursor() const noexcept {

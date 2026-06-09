@@ -38,8 +38,8 @@ namespace terminal
         draw_user_cursor();
     }
 
-    void Terminal::draw_user_cursor_with_color(drivers::vga::VGA_Textmode_Colors foreground,
-                                               drivers::vga::VGA_Textmode_Colors background) 
+    void Terminal::draw_user_cursor_with_color(const drivers::vga::VGA_Textmode_Colors foreground,
+                                               const drivers::vga::VGA_Textmode_Colors background) 
                                                const noexcept {
         const uint32_t one = 1;
 
@@ -51,11 +51,8 @@ namespace terminal
         if (y >= drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT) [[unlikely]]
             y = drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT - one;
 
-        runtime::text_output.set_text_color(
-            static_cast<drivers::vga::VGA_Textmode_Colors>(foreground),
-            static_cast<drivers::vga::VGA_Textmode_Colors>(background)
-        );
-
+        runtime::text_output.set_text_color(foreground, background);
+        
         const uint8_t color = runtime::text_output.get_text_color();
         drivers::vga::texmode.put_char_at(' ', color, x, y);
     }

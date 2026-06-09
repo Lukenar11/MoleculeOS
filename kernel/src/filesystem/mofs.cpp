@@ -26,8 +26,8 @@ namespace kernel::filesystem
                 return &inode;
             }
 
-        return nullptr;
         system::panic("MOFS: no free inodes available", "dont create to mutch files");
+        return nullptr;
     }
 
     bool MoleculeOS_File_System::is_valid_file_name_or_formant_char(const char symbol) 

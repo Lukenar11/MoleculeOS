@@ -15,6 +15,9 @@ DESCRIPTION:
 
 NOTES:
     All writes must follow the VGA text mode layout of 80×25 characters.
+
+    Some methods are placed in the header 
+    because they are so small that the compiler can inline them.
 */
 
 #pragma once
@@ -32,9 +35,18 @@ namespace drivers::vga
     public:
         [[nodiscard]]
         static inline constexpr uint8_t make_color(const VGA_Textmode_Colors& foreground, 
-                                                   const VGA_Textmode_Colors& background) 
+                                                   const VGA_Textmode_Colors& background,
+                                                   const bool does_blink=true) 
                                                    noexcept {
-            return (static_cast<uint8_t>(background) << 4) | static_cast<uint8_t>(foreground);
+            
+            const uint8_t color = (static_cast<uint8_t>(background) << 4) | 
+                                   static_cast<uint8_t>(foreground);
+            if (does_blink) {
+                const uint8_t blink_mode_bit = 0x80;
+                return color | blink_mode_bit;
+            } else {
+                return color;
+            }
         }
 
         [[nodiscard]]

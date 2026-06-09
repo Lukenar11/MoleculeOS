@@ -35,9 +35,10 @@ namespace runtime
     }
 
     void Text_Output::set_text_color(const drivers::vga::VGA_Textmode_Colors& color,
-                                    const drivers::vga::VGA_Textmode_Colors& background) 
-                                    noexcept {
-        cursor_color = drivers::vga::texmode.make_color(color, background);
+                                     const drivers::vga::VGA_Textmode_Colors& background,
+                                     const bool does_blink) 
+                                     noexcept {
+        cursor_color = drivers::vga::texmode.make_color(color, background, does_blink);
     }
 
     void Text_Output::new_line() noexcept {
