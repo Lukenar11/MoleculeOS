@@ -59,7 +59,7 @@ void kernel_main()
     // schedul MoleculeOS
     terminal::Terminal terminal;
     while (true) {
-        // kernel_system_sleep();
+        kernel_system_sleep();
         terminal.step();
     }
 
