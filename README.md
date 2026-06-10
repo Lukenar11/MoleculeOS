@@ -71,7 +71,7 @@ To build and run MoleculeOS, the following software is required:
 
 ## Build & Run
 
-## if you using VS Code
+## if you using VS Code and WSL
 ``` txt
     CTRL + SHIFT + B
 ```

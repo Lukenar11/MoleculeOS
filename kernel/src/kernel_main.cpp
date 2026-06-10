@@ -58,8 +58,8 @@ void kernel_main()
     remap_pic();
     kernel_system_enable_interrupts();
 
-    test_write_file_read_file();
-    kernel_system_hang();
+    // test_write_file_read_file();
+    // kernel_system_hang();
 
     // schedul MoleculeOS
     terminal::Terminal terminal;
