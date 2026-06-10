@@ -29,7 +29,8 @@
                 "${workspaceFolder}/drivers/vga/textmode/include",
                 "${workspaceFolder}/drivers/vga/textmode/include/utils",
                 "${workspaceFolder}/shell/include",
-                "${workspaceFolder}/shell/include/interpreter"
+                "${workspaceFolder}/shell/include/interpreter",
+                "${workspaceFolder}/shell/include/commands"
             ],
             "defines": [
                 "__MOLECULE_OS__",
