@@ -38,17 +38,33 @@ namespace kernel::filesystem
         Inode* create_file(const char* filename, const char* format) noexcept;
         void delete_file(Inode* inode) noexcept;
 
-        bool read_file(const Inode* inode,
-                       const uint32_t start_byte_index,
-                       const uint32_t end_byte_index,
-                       const uint32_t buffer_size,
-                       uint8_t* out_buffer) noexcept;
+        bool get_file_content_binary(const Inode* inode, 
+                                     uint8_t* out_buffer,
+                                     const uint32_t buffer_size) noexcept;
 
-        bool write_file(Inode* inode,
-                        const uint32_t start_byte_index,
-                        const uint32_t end_byte_index,
-                        const uint32_t buffer_size,
-                        const uint8_t* in_buffer) noexcept;
+        bool get_file_content_as_string(const Inode* inode, 
+                                        char* out_buffer,
+                                        const uint32_t buffer_size) noexcept;
+
+        bool read_file_binary_at(const Inode* inode,  
+                                 uint8_t* out_buffer,
+                                 const uint32_t buffer_size, 
+                                 const uint32_t offset, 
+                                 const uint32_t length) noexcept;
+
+        bool read_file_as_string_at(const Inode* inode, 
+                                    char* out_buffer,
+                                    const uint32_t buffer_size, 
+                                    const uint32_t offset, 
+                                    const uint32_t length) noexcept;
+
+        bool set_file_content_binary(Inode* inode, 
+                                     const uint8_t* in_buffer,
+                                     const uint32_t buffer_size) noexcept; 
+
+        bool set_file_content_as_string(Inode* inode, 
+                                        const char* in_buffer,
+                                        const uint32_t buffer_size) noexcept;
 
         inline const runtime::Array<Inode, MAX_FILES_PER_DIRECTORY>& get_inodes() const noexcept {
             return inodes;

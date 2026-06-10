@@ -105,60 +105,116 @@ namespace kernel::filesystem
         memset(inode->data, null, MAX_FILE_SIZE);
     }
 
-    bool MoleculeOS_File_System::read_file(const Inode* inode,
-                                           const uint32_t start_byte_index,
-                                           const uint32_t end_byte_index,
-                                           const uint32_t buffer_size,
-                                           uint8_t* out_buffer) noexcept {
-        const bool return_val_false = false;
+    bool MoleculeOS_File_System::get_file_content_binary(const Inode* inode, 
+                                                         uint8_t* out_buffer,
+                                                         const uint32_t buffer_size) noexcept {
+        const bool return_false = false;
 
-        if (!inode || !inode->in_use) [[unlikely]]
-            return return_val_false;
+        if (!inode || !inode->in_use) [[unlikely]] 
+            return return_false;
 
-        if (start_byte_index >= inode->size) [[unlikely]]
-            return return_val_false;
+        if (buffer_size < inode->size) [[unlikely]] 
+            return return_false;
 
-        if (end_byte_index > inode->size) [[unlikely]] 
-            return return_val_false;
+        memcpy(out_buffer, inode->data, inode->size);
+        return true;
+    }
 
-        if (end_byte_index < start_byte_index) [[unlikely]]
-            return return_val_false;
+    bool MoleculeOS_File_System::get_file_content_as_string(const Inode* inode, 
+                                                            char* out_buffer,
+                                                            const uint32_t buffer_size) noexcept {
+        const bool return_false = false;
 
-        const uint32_t length = end_byte_index - start_byte_index;
-        if (buffer_size < length) [[unlikely]]
-            return return_val_false;
-        
-        memcpy(out_buffer, (inode->data + start_byte_index), length);
+        if (!inode || !inode->in_use) [[unlikely]] 
+            return return_false;
+
+        if (buffer_size < (inode->size + 1)) [[unlikely]] 
+            return return_false;
+
+        memcpy(out_buffer, inode->data, inode->size);
+        out_buffer[inode->size] = '\0';
 
         return true;
     }
 
-    bool MoleculeOS_File_System::write_file(Inode* inode,
-                                            const uint32_t start_byte_index,
-                                            const uint32_t end_byte_index,
-                                            const uint32_t buffer_size,
-                                            const uint8_t* in_buffer) noexcept {
-        inode->size = end_byte_index;
-
-        const bool return_val_false = false;
+    bool MoleculeOS_File_System::read_file_binary_at(const Inode* inode,
+                                                     uint8_t* out_buffer,
+                                                     const uint32_t buffer_size,
+                                                     const uint32_t offset,
+                                                     const uint32_t length) noexcept {
+        const bool return_false = false;
 
         if (!inode || !inode->in_use) [[unlikely]]
-            return return_val_false;
+            return return_false;
 
-        if (start_byte_index > inode->size) [[unlikely]]
-            return return_val_false;
+        if (offset > inode->size) [[unlikely]]
+            return return_false;
 
-        if (end_byte_index > inode->size) [[unlikely]]
-            return return_val_false;
+        if ((offset + length) > inode->size) [[unlikely]]
+            return return_false;
 
-        if (end_byte_index < start_byte_index) [[unlikely]]
-            return return_val_false;
-
-        const uint32_t length = end_byte_index - start_byte_index;
         if (buffer_size < length) [[unlikely]]
-            return return_val_false;
+            return return_false;
 
-        memcpy(inode->data + start_byte_index, in_buffer, length);
+        memcpy(out_buffer, (inode->data + offset), length);
+        return true;
+    }
+
+    bool MoleculeOS_File_System::read_file_as_string_at(const Inode* inode, 
+                                                        char* out_buffer,
+                                                        const uint32_t buffer_size, 
+                                                        const uint32_t offset, 
+                                                        const uint32_t length) noexcept {
+        const bool return_false = false;
+
+        if (!inode || !inode->in_use) [[unlikely]]
+            return return_false;
+
+        if (offset > inode->size) [[unlikely]]
+            return return_false;
+
+        if ((offset + length) > inode->size) [[unlikely]]
+            return return_false;
+
+        if (buffer_size < (length + 1)) [[unlikely]]
+            return return_false;
+
+        memcpy(out_buffer, (inode->data + offset), length);
+        out_buffer[length] = '\0';
+
+        return true;
+    }
+
+    bool MoleculeOS_File_System::set_file_content_binary(Inode* inode,
+                                                         const uint8_t* in_buffer,
+                                                         const uint32_t length) noexcept {
+        const bool return_false = false;
+
+        if (!inode || !inode->in_use) [[unlikely]]
+            return return_false;
+
+        if (length > MAX_FILE_SIZE) [[unlikely]]
+            return return_false;
+
+        memcpy(inode->data, in_buffer, length);
+        inode->size = length;
+
+        return true;
+    }
+
+    bool MoleculeOS_File_System::set_file_content_as_string(Inode* inode,
+                                                            const char* in_buffer,
+                                                            const uint32_t length) noexcept {
+        const bool return_false = false;
+
+        if (!inode || !inode->in_use) [[unlikely]]
+            return return_false;
+
+        if (length > MAX_FILE_SIZE) [[unlikely]]
+            return return_false;
+
+        memcpy(inode->data, in_buffer, length);
+        inode->size = length;
 
         return true;
     }
