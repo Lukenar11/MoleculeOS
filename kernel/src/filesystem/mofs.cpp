@@ -133,5 +133,35 @@ namespace kernel::filesystem
         return true;
     }
 
+    bool MoleculeOS_File_System::write_file(Inode* inode,
+                                            const uint32_t start_byte_index,
+                                            const uint32_t end_byte_index,
+                                            const uint32_t buffer_size,
+                                            const uint8_t* in_buffer) noexcept {
+        inode->size = end_byte_index;
+
+        const bool return_val_false = false;
+
+        if (!inode || !inode->in_use) [[unlikely]]
+            return return_val_false;
+
+        if (start_byte_index > inode->size) [[unlikely]]
+            return return_val_false;
+
+        if (end_byte_index > inode->size) [[unlikely]]
+            return return_val_false;
+
+        if (end_byte_index < start_byte_index) [[unlikely]]
+            return return_val_false;
+
+        const uint32_t length = end_byte_index - start_byte_index;
+        if (buffer_size < length) [[unlikely]]
+            return return_val_false;
+
+        memcpy(inode->data + start_byte_index, in_buffer, length);
+
+        return true;
+    }
+
     MoleculeOS_File_System mofs;
 } // namespace kernel::filesystem

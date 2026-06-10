@@ -28,7 +28,7 @@ void test_create_file()
     runtime::text_output.put_ptr(reinterpret_cast<uintptr_t>(d));
 }
 
-void test_read_file()
+void test_write_file_read_file()
 {
     runtime::text_output.reset();
     runtime::text_output.put_string("Starte read_file-Test...\n");
@@ -36,8 +36,22 @@ void test_read_file()
     kernel::filesystem::Inode* a = kernel::filesystem::mofs.create_file("hello_world", "txt");
     kernel::filesystem::Inode* b = kernel::filesystem::mofs.create_file("test", "");
 
+    uint8_t data[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+
+    runtime::text_output.put_string(
+        kernel::filesystem::mofs.write_file(a, 0, 9, 10, data) ? 
+            "File A write Success\n" : 
+            "File A write fail\n"
+    );
+
+    runtime::text_output.put_string(
+        kernel::filesystem::mofs.write_file(b, 4, 5, 10, data) ? 
+            "File B write Success\n" : 
+            "File B write fail\n"
+    );
+
     uint8_t buffer_a[10] = {};
-    if (!kernel::filesystem::mofs.read_file(a, 0, 9, 10, buffer_a)) {
+    if (kernel::filesystem::mofs.read_file(a, 0, 9, 10, buffer_a)) {
         runtime::text_output.put_string("buffer_a:\n");
         for (uint32_t i = 0; i < 10; i++)
             runtime::text_output.put_int(buffer_a[i]);
@@ -46,7 +60,7 @@ void test_read_file()
     runtime::text_output.put_string("\n\n");
 
     uint8_t buffer_b[10] = {};
-    if (!kernel::filesystem::mofs.read_file(b, 4, 5, 10, buffer_b)) {
+    if (kernel::filesystem::mofs.read_file(b, 4, 5, 10, buffer_b)) {
         runtime::text_output.put_string("buffer_b:\n");
         for (uint32_t i = 0; i < 10; i++)
             runtime::text_output.put_int(buffer_b[i]);

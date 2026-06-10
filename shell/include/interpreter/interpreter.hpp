@@ -19,21 +19,16 @@ NOTES:
     Since the functions "set_error_message_text_color" and 
     "set_error_message_text_color" are so short, 
     I put them in the header so the compiler can inline them.
-
-    The method "append_char" is only in the header because it uses a template, 
-    and templates must be inline in the header.
 */
 
 #pragma once
 
-#include "utils/command_entry.hpp"   
-#include "commands.hpp"
-#include "kernel/include/system/panic.hpp"
-#include "utils/helpers.hpp"
+#include "commands/commands.hpp"
+#include "utils/command_entry.hpp"
+#include "utils/append_char.hpp"
 #include <stdint.h>
-#include <text_output.hpp>
 #include <array.hpp>
-#include <string.h>
+#include <text_output.hpp>
 
 namespace
 {
@@ -49,15 +44,15 @@ namespace
     }
 
     constexpr shell::interpreter::Command_Entry shell_command_table[] = {
-        {make_hash("help"), [](auto& _) -> void {shell::interpreter::help();}},
-        {make_hash("info"), [](auto& _) -> void {shell::interpreter::info();}},
-        {make_hash("clear"), [](auto& _) -> void {shell::interpreter::clear();}},
-        {make_hash("reboot"), [](auto& _) -> void {shell::interpreter::reboot();}},
-        {make_hash("shutdown"), [](auto& _) -> void {shell::interpreter::shutdown();}},
-        {make_hash("echo"), [](auto& arguments) -> void {shell::interpreter::echo(arguments);}},
-        {make_hash("create"), [](auto& arguments) -> void {shell::interpreter::create(arguments);}},
-        {make_hash("list"), [](auto& _) -> void {shell::interpreter::list();}},
-        {make_hash("remove"), [](auto& arguments) -> void {shell::interpreter::remove(arguments);}}
+        {make_hash("help"), [](auto& _) -> void {shell::commands::help();}},
+        {make_hash("info"), [](auto& _) -> void {shell::commands::info();}},
+        {make_hash("clear"), [](auto& _) -> void {shell::commands::clear();}},
+        {make_hash("reboot"), [](auto& _) -> void {shell::commands::reboot();}},
+        {make_hash("shutdown"), [](auto& _) -> void {shell::commands::shutdown();}},
+        {make_hash("echo"), [](auto& arguments) -> void {shell::commands::echo(arguments);}},
+        {make_hash("create"), [](auto& arguments) -> void {shell::commands::create(arguments);}},
+        {make_hash("list"), [](auto& _) -> void {shell::commands::list();}},
+        {make_hash("remove"), [](auto& arguments) -> void {shell::commands::remove(arguments);}}
     };
 }
 

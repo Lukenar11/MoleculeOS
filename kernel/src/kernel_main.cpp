@@ -26,6 +26,8 @@ NOTES:
 #include "system/panic.hpp"
 #include <stdint.h>
 
+#include "tests/kernel/file_system.hpp"
+
 void remap_pic() noexcept 
 {
     struct PIC_Mapping {
@@ -55,6 +57,9 @@ void kernel_main()
 
     remap_pic();
     kernel_system_enable_interrupts();
+
+    test_write_file_read_file();
+    kernel_system_hang();
 
     // schedul MoleculeOS
     terminal::Terminal terminal;

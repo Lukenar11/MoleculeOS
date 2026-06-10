@@ -34,7 +34,9 @@ NOTES:
 namespace terminal 
 {
     Terminal::Terminal() noexcept {
-        shell::interpreter::info();
+        runtime::text_output.reset();
+        shell::commands::info();
+
         draw_user_cursor();
     }
 

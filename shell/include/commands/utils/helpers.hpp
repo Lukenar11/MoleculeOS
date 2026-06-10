@@ -5,35 +5,25 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This file includes helper functions for the shell-interpreter and 
-    the command implementations.
+    This file contains a few helper functions 
+    that are used by the shell command implementations.
 
 NOTES:
     Since some functions are quite small, 
-    they are placed in the header so that the compiler can inline them.
+    they are intentionally placed in the header so that the compiler can inline them more easily.
 */
 
 #pragma once
 
 #include "kernel/include/filesystem/mofs.hpp"
+#include "utils/append_char.hpp"
+#include <text_output.hpp>
 #include <stdint.h>
 #include <array.hpp>
-#include <text_output.hpp>
 #include <string.h>
 
-namespace shell::interpreter
+namespace shell::commands
 {
-    template <typename Arr>
-    inline constexpr bool append_char(Arr& buffer, 
-                                      uint32_t& index,
-                                      const char symbol) noexcept {
-        if (index < buffer.size()) [[likely]] {
-            buffer[index++] = symbol;
-            return true;
-        }
-        return false;
-    }
-
     inline void print_command_error(const char* error_message) noexcept {
         runtime::text_output.set_text_color(
             drivers::vga::VGA_Textmode_Colors::YELLOW,
@@ -61,4 +51,4 @@ namespace shell::interpreter
     };
 
     Parsed_File_Name& parse_filename(const runtime::Array<char, 64>& arguments) noexcept;
-} // namespace shell::interpreter
+} // namespace shell::commands

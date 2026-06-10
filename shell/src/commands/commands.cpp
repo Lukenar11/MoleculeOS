@@ -5,8 +5,8 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This defines the built-in shell commands that are available in
-    MoleculeOS. Each command is implemented as a lightweight function
+    This defines the built-in shell commands that are available in MoleculeOS. 
+    Each command is implemented as a function
     that performs a specific action.
 
     These commands are called by the shell interpreter via a
@@ -19,9 +19,9 @@ NOTES:
     as they are quite small, so that the compiler can inline them.
 */
 
-#include "interpreter/commands.hpp"
+#include "commands/commands.hpp"
 
-namespace shell::interpreter
+namespace shell::commands
 {
     void help() noexcept {
         static const char help_message[] = {
@@ -174,4 +174,4 @@ namespace shell::interpreter
 
         command_end();
     }
-} // namespace shell::interpreter
+} // namespace shell::commands

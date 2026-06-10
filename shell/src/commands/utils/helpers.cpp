@@ -5,17 +5,17 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This file includes helper functions for the shell-interpreter and 
-    the command implementations.
+    This file contains a few helper functions 
+    that are used by the shell command implementations.
 
 NOTES:
     Since some functions are quite small, 
-    they are placed in the header so that the compiler can inline them.
+    they are intentionally placed in the header so that the compiler can inline them more easily.
 */
 
-#include "interpreter/utils/helpers.hpp"
+#include "commands/utils/helpers.hpp"
 
-namespace shell::interpreter
+namespace shell::commands
 {
     Parsed_File_Name& parse_filename(const runtime::Array<char, 64>& arguments) noexcept {
         const char null_terminator = '\0';
@@ -88,4 +88,4 @@ namespace shell::interpreter
 
         return parsed;
     }
-} // namespace shell::interpreter
+} // namespace shell::commands

@@ -44,6 +44,12 @@ namespace kernel::filesystem
                        const uint32_t buffer_size,
                        uint8_t* out_buffer) noexcept;
 
+        bool write_file(Inode* inode,
+                        const uint32_t start_byte_index,
+                        const uint32_t end_byte_index,
+                        const uint32_t buffer_size,
+                        const uint8_t* in_buffer) noexcept;
+
         inline const runtime::Array<Inode, MAX_FILES_PER_DIRECTORY>& get_inodes() const noexcept {
             return inodes;
         }

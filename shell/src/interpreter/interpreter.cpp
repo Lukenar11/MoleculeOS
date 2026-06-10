@@ -19,9 +19,6 @@ NOTES:
     Since the functions "set_error_message_text_color" and 
     "set_error_message_text_color" are so short, 
     I put them in the header so the compiler can inline them.
-
-    The method "append_char" is only in the header because it uses a template, 
-    and templates must be inline in the header.
 */
 
 #include "interpreter/interpreter.hpp"
