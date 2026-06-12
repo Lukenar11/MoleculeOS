@@ -11,6 +11,9 @@ DESCRIPTION:
 NOTES:
     Since the file system resides directly in RAM, 
     all files—along with their contents—are deleted upon shutting down or restarting the system.
+
+    One method are placed in the header 
+    because they are so small that the compiler can inline them.
 */
 
 #pragma once
@@ -28,12 +31,14 @@ namespace kernel::filesystem
         runtime::Array<Inode, MAX_FILES_PER_DIRECTORY> inodes;
 
         Inode* allocate_inode() noexcept;
+        void recalculate_file_size(Inode* inode) noexcept;
 
     public:
         bool is_valid_file_name_or_formant_char(const char symbol) const noexcept;
 
         Inode* get_inode_by_name_and_format(const char* filename, const char* format) 
                                             const noexcept;
+
         Inode* create_file(const char* filename, const char* format) noexcept;
         void delete_file(Inode* inode) noexcept;
 

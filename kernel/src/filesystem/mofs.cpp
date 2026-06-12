@@ -11,6 +11,9 @@ DESCRIPTION:
 NOTES:
     Since the file system resides directly in RAM, 
     all files—along with their contents—are deleted upon shutting down or restarting the system.
+
+    One method are placed in the header 
+    because they are so small that the compiler can inline them.
 */
 
 #include "filesystem/mofs.hpp"
@@ -28,6 +31,27 @@ namespace kernel::filesystem
 
         system::panic("MOFS: no free inodes available", "dont create to mutch files");
         return nullptr;
+    }
+
+    void MoleculeOS_File_System::recalculate_file_size(Inode* inode) noexcept {
+        const uint32_t null = 0;
+        const uint32_t one = 1;
+
+        if (!inode || !inode->in_use)
+            return;
+    
+        if (inode->size == null) {
+            inode->size = null;
+            return;
+        }
+
+        int32_t i = static_cast<int32_t>(inode->size) - static_cast<int32_t>(one);
+        for (; i >= null; i--) [[likely]]
+            if (inode->data[i] != null) {
+                inode->size = static_cast<uint32_t>(i + one);
+                return;
+            }
+        inode->size = null;
     }
 
     bool MoleculeOS_File_System::is_valid_file_name_or_formant_char(const char symbol) 
@@ -200,7 +224,7 @@ namespace kernel::filesystem
             return return_false;
 
         memcpy(inode->data, in_buffer, length);
-        inode->size = length;
+        recalculate_file_size(inode);
 
         return true;
     }
@@ -218,7 +242,7 @@ namespace kernel::filesystem
             return return_false;
 
         memcpy(inode->data, in_buffer, length);
-        inode->size = length;
+        recalculate_file_size(inode);
 
         return true;
     }
@@ -243,10 +267,7 @@ namespace kernel::filesystem
             return return_false;
 
         memcpy((inode->data + offset), in_buffer, length);
-
-        const uint32_t new_size = offset + length;
-        if (new_size > inode->size)
-            inode->size = new_size;
+        recalculate_file_size(inode);
 
         return true;
     }
@@ -261,17 +282,19 @@ namespace kernel::filesystem
         if (!inode || !inode->in_use) [[unlikely]]
             return return_false;
 
-        if (offset + length > MAX_FILE_SIZE) [[unlikely]]
+        if (offset > inode->size) [[unlikely]]
+            return return_false;
+
+        if (offset + length > inode->size) [[unlikely]]
             return return_false;
 
         if (buffer_size < length) [[unlikely]]
             return return_false;
 
-        memcpy(inode->data + offset, in_buffer, length);
+        memcpy((inode->data + offset), in_buffer, length);
+        recalculate_file_size(inode);
 
-        const uint32_t new_size = offset + length;
-        if (new_size > inode->size)
-            inode->size = new_size;
+        return true;
     }
 
     MoleculeOS_File_System mofs;
