@@ -17,7 +17,6 @@ NOTES:
 
 #include "utils/helpers.hpp"
 #include "system/panic.hpp"
-#include <textmode.hpp>
 #include <array.hpp>
 #include <string.h>
 #include <stdint.h>

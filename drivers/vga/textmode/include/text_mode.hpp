@@ -27,16 +27,16 @@ NOTES:
 
 namespace drivers::vga 
 {
-    class Textmode final {
+    class Text_Mode final {
     private:
         static inline volatile uint16_t* const VGA_TEXMODE_BUFFER = 
             reinterpret_cast<volatile uint16_t*>(0xB8000);
 
     public:
         [[nodiscard]]
-        static inline constexpr uint8_t make_color(const VGA_Textmode_Colors& foreground, 
-                                                   const VGA_Textmode_Colors& background,
-                                                   const bool does_blink=true) 
+        static inline constexpr uint8_t make_color(const Text_Mode_Colors& foreground, 
+                                                   const Text_Mode_Colors& background,
+                                                   const bool does_blink=false) 
                                                    noexcept {
             
             const uint8_t color = (static_cast<uint8_t>(background) << 4) | 
@@ -61,12 +61,12 @@ namespace drivers::vga
                          const uint32_t x, 
                          const uint32_t y) const noexcept;
 
-        void clear_screen(const VGA_Textmode_Colors& color) const noexcept;
+        void clear_screen(const Text_Mode_Colors& color) const noexcept;
 
-        Textmode() noexcept = default;
-        ~Textmode() noexcept = default;
+        Text_Mode() noexcept = default;
+        ~Text_Mode() noexcept = default;
     };
 
     // GLOBAL VGA-textmode object
-    extern Textmode texmode;
+    extern Text_Mode text_mode;
 } // namespace drivers::vga

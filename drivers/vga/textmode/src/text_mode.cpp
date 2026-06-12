@@ -20,33 +20,33 @@ NOTES:
     because they are so small that the compiler can inline them.
 */
 
-#include "textmode.hpp"
+#include "text_mode.hpp"
 
 namespace drivers::vga 
 {
-    void Textmode::put_char_at(const char symbol, 
-                               const uint8_t color, 
-                               const uint32_t x, 
-                               const uint32_t y) const noexcept {
+    void Text_Mode::put_char_at(const char symbol, 
+                                const uint8_t color, 
+                                const uint32_t x, 
+                                const uint32_t y) const noexcept {
         // VGA-Area Over/Underflow gurard
-        if (x >= VGA_TEXMODE_SCREEN_WIDTH || 
-            y >= VGA_TEXMODE_SCREEN_HEIGHT) [[unlikely]]
+        if (x >= TEXT_MODE_SCREEN_WIDTH || 
+            y >= TEXT_MODE_SCREEN_HEIGHT) [[unlikely]]
             return;
 
-        const uint32_t index = static_cast<uint32_t>(y) * VGA_TEXMODE_SCREEN_WIDTH + 
+        const uint32_t index = static_cast<uint32_t>(y) * TEXT_MODE_SCREEN_WIDTH + 
                                static_cast<uint32_t>(x);
         VGA_TEXMODE_BUFFER[index] = make_symbol_entry(symbol, color);
     }
 
-    void Textmode::clear_screen(const VGA_Textmode_Colors& background) const noexcept {
-        const uint8_t color = make_color(VGA_Textmode_Colors::BLACK, background);
+    void Text_Mode::clear_screen(const Text_Mode_Colors& background) const noexcept {
+        const uint8_t color = make_color(Text_Mode_Colors::BLACK, background);
         const uint16_t entry = make_symbol_entry(' ', color);
 
-        const uint32_t n = VGA_TEXMODE_SCREEN_WIDTH * VGA_TEXMODE_SCREEN_HEIGHT;
+        const uint32_t n = TEXT_MODE_SCREEN_WIDTH * TEXT_MODE_SCREEN_HEIGHT;
         for (uint32_t i = 0; i < n; i++) [[likely]]
             VGA_TEXMODE_BUFFER[i] = entry;
     }
 
     // GLOBAL VGA-textmode object
-    Textmode texmode;
+    Text_Mode text_mode;
 } // namespace drivers::vga

@@ -59,7 +59,6 @@ void test_write_file_read_file_string()
     }
 }
 
-
 void test_write_file_read_file_binary()
 {
     runtime::text_output.reset();
@@ -90,4 +89,3 @@ void test_write_file_read_file_binary()
         runtime::text_output.put_char('\n');
     }
 }
-

@@ -72,15 +72,15 @@ namespace shell::interpreter
 
         static inline void set_error_message_text_color() noexcept {
             runtime::text_output.set_text_color(
-                drivers::vga::VGA_Textmode_Colors::LIGHT_MAGENTA,
-                drivers::vga::VGA_Textmode_Colors::BLACK
+                drivers::vga::Text_Mode_Colors::LIGHT_MAGENTA,
+                drivers::vga::Text_Mode_Colors::BLACK
             );
         }
 
         static inline void set_default_text_color() noexcept {
             runtime::text_output.set_text_color(
-                drivers::vga::VGA_Textmode_Colors::LIGHT_GREY,
-                drivers::vga::VGA_Textmode_Colors::BLACK
+                drivers::vga::Text_Mode_Colors::LIGHT_GREY,
+                drivers::vga::Text_Mode_Colors::BLACK
             );
         }
 

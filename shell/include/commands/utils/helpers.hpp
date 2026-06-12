@@ -26,15 +26,15 @@ namespace shell::commands
 {
     inline void print_command_error(const char* error_message) noexcept {
         runtime::text_output.set_text_color(
-            drivers::vga::VGA_Textmode_Colors::YELLOW,
-            drivers::vga::VGA_Textmode_Colors::BLACK
+            drivers::vga::Text_Mode_Colors::YELLOW,
+            drivers::vga::Text_Mode_Colors::BLACK
         );
 
         runtime::text_output.put_string(error_message);
 
         runtime::text_output.set_text_color(
-            drivers::vga::VGA_Textmode_Colors::LIGHT_GREY,
-            drivers::vga::VGA_Textmode_Colors::BLACK
+            drivers::vga::Text_Mode_Colors::LIGHT_GREY,
+            drivers::vga::Text_Mode_Colors::BLACK
         );
     }
 

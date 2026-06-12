@@ -32,7 +32,7 @@ NOTES:
 #pragma once
 
 #include "drivers/ps2/keyboardin/include/keyboard_input.hpp"
-#include "drivers/vga/textmode/include/textmode.hpp"
+#include "drivers/vga/textmode/include/text_mode.hpp"
 #include "shell/include/interpreter/interpreter.hpp"
 #include <stdint.h>
 #include <text_output.hpp>
@@ -43,21 +43,21 @@ namespace terminal
     private:
         shell::interpreter::Interpreter interpreter;
 
-        void draw_user_cursor_with_color(const drivers::vga::VGA_Textmode_Colors foreground,
-                                         const drivers::vga::VGA_Textmode_Colors background) 
+        void draw_user_cursor_with_color(const drivers::vga::Text_Mode_Colors& foreground,
+                                         const drivers::vga::Text_Mode_Colors& background) 
                                          const noexcept;
 
         inline constexpr void draw_user_cursor() const noexcept {
             draw_user_cursor_with_color(
-                drivers::vga::VGA_Textmode_Colors::LIGHT_GREY,
-                drivers::vga::VGA_Textmode_Colors::LIGHT_GREY
+                drivers::vga::Text_Mode_Colors::LIGHT_GREY,
+                drivers::vga::Text_Mode_Colors::LIGHT_GREY
             );
         }
 
         inline constexpr void erase_user_cursor() const noexcept {
             draw_user_cursor_with_color(
-                drivers::vga::VGA_Textmode_Colors::LIGHT_GREY,
-                drivers::vga::VGA_Textmode_Colors::BLACK
+                drivers::vga::Text_Mode_Colors::LIGHT_GREY,
+                drivers::vga::Text_Mode_Colors::BLACK
             );
         }
 

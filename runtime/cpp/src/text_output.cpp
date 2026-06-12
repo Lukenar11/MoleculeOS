@@ -19,6 +19,8 @@ DESCRIPTION:
     allowing structured and readable output during runtime.
     
 NOTES:
+    Some methods are placed in the header 
+    because they are so small that the compiler can inline them.
 */
 
 #include "text_output.hpp"
@@ -31,22 +33,22 @@ namespace runtime
         cursor_x = null;
         cursor_y = null;
 
-        drivers::vga::texmode.clear_screen(drivers::vga::VGA_Textmode_Colors::BLACK);
+        drivers::vga::text_mode.clear_screen(drivers::vga::Text_Mode_Colors::BLACK);
     }
 
-    void Text_Output::set_text_color(const drivers::vga::VGA_Textmode_Colors& color,
-                                     const drivers::vga::VGA_Textmode_Colors& background,
+    void Text_Output::set_text_color(const drivers::vga::Text_Mode_Colors& color,
+                                     const drivers::vga::Text_Mode_Colors& background,
                                      const bool does_blink) 
                                      noexcept {
-        cursor_color = drivers::vga::texmode.make_color(color, background, does_blink);
+        cursor_color = drivers::vga::text_mode.make_color(color, background, does_blink);
     }
 
     void Text_Output::new_line() noexcept {
         cursor_x = 0;
         cursor_y++;
 
-        if (cursor_y >= drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT) [[unlikely]] {
-            cursor_y = drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT;
+        if (cursor_y >= drivers::vga::TEXT_MODE_SCREEN_HEIGHT) [[unlikely]] {
+            cursor_y = drivers::vga::TEXT_MODE_SCREEN_HEIGHT;
             reset();
         }
     }
@@ -66,7 +68,7 @@ namespace runtime
             }
 
             x++;
-            if (x >= drivers::vga::VGA_TEXMODE_SCREEN_WIDTH) {
+            if (x >= drivers::vga::TEXT_MODE_SCREEN_WIDTH) {
                 needed_lines++;
                 x = null;
             }
@@ -111,16 +113,16 @@ namespace runtime
         case '\b':
             if (cursor_x > null) {
                 cursor_x--;
-                drivers::vga::texmode.put_char_at(' ', cursor_color, cursor_x, cursor_y);
+                drivers::vga::text_mode.put_char_at(' ', cursor_color, cursor_x, cursor_y);
             }
             break;
 
         case '\t':
             for (uint32_t i = null; i < 4; ++i) {
-                drivers::vga::texmode.put_char_at(' ', cursor_color, cursor_x, cursor_y);
+                drivers::vga::text_mode.put_char_at(' ', cursor_color, cursor_x, cursor_y);
                 cursor_x++;
 
-                if (cursor_x >= drivers::vga::VGA_TEXMODE_SCREEN_WIDTH) [[unlikely]]
+                if (cursor_x >= drivers::vga::TEXT_MODE_SCREEN_WIDTH) [[unlikely]]
                     new_line();
             }
             break;
@@ -130,10 +132,10 @@ namespace runtime
             break;
 
         default:
-            drivers::vga::texmode.put_char_at(symbol, cursor_color, cursor_x, cursor_y);
+            drivers::vga::text_mode.put_char_at(symbol, cursor_color, cursor_x, cursor_y);
             cursor_x++;
 
-            if (cursor_x >= drivers::vga::VGA_TEXMODE_SCREEN_WIDTH) [[unlikely]]
+            if (cursor_x >= drivers::vga::TEXT_MODE_SCREEN_WIDTH) [[unlikely]]
                 new_line();
             break;
         }
@@ -141,7 +143,7 @@ namespace runtime
 
     void Text_Output::put_string(const char* message) noexcept {
         const uint32_t needed_lines = calculate_needed_lines(message);
-        const uint32_t remaining = drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT - cursor_y;
+        const uint32_t remaining = drivers::vga::TEXT_MODE_SCREEN_HEIGHT - cursor_y;
         if (needed_lines >= remaining) [[unlikely]]
             reset();
 

@@ -38,23 +38,23 @@ namespace terminal
         draw_user_cursor();
     }
 
-    void Terminal::draw_user_cursor_with_color(const drivers::vga::VGA_Textmode_Colors foreground,
-                                               const drivers::vga::VGA_Textmode_Colors background) 
+    void Terminal::draw_user_cursor_with_color(const drivers::vga::Text_Mode_Colors& foreground,
+                                               const drivers::vga::Text_Mode_Colors& background) 
                                                const noexcept {
         const uint32_t one = 1;
 
         uint32_t x = runtime::text_output.get_cursor_x();
-        if (x >= drivers::vga::VGA_TEXMODE_SCREEN_WIDTH) [[unlikely]]
-            x = drivers::vga::VGA_TEXMODE_SCREEN_WIDTH - one;
+        if (x >= drivers::vga::TEXT_MODE_SCREEN_WIDTH) [[unlikely]]
+            x = drivers::vga::TEXT_MODE_SCREEN_WIDTH - one;
 
         uint32_t y = runtime::text_output.get_cursor_y();
-        if (y >= drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT) [[unlikely]]
-            y = drivers::vga::VGA_TEXMODE_SCREEN_HEIGHT - one;
+        if (y >= drivers::vga::TEXT_MODE_SCREEN_HEIGHT) [[unlikely]]
+            y = drivers::vga::TEXT_MODE_SCREEN_HEIGHT - one;
 
         runtime::text_output.set_text_color(foreground, background);
         
         const uint8_t color = runtime::text_output.get_text_color();
-        drivers::vga::texmode.put_char_at(' ', color, x, y);
+        drivers::vga::text_mode.put_char_at(' ', color, x, y);
     }
 
     void Terminal::step() noexcept {

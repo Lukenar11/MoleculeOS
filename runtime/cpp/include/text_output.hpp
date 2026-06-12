@@ -14,16 +14,18 @@ DESCRIPTION:
     pointer formatting, as well as a lightweight printf implementation 
     and supports setting various text colors.
 
-    The "TextOutput" class manages its own cursor state, 
+    The "Text_Output" class manages its own cursor state, 
     color configuration, and line management, 
     allowing structured and readable output during runtime.
     
 NOTES:
+    Some methods are placed in the header 
+    because they are so small that the compiler can inline them.
 */
 
 #pragma once
 
-#include "drivers/vga/textmode/include/textmode.hpp"
+#include "drivers/vga/textmode/include/text_mode.hpp"
 #include <stdint.h>
 #include <array.hpp>
 
@@ -35,9 +37,9 @@ namespace runtime
         uint32_t cursor_y = 0;
         
         const bool does_blink = false;
-        uint8_t cursor_color = drivers::vga::texmode.make_color(
-            drivers::vga::VGA_Textmode_Colors::LIGHT_GREY, 
-            drivers::vga::VGA_Textmode_Colors::BLACK,
+        uint8_t cursor_color = drivers::vga::text_mode.make_color(
+            drivers::vga::Text_Mode_Colors::LIGHT_GREY, 
+            drivers::vga::Text_Mode_Colors::BLACK,
             does_blink
         );
 
@@ -48,8 +50,8 @@ namespace runtime
             
     public:
         void reset() noexcept;
-        void set_text_color(const drivers::vga::VGA_Textmode_Colors& color,
-                            const drivers::vga::VGA_Textmode_Colors& background,
+        void set_text_color(const drivers::vga::Text_Mode_Colors& color,
+                            const drivers::vga::Text_Mode_Colors& background,
                             const bool does_blink=false) 
                             noexcept;
         

@@ -27,8 +27,8 @@ void isr_common_handler(Register_Dump* reg_dump)
 {
     runtime::text_output.reset();
     runtime::text_output.set_text_color(
-        drivers::vga::VGA_Textmode_Colors::RED,
-        drivers::vga::VGA_Textmode_Colors::BLACK
+        drivers::vga::Text_Mode_Colors::RED,
+        drivers::vga::Text_Mode_Colors::BLACK
     );
     
     const uint32_t n = reg_dump->interrupt_number;
