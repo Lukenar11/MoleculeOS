@@ -56,7 +56,8 @@ namespace kernel::filesystem
         return nullptr;
     }
 
-    Inode* MoleculeOS_File_System::create_file(const char* filename, const char* format) noexcept {
+    Inode* MoleculeOS_File_System::create_file(const char* filename, const char* format) 
+                                               noexcept {
         const uint32_t null = 0;
         const uint32_t one = 1;
         const char null_terminator = '\0';
@@ -107,7 +108,8 @@ namespace kernel::filesystem
 
     bool MoleculeOS_File_System::get_file_content_binary(const Inode* inode, 
                                                          uint8_t* out_buffer,
-                                                         const uint32_t buffer_size) noexcept {
+                                                         const uint32_t buffer_size)
+                                                         noexcept {
         const bool return_false = false;
 
         if (!inode || !inode->in_use) [[unlikely]] 
@@ -122,7 +124,8 @@ namespace kernel::filesystem
 
     bool MoleculeOS_File_System::get_file_content_as_string(const Inode* inode, 
                                                             char* out_buffer,
-                                                            const uint32_t buffer_size) noexcept {
+                                                            const uint32_t buffer_size)
+                                                            noexcept {
         const bool return_false = false;
 
         if (!inode || !inode->in_use) [[unlikely]] 
@@ -204,7 +207,8 @@ namespace kernel::filesystem
 
     bool MoleculeOS_File_System::set_file_content_as_string(Inode* inode,
                                                             const char* in_buffer,
-                                                            const uint32_t length) noexcept {
+                                                            const uint32_t length) 
+                                                            noexcept {
         const bool return_false = false;
 
         if (!inode || !inode->in_use) [[unlikely]]
@@ -217,6 +221,57 @@ namespace kernel::filesystem
         inode->size = length;
 
         return true;
+    }
+
+    bool MoleculeOS_File_System::write_file_binary_at(Inode* inode,
+                                                      const uint8_t* in_buffer,
+                                                      const uint32_t buffer_size,
+                                                      const uint32_t offset,
+                                                      const uint32_t length) noexcept {
+        const bool return_false = false;
+
+        if (!inode || !inode->in_use) [[unlikely]]
+            return return_false;
+
+        if (offset > inode->size) [[unlikely]]
+            return return_false;
+
+        if (offset + length > inode->size) [[unlikely]]
+            return return_false;
+
+        if (buffer_size < length) [[unlikely]]
+            return return_false;
+
+        memcpy((inode->data + offset), in_buffer, length);
+
+        const uint32_t new_size = offset + length;
+        if (new_size > inode->size)
+            inode->size = new_size;
+
+        return true;
+    }
+
+    bool MoleculeOS_File_System::write_file_string_at(Inode* inode,
+                                                      const char* in_buffer,
+                                                      const uint32_t buffer_size,
+                                                      const uint32_t offset,
+                                                      const uint32_t length) noexcept {
+        const bool return_false = false;
+
+        if (!inode || !inode->in_use) [[unlikely]]
+            return return_false;
+
+        if (offset + length > MAX_FILE_SIZE) [[unlikely]]
+            return return_false;
+
+        if (buffer_size < length) [[unlikely]]
+            return return_false;
+
+        memcpy(inode->data + offset, in_buffer, length);
+
+        const uint32_t new_size = offset + length;
+        if (new_size > inode->size)
+            inode->size = new_size;
     }
 
     MoleculeOS_File_System mofs;
