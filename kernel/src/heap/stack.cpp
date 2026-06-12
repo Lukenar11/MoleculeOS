@@ -5,7 +5,7 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This class defines the entire system heap using a linear-area allocator.
+    This class defines the entire system heap using a stack allocator.
 
     The allocator uses linker-defined symbols ("heap_start" and "heap_end")
     to determine the valid heap area and moves a single pointer with each allocation
@@ -14,14 +14,17 @@ DESCRIPTION:
 NOTES:
     Always use "mark()" before allocating memory 
     so that you can free the memory again using (rewind).
+
+    Some methods are placed in the header 
+    because they are so small that the compiler can inline them.
 */
 
-#include "heap/linear_area.hpp"
+#include "heap/stack.hpp"
 
 namespace kernel::heap 
 {
     [[nodiscard]]
-    void* Linear_Area::allocate(uintptr_t allocated_bytes) {
+    void* Stack::allocate(uintptr_t allocated_bytes) {
         const uint32_t one = 1;
         const uintptr_t alignment = 8;
 
@@ -39,7 +42,7 @@ namespace kernel::heap
         return result;
     }
 
-    void Linear_Area::rewind(const uintptr_t marker) noexcept {
+    void Stack::rewind(const uintptr_t marker) noexcept {
         static const char* invalid_heap_rewind_panic_message = "Invalid heap rewind";
 
         if ((marker < start) || (marker > current) || (marker > end)) [[unlikely]]
@@ -59,5 +62,5 @@ namespace kernel::heap
     }
     
     // GLOBAL Heap object
-    Linear_Area linear_area;
+    Stack stack;
 } // namespace kernel::heap
