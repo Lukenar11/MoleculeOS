@@ -26,8 +26,6 @@ NOTES:
 #include "system/panic.hpp"
 #include <stdint.h>
 
-#include "tests/kernel/file_system.hpp"
-
 void remap_pic() noexcept 
 {
     struct PIC_Mapping {
@@ -40,10 +38,10 @@ void remap_pic() noexcept
         { .port=0x00A0, .value=0x11 },  // init slave IPC
         { .port=0x0021, .value=0x20 },  // set master interrupt vector offsets
         { .port=0x00A1, .value=0x28 },  // set slave interrupt vector offsets
-        { .port=0x0021, .value=0x04 },  // Tell master where the slave is connected
-        { .port=0x00A1, .value=0x02 },  // Tell slave its cascade identity
-        { .port=0x0021, .value=0x01 },  // Set master 8086/88 mode
-        { .port=0x00A1, .value=0x01 }   // Set slave 8086/88 mode
+        { .port=0x0021, .value=0x04 },  // tell master where the slave is connected
+        { .port=0x00A1, .value=0x02 },  // tell slave its cascade identity
+        { .port=0x0021, .value=0x01 },  // set master 8086/88 mode
+        { .port=0x00A1, .value=0x01 }   // set slave 8086/88 mode
     };
 
     for (const auto& entry : pic_mappings) [[likely]]
@@ -57,9 +55,6 @@ void kernel_main()
 
     remap_pic();
     kernel_system_enable_interrupts();
-
-    test_write_file_read_file_binary();
-    kernel_system_hang();
 
     // schedul MoleculeOS
     terminal::Terminal terminal;

@@ -14,6 +14,9 @@ NOTES:
 
     One method are placed in the header 
     because they are so small that the compiler can inline them.
+
+    Some functions are placed in the header 
+    because they are so small that the compiler can inline them.
 */
 
 #pragma once
@@ -23,6 +26,54 @@ NOTES:
 #include <array.hpp>
 #include <string.h>
 #include <stdint.h>
+
+namespace
+{
+    inline constexpr bool inode_not_available(const kernel::filesystem::Inode* inode) noexcept {
+        return !inode || !inode->in_use; 
+    }
+
+    inline constexpr bool less_then(const uint32_t a, const uint32_t b) noexcept { 
+        return a < b; 
+    }
+
+    inline constexpr bool greader_then(const uint32_t a, const uint32_t b) noexcept { 
+        return a > b; 
+    }
+
+    inline constexpr bool read_file_at_guard(const kernel::filesystem::Inode* inode,
+                                             const uint32_t offset, 
+                                             const uint32_t length) noexcept {
+        const bool ret_true = true;
+        if (inode_not_available(inode)) return ret_true;
+        if (greader_then(offset, inode->size)) return ret_true;
+        if (greader_then((offset + length), inode->size)) return ret_true;
+
+        return false;
+    }
+
+    inline constexpr bool write_fill_at_guard(const kernel::filesystem::Inode* inode,
+                                              const uint32_t offset,
+                                              const uint32_t length, 
+                                              const uint32_t buffer_size) noexcept {
+        const bool ret_true = true;
+        if (inode_not_available(inode)) return ret_true;
+        if (greader_then(offset, inode->size)) return ret_true;
+        if (greader_then((offset + length), inode->size)) return ret_true;
+        if (less_then(buffer_size, length)) return ret_true;
+
+        return false;
+    }
+
+    inline constexpr bool set_file_content_guard(const kernel::filesystem::Inode* inode, 
+                                                 const uint32_t length) noexcept {
+        const bool ret_true = true;
+        if (inode_not_available(inode)) return ret_true;
+        if (greader_then(length, kernel::filesystem::MAX_FILE_SIZE)) return ret_true;
+
+        return false;
+    }
+}
 
 namespace kernel::filesystem
 {
@@ -82,7 +133,8 @@ namespace kernel::filesystem
                                   const uint32_t offset,
                                   const uint32_t length) noexcept;
 
-        inline const runtime::Array<Inode, MAX_FILES_PER_DIRECTORY>& get_inodes() const noexcept {
+        inline const runtime::Array<Inode, MAX_FILES_PER_DIRECTORY>& get_inodes() 
+        const noexcept {
             return inodes;
         }
 

@@ -24,7 +24,7 @@ TARGET = -target i386-pc-none-elf
 
 COMMON_FLAGS = $(TARGET) \
 	-I. \
-	-m32 \
+	-march=i386 -m32 \
 	-ffreestanding -fno-builtin \
 	-fno-stack-protector \
 	-fno-rtti -fno-exceptions \

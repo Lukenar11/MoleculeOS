@@ -14,6 +14,9 @@ NOTES:
 
     One method are placed in the header 
     because they are so small that the compiler can inline them.
+
+    Some functions are placed in the header 
+    because they are so small that the compiler can inline them.
 */
 
 #include "filesystem/mofs.hpp"
@@ -34,23 +37,19 @@ namespace kernel::filesystem
     }
 
     void MoleculeOS_File_System::recalculate_file_size(Inode* inode) noexcept {
-        const uint32_t null = 0;
         const uint32_t one = 1;
+        const uint32_t null = 0;
 
-        if (!inode || !inode->in_use)
+        if (inode_not_available(inode)) [[unlikely]]
             return;
-    
-        if (inode->size == null) {
-            inode->size = null;
-            return;
-        }
 
-        int32_t i = static_cast<int32_t>(inode->size) - static_cast<int32_t>(one);
-        for (; i >= null; i--) [[likely]]
+        int32_t i = static_cast<int32_t>(MAX_FILE_SIZE) - one;
+        for (; i >= null; --i)
             if (inode->data[i] != null) {
                 inode->size = static_cast<uint32_t>(i + one);
                 return;
             }
+
         inode->size = null;
     }
 
@@ -134,13 +133,8 @@ namespace kernel::filesystem
                                                          uint8_t* out_buffer,
                                                          const uint32_t buffer_size)
                                                          noexcept {
-        const bool return_false = false;
-
-        if (!inode || !inode->in_use) [[unlikely]] 
-            return return_false;
-
-        if (buffer_size < inode->size) [[unlikely]] 
-            return return_false;
+        if (inode_not_available(inode)) [[unlikely]] return false;
+        if (less_then(buffer_size, inode->size)) [[unlikely]] return false;
 
         memcpy(out_buffer, inode->data, inode->size);
         return true;
@@ -150,13 +144,8 @@ namespace kernel::filesystem
                                                             char* out_buffer,
                                                             const uint32_t buffer_size)
                                                             noexcept {
-        const bool return_false = false;
-
-        if (!inode || !inode->in_use) [[unlikely]] 
-            return return_false;
-
-        if (buffer_size < (inode->size + 1)) [[unlikely]] 
-            return return_false;
+        if (inode_not_available(inode)) [[unlikely]] return false;
+        if (less_then(buffer_size, inode->size + 1)) [[unlikely]] return false;
 
         memcpy(out_buffer, inode->data, inode->size);
         out_buffer[inode->size] = '\0';
@@ -169,19 +158,11 @@ namespace kernel::filesystem
                                                      const uint32_t buffer_size,
                                                      const uint32_t offset,
                                                      const uint32_t length) noexcept {
-        const bool return_false = false;
+        if (read_file_at_guard(inode, offset, length)) [[unlikely]] 
+            return false;
 
-        if (!inode || !inode->in_use) [[unlikely]]
-            return return_false;
-
-        if (offset > inode->size) [[unlikely]]
-            return return_false;
-
-        if ((offset + length) > inode->size) [[unlikely]]
-            return return_false;
-
-        if (buffer_size < length) [[unlikely]]
-            return return_false;
+        if (less_then(buffer_size, length)) [[unlikely]] 
+            return false;
 
         memcpy(out_buffer, (inode->data + offset), length);
         return true;
@@ -192,19 +173,11 @@ namespace kernel::filesystem
                                                         const uint32_t buffer_size, 
                                                         const uint32_t offset, 
                                                         const uint32_t length) noexcept {
-        const bool return_false = false;
+        if (read_file_at_guard(inode, offset, length)) [[unlikely]] 
+            return false;
 
-        if (!inode || !inode->in_use) [[unlikely]]
-            return return_false;
-
-        if (offset > inode->size) [[unlikely]]
-            return return_false;
-
-        if ((offset + length) > inode->size) [[unlikely]]
-            return return_false;
-
-        if (buffer_size < (length + 1)) [[unlikely]]
-            return return_false;
+        if (less_then(buffer_size, (length + 1))) [[unlikely]] 
+            return false;
 
         memcpy(out_buffer, (inode->data + offset), length);
         out_buffer[length] = '\0';
@@ -215,13 +188,8 @@ namespace kernel::filesystem
     bool MoleculeOS_File_System::set_file_content_binary(Inode* inode,
                                                          const uint8_t* in_buffer,
                                                          const uint32_t length) noexcept {
-        const bool return_false = false;
-
-        if (!inode || !inode->in_use) [[unlikely]]
-            return return_false;
-
-        if (length > MAX_FILE_SIZE) [[unlikely]]
-            return return_false;
+        if (set_file_content_guard(inode, length)) [[unlikely]]
+            return false;
 
         memcpy(inode->data, in_buffer, length);
         recalculate_file_size(inode);
@@ -233,13 +201,8 @@ namespace kernel::filesystem
                                                             const char* in_buffer,
                                                             const uint32_t length) 
                                                             noexcept {
-        const bool return_false = false;
-
-        if (!inode || !inode->in_use) [[unlikely]]
-            return return_false;
-
-        if (length > MAX_FILE_SIZE) [[unlikely]]
-            return return_false;
+        if (set_file_content_guard(inode, length)) [[unlikely]]
+            return false;
 
         memcpy(inode->data, in_buffer, length);
         recalculate_file_size(inode);
@@ -252,19 +215,8 @@ namespace kernel::filesystem
                                                       const uint32_t buffer_size,
                                                       const uint32_t offset,
                                                       const uint32_t length) noexcept {
-        const bool return_false = false;
-
-        if (!inode || !inode->in_use) [[unlikely]]
-            return return_false;
-
-        if (offset > inode->size) [[unlikely]]
-            return return_false;
-
-        if (offset + length > inode->size) [[unlikely]]
-            return return_false;
-
-        if (buffer_size < length) [[unlikely]]
-            return return_false;
+        if (write_fill_at_guard(inode, offset, length, buffer_size)) [[unlikely]]
+            return false;
 
         memcpy((inode->data + offset), in_buffer, length);
         recalculate_file_size(inode);
@@ -277,19 +229,8 @@ namespace kernel::filesystem
                                                       const uint32_t buffer_size,
                                                       const uint32_t offset,
                                                       const uint32_t length) noexcept {
-        const bool return_false = false;
-
-        if (!inode || !inode->in_use) [[unlikely]]
-            return return_false;
-
-        if (offset > inode->size) [[unlikely]]
-            return return_false;
-
-        if (offset + length > inode->size) [[unlikely]]
-            return return_false;
-
-        if (buffer_size < length) [[unlikely]]
-            return return_false;
+        if (write_fill_at_guard(inode, offset, length, buffer_size)) [[unlikely]]
+            return false;
 
         memcpy((inode->data + offset), in_buffer, length);
         recalculate_file_size(inode);
