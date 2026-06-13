@@ -5,18 +5,14 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This defines the built-in shell commands that are available in MoleculeOS. 
-    Each command is implemented as a function
-    that performs a specific action.
-
-    These commands are called by the shell interpreter via a
-    compile-time generated command list that maps hashed command strings 
-    to their corresponding handlers.
+    This file contains includes for the internal implementations 
+    of all terminal commands available in MoleculeOS.
+    
+    The commands can be called by the shell interpreter from a table generated at compile time, 
+    where each entry contains a specific hash 
+    and a function call to the command's internal implementation.
 
 NOTES:
-    Some shell command implementations are intentionally 
-    only implemented in the header, 
-    as they are quite small, so that the compiler can inline them.
 */
 
 #include "commands/commands.hpp"
