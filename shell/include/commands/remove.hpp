@@ -8,6 +8,8 @@ DESCRIPTION:
     This file contains the internal implementation of 
     one of the terminal commands available in MoleculeOS.
 
+    This command deletes a specific file.
+
     The commands can be called by the shell interpreter from a table generated at compile time, 
     where each entry contains a specific hash 
     and a function call to the command's internal implementation.
