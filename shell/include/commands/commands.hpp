@@ -23,18 +23,16 @@ NOTES:
 
 #include "kernel/include/system/reboot.hpp"
 #include "kernel/include/system/shutdown.hpp"
-#include "kernel/include/filesystem/mofs.hpp"
-#include "commands/utils/helpers.hpp"
 #include <text_output.hpp>
-#include <stdint.h>
-#include <array.hpp>
-#include <string.h>
+#include "create.hpp"
+#include "echo.hpp"
+#include "help.hpp"
+#include "info.hpp"
+#include "list.hpp"
+#include "remove.hpp"
 
 namespace shell::commands
 {
-    void help() noexcept;
-    void info() noexcept;
-
     inline void clear() noexcept { 
         runtime::text_output.reset(); 
     }
@@ -46,9 +44,4 @@ namespace shell::commands
     inline void shutdown() noexcept { 
         kernel::system::shutdown(); 
     }
-
-    void echo(const runtime::Array<char, 64>& arguments) noexcept;
-    void create(const runtime::Array<char, 64>& arguments) noexcept;
-    void list() noexcept;
-    void remove(const runtime::Array<char, 64>& arguments) noexcept;
 } // namespace shell::commands

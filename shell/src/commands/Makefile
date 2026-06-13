@@ -5,7 +5,13 @@
 # 
 
 OBJS += \
-	$(BUILD)/commands.o
+	$(BUILD)/commands.o \
+	$(BUILD)/create.o \
+	$(BUILD)/echo.o \
+	$(BUILD)/help.o \
+	$(BUILD)/info.o \
+	$(BUILD)/list.o \
+	$(BUILD)/remove.o
 
 $(BUILD)/%.o: shell/src/commands/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
