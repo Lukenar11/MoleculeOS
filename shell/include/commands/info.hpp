@@ -1,8 +1,6 @@
 #pragma once
 
-#include "utils/helpers.hpp"
-#include "kernel/include/filesystem/mofs.hpp"
-#include <stdint.h>
+#include <text_output.hpp>
 
 namespace shell::commands
 {

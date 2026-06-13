@@ -1,10 +1,10 @@
 #pragma once
 
-#include "utils/helpers.hpp"
-#include "kernel/include/filesystem/mofs.hpp"
 #include <text_output.hpp>
 
 namespace shell::commands
 {
-    void list() noexcept;
+    inline void clear() noexcept { 
+        runtime::text_output.reset(); 
+    }
 } // namespace shell::commands

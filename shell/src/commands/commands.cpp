@@ -20,8 +20,3 @@ NOTES:
 */
 
 #include "commands/commands.hpp"
-
-namespace shell::commands
-{
-
-} // namespace shell::commands

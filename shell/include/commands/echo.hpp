@@ -2,7 +2,8 @@
 
 #include "utils/helpers.hpp"
 #include "kernel/include/filesystem/mofs.hpp"
-#include <stdint.h>
+#include <array.hpp>
+#include <text_output.hpp>
 
 namespace shell::commands
 {
