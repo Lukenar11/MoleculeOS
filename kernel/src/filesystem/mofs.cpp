@@ -85,7 +85,8 @@ namespace kernel::filesystem
         const uint32_t one = 1;
         const char null_terminator = '\0';
 
-        if (!filename || (filename[null] == null_terminator)) [[unlikely]] return nullptr;
+        if (!filename || (filename[null] == null_terminator)) [[unlikely]] 
+            return nullptr;
 
         for (uint32_t i = null; filename[i] != '\0'; i++) [[likely]]
             if (!is_valid_file_name_or_formant_char(filename[i]))

@@ -78,7 +78,7 @@ void strcpy(char* dest_ptr, const char* src_ptr)
     while ((*dest_ptr++ = *src_ptr++));
 }
 
-uint32_t strlen(char *string) 
+uint32_t strlen(const char *string) 
 {
     uint32_t length = 0;
     while (*string != '\0') {
@@ -111,4 +111,13 @@ int32_t strcmp(const char* a_ptr, const char* b_ptr)
     }
 
     return (uint8_t)*a_ptr - (uint8_t)*b_ptr;
+}
+
+const char* strchr(const char* string, int symbol) 
+{
+    while (*string != (char)symbol)
+        if (!*string++)
+            return (char*)0;
+
+    return (char*)string;
 }

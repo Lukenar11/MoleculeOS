@@ -20,8 +20,8 @@ NOTES:
 #pragma once
 
 #include "utils/helpers.hpp"
-#include "kernel/include/filesystem/mofs.hpp"
 #include <array.hpp>
+#include <string.h>
 #include <text_output.hpp>
 
 namespace shell::commands

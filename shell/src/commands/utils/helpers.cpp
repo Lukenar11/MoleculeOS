@@ -21,11 +21,11 @@ namespace shell::commands
         const char null_terminator = '\0';
         const uint32_t null = 0;
 
-        static Parsed_File_Name parsed;
+        static Parsed_File_Name parsed_filename;
 
-        parsed.name.fill(null_terminator);
-        parsed.format.fill(null_terminator);
-        parsed.error.fill(null_terminator);
+        parsed_filename.name.fill(null_terminator);
+        parsed_filename.format.fill(null_terminator);
+        parsed_filename.error.fill(null_terminator);
 
         uint32_t file_name_index = null;
         uint32_t file_format_index = null;
@@ -33,9 +33,9 @@ namespace shell::commands
 
         if (arguments[null] == null_terminator) [[unlikely]] {
             static const char* error_message = "missing argument";
-            strcpy(parsed.error.data(), error_message);
+            strcpy(parsed_filename.error.data(), error_message);
 
-            return parsed;
+            return parsed_filename;
         }
     
         for (uint32_t i = null; arguments[i] != null_terminator; i++) [[likely]] {
@@ -47,45 +47,45 @@ namespace shell::commands
             if (arguments[i] == null_terminator) [[unlikely]]
                 break;
 
-            if ((is_file_name && !append_char(parsed.name, file_name_index, arguments[i])) || 
+            if ((is_file_name && !append_char(parsed_filename.name, file_name_index, arguments[i])) || 
                 (file_name_index >= kernel::filesystem::MAX_FILENAME_LENGTH)) [[unlikely]] {
                 static const char* error_message = "filename too long";
-                strcpy(parsed.error.data(), error_message);
+                strcpy(parsed_filename.error.data(), error_message);
 
-                return parsed;
+                return parsed_filename;
             }
             
-            if (!(is_file_name || append_char(parsed.format, file_format_index, arguments[i])) || 
+            if (!(is_file_name || append_char(parsed_filename.format, file_format_index, arguments[i])) || 
                 (file_format_index >= kernel::filesystem::MAX_FILE_FORMAT_NAME_LENGTH)) [[unlikely]] {
                 static const char* error_message = "format too long";
-                strcpy(parsed.error.data(), error_message);
+                strcpy(parsed_filename.error.data(), error_message);
 
-                return parsed;
+                return parsed_filename;
             }
         }
 
         const uint32_t one = 1;
-        parsed.name[file_name_index + one] = null_terminator;
-        parsed.format[file_format_index + one] = null_terminator;
+        parsed_filename.name[file_name_index + one] = null_terminator;
+        parsed_filename.format[file_format_index + one] = null_terminator;
     
-        for (uint32_t i = null; parsed.name[i] != '\0'; i++) [[likely]]
-            if (!kernel::filesystem::mofs.is_valid_file_name_or_formant_char(parsed.name[i])
+        for (uint32_t i = null; parsed_filename.name[i] != '\0'; i++) [[likely]]
+            if (!kernel::filesystem::mofs.is_valid_file_name_or_formant_char(parsed_filename.name[i])
                ) [[unlikely]] {
                 static const char* error_message = "not a valid File Name";
-                strcpy(parsed.error.data(), error_message);
+                strcpy(parsed_filename.error.data(), error_message);
 
-                return parsed;
+                return parsed_filename;
             }
 
-        for (uint32_t i = null; parsed.format[i] != '\0'; i++) [[likely]]
-            if (!kernel::filesystem::mofs.is_valid_file_name_or_formant_char(parsed.format[i])
+        for (uint32_t i = null; parsed_filename.format[i] != '\0'; i++) [[likely]]
+            if (!kernel::filesystem::mofs.is_valid_file_name_or_formant_char(parsed_filename.format[i])
                ) [[unlikely]] {
                 static const char* error_message = "not a valid File Format";
-                strcpy(parsed.error.data(), error_message);
+                strcpy(parsed_filename.error.data(), error_message);
 
-                return parsed;
+                return parsed_filename;
             }
 
-        return parsed;
+        return parsed_filename;
     }
 } // namespace shell::commands
