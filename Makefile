@@ -41,7 +41,7 @@ ASMFLAGS = -f elf32
 
 LDFLAGS  = -T $(LINKER) -m elf_i386 -nostdlib -static
 
-include iso/boot/Makefile
+include arch/i386/iso/boot/Makefile
 include drivers/Makefile
 include runtime/Makefile
 include kernel/Makefile
@@ -63,7 +63,7 @@ $(KERNEL): $(OBJS)
 iso: $(KERNEL)
 	mkdir -p $(ISO)/boot/grub
 	cp $(KERNEL) $(ISO_KERNEL)
-	cp iso/boot/grub/grub.cfg $(ISO)/boot/grub/grub.cfg
+	cp arch/i386/iso/boot/grub/grub.cfg $(ISO)/boot/grub/grub.cfg
 	grub-mkrescue -o $(ISO_OUT) $(ISO)
 
 run: iso
