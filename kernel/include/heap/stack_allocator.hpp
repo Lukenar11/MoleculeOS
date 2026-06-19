@@ -26,7 +26,7 @@ NOTES:
 
 namespace kernel::heap 
 {
-    class Stack final {
+    class Stack_Allocator final {
     private:
         const uintptr_t start = reinterpret_cast<uintptr_t>(&heap_start);
         const uintptr_t end = reinterpret_cast<uintptr_t>(&heap_end);
@@ -43,10 +43,10 @@ namespace kernel::heap
         [[nodiscard]] inline uintptr_t used() const noexcept { return current - start; }
         [[nodiscard]] inline uintptr_t remaining() const noexcept { return end - current; }
 
-        inline Stack() noexcept { current = start; }
-        ~Stack() noexcept = default;
+        inline Stack_Allocator() noexcept { current = start; }
+        ~Stack_Allocator() noexcept = default;
     };
 
     // GLOBAL Heap object
-    extern Stack stack;
+    extern Stack_Allocator stack;
 } // namespace kernel::heap

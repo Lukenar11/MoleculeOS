@@ -24,7 +24,7 @@ NOTES:
 namespace kernel::heap 
 {
     [[nodiscard]]
-    void* Stack::allocate(uintptr_t allocated_bytes) {
+    void* Stack_Allocator::allocate(uintptr_t allocated_bytes) {
         const uint32_t one = 1;
         const uintptr_t alignment = 8;
 
@@ -42,7 +42,7 @@ namespace kernel::heap
         return result;
     }
 
-    void Stack::rewind(const uintptr_t marker) noexcept {
+    void Stack_Allocator::rewind(const uintptr_t marker) noexcept {
         static const char* invalid_heap_rewind_panic_message = "Invalid heap rewind";
 
         if ((marker < start) || (marker > current) || (marker > end)) [[unlikely]]
@@ -62,5 +62,5 @@ namespace kernel::heap
     }
     
     // GLOBAL Heap object
-    Stack stack;
+    Stack_Allocator stack;
 } // namespace kernel::heap
