@@ -22,7 +22,7 @@ NOTES:
 
 #pragma once
 
-#include "utils/exception_names.h"
+#include "utils/exception_names.hpp"
 #include "kernel/include/utils/register_dump.h"
 #include "system/hang.hpp"
 #include <text_output.hpp>
@@ -34,5 +34,8 @@ static inline constexpr void print_reg_dump(const char* label,
     runtime::text_output.put_hex(value);
 }
 
-extern "C"
-void isr_common_handler(Register_Dump* reg_dump);
+namespace kernel::isr
+{
+    extern "C"
+    void isr_common_handler(Register_Dump* reg_dump);
+} // namespace kernel::isr

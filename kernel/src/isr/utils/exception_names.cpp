@@ -9,9 +9,6 @@ DESCRIPTION:
     meaningful diagnostic messages during exception reporting.
 
 NOTES:
-    I had to implement the table in C instead of C++ because 
-    my own "array" implementation doesn't allow "char*" and 
-    I don't have a data type for strings.
 */
 
-#include "isr/utils/exception_names.h"
+#include "isr/utils/exception_names.hpp"

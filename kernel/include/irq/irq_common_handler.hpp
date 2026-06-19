@@ -22,5 +22,8 @@ NOTES:
 #include "kernel/include/utils/register_dump.h"
 #include <port_io.h>
 
-extern "C"
-void irq_common_handler(Register_Dump* reg_dump);
+namespace kernel::irq
+{
+    extern "C"
+    void irq_common_handler(Register_Dump* reg_dump) noexcept;
+} // namespace kernel::irq

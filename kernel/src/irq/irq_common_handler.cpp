@@ -19,21 +19,23 @@ NOTES:
 
 #include "irq/irq_common_handler.hpp"
 
-extern "C"
-void irq_common_handler(Register_Dump* reg_dump)
+namespace kernel::irq
 {
-    const uint8_t interrupt_vector = reg_dump->interrupt_number;
-    const uint8_t eoi = 0x20;
-
-    const uint8_t min_interrupt_vector = 0x28;
-    const uint8_t max_interrupt_vector = 0x2F;
-
-    if ((interrupt_vector >= min_interrupt_vector) && 
-        (interrupt_vector <= max_interrupt_vector)) [[likely]] {
-        const uint16_t slave_pic_command_port = 0xA0;
-        outb(slave_pic_command_port, eoi);
+    extern "C"
+    void irq_common_handler(Register_Dump* reg_dump) noexcept {
+        const uint8_t interrupt_vector = reg_dump->interrupt_number;
+        const uint8_t eoi = 0x20;
+    
+        const uint8_t min_interrupt_vector = 0x28;
+        const uint8_t max_interrupt_vector = 0x2F;
+    
+        if ((interrupt_vector >= min_interrupt_vector) && 
+            (interrupt_vector <= max_interrupt_vector)) [[likely]] {
+            const uint16_t slave_pic_command_port = 0xA0;
+            outb(slave_pic_command_port, eoi);
+        }
+    
+        const uint16_t master_pic_command_port = 0x20;
+        outb(master_pic_command_port, eoi);
     }
-
-    const uint16_t master_pic_command_port = 0x20;
-    outb(master_pic_command_port, eoi);
-}
+} // namespace kernel::irq
