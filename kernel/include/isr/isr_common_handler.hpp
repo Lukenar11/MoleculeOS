@@ -23,7 +23,7 @@ NOTES:
 #pragma once
 
 #include "utils/exception_names.hpp"
-#include "kernel/include/utils/register_dump.h"
+#include "kernel/include/utils/register_dump.hpp"
 #include "system/hang.hpp"
 #include <text_output.hpp>
 

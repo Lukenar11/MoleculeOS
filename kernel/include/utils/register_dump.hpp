@@ -10,14 +10,25 @@ DESCRIPTION:
     transferring control to the C-level handlers.
 
 NOTES:
+    This structure is marked as packed ("__attribute__((packed));") 
+    to prevent the compiler from inserting padding bytes. 
+    
     The layout of this structure must match the stack layout created by
     the assembly routines, including segment registers, general-purpose
     registers, and exception metadata.
-
-    This header is written in C rather than C++ to ensure maximum compatibility,
-    as Assembly provides a C interface, but not a C++ interface.
 */
 
-#include "utils/register_dump.h"
+#pragma once
 
-static_assert(sizeof(Register_Dump) == 17 * 4, "RegisterDump size mismatch!");
+#include <stdint.h>
+
+namespace kernel
+{
+    extern "C"
+    struct Register_Dump {
+        uint32_t ds = 0, es = 0, fs = 0, gs = 0;
+        uint32_t edi = 0, esi = 0, ebp = 0, ebx = 0, edx = 0, ecx = 0, eax = 0;
+        uint32_t interrupt_number = 0, error_code = 0;
+        uint32_t eip = 0, cs = 0, eflags = 0;
+    } __attribute__((packed));
+} // namespace kernel
