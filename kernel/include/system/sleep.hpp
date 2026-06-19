@@ -12,22 +12,12 @@ DESCRIPTION:
 
 NOTES:
     The internal implementation is located in "kernel_system_sleep.asm".
-
-    This header is written in C rather than C++ to ensure maximum compatibility,
-    as Assembly provides a C interface, but not a C++ interface.
 */
 
-#ifndef KERNEL_SYSTEM_SLEEP_H
-#define KERNEL_SYSTEM_SLEEP_H
+#pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void kernel_system_sleep(void);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif // KERNEL_SYSTEM_SLEEP_H
+namespace kernel::system
+{
+    extern "C" 
+    void sleep();
+} // namespace kernel::system

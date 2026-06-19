@@ -11,15 +11,14 @@
 ;     ensuring that the CPU remains in a safe, non-executing state.
 ;
 ; NOTES:
-;     The C interface is a header file called "kernel_system_hang.h"
+;     The interface is a header file called "hang.hpp"
 ;
 
-global kernel_system_hang
+global hang
 
 section .text
 
-; void kernel_system_hang(void)
-kernel_system_hang:
+hang:
 .hang:
     cli
     hlt

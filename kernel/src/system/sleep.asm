@@ -11,14 +11,14 @@
 ;     to stop the CPU until an interrupt occurs.
 ;
 ; NOTES:
-;     The C interface is a header file called "kernel_system_sleep.h"
+;     The interface is a header file called "sleep.hpp"
 ;
 
-global kernel_system_sleep
+global sleep
 
 section .text
 
-; void kernel_system_sleep(void)
-kernel_system_sleep:
+; void sleep()
+sleep:
     hlt
     ret

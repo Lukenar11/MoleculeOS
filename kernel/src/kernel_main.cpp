@@ -20,51 +20,52 @@ NOTES:
 */
 
 #include "idt/idt.hpp"
-#include "system/kernel_system_enable_interrupts.h"
+#include "system/enable_interrupts.hpp"
 #include "terminal.hpp"
-#include "system/kernel_system_sleep.h"
+#include "system/sleep.hpp"
 #include "system/panic.hpp"
 #include <stdint.h>
 
-void remap_pic() noexcept 
+namespace kernel
 {
-    struct PIC_Mapping {
-        uint16_t port = 0;
-        uint8_t value = 0;
-    };
+    void remap_pic() noexcept {
+        struct PIC_Mapping {
+            uint16_t port = 0;
+            uint8_t value = 0;
+        };
 
-    const PIC_Mapping pic_mappings[] = {
-        { .port=0x0020, .value=0x11 },  // init master IPC
-        { .port=0x00A0, .value=0x11 },  // init slave IPC
-        { .port=0x0021, .value=0x20 },  // set master interrupt vector offsets
-        { .port=0x00A1, .value=0x28 },  // set slave interrupt vector offsets
-        { .port=0x0021, .value=0x04 },  // tell master where the slave is connected
-        { .port=0x00A1, .value=0x02 },  // tell slave its cascade identity
-        { .port=0x0021, .value=0x01 },  // set master 8086/88 mode
-        { .port=0x00A1, .value=0x01 }   // set slave 8086/88 mode
-    };
+        const PIC_Mapping pic_mappings[] = {
+            { .port=0x0020, .value=0x11 },  // init master IPC
+            { .port=0x00A0, .value=0x11 },  // init slave IPC
+            { .port=0x0021, .value=0x20 },  // set master interrupt vector offsets
+            { .port=0x00A1, .value=0x28 },  // set slave interrupt vector offsets
+            { .port=0x0021, .value=0x04 },  // tell master where the slave is connected
+            { .port=0x00A1, .value=0x02 },  // tell slave its cascade identity
+            { .port=0x0021, .value=0x01 },  // set master 8086/88 mode
+            { .port=0x00A1, .value=0x01 }   // set slave 8086/88 mode
+        };
 
-    for (const auto& entry : pic_mappings) [[likely]]
-        outb(entry.port, entry.value);
-}
-
-extern "C"
-void kernel_main() 
-{
-    static kernel::idt::IDT idt;
-
-    remap_pic();
-    kernel_system_enable_interrupts();
-
-    // schedul MoleculeOS
-    terminal::Terminal terminal;
-    while (true) {
-        kernel_system_sleep();
-        terminal.step();
+        for (const auto& entry : pic_mappings) [[likely]]
+            outb(entry.port, entry.value);
     }
 
-    kernel::system::panic(
-        "Unexpected return from the \"kernel_main\" scheduler main loop",
-        "This should never happen.\nPlease report this to the developer."
-    );
+    extern "C" [[noreturn]] 
+    void kernel_main() noexcept {
+        static kernel::idt::IDT idt;
+
+        remap_pic();
+        system::enable_interrupts();
+
+        // schedul MoleculeOS
+        terminal::Terminal terminal;
+        while (true) {
+            system::sleep();
+            terminal.step();
+        }
+
+        system::panic(
+            "Unexpected return from the \"kernel_main\" scheduler main loop",
+            "This should never happen.\nPlease report this to the developer."
+        );
+    }
 }

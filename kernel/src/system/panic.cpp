@@ -39,6 +39,6 @@ namespace kernel::system
         runtime::text_output.put_string(troubleshooting_message);
         runtime::text_output.put_string("\n\n>>>>>>>>>> SYSTEM HALTED <<<<<<<<<<\n");
 
-        kernel_system_hang();
+        system::hang();
     }
 }

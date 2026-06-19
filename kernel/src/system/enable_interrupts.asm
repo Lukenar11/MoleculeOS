@@ -9,14 +9,13 @@
 ;     The routine uses the i386 instruction "sti" to disable interrupts.
 ;
 ; NOTES:
-;     The C interface is a header file called "kernel_system_enable_interrupts.h"
+;     The interface is a header file called "enable_interrupts.hpp"
 ;
 
-global kernel_system_enable_interrupts
+global enable_interrupts
 
 section .text
 
-; void kernel_system_enable_interrupts(void)
-kernel_system_enable_interrupts:
+enable_interrupts:
     sti
     ret

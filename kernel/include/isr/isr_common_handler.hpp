@@ -24,7 +24,7 @@ NOTES:
 
 #include "utils/exception_names.h"
 #include "kernel/include/utils/register_dump.h"
-#include "system/kernel_system_hang.h"
+#include "system/hang.hpp"
 #include <text_output.hpp>
 
 static inline constexpr void print_reg_dump(const char* label, 
