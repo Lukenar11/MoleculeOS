@@ -27,6 +27,7 @@
                 "${workspaceFolder}/arch/i386/kernel/include/idt",
                 "${workspaceFolder}/arch/i386/kernel/include/irq",
                 "${workspaceFolder}/arch/i386/kernel/include/isr",
+                "${workspaceFolder}/arch/i386/kernel/include/system",
                 "${workspaceFolder}/drivers/ps2/keyboardin/include",
                 "${workspaceFolder}/drivers/ps2/keyboardin/include/utils",
                 "${workspaceFolder}/drivers/vga/textmode/include",

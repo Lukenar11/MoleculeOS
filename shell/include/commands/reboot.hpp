@@ -21,7 +21,7 @@ NOTES:
 
 #pragma once
 
-#include "kernel/include/system/reboot.hpp"
+#include "arch/i386/kernel/include/system/reboot.hpp"
 
 namespace shell::commands
 {

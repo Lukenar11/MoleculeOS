@@ -21,7 +21,7 @@ NOTES:
 
 #pragma once
 
-#include "kernel/include/system/shutdown.hpp"
+#include "arch/i386/kernel/include/system/shutdown.hpp"
 
 namespace shell::commands
 {

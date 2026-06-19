@@ -5,13 +5,7 @@
 # 
 
 OBJS += \
-	$(BUILD)/cpu_flags.o \
 	$(BUILD)/panic.o \
-	$(BUILD)/reboot.o \
-	$(BUILD)/shutdown.o \
-	$(BUILD)/enable_interrupts.o \
-	$(BUILD)/sleep.o \
-	$(BUILD)/hang.o \
 
 $(BUILD)/%.o: kernel/src/system/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

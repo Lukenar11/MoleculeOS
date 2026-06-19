@@ -16,7 +16,7 @@ NOTES:
 
 #pragma once
 
-#include "system/hang.hpp"
+#include "arch/i386/kernel/include/system/hang.hpp"
 #include <text_output.hpp>
 
 namespace kernel::system

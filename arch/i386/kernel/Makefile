@@ -10,6 +10,7 @@ COMMON_FLAGS += \
 include arch/i386/kernel/src/idt/Makefile
 include arch/i386/kernel/src/irq/Makefile
 include arch/i386/kernel/src/isr/Makefile
+include arch/i386/kernel/src/system/Makefile
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
