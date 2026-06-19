@@ -9,8 +9,8 @@ OBJS += \
 	$(BUILD)/isr_common_stub.o \
 	$(BUILD)/isr.o
 
-$(BUILD)/%.o: kernel/src/isr/%.cpp
+$(BUILD)/%.o: arch/i386/kernel/src/isr/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(BUILD)/%.o: kernel/src/isr/%.asm
+$(BUILD)/%.o: arch/i386/kernel/src/isr/%.asm
 	nasm $(ASMFLAGS) $< -o $@
