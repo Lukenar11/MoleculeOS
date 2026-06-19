@@ -6,7 +6,7 @@ LICENSE:
 
 DESCRIPTION:
     This file contains all meta-informations and 
-    the inode structireabout the file system.
+    the inode structure about the file system.
 
 NOTES:
     Eatch inode represents a file with meta infos,
