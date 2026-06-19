@@ -52,6 +52,5 @@ namespace kernel::isr
         void isr_29();      // Reserved (unused)
         void isr_30();      // Reserved (unused)
         void isr_31();      // Reserved (unused)
-        void isr_0x69();    // Syscall Interrupt (int 0x69)
     }
 } // namespace kernel::isr

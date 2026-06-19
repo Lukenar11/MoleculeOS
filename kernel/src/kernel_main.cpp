@@ -51,7 +51,7 @@ namespace kernel
 
     extern "C" [[noreturn]] 
     void kernel_main() noexcept {
-        static kernel::idt::IDT idt;
+        static idt::Interrupt_Descriptor_Table idt;
 
         remap_pic();
         system::enable_interrupts();

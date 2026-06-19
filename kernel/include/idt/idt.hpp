@@ -30,7 +30,7 @@ NOTES:
 
 namespace kernel::idt 
 {
-    class IDT final {
+    class Interrupt_Descriptor_Table final {
     private:
         static constexpr uint8_t CODE_SEGMENT_SELECTOR = 0x08;
         static constexpr uint8_t FLAGS = 0x8E;
@@ -41,10 +41,10 @@ namespace kernel::idt
         void set_gate(const uint8_t index, void (*handler)()) noexcept;
 
     public:
-        IDT() noexcept;
-        ~IDT() noexcept = default;
+        Interrupt_Descriptor_Table() noexcept;
+        ~Interrupt_Descriptor_Table() noexcept = default;
     };
 
     // GLOBAL Idt-Object
-    extern IDT idt;
+    extern Interrupt_Descriptor_Table idt;
 } // namespace kernel::idt

@@ -22,7 +22,7 @@ NOTES:
 
 namespace kernel::idt 
 {
-    void IDT::set_gate(const uint8_t index, void (*handler)()) noexcept {
+    void Interrupt_Descriptor_Table::set_gate(const uint8_t index, void (*handler)()) noexcept {
         if (index >= idt.size()) [[unlikely]]
             system::panic("IDT index out of range", "Check \"idt_init_table\"");
         
@@ -37,7 +37,7 @@ namespace kernel::idt
         idt_entry.flags = FLAGS;
     }
 
-    IDT::IDT() noexcept {
+    Interrupt_Descriptor_Table::Interrupt_Descriptor_Table() noexcept {
         idt_ptr.limit = (sizeof(IDT_Entry) * idt.size()) - 1;
         idt_ptr.base = reinterpret_cast<uint32_t>(idt.begin());
 

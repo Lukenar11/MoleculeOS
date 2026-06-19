@@ -41,7 +41,6 @@ namespace kernel::idt
         {20, isr::isr_20}, {21, isr::isr_21}, {22, isr::isr_22}, {23, isr::isr_23}, 
         {24, isr::isr_24}, {25, isr::isr_25}, {26, isr::isr_26}, {27, isr::isr_27}, 
         {28, isr::isr_28}, {29, isr::isr_29}, {30, isr::isr_30}, {31, isr::isr_31},
-        {0x69, isr::isr_0x69},
         {32, irq::irq_0 }, {33, irq::irq_1 }, {34, irq::irq_2 }, {35, irq::irq_3 }, 
         {36, irq::irq_4 }, {37, irq::irq_5 }, {38, irq::irq_6 }, {39, irq::irq_7 }, 
         {40, irq::irq_8 }, {41, irq::irq_9 }, {42, irq::irq_10}, {43, irq::irq_11}, 
