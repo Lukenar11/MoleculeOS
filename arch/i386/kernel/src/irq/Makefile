@@ -9,8 +9,8 @@ OBJS += \
 	$(BUILD)/irq_common_stub.o \
 	$(BUILD)/irq.o
 
-$(BUILD)/%.o: kernel/src/irq/%.cpp
+$(BUILD)/%.o: arch/i386/kernel/src/irq/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(BUILD)/%.o: kernel/src/irq/%.asm
+$(BUILD)/%.o: arch/i386/kernel/src/irq/%.asm
 	nasm $(ASMFLAGS) $< -o $@

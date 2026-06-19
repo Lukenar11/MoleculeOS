@@ -8,6 +8,7 @@ COMMON_FLAGS += \
 	-Iarch/i386/kernel/include
 
 include arch/i386/kernel/src/idt/Makefile
+include arch/i386/kernel/src/irq/Makefile
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
