@@ -18,7 +18,6 @@ global sleep
 
 section .text
 
-; void sleep()
 sleep:
     hlt
     ret

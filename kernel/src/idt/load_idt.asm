@@ -11,14 +11,13 @@
 ;     which tells the CPU where the IDT is located and that it should be loaded.
 ;
 ; NOTES:
-;     The C interface is a header file called "load_idt.h".
+;     The interface is a header file called "load_idt.hpp".
 ;
 
 global load_idt
 
 section .text
 
-; void load_idt(uintptr_t)
 load_idt:
     mov eax, [esp+4]    ; uintptr_t
     lidt [eax]

@@ -38,18 +38,15 @@ namespace kernel::idt
     }
 
     IDT::IDT() noexcept {
-        // fill IDT-Descriptor
         idt_ptr.limit = (sizeof(IDT_Entry) * idt.size()) - 1;
-        idt_ptr.base = reinterpret_cast<uintptr_t>(idt.begin());
+        idt_ptr.base = reinterpret_cast<uint32_t>(idt.begin());
 
-        // clear table
         for (auto& idt_entry : idt) [[likely]]
             idt_entry = IDT_Entry{};
 
-        // build IDT
         for (const auto& idt_entry : idt_init_table) [[likely]]
             set_gate(idt_entry.index, idt_entry.handler);
 
-        load_idt(reinterpret_cast<uintptr_t>(&idt_ptr));
+        load_idt(reinterpret_cast<uint32_t>(&idt_ptr));
     }
 } // namespace kernel::idt

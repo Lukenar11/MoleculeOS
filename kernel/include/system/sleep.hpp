@@ -11,7 +11,7 @@ DESCRIPTION:
     to stop the CPU until an interrupt occurs.
 
 NOTES:
-    The internal implementation is located in "kernel_system_sleep.asm".
+    The internal implementation is located in "sleep.asm".
 */
 
 #pragma once

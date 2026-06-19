@@ -57,7 +57,7 @@ namespace kernel
         system::enable_interrupts();
 
         // schedul MoleculeOS
-        terminal::Terminal terminal;
+        static terminal::Terminal terminal;
         while (true) {
             system::sleep();
             terminal.step();

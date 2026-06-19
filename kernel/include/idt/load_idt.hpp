@@ -12,25 +12,14 @@ DESCRIPTION:
 
 NOTES:
 	The internal implementation is located in "load_idt.asm".
-    
-    This header is written in C rather than C++
-    to ensure maximum compatibility, 
-    as Assembly provides a C interface, but not a C++ interface.
 */
 
-#ifndef LOAD_IDT_H
-#define LOAD_IDT_H
+#pragma once
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-void load_idt(uintptr_t);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif // LOAD_IDT_H
+namespace kernel::idt
+{
+    extern "C"
+    void load_idt(uint32_t);
+} // namespace kernel::idt
