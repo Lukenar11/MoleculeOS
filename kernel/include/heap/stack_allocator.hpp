@@ -20,7 +20,7 @@ NOTES:
 
 #pragma once
 
-#include "utils/heap_pos_marker.h"
+#include "utils/heap_pos_marker.hpp"
 #include "system/panic.hpp"
 #include <stdint.h>
 
@@ -28,8 +28,8 @@ namespace kernel::heap
 {
     class Stack_Allocator final {
     private:
-        const uintptr_t start = reinterpret_cast<uintptr_t>(&heap_start);
-        const uintptr_t end = reinterpret_cast<uintptr_t>(&heap_end);
+        uintptr_t start;
+        uintptr_t end;
         
         uintptr_t current;
     
@@ -43,7 +43,12 @@ namespace kernel::heap
         [[nodiscard]] inline uintptr_t used() const noexcept { return current - start; }
         [[nodiscard]] inline uintptr_t remaining() const noexcept { return end - current; }
 
-        inline Stack_Allocator() noexcept { current = start; }
+        inline Stack_Allocator(const uint8_t memory_pool_begin, 
+                               const uint8_t memory_pool_end) noexcept {
+            start = reinterpret_cast<uintptr_t>(&memory_pool_begin);
+            end = reinterpret_cast<uintptr_t>(&memory_pool_end);
+            current = start; 
+        }
         ~Stack_Allocator() noexcept = default;
     };
 

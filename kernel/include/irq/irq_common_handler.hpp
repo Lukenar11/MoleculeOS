@@ -25,5 +25,5 @@ NOTES:
 namespace kernel::irq
 {
     extern "C"
-    void irq_common_handler(Register_Dump* reg_dump) noexcept;
+    void irq_common_handler(Register_Dump* reg_dump);
 } // namespace kernel::irq

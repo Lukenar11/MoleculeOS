@@ -62,5 +62,5 @@ namespace kernel::heap
     }
     
     // GLOBAL Heap object
-    Stack_Allocator stack;
+    Stack_Allocator stack(heap_start, heap_end);
 } // namespace kernel::heap

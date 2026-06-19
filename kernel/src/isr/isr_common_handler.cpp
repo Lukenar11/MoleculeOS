@@ -24,8 +24,8 @@ NOTES:
 
 namespace kernel::isr
 {
-    extern "C" 
-    void isr_common_handler(Register_Dump* reg_dump)  {
+    extern "C"
+    void isr_common_handler(Register_Dump* reg_dump) {
         runtime::text_output.reset();
         runtime::text_output.set_text_color(
             drivers::vga::Text_Mode_Colors::RED,
@@ -68,7 +68,7 @@ namespace kernel::isr
         print_reg_dump("\n  ES: ", reg_dump->es);
         print_reg_dump("\n  FS: ", reg_dump->fs);
         print_reg_dump("\n  GS: ", reg_dump->gs);
-    
-        kernel::system::hang();
+
+        system::hang();
     }
 } // namespace kernel::isr

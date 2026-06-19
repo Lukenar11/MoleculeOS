@@ -14,10 +14,16 @@ DESCRIPTION:
 NOTES:
     The internal definitions of "heap_start" and "heap_end" are located
     in the linker script (linker.ld).
-
-    This file is written in C rather than C++
-    to ensure maximum compatibility,
-    as linker symbols expose a C interface, but not a C++ interface.
 */
 
-#include "utils/heap_pos_marker.h"
+#pragma once
+
+#include <stdint.h>
+
+namespace kernel::heap
+{
+    extern "C" { 
+        extern uint8_t heap_start;
+        extern uint8_t heap_end;
+    }
+} // namespace kernel::heap

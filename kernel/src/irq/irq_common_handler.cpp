@@ -22,7 +22,7 @@ NOTES:
 namespace kernel::irq
 {
     extern "C"
-    void irq_common_handler(Register_Dump* reg_dump) noexcept {
+    void irq_common_handler(Register_Dump* reg_dump) {
         const uint8_t interrupt_vector = reg_dump->interrupt_number;
         const uint8_t eoi = 0x20;
     

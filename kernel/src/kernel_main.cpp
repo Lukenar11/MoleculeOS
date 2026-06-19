@@ -49,7 +49,7 @@ namespace kernel
             outb(entry.port, entry.value);
     }
 
-    extern "C" [[noreturn]] 
+    extern "C"
     void kernel_main() noexcept {
         static idt::Interrupt_Descriptor_Table idt;
 

@@ -1,7 +1,7 @@
 #ifndef IDT_ERRORS_H
 #define IDT_ERRORS_H
 
-#include <Runtime/C/stdint.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
