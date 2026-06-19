@@ -24,6 +24,7 @@
                 "${workspaceFolder}/kernel/include/idt",
                 "${workspaceFolder}/runtime/c/include",
                 "${workspaceFolder}/runtime/cpp/include",
+                "${workspaceFolder}/arch/i386/runtime/include",
                 "${workspaceFolder}/drivers/ps2/keyboardin/include",
                 "${workspaceFolder}/drivers/ps2/keyboardin/include/utils",
                 "${workspaceFolder}/drivers/vga/textmode/include",
