@@ -4,9 +4,6 @@
 # https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 # 
 
-COMMON_FLAGS += \
-	-Iarch/i386/runtime/include \
-
 OBJS += \
 	$(BUILD)/port_io.o \
 
