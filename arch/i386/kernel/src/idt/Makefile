@@ -8,8 +8,8 @@ OBJS += \
 	$(BUILD)/idt.o \
 	$(BUILD)/load_idt.o
 
-$(BUILD)/%.o: kernel/src/idt/%.cpp
+$(BUILD)/%.o: arch/i386/kernel/src/idt/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(BUILD)/%.o: kernel/src/idt/%.asm
+$(BUILD)/%.o: arch/i386/kernel/src/idt/%.asm
 	nasm $(ASMFLAGS) $< -o $@

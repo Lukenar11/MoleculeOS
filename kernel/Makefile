@@ -9,7 +9,6 @@ COMMON_FLAGS += \
 
 include kernel/src/filesystem/Makefile
 include kernel/src/heap/Makefile
-include kernel/src/idt/Makefile
 include kernel/src/irq/Makefile
 include kernel/src/isr/Makefile
 include kernel/src/system/Makefile
