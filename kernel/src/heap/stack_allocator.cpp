@@ -19,7 +19,7 @@ NOTES:
     because they are so small that the compiler can inline them.
 */
 
-#include "heap/stack.hpp"
+#include "heap/stack_allocator.hpp"
 
 namespace kernel::heap 
 {
