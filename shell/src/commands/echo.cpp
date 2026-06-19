@@ -46,6 +46,42 @@ namespace
         return file_instream;
     }
 
+    auto& extract_filename_after_input_redirect(const char* redict_operator_pos,
+                                                const runtime::Array<char,64>& arguments)
+                                                noexcept {
+        const char null_char = '\0';
+        const char space_char = ' ';
+        const uint32_t null = 0;
+
+        static runtime::Array<char,64> filename;
+        filename.fill(null_char);
+
+        if (!redict_operator_pos) [[unlikely]]
+            return filename;
+
+        uint32_t i = (redict_operator_pos - arguments.begin()) + 1;
+
+        while (arguments[i] == space_char) [[likely]]
+            i++;
+
+        if (arguments[i] == null_char) [[unlikely]] {
+            shell::commands::print_command_error("echo: missing filename\n");
+            return filename;
+        }
+
+        uint32_t j = null;
+        for (; i < arguments.size(); i++) [[likely]] {
+            char argument = arguments[i];
+            if ((argument == space_char) || (argument == null_char))
+                break;
+        
+            filename[j++] = argument;
+        }
+
+        filename[j] = null_char;
+        return filename;
+    }
+
     auto& extract_text_after_redict_operator(const char* redict_operator_pos, 
                                              const runtime::Array<char, 64>& arguments)
                                              noexcept {
@@ -117,6 +153,60 @@ namespace
     }
 }
 
+void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
+    const char null_char = '\0';
+    const char* command_name = "echo: ";
+
+    static runtime::Array<char, kernel::filesystem::MAX_FILE_SIZE> buffer;
+    buffer.fill(null_char);
+
+    static shell::commands::Parsed_File_Name parsed_filename;
+    parsed_filename.name.fill(null_char);
+    parsed_filename.format.fill(null_char);
+    parsed_filename.error.fill(null_char);
+
+    parsed_filename = shell::commands::parse_filename(filename);
+    if (parsed_filename.error[0] != null_char) [[unlikely]] {
+        shell::commands::print_command_error(command_name);
+        shell::commands::print_command_error(parsed_filename.error.data());
+
+        return;
+    }
+
+    auto* inode = kernel::filesystem::mofs.get_inode_by_name_and_format(
+        parsed_filename.name.data(),
+        parsed_filename.format.data()
+    );
+    if (!inode) [[unlikely]] {
+        shell::commands::print_command_error(command_name);
+        shell::commands::print_command_error("file not found\n");
+
+        return;
+    }
+
+    const uint32_t needed_size = inode->size + 1;
+    if (needed_size > buffer.size()) [[unlikely]] {
+        shell::commands::print_command_error(command_name);
+        shell::commands::print_command_error("file too large\n");
+
+        return;
+    }
+
+    if (!kernel::filesystem::mofs.get_file_content_as_string(
+            inode,
+            buffer.data(),
+            needed_size
+        )) [[unlikely]] {
+        shell::commands::print_command_error(command_name);
+        shell::commands::print_command_error("could not read file\n");
+
+        return;
+    }
+
+    for (uint32_t i = 0; buffer[i] != '\0'; i++) [[likely]]
+        runtime::text_output.put_char(buffer[i]);
+}
+
 namespace shell::commands
 {
     void echo(const runtime::Array<char, 64>& arguments) noexcept {
@@ -127,34 +217,56 @@ namespace shell::commands
             return;
         }
 
-        static runtime::Array<char, 64> file_instream;
+        static runtime::Array<char, 64> file_stream;
         static runtime::Array<char, 64> filename;
         const char null_char = '\0';
 
-        const char* first_redict_operator_pos = strchr(arguments.begin(), '>');
-        if (first_redict_operator_pos != nullptr) {
-            const char* second = strchr(first_redict_operator_pos + 1, '>');
-            if (second != nullptr) [[unlikely]] {
+        const char* file_outstrem_redict_operator_pos = strchr(arguments.begin(), '<');
+        if (file_outstrem_redict_operator_pos != nullptr) [[unlikely]] {
+        
+            if (strchr(file_outstrem_redict_operator_pos + 1, '<') != nullptr) [[unlikely]] {
+                print_command_error("echo: multiple redirect operators\n");
+                command_end();
+                return;
+            }
+        
+            filename = extract_filename_after_input_redirect(
+                file_outstrem_redict_operator_pos,
+                arguments
+            );
+        
+            handle_file_outstream(filename);
+        
+            filename.fill(null_char);
+            file_stream.fill(null_char);
+        
+            command_end();
+            return;
+        }
+
+        const char* file_intstrem_redict_operator_pos = strchr(arguments.begin(), '>');
+        if (file_intstrem_redict_operator_pos != nullptr) {
+            if (strchr(file_intstrem_redict_operator_pos + 1, '>') != nullptr) [[unlikely]] {
                 print_command_error("echo: multiple redirect operators\n");
 
                 command_end();
                 return;
             }
             
-            file_instream = extract_file_instream_befor_redict_operator(
-                first_redict_operator_pos, 
+            file_stream = extract_file_instream_befor_redict_operator(
+                file_intstrem_redict_operator_pos, 
                 arguments
             );
 
             filename = extract_text_after_redict_operator(
-                first_redict_operator_pos, 
+                file_intstrem_redict_operator_pos, 
                 arguments
             );
 
-            handle_file_instream(filename, file_instream);
+            handle_file_instream(filename, file_stream);
 
             filename.fill(null_char);
-            file_instream.fill(null_char);
+            file_stream.fill(null_char);
 
             command_end();
             return;
