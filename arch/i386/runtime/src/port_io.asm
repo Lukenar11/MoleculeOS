@@ -13,7 +13,7 @@
 ;     controller, PIC, PIT, and VGA hardware.
 ; 
 ; NOTES:
-;     The C interface is a header file called "halt.asm"
+;     The interface is a header file called "halt.asm"
 ;
 
 global byte_input
