@@ -20,8 +20,8 @@ NOTES:
 
 #pragma once
 
-#include "isr/isr.h"
-#include "irq/irq.h"
+#include "isr/isr.hpp"
+#include "irq/irq.hpp"
 #include <stdint.h>
 #include <stddef.h>
 
