@@ -28,7 +28,7 @@ namespace kernel
         };
 
         for (const auto& entry : pic_mappings) [[likely]]
-            outb(entry.port, entry.value);
+            runtime::byte_output(entry.port, entry.value);
     }
 
     void init_kernel() noexcept {

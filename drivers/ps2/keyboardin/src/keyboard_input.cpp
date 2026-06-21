@@ -25,10 +25,10 @@ namespace drivers::ps2
     char Keyboard_Input::get_key() noexcept {
         const char null_terminator = '\0';
 
-        if (!(inb(KEYBOARD_STATUS_PORT) & LOWEST_BIT))
+        if (!(runtime::byte_input(KEYBOARD_STATUS_PORT) & LOWEST_BIT))
             return null_terminator;
     
-        const uint8_t scancode = inb(KEYBOARD_DATA_PORT);
+        const uint8_t scancode = runtime::byte_input(KEYBOARD_DATA_PORT);
     
         switch (scancode) {
         case static_cast<uint8_t>(Special_Keyboard_Keys::LEFT_SHIFT):

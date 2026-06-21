@@ -22,7 +22,7 @@ NOTES:
 #include "cpu_flags.hpp"
 #include <stdint.h>
 #include <array.hpp>
-#include <port_io.h>
+#include <port_io.hpp>
 
 namespace
 {

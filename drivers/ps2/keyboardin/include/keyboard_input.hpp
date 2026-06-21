@@ -22,7 +22,7 @@ NOTES:
 
 #include "utils/helpers.hpp"
 #include <stdint.h>
-#include <port_io.h>
+#include <port_io.hpp>
 
 namespace drivers::ps2 
 {
@@ -39,7 +39,7 @@ namespace drivers::ps2
 
     public:
         inline bool has_pending_scancode() const noexcept {
-            return inb(KEYBOARD_STATUS_PORT) & LOWEST_BIT;
+            return runtime::byte_input(KEYBOARD_STATUS_PORT) & LOWEST_BIT;
         }
 
         char get_key() noexcept;

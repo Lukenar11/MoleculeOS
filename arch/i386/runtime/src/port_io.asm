@@ -16,34 +16,30 @@
 ;     The C interface is a header file called "halt.asm"
 ;
 
-global inb
-global outb
-global inw
-global outw
+global byte_input
+global word_input
+global byte_output
+global word_output
 
 section .text
 
-; uint8_t inb(uint16_t port)
-inb:
+byte_input:
     mov dx, [esp+4] ; port
     in al, dx       ; uint8_t
     ret
 
-; void outb(uint16_t port, uint8_t value);
-outb:
+word_input:
+    mov dx, [esp+4] ; port
+    in ax, dx       ; uint16_t
+    ret
+
+byte_output:
     mov dx, [esp+4] ; port
     mov al, [esp+8] ; value
     out dx, al
     ret
 
-; uint16_t inw(uint16_t port)
-inw:
-    mov dx, [esp+4] ; port
-    in ax, dx       ; uint16_t
-    ret
-
-; void outw(uint16_t port, uint16_t value)
-outw:
+word_output:
     mov dx, [esp+4] ; port
     mov ax, [esp+8] ; value
     out dx, ax

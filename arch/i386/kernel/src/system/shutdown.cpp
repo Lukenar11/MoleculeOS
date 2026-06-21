@@ -25,9 +25,9 @@ namespace kernel::system
         for (const auto& entry : emulator_specific_shutdown_command_mappings) [[likely]] {
             if (entry.is_8bit_mode) [[unlikely]] {
                 const uint8_t value = entry.value & 0xFF;
-                outb(entry.port, value);
+                runtime::byte_output(entry.port, value);
             } else [[likely]] {
-                outw(entry.port, entry.value);
+                runtime::word_output(entry.port, entry.value);
             }
 
             restore_eflags(cpu_flags);

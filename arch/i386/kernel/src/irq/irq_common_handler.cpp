@@ -32,10 +32,10 @@ namespace kernel::irq
         if ((interrupt_vector >= min_interrupt_vector) && 
             (interrupt_vector <= max_interrupt_vector)) [[likely]] {
             const uint16_t slave_pic_command_port = 0xA0;
-            outb(slave_pic_command_port, eoi);
+            runtime::byte_output(slave_pic_command_port, eoi);
         }
     
         const uint16_t master_pic_command_port = 0x20;
-        outb(master_pic_command_port, eoi);
+        runtime::byte_output(master_pic_command_port, eoi);
     }
 } // namespace kernel::irq
