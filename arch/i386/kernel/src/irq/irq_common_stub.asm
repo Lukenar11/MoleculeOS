@@ -20,13 +20,10 @@
 ;
 
 global irq_common_stub
-
 extern irq_common_handler
 
 section .text
-    
 irq_common_stub:
-    ; save general purpose register
     push eax
     push ecx
     push edx
@@ -35,7 +32,6 @@ irq_common_stub:
     push esi
     push edi
 
-    ; save segmentregister
     push gs
     push fs
     push es
@@ -53,13 +49,11 @@ irq_common_stub:
     call irq_common_handler
     add esp, 4
 
-    ; reset segmentregister
     pop ds
     pop es
     pop fs
     pop gs
 
-    ; reset general purpose register
     pop edi
     pop esi
     pop ebp

@@ -6,7 +6,8 @@ LICENSE:
 
 DESCRIPTION:
     This is the kernel reboot routine, which triggers a
-    hardware reset by issuing the appropriate command to the keyboard controller (i8042).
+    hardware reset by issuing the appropriate command to the 
+    keyboard controller (i8042).
 
 NOTES:
 */

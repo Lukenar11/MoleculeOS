@@ -66,11 +66,20 @@ namespace runtime
             
         void put_ptr(const uintptr_t value) noexcept;
 
-        inline constexpr uint32_t get_cursor_x() const noexcept { return cursor_x; }
-        inline constexpr uint32_t get_cursor_y() const noexcept { return cursor_y; }
-        inline constexpr uint8_t get_text_color() const noexcept { return cursor_color; }
+        inline constexpr uint32_t get_cursor_x() const noexcept { 
+            return cursor_x; 
+        }
 
-        inline constexpr void set_cursor(const uint32_t x, const uint32_t y) noexcept {
+        inline constexpr uint32_t get_cursor_y() const noexcept { 
+            return cursor_y; 
+        }
+
+        inline constexpr uint8_t get_text_color() const noexcept { 
+            return cursor_color; 
+        }
+
+        inline constexpr void set_cursor(const uint32_t x, 
+                                         const uint32_t y) noexcept {
             cursor_x = x;
             cursor_y = y;
         }
@@ -79,6 +88,5 @@ namespace runtime
         ~Text_Output() noexcept = default;
     };
 
-    // GLOBAL Screen-Output objekt
     extern Text_Output text_output;
 } // namespace runtime

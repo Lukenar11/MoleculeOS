@@ -8,8 +8,8 @@ DESCRIPTION:
     This is the main shell class that provides the
     high-quality command interface for interacting with the kernel.
 
-    The shell reads keyboard input, forwards characters to the command interpreter, 
-    and manages the execution flow of user commands.
+    The shell reads keyboard input, forwards characters to the 
+    command interpreter, and manages the execution flow of user commands.
     
     The shell acts as a central, 
     user-visible system element that coordinates input processing, 
@@ -26,7 +26,8 @@ NOTES:
 
     Since "draw_user_cursor" and "erase_user_cursor" are quite simple, 
     I only declared them in the header so that the compiler can inline them, 
-    because the compiler can see and optimize headers more easily than source files.
+    because the 
+    compiler can see and optimize headers more easily than source files.
 */
 
 #pragma once

@@ -5,7 +5,8 @@
 ;     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 ; 
 ; DESCRIPTION:
-;     This file implements the "Global Descriptor Table" (GDT) used by the kernel
+;     This file implements the "Global Descriptor Table" (GDT) 
+;     used by the kernel
 ;     and provides the "load_gdt" routine for loading it into the CPU.
 ;    
 ;     The routine installs the GDT via the "lgdt" instruction, reloads all
@@ -32,7 +33,6 @@ gdt_descriptor:
     dd gdt_start
 
 section .text
-
 load_gdt:
     lgdt [gdt_descriptor]
 

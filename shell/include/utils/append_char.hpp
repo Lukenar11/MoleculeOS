@@ -7,7 +7,8 @@ LICENSE:
 DESCRIPTION:
     This helper function takes an array, an index, and a value, 
     and replaces the array element at the specified index with the passed value; 
-    it also returns a boolean indicating whether the operation was successful or not.
+    it also returns a boolean indicating whether the 
+    operation was successful or not.
     
 NOTES:
     Since this function is fairly small, 

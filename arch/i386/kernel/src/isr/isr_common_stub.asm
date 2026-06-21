@@ -19,14 +19,11 @@
 ;     the pushed interrupt number and error code, and returns using "iretd".
 ;
 
+extern isr_common_handler
 global isr_common_stub
 
-extern isr_common_handler
-
 section .text
-    
 isr_common_stub:
-    ; save general purpose register
     push eax
     push ecx
     push edx
@@ -35,7 +32,6 @@ isr_common_stub:
     push esi
     push edi
 
-    ; save segmentregister
     push gs
     push fs
     push es
@@ -53,13 +49,11 @@ isr_common_stub:
     call isr_common_handler
     add esp, 4
 
-    ; reset segmentregister
     pop ds
     pop es
     pop fs
     pop gs
 
-    ; reset general purpose register
     pop edi
     pop esi
     pop ebp
@@ -72,4 +66,3 @@ isr_common_stub:
     add esp, 8
 
     iretd
-    

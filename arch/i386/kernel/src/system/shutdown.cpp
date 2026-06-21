@@ -13,7 +13,8 @@ NOTES:
     which is why the shutdown routine is emulator-specific 
     or works on real hardware but is extremely complex to implement.
 
-    This routine is emulator-specific and only works on QEMU, Bochs and VirtualBox.
+    This routine is emulator-specific and only works on 
+    QEMU, Bochs and VirtualBox.
 */
 
 #include "system/shutdown.hpp"

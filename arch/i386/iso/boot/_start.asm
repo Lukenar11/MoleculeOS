@@ -14,20 +14,19 @@
 ;     the C++ high-level entry point "kernel_main".
 ;
 ; NOTES:
-;     The internal implementation of "kernel_stack_top" is located in "kernel_stack.asm".
+;     The internal implementation of "kernel_stack_top" 
+;     is located in "kernel_stack.asm".
 ;     The internal implementation of "load_gdt" is located in "gdt.asm".
 ;
-
-global _start
 
 extern kernel_main
 extern kernel_stack_top
 extern load_gdt
+global _start
 
 %define STACK_ALIGN_16_MASK 0xFFFFFFF0
 
 section .text
-
 _start:
     cli
 

@@ -17,9 +17,8 @@
 global hang
 
 section .text
-
 hang:
-.hang:
+.halt_loop:
     cli
     hlt
-    jmp .hang
+    jmp .halt_loop

@@ -9,8 +9,8 @@ DESCRIPTION:
     that are used by the shell command implementations.
 
 NOTES:
-    Since some functions are quite small, 
-    they are intentionally placed in the header so that the compiler can inline them more easily.
+    Since some functions are quite small, they are intentionally placed in the
+    header so that the compiler can inline them more easily.
 */
 
 #pragma once
@@ -50,5 +50,6 @@ namespace shell::commands
         runtime::Array<char, 32> error;
     };
 
-    Parsed_File_Name& parse_filename(const runtime::Array<char, 64>& arguments) noexcept;
+    Parsed_File_Name& parse_filename(const runtime::Array<char, 64>& arguments)
+                                     noexcept;
 } // namespace shell::commands

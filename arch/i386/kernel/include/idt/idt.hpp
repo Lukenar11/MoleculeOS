@@ -45,6 +45,5 @@ namespace kernel::idt
         ~Interrupt_Descriptor_Table() noexcept = default;
     };
 
-    // GLOBAL Idt-Object
     extern Interrupt_Descriptor_Table idt;
 } // namespace kernel::idt

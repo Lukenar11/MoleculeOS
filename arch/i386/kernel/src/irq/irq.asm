@@ -12,22 +12,19 @@
 ;     The C interface is a header file called "irq.h".
 ;
 
+extern irq_common_handler
+extern irq_common_stub
 global irq_0, irq_1, irq_2, irq_3, irq_4, irq_5, irq_6, irq_7, \
        irq_8, irq_9, irq_10, irq_11, irq_12, irq_13, irq_14, irq_15
 
-extern irq_common_handler
-extern irq_common_stub
-
 section .text
-    
-%macro IRQ 2
-    irq_%1:
-        ; Interrupts off
-        cli
 
-        push dword 0    ; error code
-        push dword %2   ; interrupt number
-        jmp irq_common_stub
+%macro IRQ 2
+irq_%1:
+    cli
+    push dword 0    ; error code
+    push dword %2   ; interrupt number
+    jmp irq_common_stub
 %endmacro
 
 IRQ 0, 32   ; (irq_0) Timer Interrupt

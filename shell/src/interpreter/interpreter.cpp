@@ -9,7 +9,8 @@ DESCRIPTION:
             
     The interpreter receives raw keyboard input, 
     tokenizes the input string, separates command and arguments,
-    and dispatches the appropriate handler based on a compile‑time hash lookup table.
+    and dispatches the 
+    appropriate handler based on a compile‑time hash lookup table.
     
 NOTES:
     The "make_hash" function and the "shell_command_table" 
@@ -26,7 +27,8 @@ NOTES:
 namespace shell::interpreter
 {
     void Interpreter::print_overflow_error(const char* error_message_for, 
-                                           const uint32_t max_buffer_size) const noexcept {
+                                           const uint32_t max_buffer_size) 
+                                           const noexcept {
         static const char* error_messages[] = {
             "SHELL ERROR:\n\t",
             " overflow. Max size: ",

@@ -10,13 +10,14 @@ DESCRIPTION:
 
     This command restarts the system.
 
-    The commands can be called by the shell interpreter from a table generated at compile time, 
-    where each entry contains a specific hash 
-    and a function call to the command's internal implementation.
+    The commands can be called by the 
+    shell interpreter from a table generated at compile time, 
+    where each entry contains a specific hash and a function call to the 
+    command's internal implementation.
 
 NOTES:
-    Since this function is so small, 
-    it is intentionally placed in the header so that the compiler can execute it inline.
+    Since this function is so small, it is intentionally placed in the 
+    header so that the compiler can execute it inline.
 */
 
 #pragma once

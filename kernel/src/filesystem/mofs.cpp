@@ -6,11 +6,13 @@ LICENSE:
 
 DESCRIPTION:
     This file contains the internal implementation of the file system.
-    The file system is a flat, inode-based, custom file system residing directly in RAM.
+    The file system is a flat, inode-based, 
+    custom file system residing directly in RAM.
 
 NOTES:
     Since the file system resides directly in RAM, 
-    all files—along with their contents—are deleted upon shutting down or restarting the system.
+    all files—along with their contents—are deleted upon shutting down or 
+    restarting the system.
 
     One method are placed in the header 
     because they are so small that the compiler can inline them.
@@ -32,7 +34,11 @@ namespace kernel::filesystem
                 return &inode;
             }
 
-        system::panic("MOFS: no free inodes available", "dont create to mutch files");
+        system::panic(
+            "MOFS: no free inodes available", 
+            "dont create to mutch files"
+        );
+
         return nullptr;
     }
 
@@ -53,7 +59,7 @@ namespace kernel::filesystem
         inode->size = null;
     }
 
-    bool MoleculeOS_File_System::is_valid_file_name_or_formant_char(const char symbol) 
+    bool MoleculeOS_File_System::is_valid_file_name_or_formant_char(const char symbol)
                                                                     const noexcept {
         if (((symbol >= 'A') && (symbol <= 'Z')) ||
             ((symbol >= 'a') && (symbol <= 'z')) ||
@@ -158,7 +164,8 @@ namespace kernel::filesystem
                                                      uint8_t* out_buffer,
                                                      const uint32_t buffer_size,
                                                      const uint32_t offset,
-                                                     const uint32_t length) noexcept {
+                                                     const uint32_t length) 
+                                                     noexcept {
         if (read_file_at_guard(inode, offset, length)) [[unlikely]] 
             return false;
 
@@ -171,9 +178,10 @@ namespace kernel::filesystem
 
     bool MoleculeOS_File_System::read_file_as_string_at(const Inode* inode, 
                                                         char* out_buffer,
-                                                        const uint32_t buffer_size, 
+                                                        const uint32_t buffer_size,
                                                         const uint32_t offset, 
-                                                        const uint32_t length) noexcept {
+                                                        const uint32_t length) 
+                                                        noexcept {
         if (read_file_at_guard(inode, offset, length)) [[unlikely]] 
             return false;
 
@@ -188,7 +196,8 @@ namespace kernel::filesystem
 
     bool MoleculeOS_File_System::set_file_content_binary(Inode* inode,
                                                          const uint8_t* in_buffer,
-                                                         const uint32_t length) noexcept {
+                                                         const uint32_t length)
+                                                         noexcept {
         if (set_file_content_guard(inode, length)) [[unlikely]]
             return false;
 
@@ -215,7 +224,8 @@ namespace kernel::filesystem
                                                       const uint8_t* in_buffer,
                                                       const uint32_t buffer_size,
                                                       const uint32_t offset,
-                                                      const uint32_t length) noexcept {
+                                                      const uint32_t length)
+                                                      noexcept {
         if (write_fill_at_guard(inode, offset, length, buffer_size)) [[unlikely]]
             return false;
 
@@ -229,7 +239,8 @@ namespace kernel::filesystem
                                                       const char* in_buffer,
                                                       const uint32_t buffer_size,
                                                       const uint32_t offset,
-                                                      const uint32_t length) noexcept {
+                                                      const uint32_t length) 
+                                                      noexcept {
         if (write_fill_at_guard(inode, offset, length, buffer_size)) [[unlikely]]
             return false;
 

@@ -6,9 +6,9 @@ LICENSE:
 
 DESCRIPTION:
     This class defines the entire system heap using a stack allocator.
-    The allocator uses linker-defined symbols ("heap_start" and "heap_end")
-    to determine the valid heap area and moves a single pointer with each allocation
-    by the amount x.
+    The allocator uses linker-defined symbols 
+    ("heap_start" and "heap_end") to determine the valid heap area and 
+    moves a single pointer with each allocation by the amount x.
 
 NOTES:
     Always use "mark()" before allocating memory 
@@ -39,9 +39,20 @@ namespace kernel::heap
 
         void rewind(const uintptr_t marker) noexcept;
 
-        [[nodiscard]] inline uintptr_t mark() const noexcept { return current; }
-        [[nodiscard]] inline uintptr_t used() const noexcept { return current - start; }
-        [[nodiscard]] inline uintptr_t remaining() const noexcept { return end - current; }
+        [[nodiscard]] 
+        inline uintptr_t mark() const noexcept { 
+            return current; 
+        }
+
+        [[nodiscard]] 
+        inline uintptr_t used() const noexcept { 
+            return current - start;
+        }
+
+        [[nodiscard]] 
+        inline uintptr_t remaining() const noexcept { 
+            return end - current; 
+        }
 
         inline Stack_Allocator(const uint8_t memory_pool_begin, 
                                const uint8_t memory_pool_end) noexcept {

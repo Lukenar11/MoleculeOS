@@ -12,35 +12,30 @@
 ;     The C interface is a header file called "isr.h".
 ;
 
+extern isr_common_handler
+extern isr_common_stub
+extern isr_common_handler
 global isr_0, isr_1, isr_2, isr_3, isr_4, isr_5, isr_6, isr_7, \
        isr_8, isr_9, isr_10, isr_11, isr_12, isr_13, isr_14, isr_15, \
        isr_16, isr_17, isr_18, isr_19, isr_20, isr_21, isr_22, isr_23, \
        isr_24, isr_25, isr_26, isr_27, isr_28, isr_29, isr_30, isr_31, \
        isr_0x69
 
-extern isr_common_handler
-extern isr_common_stub
-extern isr_common_handler
-
 section .text
     
 %macro NO_ISR_ERROR 1
-    isr_%1:
-        ; Interrupts off
-        cli
-
-        push dword 0    ; error code
-        push dword %1   ; interrupt number
-        jmp isr_common_stub
+isr_%1:
+    cli
+    push dword 0    ; error code
+    push dword %1   ; interrupt number
+    jmp isr_common_stub
 %endmacro
     
 %macro ISR_ERROR 1
-    isr_%1:
-        ; Interrupts off
-        cli
-
-        push dword %1   ; interrupt number
-        jmp isr_common_stub
+isr_%1:
+    cli
+    push dword %1   ; interrupt number
+    jmp isr_common_stub
 %endmacro
 
 NO_ISR_ERROR 0      ; (isr_0 ) Divide Error

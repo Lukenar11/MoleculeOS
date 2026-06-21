@@ -20,7 +20,8 @@ NOTES:
     The mapping arrays must contain exactly 128 entries to match the
     valid scancode range of the PS/2 Set 1 protocol. 
         
-    Any deviation in size or ordering would result in incorrect character translation.
+    Any deviation in size or 
+    ordering would result in incorrect character translation.
 */
 
 #pragma once

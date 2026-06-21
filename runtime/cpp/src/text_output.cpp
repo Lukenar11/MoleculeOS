@@ -95,7 +95,8 @@ namespace runtime
         uint32_t i = null;
         while (value) [[likely]] {
             const uint8_t number = value % base;
-            buffer[i++] = (number < ten) ? (char_null + number) : (char_a + number - ten);
+            buffer[i++] = (number < ten) ? (char_null + number) : 
+                                           (char_a + number - ten);
             value /= base;
         }
 
@@ -113,13 +114,23 @@ namespace runtime
         case '\b':
             if (cursor_x > null) {
                 cursor_x--;
-                drivers::vga::text_mode.put_char_at(' ', cursor_color, cursor_x, cursor_y);
+                drivers::vga::text_mode.put_char_at(
+                    ' ', 
+                    cursor_color, 
+                    cursor_x, 
+                    cursor_y
+                );
             }
             break;
 
         case '\t':
             for (uint32_t i = null; i < 4; ++i) {
-                drivers::vga::text_mode.put_char_at(' ', cursor_color, cursor_x, cursor_y);
+                drivers::vga::text_mode.put_char_at(
+                    ' ', 
+                    cursor_color, 
+                    cursor_x, 
+                    cursor_y
+                );
                 cursor_x++;
 
                 if (cursor_x >= drivers::vga::TEXT_MODE_SCREEN_WIDTH) [[unlikely]]
@@ -132,7 +143,12 @@ namespace runtime
             break;
 
         default:
-            drivers::vga::text_mode.put_char_at(symbol, cursor_color, cursor_x, cursor_y);
+            drivers::vga::text_mode.put_char_at(
+                symbol, 
+                cursor_color, 
+                cursor_x, 
+                cursor_y
+            );
             cursor_x++;
 
             if (cursor_x >= drivers::vga::TEXT_MODE_SCREEN_WIDTH) [[unlikely]]
@@ -210,6 +226,5 @@ namespace runtime
         put_base(value, base);
     }
 
-    // GLOBAL Screen-Output objekt
     Text_Output text_output;
 } // namespace runtime

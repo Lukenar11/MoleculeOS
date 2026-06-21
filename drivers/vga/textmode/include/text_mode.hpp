@@ -34,26 +34,26 @@ namespace drivers::vga
 
     public:
         [[nodiscard]]
-        static inline constexpr uint8_t make_color(const Text_Mode_Colors& foreground, 
+        static inline constexpr uint8_t make_color(const Text_Mode_Colors& foreground,
                                                    const Text_Mode_Colors& background,
                                                    const bool does_blink=false) 
                                                    noexcept {
-            
             const uint8_t color = (static_cast<uint8_t>(background) << 4) | 
                                    static_cast<uint8_t>(foreground);
-            if (does_blink) {
+            if (does_blink) [[unlikely]] {
                 const uint8_t blink_mode_bit = 0x80;
                 return color | blink_mode_bit;
-            } else {
+            } else [[likely]] {
                 return color;
             }
         }
 
         [[nodiscard]]
         static inline constexpr uint16_t make_symbol_entry(const char symbol, 
-                                                           const uint8_t color) 
+                                                           const uint8_t color)
                                                            noexcept {
-            return (static_cast<uint16_t>(color) << 8) | static_cast<uint16_t>(symbol);
+            return (static_cast<uint16_t>(color) << 8) | 
+                    static_cast<uint16_t>(symbol);
         }
 
         void put_char_at(const char symbol, 

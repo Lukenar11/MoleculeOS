@@ -15,26 +15,12 @@ NOTES:
 
 namespace kernel
 {
-    void remap_pic() noexcept {
-        const PIC_Mapping pic_mappings[] = {
-            { .port=0x0020, .value=0x11 },  // init master IPC
-            { .port=0x00A0, .value=0x11 },  // init slave IPC
-            { .port=0x0021, .value=0x20 },  // set master interrupt vector offsets
-            { .port=0x00A1, .value=0x28 },  // set slave interrupt vector offsets
-            { .port=0x0021, .value=0x04 },  // tell master where the slave is connected
-            { .port=0x00A1, .value=0x02 },  // tell slave its cascade identity
-            { .port=0x0021, .value=0x01 },  // set master 8086/88 mode
-            { .port=0x00A1, .value=0x01 }   // set slave 8086/88 mode
-        };
-
-        for (const auto& entry : pic_mappings) [[likely]]
-            runtime::byte_output(entry.port, entry.value);
-    }
-
     void init_kernel() noexcept {
         static idt::Interrupt_Descriptor_Table idt;
 
-        remap_pic();
+        for (const auto& entry : pic_mappings) [[likely]]
+            runtime::byte_output(entry.port, entry.value);
+
         system::enable_interrupts();
     }
 }

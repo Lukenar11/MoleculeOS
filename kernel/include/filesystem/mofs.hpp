@@ -6,11 +6,13 @@ LICENSE:
 
 DESCRIPTION:
     This file contains the internal implementation of the file system.
-    The file system is a flat, inode-based, custom file system residing directly in RAM.
+    The file system is a flat, inode-based, 
+    custom file system residing directly in RAM.
 
 NOTES:
     Since the file system resides directly in RAM, 
-    all files—along with their contents—are deleted upon shutting down or restarting the system.
+    all files—along with their contents—are deleted upon 
+    shutting down or restarting the system.
 
     One method are placed in the header 
     because they are so small that the compiler can inline them.
@@ -29,15 +31,18 @@ NOTES:
 
 namespace
 {
-    inline constexpr bool inode_not_available(const kernel::filesystem::Inode* inode) noexcept {
+    inline constexpr bool inode_not_available(const kernel::filesystem::Inode* inode)
+                                              noexcept {
         return !inode || !inode->in_use; 
     }
 
-    inline constexpr bool less_then(const uint32_t a, const uint32_t b) noexcept { 
+    inline constexpr bool less_then(const uint32_t a, 
+                                    const uint32_t b) noexcept {
         return a < b; 
     }
 
-    inline constexpr bool greader_then(const uint32_t a, const uint32_t b) noexcept { 
+    inline constexpr bool greader_then(const uint32_t a, 
+                                       const uint32_t b) noexcept {
         return a > b; 
     }
 
@@ -85,10 +90,11 @@ namespace kernel::filesystem
         void recalculate_file_size(Inode* inode) noexcept;
 
     public:
-        bool is_valid_file_name_or_formant_char(const char symbol) const noexcept;
+        bool is_valid_file_name_or_formant_char(const char symbol) 
+                                                const noexcept;
 
-        Inode* get_inode_by_name_and_format(const char* filename, const char* format) 
-                                            const noexcept;
+        Inode* get_inode_by_name_and_format(const char* filename, 
+                                            const char* format) const noexcept;
 
         Inode* create_file(const char* filename, const char* format) noexcept;
         void delete_file(Inode* inode) noexcept;

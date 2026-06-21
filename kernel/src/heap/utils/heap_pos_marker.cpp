@@ -5,11 +5,12 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This file exposes linker-defined variables for the start and end 
+    This file exposes linker-defined variables for the start and end
     of the kernel heap region.
 
     These variables represent raw
-    memory addresses used by the heap allocator to determine the valid heap range.
+    memory addresses used by the heap allocator to 
+    determine the valid heap range.
 
 NOTES:
     The internal definitions of "heap_start" and "heap_end" are located

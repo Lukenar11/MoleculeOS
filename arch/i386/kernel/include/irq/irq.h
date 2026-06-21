@@ -5,7 +5,7 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    Each function corresponds to a specific hardware interrupt line 
+    Each function corresponds to a specific hardware interrupt line
     of the Programmable Interrupt Controller (PIC).
 
 NOTES:

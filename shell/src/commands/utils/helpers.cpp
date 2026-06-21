@@ -9,15 +9,16 @@ DESCRIPTION:
     that are used by the shell command implementations.
 
 NOTES:
-    Since some functions are quite small, 
-    they are intentionally placed in the header so that the compiler can inline them more easily.
+    Since some functions are quite small, they are intentionally placed in the 
+    header so that the compiler can inline them more easily.
 */
 
 #include "commands/utils/helpers.hpp"
 
 namespace shell::commands
 {
-    Parsed_File_Name& parse_filename(const runtime::Array<char, 64>& arguments) noexcept {
+    Parsed_File_Name& parse_filename(const runtime::Array<char, 64>& arguments)
+                                     noexcept {
         const char null_terminator = '\0';
         const uint32_t null = 0;
 

@@ -5,7 +5,8 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    C/C++ interface for the common IRQ handler, which is called by "isr_common_stub".
+    C/C++ interface for the common IRQ handler, 
+    which is called by "isr_common_stub".
 
     This function receives a complete "RegisterDump" structure and
     performs uniform exception processing, including diagnostic output

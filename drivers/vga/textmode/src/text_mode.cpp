@@ -33,12 +33,13 @@ namespace drivers::vga
             y >= TEXT_MODE_SCREEN_HEIGHT) [[unlikely]]
             return;
 
-        const uint32_t index = static_cast<uint32_t>(y) * TEXT_MODE_SCREEN_WIDTH + 
+        const uint32_t index = static_cast<uint32_t>(y) * TEXT_MODE_SCREEN_WIDTH +
                                static_cast<uint32_t>(x);
         VGA_TEXMODE_BUFFER[index] = make_symbol_entry(symbol, color);
     }
 
-    void Text_Mode::clear_screen(const Text_Mode_Colors& background) const noexcept {
+    void Text_Mode::clear_screen(const Text_Mode_Colors& background)
+                                 const noexcept {
         const uint8_t color = make_color(Text_Mode_Colors::BLACK, background);
         const uint16_t entry = make_symbol_entry(' ', color);
 

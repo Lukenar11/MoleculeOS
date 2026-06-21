@@ -32,7 +32,8 @@ namespace runtime
             return buffer[index]; 
         }
 
-        inline constexpr const T& operator[](const uint32_t index) const noexcept { 
+        inline constexpr const T& operator[](const uint32_t index) 
+                                             const noexcept {
             return buffer[index]; 
         }
 

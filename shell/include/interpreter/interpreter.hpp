@@ -9,7 +9,8 @@ DESCRIPTION:
         
     The interpreter receives raw keyboard input, 
     tokenizes the input string, separates command and arguments,
-    and dispatches the appropriate handler based on a compile‑time hash lookup table.
+    and dispatches the 
+    appropriate handler based on a compile‑time hash lookup table.
     
 NOTES:
     The "make_hash" function and the "shell_command_table" 

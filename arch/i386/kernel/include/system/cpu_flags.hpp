@@ -5,10 +5,14 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-	This file contains 2 simple assembly routines that work using stack operations.
+	This file contains 2 simple assembly routines that 
+    work using stack operations.
 
-    The function "kernel_system_save_eflags" saves the current CPU flags (flag register).
-    The function "kernel_system_restore_eflags" restores the CPU flags (flag register).
+    The function "kernel_system_save_eflags" saves the 
+    current CPU flags (flag register).
+
+    The function "kernel_system_restore_eflags" restores the 
+    CPU flags (flag register).
 
 NOTES:
 	The internal implementation is located in "cpu_flags.asm".

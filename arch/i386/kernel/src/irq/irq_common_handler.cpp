@@ -5,7 +5,8 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    C interface for the general IRQ handler, which is called by "irq_common_stub".
+    C interface for the general IRQ handler, 
+    which is called by "irq_common_stub".
 
     All hardware interruptstubs (irq_0–irq_15) 
     pass their register state to this function,
@@ -24,18 +25,18 @@ namespace kernel::irq
     extern "C"
     void irq_common_handler(Register_Dump* reg_dump) {
         const uint8_t interrupt_vector = reg_dump->interrupt_number;
-        const uint8_t eoi = 0x20;
-    
+        const uint8_t end_of_interrupt = 0x20;
+
         const uint8_t min_interrupt_vector = 0x28;
         const uint8_t max_interrupt_vector = 0x2F;
     
         if ((interrupt_vector >= min_interrupt_vector) && 
             (interrupt_vector <= max_interrupt_vector)) [[likely]] {
             const uint16_t slave_pic_command_port = 0xA0;
-            runtime::byte_output(slave_pic_command_port, eoi);
+            runtime::byte_output(slave_pic_command_port, end_of_interrupt);
         }
     
         const uint16_t master_pic_command_port = 0x20;
-        runtime::byte_output(master_pic_command_port, eoi);
+        runtime::byte_output(master_pic_command_port, end_of_interrupt);
     }
 } // namespace kernel::irq

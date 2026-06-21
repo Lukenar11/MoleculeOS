@@ -7,9 +7,9 @@ LICENSE:
 DESCRIPTION:
     This class defines the entire system heap using a stack allocator.
 
-    The allocator uses linker-defined symbols ("heap_start" and "heap_end")
-    to determine the valid heap area and moves a single pointer with each allocation
-    by the amount x.
+    The allocator uses linker-defined symbols ("heap_start" and "heap_end") 
+    to determine the valid heap area and 
+    moves a single pointer with each allocation by the amount x.
 
 NOTES:
     Always use "mark()" before allocating memory 
@@ -31,7 +31,8 @@ namespace kernel::heap
         if (allocated_bytes == 0) [[unlikely]]
             return nullptr;
     
-        allocated_bytes = (allocated_bytes + (alignment - one)) & ~(alignment - one);
+        allocated_bytes = (allocated_bytes + (alignment - one)) & 
+                          ~(alignment - one);
         uintptr_t aligned = (current + (alignment - one)) & ~(alignment - one);
     
         if (aligned + allocated_bytes > end) [[unlikely]]
@@ -43,18 +44,18 @@ namespace kernel::heap
     }
 
     void Stack_Allocator::rewind(const uintptr_t marker) noexcept {
-        static const char* invalid_heap_rewind_panic_message = "Invalid heap rewind";
+        static const char* panic_message = "Invalid heap rewind";
 
         if ((marker < start) || (marker > current) || (marker > end)) [[unlikely]]
             system::panic(
-                invalid_heap_rewind_panic_message,
+                panic_message,
                 "Marker is outside the valid heap range or not aligned."
             );
 
         const uintptr_t alignment = 8;
         if ((marker % alignment) != 0) [[unlikely]]
             system::panic(
-                invalid_heap_rewind_panic_message,
+                panic_message,
                 "Marker is not aligned to allocator alignment."
             );
 

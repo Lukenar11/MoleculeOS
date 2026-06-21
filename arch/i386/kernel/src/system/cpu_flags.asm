@@ -5,7 +5,8 @@
 ;     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 ; 
 ; DESCRIPTION:
-;     This file contains 2 simple assembly routines that work using stack operations.
+;     This file contains 2 simple assembly routines that 
+;     work using stack operations.
 ;
 ;     The function "save_eflags" saves the current CPU flags (flag register).
 ;     The function "restore_eflags" restores the CPU flags (flag register).
@@ -21,10 +22,10 @@ section .text
 
 save_eflags:
     pushf
-    pop eax ; uint32_t
+    pop eax
     ret
 
 restore_eflags:
-    push dword [esp+4]  ; param
+    push dword [esp+4]
     popf
     ret

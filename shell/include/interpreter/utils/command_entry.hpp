@@ -5,8 +5,9 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION: 
-    This file defines the "Command_Entry" structure used by the shell interpreter 
-    to associate hashed command strings with their corresponding handler functions. 
+    This file defines the "Command_Entry" structure used by the 
+    shell interpreter to associate hashed command strings 
+    with their corresponding handler functions. 
         
     Each entry contains a precomputed 32‑bit hash and a 
     function pointer that receives the parsed argument buffer.
