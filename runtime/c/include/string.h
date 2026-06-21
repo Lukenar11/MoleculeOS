@@ -35,7 +35,7 @@ void strcpy(char* dest_ptr, const char* src_ptr);
 uint32_t strlen(const char *string);
 int32_t memcmp(const void* a_ptr, const void* b_ptr, uint32_t size);
 int32_t strcmp(const char* a_ptr, const char* b_ptr);
-const char* strchr(const char* string, int symbol);
+const char* strchr(const char* string, int32_t symbol);
 
 #ifdef __cplusplus
 }

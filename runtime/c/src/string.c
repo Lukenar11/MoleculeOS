@@ -113,7 +113,7 @@ int32_t strcmp(const char* a_ptr, const char* b_ptr)
     return (uint8_t)*a_ptr - (uint8_t)*b_ptr;
 }
 
-const char* strchr(const char* string, int symbol) 
+const char* strchr(const char* string, int32_t symbol) 
 {
     while (*string != (char)symbol)
         if (!*string++)

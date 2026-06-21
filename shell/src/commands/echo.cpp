@@ -149,7 +149,7 @@ namespace
         kernel::filesystem::mofs.set_file_content_as_string(
             inode,
             file_instream.data(),
-            strlen(file_instream.data())
+            runtime::string_length(file_instream.data())
         );
     }
 }
@@ -222,10 +222,14 @@ namespace shell::commands
         static runtime::Array<char, 64> filename;
         const char null_char = '\0';
 
-        const char* file_outstrem_redict_operator_pos = strchr(arguments.begin(), '<');
+        const char* file_outstrem_redict_operator_pos = 
+            runtime::includes_char_at_pos(arguments.begin(), '<');
         if (file_outstrem_redict_operator_pos != nullptr) [[unlikely]] {
-        
-            if (strchr(file_outstrem_redict_operator_pos + 1, '<') != nullptr) [[unlikely]] {
+            const char* pos = runtime::includes_char_at_pos(
+                file_outstrem_redict_operator_pos + 1, 
+                '<'
+            );
+            if (pos != nullptr) [[unlikely]] {
                 print_command_error("echo: multiple redirect operators\n");
                 command_end();
                 return;
@@ -245,9 +249,14 @@ namespace shell::commands
             return;
         }
 
-        const char* file_intstrem_redict_operator_pos = strchr(arguments.begin(), '>');
+        const char* file_intstrem_redict_operator_pos = 
+            runtime::includes_char_at_pos(arguments.begin(), '>');
         if (file_intstrem_redict_operator_pos != nullptr) {
-            if (strchr(file_intstrem_redict_operator_pos + 1, '>') != nullptr) [[unlikely]] {
+            const char* pos = runtime::includes_char_at_pos(
+                file_intstrem_redict_operator_pos + 1,
+                '>'
+            );
+            if (pos != nullptr) [[unlikely]] {
                 print_command_error("echo: multiple redirect operators\n");
 
                 command_end();

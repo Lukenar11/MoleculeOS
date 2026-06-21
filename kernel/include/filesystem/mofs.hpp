@@ -26,7 +26,8 @@ NOTES:
 #include "utils/helpers.hpp"
 #include "system/panic.hpp"
 #include <array.hpp>
-#include <string.h>
+#include <memory_manipulation.hpp>
+#include <string_manipulation.hpp>
 #include <stdint.h>
 
 namespace

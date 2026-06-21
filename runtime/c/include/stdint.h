@@ -22,8 +22,8 @@ NOTES:
     system's "<stdint.h>".
 */
 
-#ifndef _STDINT_H
-#define _STDINT_H
+#ifndef STDINT_H
+#define STDINT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -44,4 +44,4 @@ typedef uint32_t uintptr_t;
 }
 #endif
 
-#endif  // _STDINT_H
+#endif  // STDINT_H

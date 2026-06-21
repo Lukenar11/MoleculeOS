@@ -22,7 +22,7 @@ NOTES:
 
 #include "utils/helpers.hpp"
 #include <array.hpp>
-#include <string.h>
+#include <string_manipulation.hpp>
 #include <text_output.hpp>
 
 namespace shell::commands
