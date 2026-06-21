@@ -24,23 +24,25 @@ global word_output
 section .text
 
 byte_input:
-    mov dx, [esp+4] ; port
-    in al, dx       ; uint8_t
+    xor eax, eax
+    mov dx, [esp+4]
+    in al, dx
     ret
 
 word_input:
-    mov dx, [esp+4] ; port
-    in ax, dx       ; uint16_t
+    xor eax, eax
+    mov dx, [esp+4] 
+    in ax, dx
     ret
 
 byte_output:
-    mov dx, [esp+4] ; port
-    mov al, [esp+8] ; value
+    mov dx, [esp+4] 
+    mov al, [esp+8]
     out dx, al
     ret
 
 word_output:
-    mov dx, [esp+4] ; port
-    mov ax, [esp+8] ; value
+    mov dx, [esp+4] 
+    mov ax, [esp+8] 
     out dx, ax
     ret
