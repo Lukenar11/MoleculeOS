@@ -6,7 +6,9 @@
 
 COMMON_FLAGS += \
 	-Iruntime/c/include \
-	-Iruntime/cpp/include
+	-Iruntime/cpp/include \
+	-Iruntime/c/include/utils \
+	-Iruntime/cpp/include/utils \
 
 include runtime/c/Makefile
 include runtime/cpp/Makefile
