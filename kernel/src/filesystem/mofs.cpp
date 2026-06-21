@@ -28,7 +28,7 @@ namespace kernel::filesystem
     Inode* MoleculeOS_File_System::allocate_inode() noexcept {
         for (auto& inode : inodes) [[likely]]
             if (!inode.in_use) {
-                runtime::set_memory_block(&inode, 0, sizeof(Inode));
+                runtime::memory_manip.set_memory_block(&inode, 0, sizeof(Inode));
                 inode.in_use = true;
 
                 return &inode;
@@ -78,8 +78,8 @@ namespace kernel::filesystem
             if (!inode.in_use)
                 continue;
 
-            if ((runtime::compare_strings(inode.name, filename) == null) && 
-                (runtime::compare_strings(inode.format, format) == null))
+            if ((runtime::string_manip.compare_strings(inode.name, filename) == null) &&
+                (runtime::string_manip.compare_strings(inode.format, format) == null))
                 return const_cast<Inode*>(&inode);
         }
         return nullptr;
@@ -106,8 +106,8 @@ namespace kernel::filesystem
             if (!inode.in_use)
                 continue;
 
-            if ((runtime::compare_strings(inode.name, filename) == null) &&
-                (runtime::compare_strings(inode.format, format) == null)) [[unlikely]]
+            if ((runtime::string_manip.compare_strings(inode.name, filename) == null) &&
+                (runtime::string_manip.compare_strings(inode.format, format) == null)) [[unlikely]]
                 return nullptr;
         }
 
@@ -115,13 +115,13 @@ namespace kernel::filesystem
         if (!inode) [[unlikely]]
             return nullptr;
 
-        runtime::copy_n_string_elements(
+        runtime::string_manip.copy_string_part(
             inode->name, 
             filename, 
             MAX_FILENAME_LENGTH
         );
         
-        runtime::copy_n_string_elements(
+        runtime::string_manip.copy_string_part(
             inode->format, 
             format, 
             MAX_FILE_FORMAT_NAME_LENGTH
@@ -141,9 +141,23 @@ namespace kernel::filesystem
 
         inode->in_use = false;
         inode->size = null;
-        runtime::set_memory_block(inode->name, null_terminatpr, MAX_FILENAME_LENGTH);
-        runtime::set_memory_block(inode->format, null_terminatpr, MAX_FILE_FORMAT_NAME_LENGTH);
-        runtime::set_memory_block(inode->data, null, MAX_FILE_SIZE);
+        runtime::memory_manip.set_memory_block(
+            inode->name, 
+            null_terminatpr, 
+            MAX_FILENAME_LENGTH
+        );
+
+        runtime::memory_manip.set_memory_block(
+            inode->format, 
+            null_terminatpr, 
+            MAX_FILE_FORMAT_NAME_LENGTH
+        );
+
+        runtime::memory_manip.set_memory_block(
+            inode->data, 
+            null, 
+            MAX_FILE_SIZE
+        );
     }
 
     bool MoleculeOS_File_System::get_file_content_binary(const Inode* inode, 
@@ -153,7 +167,11 @@ namespace kernel::filesystem
         if (inode_not_available(inode)) [[unlikely]] return false;
         if (less_then(buffer_size, inode->size)) [[unlikely]] return false;
 
-        runtime::copy_memory_block(out_buffer, inode->data, inode->size);
+        runtime::memory_manip.copy_memory_block(
+            out_buffer, 
+            inode->data, 
+            inode->size
+        );
         return true;
     }
 
@@ -164,7 +182,11 @@ namespace kernel::filesystem
         if (inode_not_available(inode)) [[unlikely]] return false;
         if (less_then(buffer_size, inode->size + 1)) [[unlikely]] return false;
 
-        runtime::copy_memory_block(out_buffer, inode->data, inode->size);
+        runtime::memory_manip.copy_memory_block(
+            out_buffer, 
+            inode->data, 
+            inode->size
+        );
         out_buffer[inode->size] = '\0';
 
         return true;
@@ -182,7 +204,11 @@ namespace kernel::filesystem
         if (less_then(buffer_size, length)) [[unlikely]] 
             return false;
 
-        runtime::copy_memory_block(out_buffer, (inode->data + offset), length);
+        runtime::memory_manip.copy_memory_block(
+            out_buffer, 
+            (inode->data + offset), 
+            length
+        );
         return true;
     }
 
@@ -198,7 +224,11 @@ namespace kernel::filesystem
         if (less_then(buffer_size, (length + 1))) [[unlikely]] 
             return false;
 
-        runtime::copy_memory_block(out_buffer, (inode->data + offset), length);
+        runtime::memory_manip.copy_memory_block(
+            out_buffer, 
+            (inode->data + offset), 
+            length
+        );
         out_buffer[length] = '\0';
 
         return true;
@@ -211,7 +241,11 @@ namespace kernel::filesystem
         if (set_file_content_guard(inode, length)) [[unlikely]]
             return false;
 
-        runtime::copy_memory_block(inode->data, in_buffer, length);
+        runtime::memory_manip.copy_memory_block(
+            inode->data, 
+            in_buffer, 
+            length
+        );
         recalculate_file_size(inode);
 
         return true;
@@ -224,7 +258,11 @@ namespace kernel::filesystem
         if (set_file_content_guard(inode, length)) [[unlikely]]
             return false;
 
-        runtime::copy_memory_block(inode->data, in_buffer, length);
+        runtime::memory_manip.copy_memory_block(
+            inode->data, 
+            in_buffer, 
+            length
+        );
         recalculate_file_size(inode);
 
         return true;
@@ -239,7 +277,11 @@ namespace kernel::filesystem
         if (write_fill_at_guard(inode, offset, length, buffer_size)) [[unlikely]]
             return false;
 
-        runtime::copy_memory_block((inode->data + offset), in_buffer, length);
+        runtime::memory_manip.copy_memory_block(
+            (inode->data + offset), 
+            in_buffer, 
+            length
+        );
         recalculate_file_size(inode);
 
         return true;
@@ -254,7 +296,11 @@ namespace kernel::filesystem
         if (write_fill_at_guard(inode, offset, length, buffer_size)) [[unlikely]]
             return false;
 
-        runtime::copy_memory_block((inode->data + offset), in_buffer, length);
+        runtime::memory_manip.copy_memory_block(
+            (inode->data + offset), 
+            in_buffer, 
+            length
+        );
         recalculate_file_size(inode);
 
         return true;

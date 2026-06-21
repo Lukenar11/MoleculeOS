@@ -2,9 +2,9 @@
 
 namespace runtime
 {
-    void* copy_memory_block(void* dest_ptr, 
-                            const void* src_ptr, 
-                            uint32_t size) noexcept {
+    void* Memory_Manipulation::copy_memory_block(void* dest_ptr, 
+                                                 const void* src_ptr, 
+                                                 uint32_t size) noexcept {
         uint8_t* dest = static_cast<uint8_t*>(dest_ptr);
         const uint8_t* src = static_cast<const uint8_t*>(src_ptr);
         while (size--)
@@ -13,9 +13,9 @@ namespace runtime
         return dest_ptr;
     }
 
-    void* move_memory_block(void* dest_ptr, 
-                            const void* src_ptr, 
-                            uint32_t size) noexcept {
+    void* Memory_Manipulation::move_memory_block(void* dest_ptr, 
+                                                 const void* src_ptr, 
+                                                 uint32_t size) noexcept {
         uint8_t* dest = static_cast<uint8_t*>(dest_ptr);
         const uint8_t* src = static_cast<const uint8_t*>(src_ptr);
 
@@ -33,9 +33,9 @@ namespace runtime
         return dest_ptr;
     }
 
-    void* set_memory_block(void* dest_ptr, 
-                           int32_t value, 
-                           uint32_t size) noexcept {
+    void* Memory_Manipulation::set_memory_block(void* dest_ptr, 
+                                                int32_t value, 
+                                                uint32_t size) noexcept {
         uint8_t* dest = static_cast<uint8_t*>(dest_ptr);
         uint8_t byte = static_cast<uint8_t>(value);
         while (size--)
@@ -44,9 +44,9 @@ namespace runtime
         return dest_ptr;
     };
 
-    int32_t compare_memory_block(const void* a_ptr, 
-                                 const void* b_ptr,
-                                 uint32_t size) noexcept {
+    int32_t Memory_Manipulation::compare_memory_block(const void* a_ptr, 
+                                                      const void* b_ptr,
+                                                      uint32_t size) noexcept {
         const uint8_t* a = static_cast<const uint8_t*>(a_ptr);
         const uint8_t* b = static_cast<const uint8_t*>(b_ptr);
         while (size--) {
@@ -59,4 +59,6 @@ namespace runtime
 
         return 0;
     }
+
+    Memory_Manipulation memory_manip;
 } // namespace runtime

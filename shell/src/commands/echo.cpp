@@ -149,7 +149,7 @@ namespace
         kernel::filesystem::mofs.set_file_content_as_string(
             inode,
             file_instream.data(),
-            runtime::string_length(file_instream.data())
+            runtime::string_manip.get_string_length(file_instream.data())
         );
     }
 }
@@ -223,9 +223,12 @@ namespace shell::commands
         const char null_char = '\0';
 
         const char* file_outstrem_redict_operator_pos = 
-            runtime::includes_char_at_pos(arguments.begin(), '<');
+            runtime::string_manip.find_char_in_string(
+                arguments.begin(), 
+                '<'
+            );
         if (file_outstrem_redict_operator_pos != nullptr) [[unlikely]] {
-            const char* pos = runtime::includes_char_at_pos(
+            const char* pos = runtime::string_manip.find_char_in_string(
                 file_outstrem_redict_operator_pos + 1, 
                 '<'
             );
@@ -250,9 +253,12 @@ namespace shell::commands
         }
 
         const char* file_intstrem_redict_operator_pos = 
-            runtime::includes_char_at_pos(arguments.begin(), '>');
+            runtime::string_manip.find_char_in_string(
+                arguments.begin(), 
+                '>'
+            );
         if (file_intstrem_redict_operator_pos != nullptr) {
-            const char* pos = runtime::includes_char_at_pos(
+            const char* pos = runtime::string_manip.find_char_in_string(
                 file_intstrem_redict_operator_pos + 1,
                 '>'
             );
