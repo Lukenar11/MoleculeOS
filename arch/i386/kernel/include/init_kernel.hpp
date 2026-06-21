@@ -8,7 +8,7 @@ DESCRIPTION:
     This file contains the kernel entry point "kernel_main," which
     is called directly after the bootloader hands control over to the kernel.
 
-    The function initializes core subsystems such as the IDT with the function "init_kernel",
+    The function initializes core subsystems such as the IDT with the function init_kernel,
     performs a simple interrupt- and endless-loop-driven scheduling, and starts the shell.
 
 NOTES:
@@ -19,27 +19,25 @@ NOTES:
     it is declared as "extern C" to ensure compatibility.
 */
 
-#include "arch/i386/kernel/include/init_kernel.hpp"
-#include "terminal/include/terminal.hpp"
+#pragma once
+
+#include "idt/idt.hpp"
+#include "system/enable_interrupts.hpp"
+#include "terminal.hpp"
 #include "system/sleep.hpp"
 #include "system/panic.hpp"
+#include <stdint.h>
+
+namespace
+{
+    struct PIC_Mapping final {
+        uint16_t port = 0;
+        uint8_t value = 0;
+    };
+}
 
 namespace kernel
 {
-    extern "C"
-    void kernel_main() noexcept {
-        init_kernel();
-
-        // schedul MoleculeOS
-        static terminal::Terminal terminal;
-        while (true) {
-            system::sleep();
-            terminal.step();
-        }
-
-        system::panic(
-            "Unexpected return from the \"kernel_main\" scheduler main loop",
-            "This should never happen.\nPlease report this to the developer."
-        );
-    }
+    void remap_pic() noexcept;
+    void init_kernel() noexcept;
 }
