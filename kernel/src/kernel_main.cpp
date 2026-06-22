@@ -30,7 +30,7 @@ namespace kernel
 {
     extern "C"
     void kernel_main() noexcept {
-        init_kernel();
+        arch::init_kernel();
 
         // schedul MoleculeOS
         static terminal::Terminal terminal;

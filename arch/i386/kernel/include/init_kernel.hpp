@@ -50,7 +50,7 @@ namespace
     };
 }
 
-namespace kernel
+namespace kernel::arch
 {
     void init_kernel() noexcept;
-}
+} // namespace kernel::arch

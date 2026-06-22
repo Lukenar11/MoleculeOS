@@ -13,7 +13,7 @@ NOTES:
 
 #include "arch/i386/kernel/include/init_kernel.hpp"
 
-namespace kernel
+namespace kernel::arch
 {
     void init_kernel() noexcept {
         static idt::Interrupt_Descriptor_Table idt;
@@ -23,4 +23,4 @@ namespace kernel
 
         system::enable_interrupts();
     }
-}
+} // namespace kernel::arch
