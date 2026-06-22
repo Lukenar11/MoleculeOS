@@ -8,7 +8,7 @@ OBJS += \
 	$(BUILD)/text_output.o \
 	$(BUILD)/memory_manipulation.o \
 	$(BUILD)/string_manipulation.o \
-	$(BUILD)/compiler_memory.o \
+	$(BUILD)/compiler_c_api.o \
 	$(BUILD)/text_output.o \
 
 $(BUILD)/%.o: runtime/cpp/src/%.cpp

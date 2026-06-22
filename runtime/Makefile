@@ -5,13 +5,10 @@
 # 
 
 COMMON_FLAGS += \
-	-Iruntime/c/include \
 	-Iruntime/cpp/include \
-	-Iruntime/c/include/utils \
 	-Iruntime/cpp/include/utils \
 
 include runtime/c/Makefile
-include runtime/cpp/Makefile
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
