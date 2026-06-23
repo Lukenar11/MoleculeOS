@@ -21,10 +21,10 @@ NOTES:
     it is declared as "extern C" to ensure compatibility.
 */
 
-#include "terminal/include/terminal.hpp"
 #include "system/sleep.hpp"
 #include "system/panic.hpp"
 #include <kernel_arch_api.hpp>
+#include <terminal_api.hpp>
 
 namespace kernel
 {
