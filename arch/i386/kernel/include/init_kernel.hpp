@@ -26,10 +26,8 @@ NOTES:
 
 #include "idt/idt.hpp"
 #include "system/enable_interrupts.hpp"
-#include "terminal.hpp"
-#include "system/sleep.hpp"
-#include "system/panic.hpp"
 #include <stdint.h>
+#include <io_arch_api.hpp>
 
 namespace kernel
 {

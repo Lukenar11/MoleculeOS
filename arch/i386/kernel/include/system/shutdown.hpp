@@ -23,7 +23,7 @@ NOTES:
 #include "cpu_flags.hpp"
 #include <stdint.h>
 #include <array.hpp>
-#include <port_io.hpp>
+#include <io_arch_api.hpp>
 
 namespace
 {
@@ -34,10 +34,10 @@ namespace
     };
 
     constexpr Shutdown_Command_Mapping emulator_specific_shutdown_command_mappings[] = {
-        { .port=0x0604, .value=0x2000, .is_8bit_mode=false },   // QEMU ACPI shutdown
-        { .port=0x00F4, .value=0x0000, .is_8bit_mode=true  },   // QEMU ISA exit
-        { .port=0xB004, .value=0x2000, .is_8bit_mode=false },   // Bochs shutdown
-        { .port=0x4004, .value=0x3400, .is_8bit_mode=false }    // VirtualBox shutdown
+        {.port=0x0604, .value=0x2000, .is_8bit_mode=false},   // QEMU ACPI shutdown
+        {.port=0x00F4, .value=0x0000, .is_8bit_mode=true },   // QEMU ISA exit
+        {.port=0xB004, .value=0x2000, .is_8bit_mode=false},   // Bochs shutdown
+        {.port=0x4004, .value=0x3400, .is_8bit_mode=false}    // VirtualBox shutdown
     };
 }
 

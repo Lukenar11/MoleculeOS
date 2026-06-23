@@ -17,7 +17,7 @@ NOTES:
 #include "drivers/ps2/keyboardin/include/utils/helpers.hpp"
 #include "system/panic.hpp"
 #include <stdint.h>
-#include <port_io.hpp>
+#include <io_arch_api.hpp>
 
 namespace kernel::system
 {
