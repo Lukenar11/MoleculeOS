@@ -5,8 +5,7 @@
 //     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 // 
 // DESCRIPTION:
-//     This makes VS Code know under which paths the files are located and
-//     defines macros fpr preprocessing.
+//     This makes VS Code know under which paths the files are located
 //
 
 {
