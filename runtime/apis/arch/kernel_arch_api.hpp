@@ -12,9 +12,8 @@ DESCRIPTION:
     respective architecture are compiled.
 
 NOTES:
-    Macros that have been defined based on the 
-    selected architecture are compiler-specific, e.g.
-    '__i386__' (by GCC/Clang), '_M_IX86' (in MSVC), 
+    Macros that have been defined based on the selected architecture are 
+    compiler-specific, e.g. '__i386__' (by GCC/Clang), '_M_IX86' (in MSVC), 
     'i386' (in some cross-compilers), or may not be available at all,
     which is why custom macros are defined for this purpose, 
     e.g. '__I386__' for i386 as shown here.

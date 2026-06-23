@@ -22,7 +22,7 @@ NOTES:
 
 #pragma once
 
-#include "arch/i386/kernel/include/system/shutdown.hpp"
+#include <kernel_arch_api.hpp>
 
 namespace shell::commands
 {
