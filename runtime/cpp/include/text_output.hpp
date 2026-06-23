@@ -25,7 +25,7 @@ NOTES:
 
 #pragma once
 
-#include "drivers/vga/textmode/include/text_mode.hpp"
+#include <drivers_api.hpp>
 #include <stdint.h>
 #include <array.hpp>
 
