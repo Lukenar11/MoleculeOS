@@ -32,7 +32,7 @@ NOTES:
 
 #pragma once
 
-#include "shell/include/interpreter/interpreter.hpp"
+#include <shell_api.hpp>
 #include <drivers_api.hpp>
 #include <stdint.h>
 #include <text_output.hpp>
