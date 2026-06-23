@@ -24,7 +24,7 @@ NOTES:
 #include "idt_descriptor_ptr.hpp"
 #include "idt_init_entry.hpp"
 #include "load_idt.hpp"
-#include "kernel/include/system/panic.hpp"
+#include <kernel_api.hpp>
 #include <stdint.h>
 #include <array.hpp>
 

@@ -14,9 +14,9 @@ NOTES:
 
 #pragma once
 
-#include "drivers/ps2/keyboardin/include/utils/helpers.hpp"
 #include "system/panic.hpp"
 #include <stdint.h>
+#include <drivers_api.hpp>
 #include <io_arch_api.hpp>
 
 namespace kernel::system
