@@ -21,16 +21,16 @@ NOTES:
     it is declared as "extern C" to ensure compatibility.
 */
 
-#include "arch/i386/kernel/include/init_kernel.hpp"
 #include "terminal/include/terminal.hpp"
 #include "system/sleep.hpp"
 #include "system/panic.hpp"
+#include <kernel_arch_api.hpp>
 
 namespace kernel
 {
-    extern "C"
+    extern "C" [[noreturn]]
     void kernel_main() noexcept {
-        arch::init_kernel();
+        init_kernel();
 
         // schedul MoleculeOS
         static terminal::Terminal terminal;

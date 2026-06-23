@@ -11,8 +11,8 @@ OBJS += \
 	$(BUILD)/compiler_c_api.o \
 	$(BUILD)/text_output.o \
 
-$(BUILD)/%.o: runtime/src/%.cpp
+$(BUILD)/%.o: runtime/cpp/src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(BUILD)/%.o: runtime/src/utils/%.cpp
+$(BUILD)/%.o: runtime/cpp/src/utils/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

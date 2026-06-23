@@ -5,7 +5,8 @@
 //     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 // 
 // DESCRIPTION:
-//     This makes VS Code know under which paths the files are located.
+//     This makes VS Code know under which paths the files are located and
+//     defines macros fpr preprocessing.
 //
 
 {
@@ -21,8 +22,8 @@
                 "${workspaceFolder}",
                 "${workspaceFolder}/kernel/include",
                 "${workspaceFolder}/kernel/include/heap",
-                "${workspaceFolder}/runtime/c/include",
                 "${workspaceFolder}/runtime/cpp/include",
+                "${workspaceFolder}/runtime/apis/arch",
                 "${workspaceFolder}/arch/i386/runtime/include",
                 "${workspaceFolder}/arch/i386/kernel/include/idt",
                 "${workspaceFolder}/arch/i386/kernel/include/irq",
@@ -38,8 +39,7 @@
                 "${workspaceFolder}/shell/include/commands"
             ],
             "defines": [
-                "__MOLECULE_OS__",
-                "__KERNEL__"
+                "__I386__"
             ]
         }
     ]
