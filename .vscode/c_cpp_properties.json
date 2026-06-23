@@ -22,6 +22,7 @@
                 "${workspaceFolder}/kernel/include",
                 "${workspaceFolder}/kernel/include/heap",
                 "${workspaceFolder}/runtime/cpp/include",
+                "${workspaceFolder}/runtime/apis",
                 "${workspaceFolder}/runtime/apis/arch",
                 "${workspaceFolder}/arch/i386/runtime/include",
                 "${workspaceFolder}/arch/i386/kernel/include/idt",

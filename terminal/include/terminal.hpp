@@ -32,9 +32,7 @@ NOTES:
 
 #pragma once
 
-#include "drivers/ps2/keyboardin/include/keyboard_input.hpp"
-#include "drivers/vga/textmode/include/text_mode.hpp"
-#include "shell/include/interpreter/interpreter.hpp"
+#include <drivers_api.hpp>
 #include <stdint.h>
 #include <text_output.hpp>
 
