@@ -15,8 +15,8 @@ NOTES:
 
 #pragma once
 
-#include "kernel/include/filesystem/mofs.hpp"
 #include "utils/append_char.hpp"
+#include <kernel_api.hpp>
 #include <text_output.hpp>
 #include <stdint.h>
 #include <array.hpp>

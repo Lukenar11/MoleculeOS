@@ -29,7 +29,7 @@ namespace drivers::vga
 {
     class Text_Mode final {
     private:
-        static inline volatile uint16_t* const VGA_TEXMODE_BUFFER = 
+        static inline volatile uint16_t* const VGA_TEXT_MODE_SCREEN_FRAME_BUFFER = 
             reinterpret_cast<volatile uint16_t*>(0xB8000);
 
     public:

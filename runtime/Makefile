@@ -7,7 +7,8 @@
 COMMON_FLAGS += \
 	-Iruntime/cpp/include \
 	-Iruntime/cpp/include/utils \
-	-Iruntime/apis/arch
+	-Iruntime/apis/arch \
+	-Iruntime/apis
 
 include runtime/cpp/src/Makefile
 

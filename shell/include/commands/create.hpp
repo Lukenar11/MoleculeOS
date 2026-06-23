@@ -21,7 +21,7 @@ NOTES:
 #pragma once
 
 #include "utils/helpers.hpp"
-#include "kernel/include/filesystem/mofs.hpp"
+#include <kernel_api.hpp>
 #include <array.hpp>
 
 namespace shell::commands

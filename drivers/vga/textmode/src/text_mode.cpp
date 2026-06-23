@@ -35,7 +35,7 @@ namespace drivers::vga
 
         const uint32_t index = static_cast<uint32_t>(y) * TEXT_MODE_SCREEN_WIDTH +
                                static_cast<uint32_t>(x);
-        VGA_TEXMODE_BUFFER[index] = make_symbol_entry(symbol, color);
+        VGA_TEXT_MODE_SCREEN_FRAME_BUFFER[index] = make_symbol_entry(symbol, color);
     }
 
     void Text_Mode::clear_screen(const Text_Mode_Colors& background)
@@ -45,7 +45,7 @@ namespace drivers::vga
 
         const uint32_t n = TEXT_MODE_SCREEN_WIDTH * TEXT_MODE_SCREEN_HEIGHT;
         for (uint32_t i = 0; i < n; i++) [[likely]]
-            VGA_TEXMODE_BUFFER[i] = entry;
+            VGA_TEXT_MODE_SCREEN_FRAME_BUFFER[i] = entry;
     }
 
     // GLOBAL VGA-textmode object
