@@ -8,7 +8,7 @@ DESCRIPTION:
     This file defines a central kernel API for all architecture-dependent functions.
 
     This API works by including all architecture-specific components from 'arch', 
-    and preprocessor ‘#ifdef’ cascades ensure that only the includes for the 
+    and preprocessor '#ifdef' cascades ensure that only the includes for the 
     respective architecture are compiled.
 
 NOTES:
