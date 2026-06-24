@@ -20,10 +20,10 @@ Examples:
 **lowercase**
 
 Examples:
-- `drivers`
-- `vga`
-- `kernel`
-- `ps2`
+- `drivers::vga::textmode`
+- `shell::commands`
+- `kernel::system::`
+- `runtime::`
 
 ---
 
@@ -31,10 +31,10 @@ Examples:
 **snake_case**
 
 Examples:
-- `cursor_x`
+- `file_intstrem_redict_operator_pos`
 - `text_output`
 - `load_idt()`
-- `kernel_system_sleep()`
+- `extract_file_instream_befor_redict_operator()`
 
 ---
 
@@ -43,8 +43,8 @@ Examples:
 
 Examples:
 - `NULL`
-- `VGA_TEXMODE_SCREEN_WIDTH`
-- `VGA_TEXMODE_SCREEN_HEIGHT`
+- `TEX_MODE_SCREEN_WIDTH`
+- `TEX_MODE_SCREEN_HEIGHT`
 - `LIGHT_MAGENTA`
 
 ---
@@ -55,7 +55,7 @@ Examples:
 Examples:
 - `kernel_main.cpp`
 - `text_output.hpp`
-- `kernel_system_sleep.asm`
+- `sleep.asm`
 
 ---
 
@@ -64,9 +64,9 @@ Examples:
 
 Examples:
 - `drivers/`
-- `runtime/`
+- `filesystem/`
 - `keyboardin/`
-- `interpreter/`
+- `arch/`
 
 ---
 
@@ -237,13 +237,13 @@ Example:
 C example:
 
 ```c
-    #ifndef KERNEL_SYSTEM_SLEEP_H
-    #define KERNEL_SYSTEM_SLEEP_H
+    #ifndef SLEEP_H
+    #define SLEEP_H
 
     /* ... */
     /* ... */
 
-    #endif // KERNEL_SYSTEM_SLEEP_H
+    #endif // SLEEP_H
 ```
 
 C++ example:
@@ -261,7 +261,7 @@ C++ example:
 
 ### Break function signatures as follows:
 
-- Break parameters into separate lines  
+- Break parameters into separate lines if the character limit has been exceeded
 - Place `const noexcept` on a new line if the character limit has been exceeded.
 
 Examples:
@@ -269,8 +269,8 @@ Examples:
 ```cpp
     namespace shell
     {
-        void Shell::draw_user_cursor_with_color(drivers::vga::VGA_Textmode_Colors foreground,
-                                                drivers::vga::VGA_Textmode_Colors background)
+        void Shell::draw_user_cursor_with_color(drivers::vga::Text_Mode_Colors& foreground,
+                                                drivers::vga::Text_Mode_Colors& background)
                                                 const noexcept {
             /* ... */
             /* ... */
@@ -449,11 +449,9 @@ This improves visual structure and makes switch blocks extremely easy to scan.
 
 **Rules**
 
-No circular dependencies between folders.
-- `kernel/` may use `runtime/` and `shell/`.
-- `drivers/` may only use `runtime/`.
-- `runtime/` may use `drivers/`.
-- `shell/` may use `runtime/` and `kernel/`, but not drivers directly.
+All major components, such as `kernel/` and `shell`, 
+must have a central API located under `runtime/apis` or `runtime/apis/arch` (if the component is architecture-dependent)
+and may only use the APIs of other components.
 
 ---
 
@@ -464,7 +462,7 @@ No circular dependencies between folders.
 - Headers → `include/`  
 - Implementation → `src/`  
 - Classes may contain a maximum of 15 methods
-- A file may be no longer than 250 lines
+- A file may be no longer than 300 lines
 - Enums, structs, and classes must be marked as `final`.
 - Classes may only be used for encapsulation and for the constructor and destructor system
 - A class that does not use a constructor, destructor, or both must mark them as `noexcept` and `default` in the header
@@ -472,6 +470,7 @@ No circular dependencies between folders.
 <br> (both in the scripting language community and in the system programming community) and should be written out clearly and self-explanatorily.
 - Even if only a header is needed, you must create an empty source file containing the header comment and an include statement for the header, 
 <br>to maintain a consistent file structure.
+- The empty .cpp file contains only header includes and header comments.
 
 Every file follows this exact structure:
 1. **Header comment**
@@ -572,7 +571,7 @@ A practical example of all the rules:
 
     #include "utils/helpers.hpp"
     #include <stdint.h>
-    #include <port_io.h>
+    #include <io_arch_api.hpp>
 
     namespace drivers::ps2 
     {
@@ -589,7 +588,7 @@ A practical example of all the rules:
 
         public:
             inline bool has_pending_scancode() const noexcept {
-                return inb(KEYBOARD_STATUS_PORT) & LOWEST_BIT;
+                return rintime::byte_input(KEYBOARD_STATUS_PORT) & LOWEST_BIT;
             }
 
             char get_key() noexcept;
@@ -598,7 +597,6 @@ A practical example of all the rules:
             ~Keyboard_Input() noexcept = default;
         };
 
-        // GLOBAL Keyboard-Input object
         extern Keyboard_Input keyboard_input;
     } // namespace drivers::ps2
 ```
@@ -694,10 +692,10 @@ A practical example of all the rules:
         char Keyboard_Input::get_key() noexcept {
             const uint8_t null_terminator = '\0';
 
-            if (!(inb(KEYBOARD_STATUS_PORT) & LOWEST_BIT))
+            if (!(rintime::byte_input(KEYBOARD_STATUS_PORT) & LOWEST_BIT))
                 return null_terminator;
 
-            const uint8_t scancode = inb(KEYBOARD_DATA_PORT);
+            const uint8_t scancode = rintime::byte_input(KEYBOARD_DATA_PORT);
 
             switch (scancode) {
             case static_cast<uint8_t>(Special_Keyboard_Keys::LEFT_SHIFT):
@@ -735,7 +733,6 @@ A practical example of all the rules:
             return character;
         }
 
-        // GLOBAL Keyboard-Input object
         Keyboard_Input keyboard_input;
     } // namespace drivers::ps2
 ```
@@ -782,6 +779,7 @@ A practical example of all the rules:
 - contain a namespace
 - a class (unless it is a helper file)
 - No logic except for trivial `inline` functions  
+- must not define function pointer tables (except for `constexpr`)
 
 ### C++ Source **(.cpp)**
 
@@ -814,8 +812,8 @@ A practical example of all the rules:
 Assembly files follow this structure:
 
 1. **Header comments**
-2. **Global labels** (using `global`)
-3. **External labels** (using `extern`)
+2. **External labels** (using `extern`)
+3. **Global labels** (using `global`)
 4. **Macros**
 6. **Sections** (`section .[SectionName]`)
 5. **Text section** (`section .text`)
@@ -828,52 +826,39 @@ Example:
     ;     Copyright (c) 2026 Lukenar11 (Luke Matthes)
     ;     MIT Licensed
     ;     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-    ; 
+    ;
     ; DESCRIPTION:
-    ;     This file implements the "Global Descriptor Table" (GDT) used by the kernel
-    ;     and provides the "load_gdt" routine for loading it into the CPU.
-    ;    
-    ;     The routine installs the GDT via the "lgdt" instruction, reloads all
-    ;     segment registers, and performs a far jump to ensure the new code
-    ;     segment descriptor becomes active.
-    ;     
+    ;     This file contains the kernel entry point "_start", which is the first
+    ;     executed instruction after the bootloader transfers control to
+    ;     the kernel.
+    ;
+    ;     The routine loads the Global Descriptor Table (GDT), initializes the
+    ;     kernel stack, aligns it to a 16-byte boundary, and then jumps into
+    ;     the C++ high-level entry point "kernel_main".
+    ;
     ; NOTES:
+    ;     The internal implementation of "kernel_stack_top" 
+    ;     is located in "kernel_stack.asm".
+    ;     The internal implementation of "load_gdt" is located in "gdt.asm".
     ;
 
-    global load_gdt
+    extern kernel_main
+    extern kernel_stack_top
+    extern load_gdt
+    global _start
 
-    %define KERNEL_DATA_SEGMENT_SELECTOR 0x10
-
-    section .gdt
-
-    gdt_start:
-
-        dq 0x0000000000000000   ; Null Descriptor
-        dq 0x00CF9A000000FFFF   ; Kernel Code Segment
-        dq 0x00CF92000000FFFF   ; Kernel Data Segment
-
-    gdt_end:
-
-    gdt_descriptor:
-        dw gdt_end - gdt_start - 1
-        dd gdt_start
+    %define STACK_ALIGN_16_MASK 0xFFFFFFF0
 
     section .text
+    _start:
+        cli
 
-    load_gdt:
-        lgdt [gdt_descriptor]
+        call load_gdt
 
-        mov ax, KERNEL_DATA_SEGMENT_SELECTOR
-        mov ds, ax
-        mov es, ax
-        mov fs, ax
-        mov gs, ax
-        mov ss, ax
+        mov esp, kernel_stack_top
+        and esp, STACK_ALIGN_16_MASK
 
-        jmp 0x08:.flush
-
-    .flush:
-        ret
+        jmp kernel_main
 ```
 
 ---
@@ -902,6 +887,12 @@ Modules should follow this pattern:
         └── *.cpp / *.c / *.asm
 ```
 
+### Rules
+- Even if no helper files are needed, a `utils` folder is still created to maintain a consistent folder structure.
+- All header files go in `include`.
+- All source files go in `src`.
+- Every header file must also have a corresponding source file, even if it is not used, to maintain a consistent file structure.
+
 ---
 
 ## 3.6 Driver Structure
@@ -912,7 +903,7 @@ Each driver is a **standalone block** that contains **various modules**:
     drivers/
     │
     ├─ ps2/
-    │   │   # Classic module structure, as explained in “3.4 Module Structure”
+    │   │   # Classic module structure, as explained in '3.4 Module Structure'
     │   ├── keyboardin/
     │   |   │
     │   |   └── ...
@@ -920,7 +911,7 @@ Each driver is a **standalone block** that contains **various modules**:
     |   └── ...
     |
     ├─ vga/
-    |   │   # Classic module structure, as explained in “3.4 Module Structure”
+    |   │   # Classic module structure, as explained in '3.4 Module Structure'
     |   ├── textmode/
     │   |   │
     │   |   └── ...
@@ -936,6 +927,8 @@ Each driver is a **standalone block** that contains **various modules**:
 - Drivers must use **only runtime**  
 - Drivers must **not directly** call kernel subsystems  
 - Drivers should be as **simple** as possible and serve only as a **HAL (Hardware Abstraction Layer)**
+- Each new driver must be included in the file `runtime\apis\drivers_api.hpp`.
+- Even internal runtime components, such as “text_output,” must use the central APIs.
 
 ---
 
@@ -943,43 +936,35 @@ Each driver is a **standalone block** that contains **various modules**:
 
 ```txt
     runtime/
-    │   # C Runtime (e.g., "stdint.h", "string.h")
-    ├─ c/
-    │   │   # public API
-    │   ├── include/
-    |   |   |
-    │   |   ├── utils/
-    |   |   |   |   
-    │   |   |   └── ... *.h
+    │   # Central APIs (e.g. "drivers_api.hpp", "drivers_api.hpp")
+    ├─ apis/
+    │   │   # Standard APIs for architecture-specific components (e.g. "kernel_arch_api.hpp", "io_arch_api.hpp")
+    │   ├── arch/
     │   |   |   
-    │   |   └── ... *.h
+    │   |   └── ... *.hpp / *.h
     |   |
-    │   |   # Implementation
-    │   └── src/
-    │       ├── utils/
-    |       |   |   
-    |       |   └── ... *.c
-    |       |   
-    |       └── ... *.c / *.asm
+    │   |   # Standard APIs (e.g. "drivers_api.hpp")
+    │   └── ... *.hpp / *.hpp
     |
-    |   # C++ Runtime (e.g., "array.hpp", "text_output.hpp")
+    |   # C++ Runtime (e.g. "array.hpp", "text_output.hpp")
+    |   # Classic module structure, as explained in '3.4 Module Structure'
     └─ cpp/
         │   # public API
         ├── include/
         |   |
         |   ├── utils/
         |   |   |   
-        |   |   └── ... *.hpp
+        |   |   └── ... 
         |   |   
-        |   └── ... *.hpp
+        |   └── ... 
         |   
         │   # Implementation
         └── src/
             ├── utils/
             |   |   
-            |   └── ... *.cpp
+            |   └── ... 
             |   
-            └── ... *.cpp
+            └── ... 
 ```
 
 ### Rules
@@ -987,8 +972,8 @@ Each driver is a **standalone block** that contains **various modules**:
 - The runtime must not access **any hardware** directly (only via `drivers/`)
 - The runtime is the **lowest layer**  
 - The runtime must be accessible **to all other modules**
-
----
+- The APIs for the runtime-specific components must include "arch" in their names and 
+  use `#ifdef` preprocessor directives to compile only the code for the respective architecture.
 
 ---
 
@@ -1011,7 +996,7 @@ The kernel consists of clearly separated subsystems
     |   ├── utils/
     |   |
     |   |   # Kernel Subsystem/Komponente structure
-    |   ├── idt/
+    |   ├── heap/
     |   |   |
     |   |   ├── utils/
     |   |   |   |
@@ -1042,3 +1027,4 @@ The kernel consists of clearly separated subsystems
 ```
 
 ---
+
