@@ -1,3 +1,15 @@
+/* 
+LICENSE:
+    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+    MIT Licensed
+    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+
+DESCRIPTION:
+    This file defines a central API for all non-architecture-dependent drivers.
+
+NOTES:
+*/
+
 #pragma once
 
 #include "drivers/ps2/keyboardin/include/keyboard_input.hpp"
