@@ -16,12 +16,15 @@ understandable and transparent - hence the name *MoleculeOS*.
 - Basic hardware initialization
 - Interrupt Descriptor Table (IDT)
 - Global Descriptor Table (GDT)
-- Simple IRQ and endless-loop scheduling
+- Simple endless-loop scheduling
 - linear-area-allocator System Heap
 - PS/2 Keyboard input
 - Shell Interpreter
+- Simple Terminal
 - grub Boot-Setup
 - inode-based custom direct RAM flat file-system
+- central APIs for all componentes
+- strict separation between architecture-specific and non-architecture-specific code
 
 ---
 
@@ -42,15 +45,15 @@ The goal is to understand the *essence* of OS development without unnecessary co
 
 Below is the current state of MoleculeOS running in QEMU:
 
-![MoleculeOS boot screenshot](docs/images/std-screen.png)
+![MoleculeOS boot screenshot](docs/images/std-srceen-v2.png)
 
 Below is the current state of MoleculeOS running in QEMU (deliberately triggered panic with a division by 0):
 
-![MoleculeOS panic screenshot](docs/images/kernel-panic.png)
+![MoleculeOS panic screenshot](docs/images/kernel-panic-v2.png)
 
 ## Demo Preview
 
-![Demo Preview](docs/videos/molecule-os-using.gif)
+![Demo Preview](docs/videos/molecule-os-using-v2.gif)
 
 ---
 
