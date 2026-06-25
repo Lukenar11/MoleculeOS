@@ -8,7 +8,7 @@ DESCRIPTION:
     Class for creating and loading the Interrupt Descriptor Table (IDT). 
 
     This class reserves a 49-entry IDT,
-    initializes all interrupt gates using the "IDTInitEntry" table and
+    initializes all interrupt gates using the "IDT_INIT_Entry" table and
     loads the final descriptor into the CPU using the "load_idt" function.
 
 NOTES:
