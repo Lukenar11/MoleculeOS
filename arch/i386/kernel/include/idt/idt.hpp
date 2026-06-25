@@ -12,7 +12,7 @@ DESCRIPTION:
     loads the final descriptor into the CPU using the "load_idt" function.
 
 NOTES:
-    The global "idt" object is created in "kernel_main" 
+    The global "idt" object is created in "init_kernel" 
     and not directly like other system components in the source file, 
     otherwise the compiler would remove it 
     since it does not see any direct usage related to other components.
