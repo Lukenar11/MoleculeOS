@@ -868,7 +868,7 @@ Example:
 Modules should follow this pattern:
 
 ```txt
-    modul/
+    module/
     │
     ├── include/
     |   |
@@ -987,6 +987,7 @@ The kernel consists of clearly separated subsystems
 - No mixing of logic  
 - No global variables except for intentionally defined kernel singletons
 - As few dependencies as possible between its components
+- The kernel may only access architecture-dependent kernel components using their APIs.
 
 ```txt
     kernel/
@@ -1028,3 +1029,134 @@ The kernel consists of clearly separated subsystems
 
 ---
 
+## 3.9 Shell Structure
+
+The shell consists of two modules: the interpreter and the command implementations.
+
+### Rules
+- All interpreter logic goes in `shell/interpreter/` 
+- All internal command implementations go in `shell/commands/`
+- Each command gets a separate source and header file, named after the command
+- `commands/` and `interpreter/` must not be intertwined, 
+and the only link between them is the **shell_command_table** in the interpreter
+- `interpreter` is responsible for providing an argument array, 
+calling the respective command implementations via the **shell_command_table**, and analyzing and handling syntax errors and buffer errors.
+- The command implementation is responsible for parsing the passed arguments and handling any errors.
+- Must not access the hardware directly
+- Must not use drivers directly
+- The interpreter must not be aware of the commands' logic, except for their function pointers.
+The commands must have no connection to the interpreter, except for the argument array and the **shell_command_table**
+
+``` txt
+    shell/
+    |
+    |   # shell command implementations (e.g. echo, list)
+    |   # Classic module structure, as explained in '3.4 Module Structure' 
+    ├── commands/
+    |   |
+    |   ├── include/
+    |   |   |
+    |   |   ├── utils/
+    |   |   |   |
+    |   |   |   └── ...
+    |   |   |
+    |   |   └── ...
+    |   |
+    |   └── src/
+    |       |
+    |       ├── utils/
+    |       |   |
+    |       |   └── ...
+    |       |
+    |       └── ...
+    |
+    |   # interpreter for the shell commands
+    |   # Classic module structure, as explained in '3.4 Module Structure' 
+    └── interpreter/
+        |
+        ├── include/
+        |   |
+        |   ├── utils/
+        |   |   |
+        |   |   └── ...
+        |   |
+        |   └── ...
+        |
+        └── src/
+            |
+            ├── utils/
+            |
+            └── ...
+```
+
+---
+
+## 3.10 Terminal Structure
+
+The terminal is a high-level UI that uses the keyboard driver and the shell internally.
+
+### Rules
+- It should interact as little as possible with other system components
+- It does not execute or contain any logic directly in the background
+- It passes commands to the shell character by character
+- It does not execute commands.
+- It only displays user input and forwards characters to the shell.
+
+``` txt
+    # Classic module structure, as explained in '3.4 Module Structure' 
+    terminal/
+    │
+    ├── include/
+    |   |
+    |   ├─ utils/
+    |   |  |
+    |   |  └── ...
+    |   |
+    │   └── ...
+    │
+    └── src/
+        |
+        ├─ utils/
+        |  |
+        |  └── ...
+        |
+        └── ...
+```
+
+---
+
+## 3.11 arch Structure
+
+The `arch/` directory contains all architecture-specific code
+
+### Rules
+- Each architecture gets its own Folder.
+- There is a central API that uses preprocessors to ensure that only the correct architecture is compiled.
+- `arch` may access non-architecture-specific components only through their APIs.
+
+``` txt
+    arch/
+    |
+    ├── i386/
+    |   |
+    |   |   # The structure is identical to that explained in "3.8 Kernel Structure".
+    |   ├── kernel/
+    |   |   |
+    |   |   └── ...
+    |   |
+    |   |   # The structure is identical to that explained in "3.7 Runtime Structure".
+    |   ├── runtime/
+    |   |   |
+    |   |   └── ...
+    |   |
+    |   └── ...
+    |
+    |   # Folders for other architectures, e.g., (x86_64, arm, misp)
+    └── ...
+```
+
+---
+
+# 
+
+---
