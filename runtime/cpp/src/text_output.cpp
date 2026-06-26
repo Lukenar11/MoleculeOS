@@ -156,10 +156,10 @@ namespace runtime
     void Text_Output::put_string(const char* message) noexcept {
         const uint32_t needed_lines = calculate_needed_lines(message);
         const uint32_t remaining = drivers::vga::TEXT_MODE_SCREEN_HEIGHT - cursor_y;
-        if (needed_lines >= remaining) [[unlikely]]
+        if (needed_lines >= (remaining - 1)) [[unlikely]]
             reset();
 
-        while (*message) [[likely]]
+        while (*message)
             put_char(*message++);
     }
 

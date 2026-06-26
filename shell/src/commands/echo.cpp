@@ -207,8 +207,11 @@ void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
 namespace shell::commands
 {
     void echo(const runtime::Array<char, 64>& arguments) noexcept {
+        const char* command_name = "echo: ";
+
         if (arguments[0] == '\0') [[unlikely]] {
-            print_command_error("echo: missing argument");
+            print_command_error(command_name);
+            print_command_error("missing argument");
 
             command_end();
             return;
@@ -229,7 +232,9 @@ namespace shell::commands
                 '<'
             );
             if (pos != nullptr) [[unlikely]] {
-                print_command_error("echo: multiple redirect operators\n");
+                print_command_error(command_name);
+                print_command_error("multiple redirect operators\n");
+
                 command_end();
                 return;
             }
@@ -259,7 +264,8 @@ namespace shell::commands
                 '>'
             );
             if (pos != nullptr) [[unlikely]] {
-                print_command_error("echo: multiple redirect operators\n");
+                print_command_error(command_name);
+                print_command_error("multiple redirect operators\n");
 
                 command_end();
                 return;
@@ -284,12 +290,7 @@ namespace shell::commands
             return;
         }
 
-        for (const char& argument : arguments) {
-            if (argument == '\0') [[unlikely]]
-                break;
-
-            runtime::text_output.put_char(argument);
-        }
+        runtime::text_output.put_string(arguments.data());
 
         command_end();
     }
