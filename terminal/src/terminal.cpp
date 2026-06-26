@@ -42,15 +42,13 @@ namespace terminal
     void Terminal::draw_user_cursor_with_color(const drivers::vga::Text_Mode_Colors& foreground,
                                                const drivers::vga::Text_Mode_Colors& background) 
                                                const noexcept {
-        const uint32_t one = 1;
-
         uint32_t x = runtime::text_output.get_cursor_x();
         if (x >= drivers::vga::TEXT_MODE_SCREEN_WIDTH) [[unlikely]]
-            x = drivers::vga::TEXT_MODE_SCREEN_WIDTH - one;
+            x = drivers::vga::TEXT_MODE_SCREEN_WIDTH - 1;
 
         uint32_t y = runtime::text_output.get_cursor_y();
         if (y >= drivers::vga::TEXT_MODE_SCREEN_HEIGHT) [[unlikely]]
-            y = drivers::vga::TEXT_MODE_SCREEN_HEIGHT - one;
+            y = drivers::vga::TEXT_MODE_SCREEN_HEIGHT - 1;
 
         runtime::text_output.set_text_color(foreground, background);
         

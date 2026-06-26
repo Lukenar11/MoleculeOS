@@ -24,16 +24,12 @@ NOTES:
 namespace kernel::heap 
 {
     [[nodiscard]]
-    void* Stack_Allocator::allocate(uintptr_t allocated_bytes) {
-        const uint32_t one = 1;
-        const uintptr_t alignment = 8;
-
+    void* Stack_Allocator::allocate(uintptr_t allocated_bytes) {;
         if (allocated_bytes == 0) [[unlikely]]
             return nullptr;
     
-        allocated_bytes = (allocated_bytes + (alignment - one)) & 
-                          ~(alignment - one);
-        uintptr_t aligned = (current + (alignment - one)) & ~(alignment - one);
+        allocated_bytes = (allocated_bytes + ALIGNMENT_MINUS_ONE) & ~ALIGNMENT_MINUS_ONE ;
+        uintptr_t aligned = (current + ALIGNMENT_MINUS_ONE) & ~ALIGNMENT_MINUS_ONE;
     
         if (aligned + allocated_bytes > end) [[unlikely]]
             system::panic("Out of heap memory", "optimize your memory usage");
@@ -52,16 +48,14 @@ namespace kernel::heap
                 "Marker is outside the valid heap range or not aligned."
             );
 
-        const uintptr_t alignment = 8;
-        if ((marker % alignment) != 0) [[unlikely]]
+        if ((marker % ALIGNMENT) != 0) [[unlikely]]
             system::panic(
                 panic_message,
-                "Marker is not aligned to allocator alignment."
+                "Marker is not aligned to allocator ALIGNMENT."
             );
 
         current = marker;
     }
     
-    // GLOBAL Heap object
     Stack_Allocator stack(heap_start, heap_end);
 } // namespace kernel::heap

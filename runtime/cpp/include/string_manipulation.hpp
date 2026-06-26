@@ -45,9 +45,9 @@ namespace runtime
         }
 
         inline const char* find_char_in_string(const char* string, 
-                                              int32_t symbol) noexcept {
+                                               int32_t symbol) noexcept {
             while (*string != static_cast<char>(symbol))
-                if (!(*string++))
+                if (!(*string++)) [[unlikely]]
                     return nullptr;
 
             return const_cast<char*>(string);

@@ -27,11 +27,11 @@ namespace shell::commands
         runtime::text_output.put_string("Files:\n");
 
         const auto& inodes = kernel::filesystem::mofs.get_inodes();
-        for (const auto& inode : inodes) [[likely]] {
+        for (const auto& inode : inodes) {
             if (!inode.in_use)
                 continue;
 
-            if (inode.name[0] == '\0') {
+            if (inode.name[0] == '\0') [[unlikely]] {
                 static const char* error_message = "\t- [INVALID INODE]\n";
                 runtime::text_output.put_string(error_message);
                 continue;

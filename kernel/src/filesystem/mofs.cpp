@@ -14,7 +14,7 @@ NOTES:
     all files—along with their contents—are deleted upon shutting down or 
     restarting the system.
 
-    One method are placed in the header 
+    1 method are placed in the header 
     because they are so small that the compiler can inline them.
 
     Some functions are placed in the header 
@@ -25,8 +25,9 @@ NOTES:
 
 namespace kernel::filesystem
 {
+    [[nodiscard]]
     Inode* MoleculeOS_File_System::allocate_inode() noexcept {
-        for (auto& inode : inodes) [[likely]]
+        for (auto& inode : inodes)
             if (!inode.in_use) {
                 runtime::memory_manip.set_memory_block(&inode, 0, sizeof(Inode));
                 inode.in_use = true;
@@ -43,20 +44,17 @@ namespace kernel::filesystem
     }
 
     void MoleculeOS_File_System::recalculate_file_size(Inode* inode) noexcept {
-        const uint32_t one = 1;
-        const uint32_t null = 0;
-
         if (inode_not_available(inode)) [[unlikely]]
             return;
 
-        int32_t i = static_cast<int32_t>(MAX_FILE_SIZE) - one;
-        for (; i >= null; --i)
-            if (inode->data[i] != null) {
-                inode->size = static_cast<uint32_t>(i + one);
+        int32_t i = static_cast<int32_t>(MAX_FILE_SIZE) - 1;
+        for (; i >= 0; --i)
+            if (inode->data[i] != 0) {
+                inode->size = static_cast<uint32_t>(i + 1);
                 return;
             }
 
-        inode->size = null;
+        inode->size = 0;
     }
 
     bool MoleculeOS_File_System::is_valid_file_name_or_formant_char(const char symbol)
@@ -64,7 +62,7 @@ namespace kernel::filesystem
         if (((symbol >= 'A') && (symbol <= 'Z')) ||
             ((symbol >= 'a') && (symbol <= 'z')) ||
             ((symbol >= '0') && (symbol <= '9')) ||
-            (symbol == '_') || (symbol == '-'))
+            (symbol == '_') || (symbol == '-')) [[likely]]
             return true;
 
         return false;
@@ -73,41 +71,37 @@ namespace kernel::filesystem
     Inode* MoleculeOS_File_System::get_inode_by_name_and_format(const char* filename, 
                                                                 const char* format) 
                                                                 const noexcept {
-        const uint32_t null = 0;
-        for (auto& inode : inodes) [[likely]] {
+        for (auto& inode : inodes) {
             if (!inode.in_use)
                 continue;
 
-            if ((runtime::string_manip.compare_strings(inode.name, filename) == null) &&
-                (runtime::string_manip.compare_strings(inode.format, format) == null))
+            if ((runtime::string_manip.compare_strings(inode.name, filename) == 0) &&
+                (runtime::string_manip.compare_strings(inode.format, format) == 0))
                 return const_cast<Inode*>(&inode);
         }
+
         return nullptr;
     }
 
-    Inode* MoleculeOS_File_System::create_file(const char* filename, const char* format) 
-                                               noexcept {
-        const uint32_t null = 0;
-        const uint32_t one = 1;
-        const char null_terminator = '\0';
-
-        if (!filename || (filename[null] == null_terminator)) [[unlikely]] 
+    Inode* MoleculeOS_File_System::create_file(const char* filename, 
+                                               const char* format) noexcept {
+        if (!filename || (filename[0] == '\0')) [[unlikely]] 
             return nullptr;
 
-        for (uint32_t i = null; filename[i] != '\0'; i++) [[likely]]
-            if (!is_valid_file_name_or_formant_char(filename[i]))
+        for (uint32_t i = 0; filename[i] != '\0'; i++)
+            if (!is_valid_file_name_or_formant_char(filename[i])) [[unlikely]]
                 return nullptr;
 
-        for (uint32_t i = null; format[i] != '\0'; i++) [[likely]]
-            if (!is_valid_file_name_or_formant_char(format[i]))
+        for (uint32_t i = 0; format[i] != '\0'; i++)
+            if (!is_valid_file_name_or_formant_char(format[i])) [[unlikely]]
                 return nullptr;
 
-        for (auto& inode : inodes) [[likely]] {
+        for (auto& inode : inodes) {
             if (!inode.in_use)
                 continue;
 
-            if ((runtime::string_manip.compare_strings(inode.name, filename) == null) &&
-                (runtime::string_manip.compare_strings(inode.format, format) == null)) [[unlikely]]
+            if ((runtime::string_manip.compare_strings(inode.name, filename) == 0) &&
+                (runtime::string_manip.compare_strings(inode.format, format) == 0)) [[unlikely]]
                 return nullptr;
         }
 
@@ -127,35 +121,32 @@ namespace kernel::filesystem
             MAX_FILE_FORMAT_NAME_LENGTH
         );
 
-        inode->name[MAX_FILENAME_LENGTH - one] = null_terminator;
-        inode->format[MAX_FILE_FORMAT_NAME_LENGTH - one] = null_terminator;
-
-        inode->size = null;
+        inode->name[MAX_FILENAME_LENGTH - 1] = '\0';
+        inode->format[MAX_FILE_FORMAT_NAME_LENGTH - 1] = '\0';
+        inode->size = 0;
 
         return inode;
     }
 
     void MoleculeOS_File_System::delete_file(Inode* inode) noexcept {
-        const char null_terminatpr = '\0';
-        const uint8_t null = 0;
-
         inode->in_use = false;
-        inode->size = null;
+        inode->size = 0;
+
         runtime::memory_manip.set_memory_block(
             inode->name, 
-            null_terminatpr, 
+            '\0', 
             MAX_FILENAME_LENGTH
         );
 
         runtime::memory_manip.set_memory_block(
             inode->format, 
-            null_terminatpr, 
+            '\0', 
             MAX_FILE_FORMAT_NAME_LENGTH
         );
 
         runtime::memory_manip.set_memory_block(
             inode->data, 
-            null, 
+            0, 
             MAX_FILE_SIZE
         );
     }
@@ -164,8 +155,11 @@ namespace kernel::filesystem
                                                          uint8_t* out_buffer,
                                                          const uint32_t buffer_size)
                                                          noexcept {
-        if (inode_not_available(inode)) [[unlikely]] return false;
-        if (less_then(buffer_size, inode->size)) [[unlikely]] return false;
+        if (inode_not_available(inode)) [[unlikely]] 
+            return false;
+
+        if (less_then(buffer_size, inode->size)) [[unlikely]] 
+            return false;
 
         runtime::memory_manip.copy_memory_block(
             out_buffer, 
@@ -179,8 +173,11 @@ namespace kernel::filesystem
                                                             char* out_buffer,
                                                             const uint32_t buffer_size)
                                                             noexcept {
-        if (inode_not_available(inode)) [[unlikely]] return false;
-        if (less_then(buffer_size, inode->size + 1)) [[unlikely]] return false;
+        if (inode_not_available(inode)) [[unlikely]] 
+            return false;
+
+        if (less_then(buffer_size, inode->size + 1)) [[unlikely]] 
+            return false;
 
         runtime::memory_manip.copy_memory_block(
             out_buffer, 
@@ -209,6 +206,7 @@ namespace kernel::filesystem
             (inode->data + offset), 
             length
         );
+
         return true;
     }
 

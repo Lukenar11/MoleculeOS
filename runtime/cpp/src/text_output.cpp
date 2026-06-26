@@ -28,10 +28,8 @@ NOTES:
 namespace runtime
 {
     void Text_Output::reset() noexcept {
-        const uint32_t null = 0;
-
-        cursor_x = null;
-        cursor_y = null;
+        cursor_x = 0;
+        cursor_y = 0;
 
         drivers::vga::text_mode.clear_screen(drivers::vga::Text_Mode_Colors::BLACK);
     }
@@ -59,7 +57,7 @@ namespace runtime
         uint32_t needed_lines = 1;
         uint32_t x = cursor_x;
 
-        while (*text) [[likely]] {
+        while (*text) {
             const char symbol = *text++;
             if (symbol == '\n') {
                 needed_lines++;
@@ -78,12 +76,11 @@ namespace runtime
     }
 
     void Text_Output::put_base(uint32_t value, const uint32_t base) noexcept {
-        const uint32_t null = 0;
         const uint32_t ten = 10;
-        const char char_null = '0';
-        const char char_a = 'A';
+        const char null_char = '0';
+        const char a_char = 'A';
 
-        if (value == null) [[unlikely]] {
+        if (value == 0) [[unlikely]] {
             put_char('0');
             return;
         }
@@ -92,27 +89,26 @@ namespace runtime
             return;
         
         runtime::Array<char, 32> buffer;
-        uint32_t i = null;
-        while (value) [[likely]] {
+        uint32_t i = 0;
+        while (value) {
             const uint8_t number = value % base;
-            buffer[i++] = (number < ten) ? (char_null + number) : 
-                                           (char_a + number - ten);
+            buffer[i++] = (number < ten) ? (null_char + number) : 
+                                           (a_char + number - ten);
             value /= base;
         }
 
-        while (i--) [[likely]]
+        while (i--)
             put_char(buffer[i]);
     }
 
     void Text_Output::put_char(const char symbol) noexcept {
-        const uint32_t null = 0;
         switch (symbol) {
         case '\r':
-            cursor_x = null;
+            cursor_x = 0;
             break;
             
         case '\b':
-            if (cursor_x > null) {
+            if (cursor_x > 0) {
                 cursor_x--;
                 drivers::vga::text_mode.put_char_at(
                     ' ', 
@@ -124,7 +120,7 @@ namespace runtime
             break;
 
         case '\t':
-            for (uint32_t i = null; i < 4; ++i) {
+            for (uint32_t i = 0; i < 4; ++i) {
                 drivers::vga::text_mode.put_char_at(
                     ' ', 
                     cursor_color, 
@@ -168,11 +164,10 @@ namespace runtime
     }
 
     void Text_Output::put_int(int32_t value) noexcept {
-        const uint32_t one = 1;
-        if (value < 0) [[unlikely]] {
+        if (value < 0) {
             put_char('-');
 
-            value = static_cast<uint32_t>(-(value + one)) + one;
+            value = static_cast<uint32_t>(-(value + 1)) + 1;
             put_uint(value);
 
             return;
@@ -182,23 +177,22 @@ namespace runtime
     }
 
     void Text_Output::put_uint(uint32_t value) noexcept {
-        const uint32_t null = 0;
         const uint32_t ten = 10;
         const char null_char = '0';
 
-        if (value == null) [[unlikely]] {
+        if (value == 0) [[unlikely]] {
             put_char('0');
             return;
         }
 
         runtime::Array<char, 12> buffer;
-        uint32_t i = null;
-        while (value) [[likely]] {
+        uint32_t i = 0;
+        while (value) {
             buffer[i++] = null_char + (value % ten);
             value /= ten;
         }
 
-        while (i--) [[likely]]
+        while (i--)
             put_char(buffer[i]);
     }
 

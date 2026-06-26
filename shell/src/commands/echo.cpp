@@ -26,17 +26,16 @@ namespace
                                                       const runtime::Array<char, 64>& arguments)
                                                       noexcept {
         const char null_char = '\0';
-        const uint32_t null = 0;
         static runtime::Array<char, 64> file_instream;
         file_instream.fill(null_char);
 
         if (!redict_operator_pos) [[unlikely]]
             return file_instream;
 
-        uint32_t j = null;
+        uint32_t j = 0;
 
         uint32_t file_instream_end = redict_operator_pos - arguments.begin();
-        for (uint32_t i = null; i < file_instream_end; i++) [[likely]] {
+        for (uint32_t i = 0; i < file_instream_end; i++) {
             if (arguments[i] == null_char) [[unlikely]]
                 break;
 
@@ -62,16 +61,16 @@ namespace
 
         uint32_t i = (redict_operator_pos - arguments.begin()) + 1;
 
-        while (arguments[i] == space_char) [[likely]]
+        while (arguments[i] == space_char) 
             i++;
 
-        if (arguments[i] == null_char) [[unlikely]] {
+        if (arguments[i] == null_char) {
             shell::commands::print_command_error("echo: missing filename\n");
             return filename;
         }
 
         uint32_t j = null;
-        for (; i < arguments.size(); i++) [[likely]] {
+        for (; i < arguments.size(); i++) {
             char argument = arguments[i];
             if ((argument == space_char) || (argument == null_char))
                 break;
@@ -88,7 +87,6 @@ namespace
                                              noexcept {
         const char null_char = '\0';
         const char spache_char = ' ';
-        const uint32_t null = 0;
 
         static runtime::Array<char, 64> filename;
         filename.fill(null_char);
@@ -97,17 +95,17 @@ namespace
             return filename;
 
         uint32_t i = (redict_operator_pos - arguments.begin()) + 1;
-        while (arguments[i] == spache_char) [[likely]]
+        while (arguments[i] == spache_char)
             i++;
 
-        if (arguments[i] == null_char) [[unlikely]] {
+        if (arguments[i] == null_char) {
             shell::commands::print_command_error("echo: missing filename\n");
 
-            filename[null] = null_char;
+            filename[0] = null_char;
             return filename;
         }
 
-        uint32_t j = null;
+        uint32_t j = 0;
         for (; i < arguments.size(); i++) [[unlikely]] {
             const char argument = arguments[i];
             if ((argument == spache_char) || (argument == null_char)) [[unlikely]]
@@ -123,14 +121,13 @@ namespace
     void handle_file_instream(const runtime::Array<char, 64>& filename,
                               const runtime::Array<char, 64>& file_instream) 
                               noexcept {
-        const char null_char = '\0';
         static shell::commands::Parsed_File_Name parsed_filename;
-        parsed_filename.name.fill(null_char);
-        parsed_filename.format.fill(null_char);
-        parsed_filename.error.fill(null_char);
+        parsed_filename.name.fill('\0');
+        parsed_filename.format.fill('\0');
+        parsed_filename.error.fill('\0');
 
         parsed_filename = shell::commands::parse_filename(filename);
-        if (parsed_filename.error.data()[0] != null_char) [[unlikely]] {
+        if (parsed_filename.error.data()[0] != '\0') [[unlikely]] {
             shell::commands::print_command_error("echo: ");
             shell::commands::print_command_error(parsed_filename.error.data());
             return;
@@ -155,19 +152,18 @@ namespace
 }
 
 void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
-    const char null_char = '\0';
     const char* command_name = "echo: ";
 
     static runtime::Array<char, kernel::filesystem::MAX_FILE_SIZE> buffer;
-    buffer.fill(null_char);
+    buffer.fill('\0');
 
     static shell::commands::Parsed_File_Name parsed_filename;
-    parsed_filename.name.fill(null_char);
-    parsed_filename.format.fill(null_char);
-    parsed_filename.error.fill(null_char);
+    parsed_filename.name.fill('\0');
+    parsed_filename.format.fill('\0');
+    parsed_filename.error.fill('\0');
 
     parsed_filename = shell::commands::parse_filename(filename);
-    if (parsed_filename.error[0] != null_char) [[unlikely]] {
+    if (parsed_filename.error[0] != '\0') {
         shell::commands::print_command_error(command_name);
         shell::commands::print_command_error(parsed_filename.error.data());
 
@@ -178,7 +174,7 @@ void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
         parsed_filename.name.data(),
         parsed_filename.format.data()
     );
-    if (!inode) [[unlikely]] {
+    if (!inode) {
         shell::commands::print_command_error(command_name);
         shell::commands::print_command_error("file not found\n");
 
@@ -186,7 +182,7 @@ void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
     }
 
     const uint32_t needed_size = inode->size + 1;
-    if (needed_size > buffer.size()) [[unlikely]] {
+    if (needed_size > buffer.size()) {
         shell::commands::print_command_error(command_name);
         shell::commands::print_command_error("file too large\n");
 
@@ -197,14 +193,14 @@ void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
             inode,
             buffer.data(),
             needed_size
-        )) [[unlikely]] {
+        )) {
         shell::commands::print_command_error(command_name);
         shell::commands::print_command_error("could not read file\n");
 
         return;
     }
 
-    for (uint32_t i = 0; buffer[i] != '\0'; i++) [[likely]]
+    for (uint32_t i = 0; buffer[i] != '\0'; i++)
         runtime::text_output.put_char(buffer[i]);
 }
 
@@ -227,7 +223,7 @@ namespace shell::commands
                 arguments.begin(), 
                 '<'
             );
-        if (file_outstrem_redict_operator_pos != nullptr) [[unlikely]] {
+        if (file_outstrem_redict_operator_pos != nullptr) {
             const char* pos = runtime::string_manip.find_char_in_string(
                 file_outstrem_redict_operator_pos + 1, 
                 '<'
@@ -288,7 +284,7 @@ namespace shell::commands
             return;
         }
 
-        for (const char& argument : arguments) [[likely]] {
+        for (const char& argument : arguments) {
             if (argument == '\0') [[unlikely]]
                 break;
 

@@ -19,20 +19,17 @@ namespace shell::commands
 {
     Parsed_File_Name& parse_filename(const runtime::Array<char, 64>& arguments)
                                      noexcept {
-        const char null_terminator = '\0';
-        const uint32_t null = 0;
-
         static Parsed_File_Name parsed_filename;
 
-        parsed_filename.name.fill(null_terminator);
-        parsed_filename.format.fill(null_terminator);
-        parsed_filename.error.fill(null_terminator);
+        parsed_filename.name.fill('\0');
+        parsed_filename.format.fill('\0');
+        parsed_filename.error.fill('\0');
 
-        uint32_t file_name_index = null;
-        uint32_t file_format_index = null;
+        uint32_t file_name_index = 0;
+        uint32_t file_format_index = 0;
         bool is_file_name = true;
 
-        if (arguments[null] == null_terminator) [[unlikely]] {
+        if (arguments[0] == '\0') [[unlikely]] {
             static const char* error_message = "missing argument";
             runtime::string_manip.copy_string(
                 parsed_filename.error.data(), 
@@ -42,18 +39,18 @@ namespace shell::commands
             return parsed_filename;
         }
     
-        for (uint32_t i = null; arguments[i] != null_terminator; i++) [[likely]] {
-            if (arguments[i] == '.') [[unlikely]] {
+        for (uint32_t i = 0; arguments[i] != '\0'; i++) [[likely]] {
+            if (arguments[i] == '.') {
                 is_file_name = false;
                 continue;
             }
 
-            if (arguments[i] == null_terminator) [[unlikely]]
+            if (arguments[i] == '\0') [[unlikely]]
                 break;
 
             if ((is_file_name && 
                  !append_char(parsed_filename.name, file_name_index, arguments[i])) ||
-                (file_name_index >= kernel::filesystem::MAX_FILENAME_LENGTH)) [[unlikely]] {
+                (file_name_index >= kernel::filesystem::MAX_FILENAME_LENGTH)) {
                 static const char* error_message = "filename too long";
                 runtime::string_manip.copy_string(
                     parsed_filename.error.data(), 
@@ -65,8 +62,7 @@ namespace shell::commands
             
             if (!(is_file_name || 
                   append_char(parsed_filename.format, file_format_index, arguments[i])) || 
-                (file_format_index >= kernel::filesystem::MAX_FILE_FORMAT_NAME_LENGTH)
-                ) [[unlikely]] {
+                (file_format_index >= kernel::filesystem::MAX_FILE_FORMAT_NAME_LENGTH)) {
                 static const char* error_message = "format too long";
                 runtime::string_manip.copy_string(
                     parsed_filename.error.data(), 
@@ -77,13 +73,13 @@ namespace shell::commands
             }
         }
 
-        const uint32_t one = 1;
-        parsed_filename.name[file_name_index + one] = null_terminator;
-        parsed_filename.format[file_format_index + one] = null_terminator;
+        parsed_filename.name[file_name_index + 1] = '\0';
+        parsed_filename.format[file_format_index + 1] = '\0';
     
-        for (uint32_t i = null; parsed_filename.name[i] != '\0'; i++) [[likely]]
+        for (uint32_t i = 0; parsed_filename.name[i] != '\0'; i++) [[likely]]
             if (!kernel::filesystem::mofs.is_valid_file_name_or_formant_char(
-                parsed_filename.name[i])) [[unlikely]] {
+                    parsed_filename.name[i]
+                )) {
                 static const char* error_message = "not a valid File Name";
                 runtime::string_manip.copy_string(
                     parsed_filename.error.data(),
@@ -93,9 +89,10 @@ namespace shell::commands
                 return parsed_filename;
             }
 
-        for (uint32_t i = null; parsed_filename.format[i] != '\0'; i++) [[likely]]
+        for (uint32_t i = 0; parsed_filename.format[i] != '\0'; i++) [[likely]]
             if (!kernel::filesystem::mofs.is_valid_file_name_or_formant_char(
-                parsed_filename.format[i])) [[unlikely]] {
+                parsed_filename.format[i]
+            )) {
                 static const char* error_message = "not a valid File Format";
                 runtime::string_manip.copy_string(
                     parsed_filename.error.data(), 

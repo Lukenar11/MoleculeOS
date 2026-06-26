@@ -28,6 +28,9 @@ namespace kernel::heap
 {
     class Stack_Allocator final {
     private:
+        static constexpr uint32_t ALIGNMENT = 8;
+        static constexpr uint32_t ALIGNMENT_MINUS_ONE = ALIGNMENT - 1;
+
         uintptr_t start;
         uintptr_t end;
         
@@ -40,17 +43,17 @@ namespace kernel::heap
         void rewind(const uintptr_t marker) noexcept;
 
         [[nodiscard]] 
-        inline uintptr_t mark() const noexcept { 
+        inline constexpr uintptr_t mark() const noexcept { 
             return current; 
         }
 
         [[nodiscard]] 
-        inline uintptr_t used() const noexcept { 
+        inline constexpr uintptr_t used() const noexcept { 
             return current - start;
         }
 
         [[nodiscard]] 
-        inline uintptr_t remaining() const noexcept { 
+        inline constexpr uintptr_t remaining() const noexcept { 
             return end - current; 
         }
 
@@ -63,6 +66,5 @@ namespace kernel::heap
         ~Stack_Allocator() noexcept = default;
     };
 
-    // GLOBAL Heap object
     extern Stack_Allocator stack;
 } // namespace kernel::heap

@@ -23,11 +23,10 @@ NOTES:
 
 namespace drivers::ps2
 {
+    [[nodiscard]]
     char Keyboard_Input::get_key() noexcept {
-        const char null_terminator = '\0';
-
         if (!(runtime::byte_input(KEYBOARD_STATUS_PORT) & LOWEST_BIT))
-            return null_terminator;
+            return '\0';
     
         const uint8_t scancode = runtime::byte_input(KEYBOARD_DATA_PORT);
     
@@ -35,34 +34,33 @@ namespace drivers::ps2
         case static_cast<uint8_t>(Special_Keyboard_Keys::LEFT_SHIFT):
         case static_cast<uint8_t>(Special_Keyboard_Keys::RIGHT_SHIFT):
             shift_is_pressed = true;
-            return null_terminator;
+            return '\0';
         
         case static_cast<uint8_t>(Special_Keyboard_Keys::LEFT_SHIFT_RELEASE):
         case static_cast<uint8_t>(Special_Keyboard_Keys::RIGHT_SHIFT_RELEASE):
             shift_is_pressed = false;
-            return null_terminator;
+            return '\0';
         
         case static_cast<uint8_t>(Special_Keyboard_Keys::CAPSLOCK):
             capslock_is_enabled = !capslock_is_enabled;
-            return null_terminator;
+            return '\0';
         }
     
         if (scancode & static_cast<uint8_t>(Special_Keyboard_Keys::KEYBOARD_RELEASE))
-            return null_terminator;
+            return '\0';
     
         if (scancode >= ALOWED_SCANCODE_SIZE)
-            return null_terminator;
+            return '\0';
     
         char character = (shift_is_pressed) 
                          ? us_qwerty_shift_key_mapping[scancode] 
                          : us_qwerty_std_key_mapping[scancode]; 
 
-        const uint32_t thirty_two = 32;
         if (capslock_is_enabled) [[unlikely]] {
             if ((character >= 'a') && (character <= 'z'))
-                character -= thirty_two;
+                character -= 32;
             else if ((character >= 'A') && (character <= 'Z'))
-                character += thirty_two;
+                character += 32;
         }
 
         return character;

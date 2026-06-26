@@ -60,7 +60,7 @@ namespace runtime
 
         // Repace array-data with "value"
         inline constexpr void fill(const T& value) noexcept {
-            for (uint32_t i = 0; i < S; i++) [[likely]]
+            for (uint32_t i = 0; i < S; i++)
                 buffer[i] = value; 
         }
 

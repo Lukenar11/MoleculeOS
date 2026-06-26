@@ -39,9 +39,8 @@ namespace shell::commands
     }
 
     inline void command_end() noexcept {
-        const char new_line = '\n';
-        runtime::text_output.put_char(new_line);
-        runtime::text_output.put_char(new_line);
+        runtime::text_output.put_char('\n');
+        runtime::text_output.put_char('\n');
     }
 
     struct Parsed_File_Name final {

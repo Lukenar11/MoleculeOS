@@ -72,6 +72,8 @@ Examples:
 
 # 2. Formatting Conventions
 
+---
+
 ## 2.1 Indentation
 
 - Use **tabs** set to **4 spaces** for indentation.  
@@ -462,7 +464,7 @@ and may only use the APIs of other components.
 - Headers → `include/`  
 - Implementation → `src/`  
 - Classes may contain a maximum of 15 methods
-- A file may be no longer than 300 lines
+- A file may be no longer than 350 lines
 - Enums, structs, and classes must be marked as `final`.
 - Classes may only be used for encapsulation and for the constructor and destructor system
 - A class that does not use a constructor, destructor, or both must mark them as `noexcept` and `default` in the header
@@ -1157,6 +1159,7 @@ The `arch/` directory contains all architecture-specific code
 
 ---
 
-# 
+# 4. Coding Conventions
 
 ---
+

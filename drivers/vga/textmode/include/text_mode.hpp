@@ -40,11 +40,11 @@ namespace drivers::vga
                                                    noexcept {
             const uint8_t color = (static_cast<uint8_t>(background) << 4) | 
                                    static_cast<uint8_t>(foreground);
-            if (does_blink) [[unlikely]] {
+            if (!does_blink) [[likely]] {
+                return color;
+            } else [[unlikely]] {
                 const uint8_t blink_mode_bit = 0x80;
                 return color | blink_mode_bit;
-            } else [[likely]] {
-                return color;
             }
         }
 
