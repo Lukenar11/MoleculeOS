@@ -22,11 +22,12 @@ namespace kernel::system
         const uint8_t keyboard_ctrl = static_cast<uint8_t>(CTRL);
         const uint8_t rboot_command = static_cast<uint8_t>(REBOOT_COMMAND);
         const uint8_t input_buffer_full = 0x02;
+        const uint8_t zero = 0;
 
         uint32_t timeout = 100'000;
-        while (timeout--) [[likely]] {
+        while (timeout--) {
             const uint8_t status = runtime::byte_input(keyboard_ctrl);
-            if ((status & input_buffer_full) == 0)
+            if ((status & input_buffer_full) == zero)
                 break;
         }
 

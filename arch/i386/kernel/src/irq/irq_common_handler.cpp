@@ -31,7 +31,7 @@ namespace kernel::irq
         const uint8_t max_interrupt_vector = 0x2F;
     
         if ((interrupt_vector >= min_interrupt_vector) && 
-            (interrupt_vector <= max_interrupt_vector)) [[likely]] {
+            (interrupt_vector <= max_interrupt_vector)) {
             const uint16_t slave_pic_command_port = 0xA0;
             runtime::byte_output(slave_pic_command_port, end_of_interrupt);
         }

@@ -42,10 +42,10 @@ namespace kernel::idt
         idt_ptr.limit = (sizeof(IDT_Entry) * idt.size()) - 1;
         idt_ptr.base = reinterpret_cast<uint32_t>(idt.begin());
 
-        for (auto& idt_entry : idt) [[likely]]
+        for (auto& idt_entry : idt)
             idt_entry = IDT_Entry{};
 
-        for (const auto& idt_entry : idt_init_table) [[likely]]
+        for (const auto& idt_entry : idt_init_table)
             set_gate(idt_entry.index, idt_entry.handler);
 
         load_idt(reinterpret_cast<uint32_t>(&idt_ptr));

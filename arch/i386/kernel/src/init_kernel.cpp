@@ -37,7 +37,7 @@ namespace kernel
     void init_kernel() noexcept {
         static idt::Interrupt_Descriptor_Table idt;
 
-        for (const auto& entry : pic_mappings) [[likely]]
+        for (const auto& entry : pic_mappings)
             runtime::byte_output(entry.port, entry.value);
 
         system::enable_interrupts();

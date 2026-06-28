@@ -23,7 +23,7 @@ namespace kernel::system
 {
     void shutdown() noexcept {
         const uint32_t cpu_flags = save_eflags();
-        for (const auto& entry : emulator_specific_shutdown_command_mappings) [[likely]] {
+        for (const auto& entry : emulator_specific_shutdown_command_mappings) {
             if (entry.is_8bit_mode) [[unlikely]] {
                 const uint8_t value = entry.value & 0xFF;
                 runtime::byte_output(entry.port, value);
