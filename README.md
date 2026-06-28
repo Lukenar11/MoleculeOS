@@ -1,11 +1,9 @@
 # MoleculeOS
 
-**MoleculeOS** is a minimalist, text-based *i386* monolithic operating system, 
-<br> developed in C++ as a hobby project.
+**MoleculeOS** is a minimalist, text-based *i386* monolithic operating system, developed in C++ as a hobby project.
 
-The goal of this project is to create a clearly structured, <br>
-modular learning and experimentation system that makes the fundamental building blocks of an operating system <br>
-understandable and transparent - hence the name *MoleculeOS*.
+The goal of this project is to create a clearly structured, 
+modular learning and experimentation system that makes the fundamental building blocks of an operating system understandable and transparent - hence the name *MoleculeOS*.
 
 ---
 

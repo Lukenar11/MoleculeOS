@@ -20,10 +20,10 @@ Examples:
 **lowercase**
 
 Examples:
-- `drivers::vga::textmode`
+- `drivers::ps2`
 - `shell::commands`
-- `kernel::system::`
-- `runtime::`
+- `kernel`
+- `runtime`
 
 ---
 
@@ -42,9 +42,9 @@ Examples:
 **SCREAMING_SNAKE_CASE**
 
 Examples:
-- `NULL`
+- `LOWEST_BIT`
 - `TEXT_MODE_SCREEN_WIDTH`
-- `TEXT_MODE_SCREEN_HEIGHT`
+- `KEYBOARD_STATUS_PORT`
 - `LIGHT_MAGENTA`
 
 ---
@@ -468,10 +468,10 @@ and may only use the APIs of other components.
 - Enums, structs, and classes must be marked as `final`.
 - Classes may only be used for encapsulation and for the constructor and destructor system
 - A class that does not use a constructor, destructor, or both must mark them as `noexcept` and `default` in the header
-- Anything that can be named (e.g., functions, variables) must not use abbreviations unless they are widely recognized
-<br> (both in the scripting language community and in the system programming community) and should be written out clearly and self-explanatorily.
+- Anything that can be named (e.g., functions, variables) must not use abbreviations unless they are widely recognized 
+(both in the scripting language community and in the system programming community) and should be written out clearly and self-explanatorily.
 - Even if only a header is needed, you must create an empty source file containing the header comment and an include statement for the header, 
-<br>to maintain a consistent file structure.
+to maintain a consistent file structure.
 - The empty .cpp file contains only header includes and header comments.
 
 Every file follows this exact structure:
@@ -1163,3 +1163,57 @@ The `arch/` directory contains all architecture-specific code
 
 ---
 
+## 4.1 General C++ Rules
+
+- No exceptions (`throw`, `try`, and `catch` are prohibited)
+- No RTTI (`dynamic_cast` and `typeid` are prohibited)
+- No recursion
+- No virtual methods
+- No dynamic memory allocation, unless explicitly permitted by the subsystem
+- No use of the C++ Standard Library
+- No global variables except for intentionally defined singletons
+- All functions must be `noexcept`, unless this is impossible
+- All constructors and destructors must be `noexcept`
+- All trivial constructors/destructors must be `= default`
+- Anything that is possible and for which the compiler does not indicate that it has no effect should be declared as `const`
+- Anything that is merely possible should be declared as `constexpr`
+- Everything should be explicitly defined
+- Each file contains one class as a module for encapsulation, which handles the main logic, except for helper files.
+- No inline assembly (use `.asm` files instead)
+- names should be written out in full; do not use abbreviations unless they are common and well-known.
+- Declare C++ functions that serve as an assembly interface using `extern "C"`, `extern "C"`. 
+This prevents name conflicts, which is why you can then use these functions even without namespaces.
+- One class per file:
+    - Helper files may contain multiple small helper functions, but no classes.
+- No magic numbers:
+    - All values that can become magic are declared in `const` variables.
+    - All values that can become magic and are needed by multiple methods within a class are declared in `constexpr` variables in the `private:` section of the class.
+
+---
+
+## 4.2 C Code Rules
+
+- No recursion
+- No use of the C standard library
+- No global variables
+- C code should be avoided at all costs and used only when absolutely necessary, e.g., as a runtime API for the compiler
+- Anything that is possible and for which the compiler does not specify that it has no impact should be declared as `const`
+- names should be written out in full; do not use abbreviations unless they are common and well-known.
+- Everything should be explicitly defined
+- No inline assembler (use `.asm` files instead)
+- C code should not be used as an assembly interface, unless there is no other option.
+- No magic numbers:
+    - All values that could become magic numbers are declared as `const` variables.
+
+---
+
+## 4.3 Assembler Rules
+
+- No magic numbers—use macros
+- Assembly code should be avoided at all costs and used only when there is no other option—for example, 
+when maximum hardware control is required, or when a problem is easier to solve in assembly than in regular code.
+- Labels and macro names should be written out in full; do not use abbreviations unless they are common and well-known.
+- The assembler code must be architecture-specific and stored under `arch/[Architecture]/...`
+- Do not use `%include`; use `extern` instead
+
+---
