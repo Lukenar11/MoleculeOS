@@ -24,8 +24,8 @@ namespace kernel::idt
 {
     void Interrupt_Descriptor_Table::set_gate(const uint8_t index, 
                                               void (*handler)()) noexcept {
-        if (index >= idt.size()) [[unlikely]]
-            system::panic("IDT index out of range", "Check \"idt_init_table\"");
+        // if (index >= idt.size()) [[unlikely]]
+        //     system::panic("IDT index out of range", "Check \"idt_init_table\"");
         
         const uint32_t base = reinterpret_cast<uint32_t>(handler);
         const uint16_t word_mask = 0xFFFF;

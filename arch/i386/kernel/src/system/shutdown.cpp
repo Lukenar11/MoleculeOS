@@ -34,10 +34,6 @@ namespace kernel::system
             restore_eflags(cpu_flags);
         }
 
-        panic(
-            "Shutdown failed",
-            "No supported emulator-specific shutdown method worked.\n"
-            "This system may not be running in a supported emulator."
-        );
+        panic("Shutdown failed");
     }
 } // namespace kernel::system

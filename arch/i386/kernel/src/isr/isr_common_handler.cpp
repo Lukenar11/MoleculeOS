@@ -27,6 +27,8 @@ namespace kernel::isr
 {
     extern "C"
     void isr_common_handler(Register_Dump* reg_dump) {
+        const bool clear_screen_if_hight_limit_reached = false;
+
         runtime::text_output.reset();
         runtime::text_output.set_text_color(
             drivers::vga::Text_Mode_Colors::RED,
@@ -39,36 +41,54 @@ namespace kernel::isr
                                 ? exception_names[n]
                                 : "Unknown Exception";
     
-        runtime::text_output.put_string(">>>>>>>>>> !KERNEL PANIC! <<<<<<<<<<");
+        runtime::text_output.put_string(
+            ">>>>>>>>>> !KERNEL PANIC! <<<<<<<<<<", 
+            clear_screen_if_hight_limit_reached
+        );
         print_reg_dump("\n\nError Code: ", reg_dump->error_code);
     
-        runtime::text_output.put_string("\nException: ");
+        runtime::text_output.put_string(
+            "\nException: ", 
+            clear_screen_if_hight_limit_reached
+        );
         runtime::text_output.put_string(exception);
         runtime::text_output.put_char(' ');
         runtime::text_output.put_char('(');
         runtime::text_output.put_hex(reg_dump->interrupt_number);
         runtime::text_output.put_char(')');
     
-        runtime::text_output.put_string("\n\nCPU State:");
-        print_reg_dump("\n  EIP: ", reg_dump->eip);
-        print_reg_dump("\n  CS: ", reg_dump->cs);
-        runtime::text_output.put_string("\n  EFLAGS: ");
+        runtime::text_output.put_string(
+            "\n\nCPU State:",
+            clear_screen_if_hight_limit_reached
+        );
+        print_reg_dump("\n\tEIP: ", reg_dump->eip);
+        print_reg_dump("\n\tCS: ", reg_dump->cs);
+        runtime::text_output.put_string(
+            "\n\tEFLAGS: ", 
+            clear_screen_if_hight_limit_reached
+        );
         runtime::text_output.put_bin(reg_dump->eflags);
     
-        runtime::text_output.put_string("\n\nGeneral Registers:");
-        print_reg_dump("\n  EAX: ", reg_dump->eax);
-        print_reg_dump("\n  EBX: ", reg_dump->ebx);
-        print_reg_dump("\n  ECX: ", reg_dump->ecx);
-        print_reg_dump("\n  EDX: ", reg_dump->edx);
-        print_reg_dump("\n  ESI: ", reg_dump->esi);
-        print_reg_dump("\n  EDI: ", reg_dump->edi);
-        print_reg_dump("\n  EBP: ", reg_dump->ebp);
-    
-        runtime::text_output.put_string("\n\nSegment Registers:");
-        print_reg_dump("\n  DS: ", reg_dump->ds);
-        print_reg_dump("\n  ES: ", reg_dump->es);
-        print_reg_dump("\n  FS: ", reg_dump->fs);
-        print_reg_dump("\n  GS: ", reg_dump->gs);
+        runtime::text_output.put_string(
+            "\n\nGeneral Registers:", 
+            clear_screen_if_hight_limit_reached
+        );
+        print_reg_dump("\n\tEAX: ", reg_dump->eax);
+        print_reg_dump("\n\tEBX: ", reg_dump->ebx);
+        print_reg_dump("\n\tECX: ", reg_dump->ecx);
+        print_reg_dump("\n\tEDX: ", reg_dump->edx);
+        print_reg_dump("\n\tESI: ", reg_dump->esi);
+        print_reg_dump("\n\tEDI: ", reg_dump->edi);
+        print_reg_dump("\n\tEBP: ", reg_dump->ebp);
+
+        runtime::text_output.put_string(
+            "\n\nSegment Registers:", 
+            clear_screen_if_hight_limit_reached
+        );
+        print_reg_dump("\n\tDS: ", reg_dump->ds);
+        print_reg_dump("\n\tES: ", reg_dump->es);
+        print_reg_dump("\n\tFS: ", reg_dump->fs);
+        print_reg_dump("\n\tGS: ", reg_dump->gs);
 
         system::hang();
     }

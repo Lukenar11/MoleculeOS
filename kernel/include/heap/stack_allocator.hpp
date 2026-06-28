@@ -23,6 +23,7 @@ NOTES:
 #include "utils/heap_pos_marker.hpp"
 #include "system/panic.hpp"
 #include <stdint.h>
+#include <kernel_arch_api.hpp>
 
 namespace kernel::heap 
 {

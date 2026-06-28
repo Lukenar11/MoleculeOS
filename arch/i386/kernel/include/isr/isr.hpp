@@ -35,7 +35,7 @@ namespace kernel::isr
         void isr_12();      // Stack Fault (dangerous)
         void isr_13();      // General Protection Fault (error code)
         void isr_14();      // Page Fault (dangerous without paging)
-        void isr_15();      // Reserved (unused)
+        void isr_15();      // Reserved (custom panic)
         void isr_16();      // x87 FP Exception
         void isr_17();      // Alignment Check (error code, often unsupported)
         void isr_18();      // Machine Check

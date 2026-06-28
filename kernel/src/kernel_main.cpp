@@ -40,8 +40,7 @@ namespace kernel
         }
 
         system::panic(
-            "Unexpected return from the \"kernel_main\" scheduler main loop",
-            "This should never happen.\nPlease report this to the developer."
+            "Unexpected return from the \"kernel_main\" scheduler main loop"
         );
     }
 }

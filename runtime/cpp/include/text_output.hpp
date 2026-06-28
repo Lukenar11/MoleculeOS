@@ -56,7 +56,9 @@ namespace runtime
                             noexcept;
         
         void put_char(const char symbol) noexcept;
-        void put_string(const char* message) noexcept;
+        void put_string(const char* message, 
+                        const bool clear_screen_if_hight_limit_reached=true)
+                        noexcept;
             
         void put_int(int32_t value) noexcept;
         void put_uint(uint32_t value) noexcept;

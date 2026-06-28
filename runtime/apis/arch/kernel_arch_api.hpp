@@ -30,4 +30,5 @@ NOTES:
 #include "arch/i386/kernel/include/system/reboot.hpp"
 #include "arch/i386/kernel/include/system/shutdown.hpp"
 #include "arch/i386/kernel/include/system/sleep.hpp"
+#include "arch/i386/kernel/include/system/panic.hpp"
 #endif

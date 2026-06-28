@@ -33,11 +33,6 @@ namespace kernel::system
 
         runtime::byte_output(keyboard_ctrl, rboot_command);
 
-        panic(
-            "Reboot failed",
-            "The keyboard controller did not trigger a hardware reset.\n"
-            "This should never happen.\n"
-            "Please report this to the developer."
-        );
+        panic("Reboot failed");
     }
 } // namespace kernel::system

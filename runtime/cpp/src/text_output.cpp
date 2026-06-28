@@ -153,11 +153,15 @@ namespace runtime
         }
     }
 
-    void Text_Output::put_string(const char* message) noexcept {
+    void Text_Output::put_string(const char* message, 
+                                 const bool clear_screen_if_hight_limit_reached) 
+                                 noexcept {
         const uint32_t needed_lines = calculate_needed_lines(message);
         const uint32_t remaining = drivers::vga::TEXT_MODE_SCREEN_HEIGHT - cursor_y;
-        if (needed_lines >= (remaining - 1)) [[unlikely]]
-            reset();
+        
+        if (clear_screen_if_hight_limit_reached)
+            if (needed_lines >= (remaining - 1)) [[unlikely]]
+                reset();
 
         while (*message)
             put_char(*message++);

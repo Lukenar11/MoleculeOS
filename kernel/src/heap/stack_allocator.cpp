@@ -32,7 +32,7 @@ namespace kernel::heap
         uintptr_t aligned = (current + ALIGNMENT_MINUS_ONE) & ~ALIGNMENT_MINUS_ONE;
     
         if (aligned + allocated_bytes > end) [[unlikely]]
-            system::panic("Out of heap memory", "optimize your memory usage");
+            system::panic("Out of heap memory");
     
         void* result = reinterpret_cast<void*>(aligned);
         current = aligned + allocated_bytes;
@@ -40,17 +40,13 @@ namespace kernel::heap
     }
 
     void Stack_Allocator::rewind(const uintptr_t marker) noexcept {
-        static const char* panic_message = "Invalid heap rewind";
-
         if ((marker < start) || (marker > current) || (marker > end)) [[unlikely]]
             system::panic(
-                panic_message,
                 "Marker is outside the valid heap range or not aligned."
             );
 
         if ((marker % ALIGNMENT) != 0) [[unlikely]]
             system::panic(
-                panic_message,
                 "Marker is not aligned to allocator ALIGNMENT."
             );
 

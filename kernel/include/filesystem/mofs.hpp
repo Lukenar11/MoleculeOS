@@ -24,8 +24,8 @@ NOTES:
 #pragma once
 
 #include "utils/helpers.hpp"
-#include "system/panic.hpp"
 #include <array.hpp>
+#include <kernel_arch_api.hpp>
 #include <memory_manipulation.hpp>
 #include <string_manipulation.hpp>
 #include <stdint.h>

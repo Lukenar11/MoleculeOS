@@ -26,12 +26,15 @@ NOTES:
 #include "utils/exception_names.hpp"
 #include "utils/register_dump.hpp"
 #include "system/hang.hpp"
+#include "system/panic.hpp"
 #include <text_output.hpp>
 
 static inline constexpr void print_reg_dump(const char* label, 
                                             const uint32_t value) noexcept
 {
-    runtime::text_output.put_string(label);
+    const bool clear_screen_if_hight_limit_reached = false;
+    
+    runtime::text_output.put_string(label, clear_screen_if_hight_limit_reached);
     runtime::text_output.put_hex(value);
 }
 

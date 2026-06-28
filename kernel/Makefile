@@ -9,7 +9,6 @@ COMMON_FLAGS += \
 
 include kernel/src/filesystem/Makefile
 include kernel/src/heap/Makefile
-include kernel/src/system/Makefile
 include kernel/src/Makefile
 
 $(BUILD_DIR):

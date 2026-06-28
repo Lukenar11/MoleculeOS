@@ -5,7 +5,7 @@
 # 
 
 COMMON_FLAGS += \
-	-Iarch/i386/kernel/include
+	-Iarch/i386/kernel/include \
 
 include arch/i386/kernel/src/idt/Makefile
 include arch/i386/kernel/src/irq/Makefile

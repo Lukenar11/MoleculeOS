@@ -7,10 +7,12 @@
 OBJS += \
 	$(BUILD)/cpu_flags.o \
 	$(BUILD)/reboot.o \
+	$(BUILD)/panic.o \
 	$(BUILD)/shutdown.o \
 	$(BUILD)/enable_interrupts.o \
 	$(BUILD)/sleep.o \
 	$(BUILD)/hang.o \
+	$(BUILD)/trigger_interrupt.o
 
 $(BUILD)/%.o: arch/i386/kernel/src/system/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

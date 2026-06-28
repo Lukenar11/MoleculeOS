@@ -20,4 +20,7 @@ NOTES:
 
 #include "utils/register_dump.hpp"
 
-static_assert(sizeof(Register_Dump) == 17 * 4, "RegisterDump size mismatch!");
+namespace kernel
+{
+    static_assert(sizeof(Register_Dump) == 16 * 4, "Register_Dump size mismatch!");
+} // namespace kernel

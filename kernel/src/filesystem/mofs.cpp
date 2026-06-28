@@ -35,10 +35,7 @@ namespace kernel::filesystem
                 return &inode;
             }
 
-        system::panic(
-            "MOFS: no free inodes available", 
-            "dont create to mutch files"
-        );
+        system::panic("MOFS: no free inodes available");
 
         return nullptr;
     }
