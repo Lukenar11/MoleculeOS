@@ -30,7 +30,7 @@ namespace shell::commands
             "| |\\/| |/ _ \\| |/ _ \\/ __| | | | |/ _ \\ | |  | |\\___ \\ \n"
             "| |  | | (_) | |  __/ (__| |_| | |  __/ | |__| |____) |\n"
             "|_|  |_|\\___/|_|\\___|\\___|\\__,_|_|\\___|  \\____/|_____/ \n"
-            "\nVersion 0.1.0-alpha (Kernel Mode)\n"
+            "\nVersion 0.2.0-alpha (Kernel Mode)\n"
             "\nCopyright (c) 2026 Lukenar11 (Luke Matthes)\n"
             "MIT Licensed\n"
             "https://github.com/Lukenar11/MoleculeOS\n"

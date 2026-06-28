@@ -1181,6 +1181,10 @@ The `arch/` directory contains all architecture-specific code
 - Each file contains one class as a module for encapsulation, which handles the main logic, except for helper files.
 - No inline assembly (use `.asm` files instead)
 - names should be written out in full; do not use abbreviations unless they are common and well-known.
+- Use `[[likely]]` and `[[unlikely]]` in some places to optimize the hot path.
+- `kernel_main` is declared as `[[noreturn]]`
+- Use `[[nodiscard]]` for methods and functions where the return value cannot be ignored under any circumstances.
+- Do not use C code in C++
 - Declare C++ functions that serve as an assembly interface using `extern "C"`, `extern "C"`. 
 This prevents name conflicts, which is why you can then use these functions even without namespaces.
 - One class per file:
