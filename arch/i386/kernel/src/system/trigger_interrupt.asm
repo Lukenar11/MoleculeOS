@@ -1,3 +1,20 @@
+;
+; LICENSE:
+;     Copyright (c) 2026 Lukenar11 (Luke Matthes)
+;     MIT Licensed
+;     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+;
+; DESCRIPTION:
+;     This file creates a table with 256 entries at assembly time, 
+;     where each entry is a function that triggers an interrupt.
+;     
+;     The function 'trigger_interrupt' takes an integer, 
+;     uses it to determine which interrupt table entry it needs to call, 
+;     and jumps to that entry. 
+;
+; NOTES:
+;
+
 global trigger_interrupt
 
 %define INTERRUPT_TABLE_SIZE 256
