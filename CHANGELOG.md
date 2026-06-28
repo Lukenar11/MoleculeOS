@@ -82,7 +82,7 @@
 - Updated STYLE.md runtime structure section  
 - Hot‑path optimization rules across the entire codebase  
 - New `stack_allocator` (renamed from `linear_area`)  
-- New C++ namespace‑based linkage for all assembly interfaces and `extern "C"` deklarations
+- `extern "C"` interfaces replaced C code where appropriate, and existing `extern "C"` declarations were wrapped in proper C++ namespaces.
 
 ### Changed
 - C code removed from the system (except minimal compiler ABI layer)  
