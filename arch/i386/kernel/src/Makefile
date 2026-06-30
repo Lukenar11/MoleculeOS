@@ -5,7 +5,7 @@
 # 
 
 OBJS += \
-	$(BUILD)/init_kernel.o \
+	$(BUILD)/kernel_arch_init.o \
 
 $(BUILD)/%.o: arch/i386/kernel/src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

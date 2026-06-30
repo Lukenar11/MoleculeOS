@@ -5,13 +5,13 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    The function "init_kernel" is calles from "kernel_main" and 
+    The function "kernel_arch_init" is calles from "kernel_main" and 
     initializes core subsystems such as the IDT and remap the PIC.
 
 NOTES:
 */
 
-#include "init_kernel.hpp"
+#include "kernel_arch_init.hpp"
 
 namespace 
 {
@@ -34,7 +34,7 @@ namespace
 
 namespace kernel
 {
-    void init_kernel() noexcept {
+    void kernel_arch_init() noexcept {
         static idt::Interrupt_Descriptor_Table idt;
 
         for (const auto& entry : pic_mappings)

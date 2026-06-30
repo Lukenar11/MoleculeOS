@@ -22,7 +22,7 @@ NOTES:
 #pragma once
 
 #ifdef __I386__
-#include "arch/i386/kernel/include/init_kernel.hpp"
+#include "arch/i386/kernel/include/kernel_arch_init.hpp"
 #include "arch/i386/kernel/include/utils/register_dump.hpp"
 #include "arch/i386/kernel/include/system/cpu_flags.hpp"
 #include "arch/i386/kernel/include/system/enable_interrupts.hpp"
