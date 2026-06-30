@@ -5,7 +5,8 @@
 # 
 
 OBJS += \
-	$(BUILD)/block_allocator.o
+	$(BUILD)/block_allocator.o \
+	$(BUILD)/new_delete.o
 
 $(BUILD)/%.o: kernel/src/heap/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

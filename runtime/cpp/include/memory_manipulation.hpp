@@ -40,8 +40,8 @@ namespace runtime
             uint8_t* dest = static_cast<uint8_t*>(dest_ptr);
             const uint8_t* src = static_cast<const uint8_t*>(src_ptr);
 
-            if (reinterpret_cast<uintptr_t>(dest) < 
-                reinterpret_cast<uintptr_t>(src)) {
+            if (reinterpret_cast<uint32_t>(dest) < 
+                reinterpret_cast<uint32_t>(src)) {
                 while (size--)
                     *dest++ = *src++;
             } else {

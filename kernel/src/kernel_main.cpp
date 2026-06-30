@@ -35,9 +35,6 @@ namespace kernel
         init_kernel();
 
         heap::block.init(&heap::heap_start, &heap::heap_end);
-        
-        test_allocator_raw();
-        system::hang();
 
         // schedul MoleculeOS
         static terminal::Terminal terminal;

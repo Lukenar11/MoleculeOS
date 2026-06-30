@@ -16,3 +16,4 @@ NOTES:
 #include "kernel/include/filesystem/mofs.hpp"
 #include "kernel/include/filesystem/utils/helpers.hpp"
 #include "kernel/include/heap/block_allocator.hpp"
+#include "kernel/include/heap/new_delete.hpp"
