@@ -18,6 +18,8 @@ NOTES:
 #include "utils/heap_pos_marker.hpp"
 #include <stdint.h>
 #include <array.hpp>
+#include <kernel_arch_api.hpp>
+#include <text_output.hpp>
 
 namespace kernel::heap
 {
@@ -44,6 +46,7 @@ namespace kernel::heap
     public:
         void init(const uint8_t* begin, const uint8_t* end) noexcept;
         
+        [[nodiscard]]
         void* allocate(const uint32_t allocated_bytes) noexcept;
         void deallocate(void* ptr) noexcept;
 

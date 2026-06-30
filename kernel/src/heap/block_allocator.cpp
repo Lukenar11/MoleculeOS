@@ -52,7 +52,8 @@ namespace kernel::heap
 
     bool Block_Allocator::fiend_enough_free_memory_blocks(const uint32_t i, 
                                                           const uint32_t blocks_needed,
-                                                          uint32_t* j) noexcept {
+                                                          uint32_t* j) 
+                                                          noexcept {
         bool enough_free_memory_blocks_found = true;
         *j = 0;
 
@@ -67,15 +68,22 @@ namespace kernel::heap
         return enough_free_memory_blocks_found;
     }
 
+    [[nodiscard]]
     void* Block_Allocator::allocate(const uint32_t allocated_bytes) noexcept {
-        if ((memory_pool_ptr == nullptr) || (allocated_bytes == 0)) [[unlikely]]
+        if (memory_pool_ptr == nullptr) [[unlikely]]
+            system::panic("Block allocator not initialized");
+
+        if (allocated_bytes == 0) [[unlikely]]
             return nullptr;
 
         const uint32_t blocks_needed = (allocated_bytes + MEMORY_BLOCK_BYTE_SIZE - 1)
                                        / MEMORY_BLOCK_BYTE_SIZE;
+        if (blocks_needed > total_memory_blocks) [[unlikely]]
+            system::panic("Requested allocation exceeds heap capacity");
+
         uint32_t i = 0;
+        uint32_t j = 0;
         while (i <= total_memory_blocks - blocks_needed) {
-            uint32_t j = 0;
             if (fiend_enough_free_memory_blocks(i, blocks_needed, &j)) {
                 return set_allocation_sizes_entry(blocks_needed, i);
             } else {
@@ -91,14 +99,19 @@ namespace kernel::heap
             return;
             
         const uint8_t* block_ptr = reinterpret_cast<uint8_t*>(ptr);
-        if (block_ptr < memory_pool_ptr || 
+        if (block_ptr < memory_pool_ptr ||
             block_ptr >= memory_pool_ptr + required_memory_pool_space) [[unlikely]]
-            return; 
-        
+            system::panic("Attempted to free pointer outside heap");
+
         const uint32_t memory_offset = static_cast<uint32_t>(block_ptr - memory_pool_ptr);
         const uint32_t memory_pool_start_index = memory_offset / MEMORY_BLOCK_BYTE_SIZE;
+        if (memory_pool_start_index >= total_memory_blocks) [[unlikely]]
+            system::panic("Invalid block index during deallocation");
 
         const uint32_t memory_blocks_to_free = allocation_sizes[memory_pool_start_index];
+        if (memory_blocks_to_free == 0) [[unlikely]]
+            return;
+
         for (uint32_t i = 0; i < memory_blocks_to_free; ++i)
             if (memory_pool_start_index + i < total_memory_blocks)
                 free_memory_blocks[memory_pool_start_index + i] = true;
