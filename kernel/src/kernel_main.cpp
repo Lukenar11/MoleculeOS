@@ -26,11 +26,15 @@ NOTES:
 #include <kernel_arch_api.hpp>
 #include <terminal_api.hpp>
 
+#include "tests/kernel/test_heap.hpp"
+
 namespace kernel
 {
     extern "C" [[noreturn]]
     void kernel_main() noexcept {
         init_kernel();
+        
+        heap::block.init(&heap::heap_start, &heap::heap_end);
 
         // schedul MoleculeOS
         static terminal::Terminal terminal;

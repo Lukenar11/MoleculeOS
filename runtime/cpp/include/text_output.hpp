@@ -66,7 +66,7 @@ namespace runtime
         void put_hex(const uint32_t value) noexcept;
         void put_bin(const uint32_t value) noexcept;
             
-        void put_ptr(const uintptr_t value) noexcept;
+        void put_ptr(const uint32_t value) noexcept;
 
         inline constexpr uint32_t get_cursor_x() const noexcept { 
             return cursor_x; 

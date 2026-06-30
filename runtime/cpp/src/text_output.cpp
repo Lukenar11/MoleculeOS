@@ -216,7 +216,7 @@ namespace runtime
         put_base(value, base);
     }
 
-    void Text_Output::put_ptr(const uintptr_t value) noexcept {
+    void Text_Output::put_ptr(const uint32_t value) noexcept {
         put_char('0'); 
         put_char('x');
 
