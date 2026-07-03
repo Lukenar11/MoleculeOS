@@ -51,7 +51,6 @@ namespace
                                                 noexcept {
         const char null_char = '\0';
         const char space_char = ' ';
-        const uint32_t null = 0;
 
         static runtime::Array<char,64> filename;
         filename.fill(null_char);
@@ -69,7 +68,7 @@ namespace
             return filename;
         }
 
-        uint32_t j = null;
+        uint32_t j = 0;
         for (; i < arguments.size(); i++) {
             char argument = arguments[i];
             if ((argument == space_char) || (argument == null_char))
