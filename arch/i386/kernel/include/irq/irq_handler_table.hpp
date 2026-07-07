@@ -27,14 +27,12 @@ namespace kernel::irq
 
     inline constexpr IRQ_Handler_Entry irq_handler_table[] = {
         { 0, nullptr}, 
-        { 1, +[](kernel::Register_Dump* reg_dump) -> void {
-            drivers::ps2::Keyboard_Input::keyboard_irq_handler(reg_dump);
-        }},
-        { 2, nullptr},
+        { 1, drivers::ps2::Keyboard_Input::keyboard_irq_handler},
+        { 2, nullptr}, 
         { 3, nullptr}, 
-        { 4, nullptr}, 
-        { 5, nullptr},
-        { 6, nullptr}, 
+        { 4, nullptr},
+        { 5, nullptr}, 
+        { 6, nullptr},
         { 7, nullptr}, 
         { 8, nullptr},
         { 9, nullptr}, 
