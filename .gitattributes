@@ -4,4 +4,4 @@
 # https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 # 
 
-tools/*.ld linguist-detectable=true
+tools/linker.ld linguist-detectable=true
