@@ -39,7 +39,7 @@ namespace kernel::idt
         static constexpr uint32_t IDT_ENTRY_COUNT      = 256;
 
         runtime::Array<IDT_Entry, IDT_ENTRY_COUNT> idt;
-        IDT_Descriptor_PTR idt_ptr = nullptr;
+        IDT_Descriptor_PTR idt_ptr;
 
         void set_gate(const uint8_t index, void (*handler)()) noexcept;
 

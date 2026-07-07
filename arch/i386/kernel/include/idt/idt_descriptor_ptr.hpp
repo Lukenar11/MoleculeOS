@@ -26,7 +26,7 @@ NOTES:
 
 namespace kernel::idt 
 {
-    struct IDT_Descriptor_PTR final {
+    struct IDT_Descriptor_PTR {
         uint16_t limit = 0;
         uint32_t base  = 0;
     } __attribute__((packed));
