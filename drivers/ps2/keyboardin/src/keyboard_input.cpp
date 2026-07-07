@@ -66,5 +66,14 @@ namespace drivers::ps2
         return character;
     }
 
+    void Keyboard_Input::keyboard_irq_handler(kernel::Register_Dump*) noexcept {
+        if (!has_pending_scancode()) [[unlikely]]
+            return;
+
+        const char symbol = get_key();
+        if (symbol != '\0')
+            scancode_buffer.push(symbol, false);
+    }
+
     Keyboard_Input keyboard_input;
 } // namespace drivers::ps2

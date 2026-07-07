@@ -29,7 +29,8 @@ namespace drivers::vga
 {
     class Text_Mode final {
     private:
-        static inline volatile uint16_t* const VGA_TEXT_MODE_SCREEN_FRAME_BUFFER = 
+        static constexpr uint8_t BLINK_MODE_BIT = 0x80;
+        static inline volatile uint16_t* const VGA_TEXT_MODE_SCREEN_FRAME_BUFFER =
             reinterpret_cast<volatile uint16_t*>(0xB8000);
 
     public:
@@ -40,12 +41,10 @@ namespace drivers::vga
                                                    noexcept {
             const uint8_t color = (static_cast<uint8_t>(background) << 4) | 
                                    static_cast<uint8_t>(foreground);
-            if (!does_blink) [[likely]] {
+            if (!does_blink) [[likely]]
                 return color;
-            } else [[unlikely]] {
-                const uint8_t blink_mode_bit = 0x80;
-                return color | blink_mode_bit;
-            }
+            else [[unlikely]]
+                return color | BLINK_MODE_BIT;
         }
 
         [[nodiscard]]
@@ -67,6 +66,5 @@ namespace drivers::vga
         ~Text_Mode() noexcept = default;
     };
 
-    // GLOBAL VGA-textmode object
     extern Text_Mode text_mode;
 } // namespace drivers::vga

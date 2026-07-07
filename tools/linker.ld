@@ -8,41 +8,35 @@ ENTRY(_start)
 
 SECTIONS 
 {
-  . = 1M;
+    . = 1M;
 
-  .multiboot :
-  {
-    KEEP(*(.multiboot))
-  }
+    .multiboot : {
+        KEEP(*(.multiboot))
+    }
 
-  .text : 
-  { 
-    *(.text*) 
-  }
+    .text : { 
+        *(.text*) 
+    }
 
-  .rodata : 
-  { 
-    *(.rodata*) 
-  }
+    .rodata : { 
+        *(.rodata*) 
+    }
 
-  .data : 
-  { 
-    *(.data*) 
-  }
+    .data : { 
+        *(.data*) 
+    }
 
-  .gdt :
-  {
-    *(.gdt*)
-  }
-  
-  .bss : 
-  { 
-    *(.bss*) 
-    *(COMMON) 
-  }
+    .gdt : {
+        *(.gdt*)
+    }
+    
+    .bss : { 
+        *(.bss*) 
+        *(COMMON) 
+    }
 
-  . = ALIGN(8);
-  heap_start = .;
-  . += 64K;
-  heap_end = .;
+    . = ALIGN(8);
+    heap_start = .;
+    . += 64K;
+    heap_end = .;
 }

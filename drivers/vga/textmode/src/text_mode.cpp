@@ -47,7 +47,6 @@ namespace drivers::vga
         for (uint32_t i = 0; i < n; i++) [[likely]]
             VGA_TEXT_MODE_SCREEN_FRAME_BUFFER[i] = entry;
     }
-
-    // GLOBAL VGA-textmode object
+    
     Text_Mode text_mode;
 } // namespace drivers::vga

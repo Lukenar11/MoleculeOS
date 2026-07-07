@@ -15,7 +15,7 @@ NOTES:
     header so that the compiler can inline them.
 */
 
-#include "string_manipulation.hpp"
+#include <string_manipulation.hpp>
 
 namespace runtime
 {

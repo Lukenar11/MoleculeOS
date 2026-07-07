@@ -57,11 +57,8 @@ namespace terminal
     }
 
     void Terminal::step() noexcept {
-        while (drivers::ps2::keyboard_input.has_pending_scancode()) [[likely]] {
-            const char key = drivers::ps2::keyboard_input.get_key();
-            if (!key)
-                continue;
-
+        char key;
+        while (drivers::ps2::keyboard_input.scancode_buffer.pop(key)) {
             erase_user_cursor();
 
             runtime::text_output.put_char(key);

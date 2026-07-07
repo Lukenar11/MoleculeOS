@@ -22,6 +22,8 @@
 extern isr_common_handler
 global isr_common_stub
 
+%define KERNEL_DATA_SEGMENT_SELECTOR 0x10
+
 section .text
 isr_common_stub:
     push eax
@@ -38,7 +40,7 @@ isr_common_stub:
     push ds
 
     ; set kernel data segment
-    mov ax, 0x10
+    mov ax, KERNEL_DATA_SEGMENT_SELECTOR
     mov ds, ax
     mov es, ax
     mov fs, ax

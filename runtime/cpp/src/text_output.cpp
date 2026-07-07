@@ -23,7 +23,7 @@ NOTES:
     because they are so small that the compiler can inline them.
 */
 
-#include "text_output.hpp"
+#include <text_output.hpp>
 
 namespace runtime
 {

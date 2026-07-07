@@ -22,6 +22,8 @@
 global irq_common_stub
 extern irq_common_handler
 
+%define KERNEL_DATA_SEGMENT_SELECTOR 0x10
+
 section .text
 irq_common_stub:
     push eax
@@ -38,7 +40,7 @@ irq_common_stub:
     push ds
 
     ; set kernel data segment
-    mov ax, 0x10
+    mov ax, KERNEL_DATA_SEGMENT_SELECTOR
     mov ds, ax
     mov es, ax
     mov fs, ax

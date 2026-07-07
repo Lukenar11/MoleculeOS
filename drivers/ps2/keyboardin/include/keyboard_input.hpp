@@ -23,7 +23,9 @@ NOTES:
 
 #include "utils/helpers.hpp"
 #include <stdint.h>
+#include <circular_buffer.hpp>
 #include <io_arch_api.hpp>
+#include <kernel_arch_api.hpp>
 
 namespace drivers::ps2 
 {
@@ -39,6 +41,8 @@ namespace drivers::ps2
         bool capslock_is_enabled = false;
 
     public:
+        runtime::Circular_Buffer<char, ALOWED_SCANCODE_SIZE> scancode_buffer;
+
         [[nodiscard]]
         inline bool has_pending_scancode() const noexcept {
             return runtime::byte_input(KEYBOARD_STATUS_PORT) & LOWEST_BIT;
@@ -46,6 +50,8 @@ namespace drivers::ps2
 
         [[nodiscard]]
         char get_key() noexcept;
+
+        void keyboard_irq_handler(kernel::Register_Dump*) noexcept;
     
         Keyboard_Input() noexcept = default;
         ~Keyboard_Input() noexcept = default;

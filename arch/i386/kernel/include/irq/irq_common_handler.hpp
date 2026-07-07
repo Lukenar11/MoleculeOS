@@ -21,6 +21,7 @@ NOTES:
 #pragma once
 
 #include "utils/register_dump.hpp"
+#include "irq_handler_table.hpp"
 #include <io_arch_api.hpp>
 
 namespace kernel::irq

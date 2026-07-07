@@ -24,11 +24,17 @@ namespace kernel::irq
 {
     extern "C"
     void irq_common_handler(Register_Dump* reg_dump) {
-        const uint8_t interrupt_vector = reg_dump->interrupt_number;
         const uint8_t end_of_interrupt = 0x20;
-
         const uint8_t min_interrupt_vector = 0x28;
         const uint8_t max_interrupt_vector = 0x2F;
+        const uint8_t max_irq_event_number = 15;
+
+        const uint8_t interrupt_vector = reg_dump->interrupt_number;
+        const uint8_t irq_event = interrupt_vector - end_of_interrupt;
+
+        if ((irq_event <= max_irq_event_number) && 
+            (kernel::irq::irq_handler_table[irq_event].handler != nullptr)) 
+            kernel::irq::irq_handler_table[irq_event].handler(reg_dump);
     
         if ((interrupt_vector >= min_interrupt_vector) && 
             (interrupt_vector <= max_interrupt_vector)) {

@@ -10,6 +10,10 @@ OBJS += \
 	$(BUILD)/string_manipulation.o \
 	$(BUILD)/compiler_c_api.o \
 	$(BUILD)/text_output.o \
+	$(BUILD)/circular_buffer.o \
+	$(BUILD)/memory_manipulation.o \
+	$(BUILD)/string_manipulation.o \
+	$(BUILD)/compiler_c_api.o \
 
 $(BUILD)/%.o: runtime/cpp/src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
