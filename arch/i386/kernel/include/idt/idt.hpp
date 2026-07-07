@@ -44,6 +44,4 @@ namespace kernel::idt
         Interrupt_Descriptor_Table() noexcept;
         ~Interrupt_Descriptor_Table() noexcept = default;
     };
-
-    extern Interrupt_Descriptor_Table idt;
 } // namespace kernel::idt

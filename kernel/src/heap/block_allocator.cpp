@@ -116,6 +116,4 @@ namespace kernel::heap
             if (memory_pool_start_index + i < total_memory_blocks)
                 free_memory_blocks[memory_pool_start_index + i] = true;
     }
-
-    Block_Allocator block;
 } //namespace kernel::heap

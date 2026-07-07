@@ -27,6 +27,6 @@ NOTES:
 namespace shell::commands
 {
     inline void clear() noexcept { 
-        runtime::text_output.reset(); 
+        runtime::Text_Output::reset(); 
     }
 } // namespace shell::commands

@@ -32,7 +32,7 @@ namespace kernel
     void kernel_main() noexcept {
         kernel_arch_init();
 
-        heap::block.init(&heap::heap_start, &heap::heap_end);
+        heap::Block_Allocator::init(&heap::heap_start, &heap::heap_end);
 
         // schedul MoleculeOS
         static terminal::Terminal terminal;
@@ -41,6 +41,7 @@ namespace kernel
             terminal.step();
         }
 
+        
         system::panic(
             "Unexpected return from the \"kernel_main\" scheduler main loop"
         );

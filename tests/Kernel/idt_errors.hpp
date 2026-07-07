@@ -1,5 +1,4 @@
-#ifndef IDT_ERRORS_H
-#define IDT_ERRORS_H
+#pragma once
 
 #include <stdint.h>
 
@@ -83,5 +82,3 @@ static inline void run_exception_tests()
 #ifdef __cplusplus
 }
 #endif
-
-#endif // IDT_ERRORS_H

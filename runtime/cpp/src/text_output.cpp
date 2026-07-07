@@ -31,14 +31,14 @@ namespace runtime
         cursor_x = 0;
         cursor_y = 0;
 
-        drivers::vga::text_mode.clear_screen(drivers::vga::Text_Mode_Colors::BLACK);
+        drivers::vga::Text_Mode::clear_screen(drivers::vga::Text_Mode_Colors::BLACK);
     }
 
     void Text_Output::set_text_color(const drivers::vga::Text_Mode_Colors& color,
                                      const drivers::vga::Text_Mode_Colors& background,
                                      const bool does_blink) 
                                      noexcept {
-        cursor_color = drivers::vga::text_mode.make_color(color, background, does_blink);
+        cursor_color = drivers::vga::Text_Mode::make_color(color, background, does_blink);
     }
 
     void Text_Output::new_line() noexcept {
@@ -110,7 +110,7 @@ namespace runtime
         case '\b':
             if (cursor_x > 0) {
                 cursor_x--;
-                drivers::vga::text_mode.put_char_at(
+                drivers::vga::Text_Mode::put_char_at(
                     ' ', 
                     cursor_color, 
                     cursor_x, 
@@ -121,7 +121,7 @@ namespace runtime
 
         case '\t':
             for (uint32_t i = 0; i < 4; ++i) {
-                drivers::vga::text_mode.put_char_at(
+                drivers::vga::Text_Mode::put_char_at(
                     ' ', 
                     cursor_color, 
                     cursor_x, 
@@ -139,7 +139,7 @@ namespace runtime
             break;
 
         default:
-            drivers::vga::text_mode.put_char_at(
+            drivers::vga::Text_Mode::put_char_at(
                 symbol, 
                 cursor_color, 
                 cursor_x, 
@@ -223,6 +223,4 @@ namespace runtime
         const uint32_t base = 16;
         put_base(value, base);
     }
-
-    Text_Output text_output;
 } // namespace runtime

@@ -1,5 +1,4 @@
-#ifndef REG_DUMP_TEST_H
-#define REG_DUMP_TEST_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,5 +21,3 @@ void test_reg_dump()
 #ifdef __cplusplus
 }
 #endif
-
-#endif // REG_DUMP_TEST_H

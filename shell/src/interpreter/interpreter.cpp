@@ -37,11 +37,11 @@ namespace shell::interpreter
 
         set_error_message_text_color();
 
-        runtime::text_output.put_string(error_messages[0]);
-        runtime::text_output.put_string(error_message_for);
-        runtime::text_output.put_string(error_messages[1]);
-        runtime::text_output.put_uint(max_buffer_size);
-        runtime::text_output.put_string(error_messages[2]);
+        runtime::Text_Output::put_string(error_messages[0]);
+        runtime::Text_Output::put_string(error_message_for);
+        runtime::Text_Output::put_string(error_messages[1]);
+        runtime::Text_Output::put_uint(max_buffer_size);
+        runtime::Text_Output::put_string(error_messages[2]);
 
         set_default_text_color();
     };
@@ -90,7 +90,7 @@ namespace shell::interpreter
             set_error_message_text_color();
 
             static const char* error_message = "Error: arguments without command.\n\n";
-            runtime::text_output.put_string(error_message);
+            runtime::Text_Output::put_string(error_message);
             
             set_default_text_color();
 
@@ -99,7 +99,7 @@ namespace shell::interpreter
 
         if (commands_index == null || commands[null] == NULL_TERMINATOR) [[unlikely]] {
             static const char* error_message = "No command entered.\n\n";
-            runtime::text_output.put_string(error_message);
+            runtime::Text_Output::put_string(error_message);
 
             return false;
         }
@@ -122,7 +122,7 @@ namespace shell::interpreter
         };
 
         set_error_message_text_color();
-        runtime::text_output.put_string(error_messages);
+        runtime::Text_Output::put_string(error_messages);
         set_default_text_color();
     }
 
@@ -161,7 +161,7 @@ namespace shell::interpreter
             return;
 
         static const char* error_message = "Input buffer";
-        runtime::text_output.put_char('\n');
+        runtime::Text_Output::put_char('\n');
         print_overflow_error(error_message, input_buffer.size());
 
         flush_interpreter_pipeline();

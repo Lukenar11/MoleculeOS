@@ -42,26 +42,26 @@ namespace terminal
     void Terminal::draw_user_cursor_with_color(const drivers::vga::Text_Mode_Colors& foreground,
                                                const drivers::vga::Text_Mode_Colors& background) 
                                                const noexcept {
-        uint32_t x = runtime::text_output.get_cursor_x();
+        uint32_t x = runtime::Text_Output::get_cursor_x();
         if (x >= drivers::vga::TEXT_MODE_SCREEN_WIDTH) [[unlikely]]
             x = drivers::vga::TEXT_MODE_SCREEN_WIDTH - 1;
 
-        uint32_t y = runtime::text_output.get_cursor_y();
+        uint32_t y = runtime::Text_Output::get_cursor_y();
         if (y >= drivers::vga::TEXT_MODE_SCREEN_HEIGHT) [[unlikely]]
             y = drivers::vga::TEXT_MODE_SCREEN_HEIGHT - 1;
 
-        runtime::text_output.set_text_color(foreground, background);
+        runtime::Text_Output::set_text_color(foreground, background);
         
-        const uint8_t color = runtime::text_output.get_text_color();
-        drivers::vga::text_mode.put_char_at(' ', color, x, y);
+        const uint8_t color = runtime::Text_Output::get_text_color();
+        drivers::vga::Text_Mode::put_char_at(' ', color, x, y);
     }
 
     void Terminal::step() noexcept {
         char key;
-        while (drivers::ps2::keyboard_input.scancode_buffer.pop(key)) {
+        while (drivers::ps2::Keyboard_Input::scancode_buffer.pop(key)) {
             erase_user_cursor();
 
-            runtime::text_output.put_char(key);
+            runtime::Text_Output::put_char(key);
             interpreter.step(key);
 
             draw_user_cursor();

@@ -31,7 +31,7 @@ namespace shell::commands
 
         if (arguments[0] == '\0') [[unlikely]] {
             static const char* error_message = "missing argument";
-            runtime::string_manip.copy_string(
+            runtime::String_Manipulation::copy_string(
                 parsed_filename.error.data(), 
                 error_message
             );
@@ -52,7 +52,7 @@ namespace shell::commands
                  !append_char(parsed_filename.name, file_name_index, arguments[i])) ||
                 (file_name_index >= kernel::filesystem::MAX_FILENAME_LENGTH)) {
                 static const char* error_message = "filename too long";
-                runtime::string_manip.copy_string(
+                runtime::String_Manipulation::copy_string(
                     parsed_filename.error.data(), 
                     error_message
                 );
@@ -64,7 +64,7 @@ namespace shell::commands
                   append_char(parsed_filename.format, file_format_index, arguments[i])) || 
                 (file_format_index >= kernel::filesystem::MAX_FILE_FORMAT_NAME_LENGTH)) {
                 static const char* error_message = "format too long";
-                runtime::string_manip.copy_string(
+                runtime::String_Manipulation::copy_string(
                     parsed_filename.error.data(), 
                     error_message
                 );
@@ -77,11 +77,11 @@ namespace shell::commands
         parsed_filename.format[file_format_index + 1] = '\0';
     
         for (uint32_t i = 0; parsed_filename.name[i] != '\0'; i++) [[likely]]
-            if (!kernel::filesystem::mofs.is_valid_file_name_or_formant_char(
+            if (!kernel::filesystem::MoleculeOS_File_System::is_valid_file_name_or_formant_char(
                     parsed_filename.name[i]
                 )) {
                 static const char* error_message = "not a valid File Name";
-                runtime::string_manip.copy_string(
+                runtime::String_Manipulation::copy_string(
                     parsed_filename.error.data(),
                     error_message
                 );
@@ -90,11 +90,11 @@ namespace shell::commands
             }
 
         for (uint32_t i = 0; parsed_filename.format[i] != '\0'; i++) [[likely]]
-            if (!kernel::filesystem::mofs.is_valid_file_name_or_formant_char(
+            if (!kernel::filesystem::MoleculeOS_File_System::is_valid_file_name_or_formant_char(
                 parsed_filename.format[i]
             )) {
                 static const char* error_message = "not a valid File Format";
-                runtime::string_manip.copy_string(
+                runtime::String_Manipulation::copy_string(
                     parsed_filename.error.data(), 
                     error_message
                 );

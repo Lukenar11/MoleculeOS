@@ -29,7 +29,7 @@ namespace drivers::vga
 {
     class Text_Mode final {
     private:
-        static constexpr uint8_t BLINK_MODE_BIT = 0x80;
+        static inline constexpr uint8_t BLINK_MODE_BIT = 0x80;
         static inline volatile uint16_t* const VGA_TEXT_MODE_SCREEN_FRAME_BUFFER =
             reinterpret_cast<volatile uint16_t*>(0xB8000);
 
@@ -55,16 +55,14 @@ namespace drivers::vga
                     static_cast<uint16_t>(symbol);
         }
 
-        void put_char_at(const char symbol, 
-                         const uint8_t color, 
-                         const uint32_t x, 
-                         const uint32_t y) const noexcept;
+        static void put_char_at(const char symbol, 
+                                const uint8_t color, 
+                                const uint32_t x, 
+                                const uint32_t y) noexcept;
 
-        void clear_screen(const Text_Mode_Colors& color) const noexcept;
+        static void clear_screen(const Text_Mode_Colors& color) noexcept;
 
         Text_Mode() noexcept = default;
         ~Text_Mode() noexcept = default;
     };
-
-    extern Text_Mode text_mode;
 } // namespace drivers::vga

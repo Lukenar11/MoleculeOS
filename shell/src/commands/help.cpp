@@ -49,7 +49,7 @@ namespace shell::commands
             "\n"
         };
 
-        runtime::text_output.reset();
-        runtime::text_output.put_string(help_message);
+        runtime::Text_Output::reset();
+        runtime::Text_Output::put_string(help_message);
     }
 } // namespace shell::commands

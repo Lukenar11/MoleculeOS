@@ -25,22 +25,22 @@ NOTES:
 namespace shell::commands
 {
     inline void print_command_error(const char* error_message) noexcept {
-        runtime::text_output.set_text_color(
+        runtime::Text_Output::set_text_color(
             drivers::vga::Text_Mode_Colors::YELLOW,
             drivers::vga::Text_Mode_Colors::BLACK
         );
 
-        runtime::text_output.put_string(error_message);
+        runtime::Text_Output::put_string(error_message);
 
-        runtime::text_output.set_text_color(
+        runtime::Text_Output::set_text_color(
             drivers::vga::Text_Mode_Colors::LIGHT_GREY,
             drivers::vga::Text_Mode_Colors::BLACK
         );
     }
 
     inline void command_end() noexcept {
-        runtime::text_output.put_char('\n');
-        runtime::text_output.put_char('\n');
+        runtime::Text_Output::put_char('\n');
+        runtime::Text_Output::put_char('\n');
     }
 
     struct Parsed_File_Name final {

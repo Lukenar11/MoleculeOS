@@ -31,31 +31,27 @@ namespace drivers::ps2
 {
     class Keyboard_Input final {
     private:
-        static constexpr uint8_t LOWEST_BIT = 0x01;
-        static constexpr uint8_t ALOWED_SCANCODE_SIZE = 128;
+        static inline constexpr uint8_t LOWEST_BIT = 0x01;
+        static inline constexpr uint8_t ALOWED_SCANCODE_SIZE = 128;
 
-        static constexpr uint16_t KEYBOARD_STATUS_PORT = 0x64;
-        static constexpr uint16_t KEYBOARD_DATA_PORT = 0x60;
+        static inline constexpr uint16_t KEYBOARD_STATUS_PORT = 0x64;
+        static inline constexpr uint16_t KEYBOARD_DATA_PORT = 0x60;
     
-        bool shift_is_pressed = false;
-        bool capslock_is_enabled = false;
+        static inline bool shift_is_pressed = false;
+        static inline bool capslock_is_enabled = false;
 
-    public:
-        runtime::Circular_Buffer<char, ALOWED_SCANCODE_SIZE> scancode_buffer;
-
-        [[nodiscard]]
-        inline bool has_pending_scancode() const noexcept {
+        static inline bool has_pending_scancode() noexcept {
             return runtime::byte_input(KEYBOARD_STATUS_PORT) & LOWEST_BIT;
         }
 
-        [[nodiscard]]
-        char get_key() noexcept;
+        static char get_key() noexcept;
 
-        void keyboard_irq_handler(kernel::Register_Dump*) noexcept;
+    public:
+        static inline runtime::Circular_Buffer<char, ALOWED_SCANCODE_SIZE> scancode_buffer;
+        
+        static void keyboard_irq_handler(kernel::Register_Dump*) noexcept;
     
         Keyboard_Input() noexcept = default;
         ~Keyboard_Input() noexcept = default;
     };
-
-    extern Keyboard_Input keyboard_input;
 } // namespace drivers::ps2

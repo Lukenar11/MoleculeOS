@@ -34,8 +34,8 @@ static inline constexpr void print_reg_dump(const char* label,
 {
     const bool clear_screen_if_hight_limit_reached = false;
     
-    runtime::text_output.put_string(label, clear_screen_if_hight_limit_reached);
-    runtime::text_output.put_hex(value);
+    runtime::Text_Output::put_string(label, clear_screen_if_hight_limit_reached);
+    runtime::Text_Output::put_hex(value);
 }
 
 namespace kernel::isr

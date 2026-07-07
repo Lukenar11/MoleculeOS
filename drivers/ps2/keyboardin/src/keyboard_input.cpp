@@ -74,6 +74,4 @@ namespace drivers::ps2
         if (symbol != '\0')
             scancode_buffer.push(symbol, false);
     }
-
-    Keyboard_Input keyboard_input;
 } // namespace drivers::ps2

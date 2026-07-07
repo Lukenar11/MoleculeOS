@@ -29,8 +29,8 @@ namespace kernel::isr
     void isr_common_handler(Register_Dump* reg_dump) {
         const bool clear_screen_if_hight_limit_reached = false;
 
-        runtime::text_output.reset();
-        runtime::text_output.set_text_color(
+        runtime::Text_Output::reset();
+        runtime::Text_Output::set_text_color(
             drivers::vga::Text_Mode_Colors::RED,
             drivers::vga::Text_Mode_Colors::BLACK
         );
@@ -41,35 +41,35 @@ namespace kernel::isr
                                 ? exception_names[n]
                                 : "Unknown Exception";
     
-        runtime::text_output.put_string(
+        runtime::Text_Output::put_string(
             ">>>>>>>>>> !KERNEL PANIC! <<<<<<<<<<", 
             clear_screen_if_hight_limit_reached
         );
         print_reg_dump("\n\nError Code: ", reg_dump->error_code);
     
-        runtime::text_output.put_string(
+        runtime::Text_Output::put_string(
             "\nException: ", 
             clear_screen_if_hight_limit_reached
         );
-        runtime::text_output.put_string(exception);
-        runtime::text_output.put_char(' ');
-        runtime::text_output.put_char('(');
-        runtime::text_output.put_hex(reg_dump->interrupt_number);
-        runtime::text_output.put_char(')');
+        runtime::Text_Output::put_string(exception);
+        runtime::Text_Output::put_char(' ');
+        runtime::Text_Output::put_char('(');
+        runtime::Text_Output::put_hex(reg_dump->interrupt_number);
+        runtime::Text_Output::put_char(')');
     
-        runtime::text_output.put_string(
+        runtime::Text_Output::put_string(
             "\n\nCPU State:",
             clear_screen_if_hight_limit_reached
         );
         print_reg_dump("\n\tEIP: ", reg_dump->eip);
         print_reg_dump("\n\tCS: ", reg_dump->cs);
-        runtime::text_output.put_string(
+        runtime::Text_Output::put_string(
             "\n\tEFLAGS: ", 
             clear_screen_if_hight_limit_reached
         );
-        runtime::text_output.put_bin(reg_dump->eflags);
+        runtime::Text_Output::put_bin(reg_dump->eflags);
     
-        runtime::text_output.put_string(
+        runtime::Text_Output::put_string(
             "\n\nGeneral Registers:", 
             clear_screen_if_hight_limit_reached
         );
@@ -81,7 +81,7 @@ namespace kernel::isr
         print_reg_dump("\n\tEDI: ", reg_dump->edi);
         print_reg_dump("\n\tEBP: ", reg_dump->ebp);
 
-        runtime::text_output.put_string(
+        runtime::Text_Output::put_string(
             "\n\nSegment Registers:", 
             clear_screen_if_hight_limit_reached
         );

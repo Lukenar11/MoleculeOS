@@ -29,7 +29,7 @@ namespace kernel::filesystem
     Inode* MoleculeOS_File_System::allocate_inode() noexcept {
         for (auto& inode : inodes)
             if (!inode.in_use) {
-                runtime::memory_manip.set_memory_block(&inode, 0, sizeof(Inode));
+                runtime::Memory_Manipulation::set_memory_block(&inode, 0, sizeof(Inode));
                 inode.in_use = true;
 
                 return &inode;
@@ -55,7 +55,7 @@ namespace kernel::filesystem
     }
 
     bool MoleculeOS_File_System::is_valid_file_name_or_formant_char(const char symbol)
-                                                                    const noexcept {
+                                                                    noexcept {
         if (((symbol >= 'A') && (symbol <= 'Z')) ||
             ((symbol >= 'a') && (symbol <= 'z')) ||
             ((symbol >= '0') && (symbol <= '9')) ||
@@ -67,13 +67,13 @@ namespace kernel::filesystem
 
     Inode* MoleculeOS_File_System::get_inode_by_name_and_format(const char* filename, 
                                                                 const char* format) 
-                                                                const noexcept {
+                                                                noexcept {
         for (auto& inode : inodes) {
             if (!inode.in_use)
                 continue;
 
-            if ((runtime::string_manip.compare_strings(inode.name, filename) == 0) &&
-                (runtime::string_manip.compare_strings(inode.format, format) == 0))
+            if ((runtime::String_Manipulation::compare_strings(inode.name, filename) == 0) &&
+                (runtime::String_Manipulation::compare_strings(inode.format, format) == 0))
                 return const_cast<Inode*>(&inode);
         }
 
@@ -97,8 +97,8 @@ namespace kernel::filesystem
             if (!inode.in_use)
                 continue;
 
-            if ((runtime::string_manip.compare_strings(inode.name, filename) == 0) &&
-                (runtime::string_manip.compare_strings(inode.format, format) == 0)) [[unlikely]]
+            if ((runtime::String_Manipulation::compare_strings(inode.name, filename) == 0) &&
+                (runtime::String_Manipulation::compare_strings(inode.format, format) == 0)) [[unlikely]]
                 return nullptr;
         }
 
@@ -106,13 +106,13 @@ namespace kernel::filesystem
         if (!inode) [[unlikely]]
             return nullptr;
 
-        runtime::string_manip.copy_string_part(
+        runtime::String_Manipulation::copy_string_part(
             inode->name, 
             filename, 
             MAX_FILENAME_LENGTH
         );
         
-        runtime::string_manip.copy_string_part(
+        runtime::String_Manipulation::copy_string_part(
             inode->format, 
             format, 
             MAX_FILE_FORMAT_NAME_LENGTH
@@ -129,19 +129,19 @@ namespace kernel::filesystem
         inode->in_use = false;
         inode->size = 0;
 
-        runtime::memory_manip.set_memory_block(
+        runtime::Memory_Manipulation::set_memory_block(
             inode->name, 
             '\0', 
             MAX_FILENAME_LENGTH
         );
 
-        runtime::memory_manip.set_memory_block(
+        runtime::Memory_Manipulation::set_memory_block(
             inode->format, 
             '\0', 
             MAX_FILE_FORMAT_NAME_LENGTH
         );
 
-        runtime::memory_manip.set_memory_block(
+        runtime::Memory_Manipulation::set_memory_block(
             inode->data, 
             0, 
             MAX_FILE_SIZE
@@ -158,7 +158,7 @@ namespace kernel::filesystem
         if (less_then(buffer_size, inode->size)) [[unlikely]] 
             return false;
 
-        runtime::memory_manip.copy_memory_block(
+        runtime::Memory_Manipulation::copy_memory_block(
             out_buffer, 
             inode->data, 
             inode->size
@@ -176,7 +176,7 @@ namespace kernel::filesystem
         if (less_then(buffer_size, inode->size + 1)) [[unlikely]] 
             return false;
 
-        runtime::memory_manip.copy_memory_block(
+        runtime::Memory_Manipulation::copy_memory_block(
             out_buffer, 
             inode->data, 
             inode->size
@@ -198,7 +198,7 @@ namespace kernel::filesystem
         if (less_then(buffer_size, length)) [[unlikely]] 
             return false;
 
-        runtime::memory_manip.copy_memory_block(
+        runtime::Memory_Manipulation::copy_memory_block(
             out_buffer, 
             (inode->data + offset), 
             length
@@ -219,7 +219,7 @@ namespace kernel::filesystem
         if (less_then(buffer_size, (length + 1))) [[unlikely]] 
             return false;
 
-        runtime::memory_manip.copy_memory_block(
+        runtime::Memory_Manipulation::copy_memory_block(
             out_buffer, 
             (inode->data + offset), 
             length
@@ -236,7 +236,7 @@ namespace kernel::filesystem
         if (set_file_content_guard(inode, length)) [[unlikely]]
             return false;
 
-        runtime::memory_manip.copy_memory_block(
+        runtime::Memory_Manipulation::copy_memory_block(
             inode->data, 
             in_buffer, 
             length
@@ -253,7 +253,7 @@ namespace kernel::filesystem
         if (set_file_content_guard(inode, length)) [[unlikely]]
             return false;
 
-        runtime::memory_manip.copy_memory_block(
+        runtime::Memory_Manipulation::copy_memory_block(
             inode->data, 
             in_buffer, 
             length
@@ -272,7 +272,7 @@ namespace kernel::filesystem
         if (write_fill_at_guard(inode, offset, length, buffer_size)) [[unlikely]]
             return false;
 
-        runtime::memory_manip.copy_memory_block(
+        runtime::Memory_Manipulation::copy_memory_block(
             (inode->data + offset), 
             in_buffer, 
             length
@@ -291,7 +291,7 @@ namespace kernel::filesystem
         if (write_fill_at_guard(inode, offset, length, buffer_size)) [[unlikely]]
             return false;
 
-        runtime::memory_manip.copy_memory_block(
+        runtime::Memory_Manipulation::copy_memory_block(
             (inode->data + offset), 
             in_buffer, 
             length
@@ -300,6 +300,4 @@ namespace kernel::filesystem
 
         return true;
     }
-
-    MoleculeOS_File_System mofs;
 } // namespace kernel::filesystem

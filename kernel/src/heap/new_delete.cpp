@@ -21,20 +21,20 @@ NOTES:
 
 void* operator new(const size_t allocated_bytes)
 {
-    return kernel::heap::block.allocate(allocated_bytes);
+    return kernel::heap::Block_Allocator::allocate(allocated_bytes);
 }
 
 void* operator new[](const size_t allocated_bytes)
 {
-    return kernel::heap::block.allocate(allocated_bytes);
+    return kernel::heap::Block_Allocator::allocate(allocated_bytes);
 }
 
 void operator delete(void* ptr) noexcept
 {
-    kernel::heap::block.deallocate(ptr);
+    kernel::heap::Block_Allocator::deallocate(ptr);
 }
 
 void operator delete[](void* ptr) noexcept
 {
-    kernel::heap::block.deallocate(ptr);
+    kernel::heap::Block_Allocator::deallocate(ptr);
 }

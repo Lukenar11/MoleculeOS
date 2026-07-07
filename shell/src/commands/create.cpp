@@ -34,7 +34,7 @@ namespace shell::commands
             return;
         }
 
-        auto* inode = kernel::filesystem::mofs.create_file(
+        auto* inode = kernel::filesystem::MoleculeOS_File_System::create_file(
             parsed.name.data(), 
             parsed.format.data()
         );

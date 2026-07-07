@@ -23,13 +23,13 @@ namespace runtime
 {
     class String_Manipulation final {
     public:
-        inline void copy_string(char* dest_ptr, const char* src_ptr) noexcept {
+        static  inline void copy_string(char* dest_ptr, const char* src_ptr) noexcept {
             while ((*dest_ptr++ = *src_ptr++));
         }
 
-        inline void copy_string_part(char* dest_ptr, 
-                                     const char* src_ptr, 
-                                     uint32_t size) noexcept {
+        static inline void copy_string_part(char* dest_ptr, 
+                                            const char* src_ptr, 
+                                            uint32_t size) noexcept {
             const char null_char = '\0';
 
             for (uint32_t i = 0; i < size; i++) {
@@ -44,8 +44,8 @@ namespace runtime
             dest_ptr[size - 1] = null_char;
         }
 
-        inline const char* find_char_in_string(const char* string, 
-                                               int32_t symbol) noexcept {
+        static inline const char* find_char_in_string(const char* string, 
+                                                      int32_t symbol) noexcept {
             while (*string != static_cast<char>(symbol))
                 if (!(*string++)) [[unlikely]]
                     return nullptr;
@@ -53,7 +53,7 @@ namespace runtime
             return const_cast<char*>(string);
         }
 
-        inline uint32_t get_string_length(const char *string) noexcept {
+        static inline uint32_t get_string_length(const char *string) noexcept {
             uint32_t length = 0;
             while (*string != '\0') {
                 string++;
@@ -63,8 +63,8 @@ namespace runtime
             return length;
         }
 
-        inline int32_t compare_strings(const char* a_ptr, const char* b_ptr) 
-                                       noexcept {
+        static inline int32_t compare_strings(const char* a_ptr, const char* b_ptr) 
+                                              noexcept {
             while (*a_ptr && (*a_ptr == *b_ptr)) {
                 ++a_ptr;
                 ++b_ptr;
@@ -76,6 +76,4 @@ namespace runtime
         String_Manipulation() noexcept = default;
         ~String_Manipulation() noexcept = default;
     };
-
-    extern String_Manipulation string_manip;
 } // namespace runtime

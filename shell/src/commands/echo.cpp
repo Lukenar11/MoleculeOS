@@ -132,20 +132,20 @@ namespace
             return;
         }
     
-        auto* inode = kernel::filesystem::mofs.get_inode_by_name_and_format(
+        auto* inode = kernel::filesystem::MoleculeOS_File_System::get_inode_by_name_and_format(
             parsed_filename.name.data(),
             parsed_filename.format.data()
         );
         if (!inode)
-            inode = kernel::filesystem::mofs.create_file(
+            inode = kernel::filesystem::MoleculeOS_File_System::create_file(
                 parsed_filename.name.data(),
                 parsed_filename.format.data()
             );
 
-        kernel::filesystem::mofs.set_file_content_as_string(
+        kernel::filesystem::MoleculeOS_File_System::set_file_content_as_string(
             inode,
             file_instream.data(),
-            runtime::string_manip.get_string_length(file_instream.data())
+            runtime::String_Manipulation::get_string_length(file_instream.data())
         );
     }
 }
@@ -169,7 +169,7 @@ void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
         return;
     }
 
-    auto* inode = kernel::filesystem::mofs.get_inode_by_name_and_format(
+    auto* inode = kernel::filesystem::MoleculeOS_File_System::get_inode_by_name_and_format(
         parsed_filename.name.data(),
         parsed_filename.format.data()
     );
@@ -188,7 +188,7 @@ void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
         return;
     }
 
-    if (!kernel::filesystem::mofs.get_file_content_as_string(
+    if (!kernel::filesystem::MoleculeOS_File_System::get_file_content_as_string(
             inode,
             buffer.data(),
             needed_size
@@ -200,7 +200,7 @@ void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
     }
 
     for (uint32_t i = 0; buffer[i] != '\0'; i++)
-        runtime::text_output.put_char(buffer[i]);
+        runtime::Text_Output::put_char(buffer[i]);
 }
 
 namespace shell::commands
@@ -221,12 +221,12 @@ namespace shell::commands
         const char null_char = '\0';
 
         const char* file_outstrem_redict_operator_pos = 
-            runtime::string_manip.find_char_in_string(
+            runtime::String_Manipulation::find_char_in_string(
                 arguments.begin(), 
                 '<'
             );
         if (file_outstrem_redict_operator_pos != nullptr) {
-            const char* pos = runtime::string_manip.find_char_in_string(
+            const char* pos = runtime::String_Manipulation::find_char_in_string(
                 file_outstrem_redict_operator_pos + 1, 
                 '<'
             );
@@ -253,12 +253,12 @@ namespace shell::commands
         }
 
         const char* file_intstrem_redict_operator_pos = 
-            runtime::string_manip.find_char_in_string(
+            runtime::String_Manipulation::find_char_in_string(
                 arguments.begin(), 
                 '>'
             );
         if (file_intstrem_redict_operator_pos != nullptr) {
-            const char* pos = runtime::string_manip.find_char_in_string(
+            const char* pos = runtime::String_Manipulation::find_char_in_string(
                 file_intstrem_redict_operator_pos + 1,
                 '>'
             );
@@ -289,7 +289,7 @@ namespace shell::commands
             return;
         }
 
-        runtime::text_output.put_string(arguments.data());
+        runtime::Text_Output::put_string(arguments.data());
 
         command_end();
     }

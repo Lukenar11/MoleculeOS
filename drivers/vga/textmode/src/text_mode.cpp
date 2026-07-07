@@ -27,7 +27,7 @@ namespace drivers::vga
     void Text_Mode::put_char_at(const char symbol, 
                                 const uint8_t color, 
                                 const uint32_t x, 
-                                const uint32_t y) const noexcept {
+                                const uint32_t y) noexcept {
         // VGA-Area Over/Underflow gurard
         if (x >= TEXT_MODE_SCREEN_WIDTH || 
             y >= TEXT_MODE_SCREEN_HEIGHT) [[unlikely]]
@@ -38,8 +38,7 @@ namespace drivers::vga
         VGA_TEXT_MODE_SCREEN_FRAME_BUFFER[index] = make_symbol_entry(symbol, color);
     }
 
-    void Text_Mode::clear_screen(const Text_Mode_Colors& background)
-                                 const noexcept {
+    void Text_Mode::clear_screen(const Text_Mode_Colors& background) noexcept {
         const uint8_t color = make_color(Text_Mode_Colors::BLACK, background);
         const uint16_t entry = make_symbol_entry(' ', color);
 
@@ -47,6 +46,4 @@ namespace drivers::vga
         for (uint32_t i = 0; i < n; i++) [[likely]]
             VGA_TEXT_MODE_SCREEN_FRAME_BUFFER[i] = entry;
     }
-    
-    Text_Mode text_mode;
 } // namespace drivers::vga

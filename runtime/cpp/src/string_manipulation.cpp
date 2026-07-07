@@ -16,8 +16,3 @@ NOTES:
 */
 
 #include <string_manipulation.hpp>
-
-namespace runtime
-{
-    String_Manipulation string_manip;
-} // namespace runtime
