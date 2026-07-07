@@ -1,9 +1,5 @@
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 void test_reg_dump() 
 {
     __asm__ volatile (
@@ -17,7 +13,3 @@ void test_reg_dump()
         "ud2"
     );
 }
-
-#ifdef __cplusplus
-}
-#endif

@@ -22,7 +22,7 @@ inline void test_array() {
             pos += 4;
         }
     }
-
+ 
     {
         volatile char* vga = (char*)0xB8A00;
         uint32_t pos = 0;

@@ -3,7 +3,7 @@
 #include <Runtime/CPP/ConsoleIO.hpp>
 
 void test_console_io() {
-
+    
     runtime::ConsoleIO console;
     console.reset();
     console.put_char('H');

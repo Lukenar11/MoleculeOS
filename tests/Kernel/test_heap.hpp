@@ -12,7 +12,7 @@ void test_allocator_raw()
 
     runtime::text_output.put_char('\n');
     for (uint32_t n = 1; n < 4; n++) {
-        void* ptr = kernel::heap::block.allocate(n);
+        void* ptr = kernel::heap::Block_Allocator::.allocate(n);
         uint32_t addr = reinterpret_cast<uint32_t>(ptr);
 
         runtime::text_output.put_string(((addr % 8) == 0) ? "\naligend" : "\nno aligend");
@@ -42,7 +42,7 @@ void test_allocator()
 
     runtime::text_output.put_char('\n');
     for (uint32_t n = 1; n < 4; n++) {
-        void* ptr = kernel::heap::block.allocate(n);
+        void* ptr = kernel::heap::Block_Allocator::.allocate(n);
         uint32_t addr = reinterpret_cast<uint32_t>(ptr);
 
         runtime::text_output.put_string(((addr % 8) == 0) ? "\naligend" : "\nno aligend");
@@ -56,7 +56,7 @@ void test_allocator()
         runtime::text_output.put_string("\naddress: ");
         runtime::text_output.put_uint(addr);
 
-        kernel::heap::block.deallocate(ptr);
+        kernel::heap::Block_Allocator::.deallocate(ptr);
 
         runtime::text_output.put_char('\n');
     }

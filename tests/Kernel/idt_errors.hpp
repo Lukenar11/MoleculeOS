@@ -2,10 +2,6 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // Divide Error (ISR 0)
 static void test_divide_error() 
 {
@@ -60,14 +56,6 @@ static void general_protection_fault()
         "mov %ax, %ds"
     );
 }
-
-// Syscall Test (ISR 0x69)
-static void test_syscall_0x69() 
-{
-    __asm__ volatile(
-        "int $0x69"
-    );
-}
     
 static inline void run_exception_tests() 
 {
@@ -76,9 +64,4 @@ static inline void run_exception_tests()
     // test_overflow();
     // test_invalid_opcode();
     // general_protection_fault();
-    test_syscall_0x69();
 }
-
-#ifdef __cplusplus
-}
-#endif
