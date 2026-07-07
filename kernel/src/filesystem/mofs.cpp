@@ -5,20 +5,15 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This file contains the internal implementation of the file system.
-    The file system is a flat, inode-based, 
-    custom file system residing directly in RAM.
+    This file contains all meta-informations and 
+    the file structure about the file system.
 
 NOTES:
-    Since the file system resides directly in RAM, 
-    all files—along with their contents—are deleted upon shutting down or 
-    restarting the system.
+    Each file-structure represents a file with meta infos, the file contains the
+    file name, format, the data, the size and a using info.
 
-    1 method are placed in the header 
-    because they are so small that the compiler can inline them.
-
-    Some functions are placed in the header 
-    because they are so small that the compiler can inline them.
+    An array of file instances is created from the file structure,
+    which then represents all the files.
 */
 
 #include "filesystem/mofs.hpp"
@@ -26,31 +21,30 @@ NOTES:
 namespace kernel::filesystem
 {
     [[nodiscard]]
-    Inode* MoleculeOS_File_System::allocate_inode() noexcept {
-        for (auto& inode : inodes)
-            if (!inode.in_use) {
-                runtime::Memory_Manipulation::set_memory_block(&inode, 0, sizeof(Inode));
-                inode.in_use = true;
-                return &inode;
+    File* MoleculeOS_File_System::allocate_File() noexcept {
+        for (auto& file : files)
+            if (!file.in_use) {
+                runtime::Memory_Manipulation::set_memory_block(&file, 0, sizeof(file));
+                file.in_use = true;
+                return &file;
             }
 
-        system::panic("MOFS: no free inodes available");
-
+        system::panic("MOFS: no free Files available");
         return nullptr;
     }
 
-    void MoleculeOS_File_System::recalculate_file_size(Inode* inode) noexcept {
-        if (inode_not_available(inode)) [[unlikely]]
+    void MoleculeOS_File_System::recalculate_file_size(File* file) noexcept {
+        if (File_not_available(file)) [[unlikely]]
             return;
 
         int32_t i = static_cast<int32_t>(MAX_FILE_SIZE) - 1;
         for (; i >= 0; --i)
-            if (inode->data[i] != 0) {
-                inode->size = static_cast<uint32_t>(i + 1);
+            if (file->data[i] != 0) {
+                file->size = static_cast<uint32_t>(i + 1);
                 return;
             }
 
-        inode->size = 0;
+        file->size = 0;
     }
 
     bool MoleculeOS_File_System::is_valid_file_name_or_formant_char(const char symbol)
@@ -64,23 +58,23 @@ namespace kernel::filesystem
         return false;
     }
 
-    Inode* MoleculeOS_File_System::get_inode_by_name_and_format(const char* filename, 
-                                                                const char* format) 
-                                                                noexcept {
-        for (auto& inode : inodes) {
-            if (!inode.in_use)
+    File* MoleculeOS_File_System::get_file_by_name_and_format(const char* filename, 
+                                                              const char* format) 
+                                                              noexcept {
+        for (auto& file : files) {
+            if (!file.in_use)
                 continue;
 
-            if ((runtime::String_Manipulation::compare_strings(inode.name, filename) == 0) &&
-                (runtime::String_Manipulation::compare_strings(inode.format, format) == 0))
-                return const_cast<Inode*>(&inode);
+            if ((runtime::String_Manipulation::compare_strings(file.name, filename) == 0) &&
+                (runtime::String_Manipulation::compare_strings(file.format, format) == 0))
+                return const_cast<File*>(&file);
         }
 
         return nullptr;
     }
 
-    Inode* MoleculeOS_File_System::create_file(const char* filename, 
-                                               const char* format) noexcept {
+    File* MoleculeOS_File_System::create_file(const char* filename, 
+                                              const char* format) noexcept {
         if (!filename || (filename[0] == '\0')) [[unlikely]] 
             return nullptr;
 
@@ -92,179 +86,181 @@ namespace kernel::filesystem
             if (!is_valid_file_name_or_formant_char(format[i])) [[unlikely]]
                 return nullptr;
 
-        for (auto& inode : inodes) {
-            if (!inode.in_use)
+        for (auto& file : files) {
+            if (!file.in_use)
                 continue;
 
-            if ((runtime::String_Manipulation::compare_strings(inode.name, filename) == 0) &&
-                (runtime::String_Manipulation::compare_strings(inode.format, 
+            if ((runtime::String_Manipulation::compare_strings(file.name, filename) == 0) &&
+                (runtime::String_Manipulation::compare_strings(file.format, 
                                                                format) == 0)) [[unlikely]]
                 return nullptr;
         }
 
-        Inode* inode = allocate_inode();
-        if (!inode) [[unlikely]]
+        File* file = allocate_File();
+        if (!file) [[unlikely]]
             return nullptr;
 
-        runtime::String_Manipulation::copy_string_part(inode->name, 
-                                                        filename, 
-                                                        MAX_FILENAME_LENGTH);
+        runtime::String_Manipulation::copy_string_part(file->name, 
+                                                       filename, 
+                                                       MAX_FILENAME_LENGTH);
         
-        runtime::String_Manipulation::copy_string_part(inode->format, 
+        runtime::String_Manipulation::copy_string_part(file->format, 
                                                        format, 
                                                        MAX_FILE_FORMAT_NAME_LENGTH);
 
-        inode->name[MAX_FILENAME_LENGTH - 1]           = '\0';
-        inode->format[MAX_FILE_FORMAT_NAME_LENGTH - 1] = '\0';
-        inode->size                                    = 0;
+        file->name[MAX_FILENAME_LENGTH - 1]           = '\0';
+        file->format[MAX_FILE_FORMAT_NAME_LENGTH - 1] = '\0';
+        file->size                                    = 0;
 
-        return inode;
+        return file;
     }
 
-    void MoleculeOS_File_System::delete_file(Inode* inode) noexcept {
-        inode->in_use = false;
-        inode->size   = 0;
+    void MoleculeOS_File_System::delete_file(File* file) noexcept {
+        file->in_use = false;
+        file->size   = 0;
 
-        runtime::Memory_Manipulation::set_memory_block(inode->name, 
+        runtime::Memory_Manipulation::set_memory_block(file->name, 
                                                        '\0', 
                                                        MAX_FILENAME_LENGTH);
-        runtime::Memory_Manipulation::set_memory_block(inode->format, 
+
+        runtime::Memory_Manipulation::set_memory_block(file->format, 
                                                        '\0', 
                                                        MAX_FILE_FORMAT_NAME_LENGTH);
-        runtime::Memory_Manipulation::set_memory_block(inode->data, 
+
+        runtime::Memory_Manipulation::set_memory_block(file->data, 
                                                        0, 
                                                        MAX_FILE_SIZE);
     }
 
-    bool MoleculeOS_File_System::get_file_content_binary(const Inode* inode, 
+    bool MoleculeOS_File_System::get_file_content_binary(const File* file, 
                                                          uint8_t* out_buffer,
                                                          const uint32_t buffer_size)
                                                          noexcept {
-        if (inode_not_available(inode)) [[unlikely]] 
+        if (File_not_available(file)) [[unlikely]] 
             return false;
 
-        if (less_then(buffer_size, inode->size)) [[unlikely]] 
+        if (less_then(buffer_size, file->size)) [[unlikely]] 
             return false;
 
         runtime::Memory_Manipulation::copy_memory_block(out_buffer, 
-                                                        inode->data, 
-                                                        inode->size);
+                                                        file->data, 
+                                                        file->size);
         return true;
     }
 
-    bool MoleculeOS_File_System::get_file_content_as_string(const Inode* inode, 
+    bool MoleculeOS_File_System::get_file_content_as_string(const File* file, 
                                                             char* out_buffer,
                                                             const uint32_t buffer_size)
                                                             noexcept {
-        if (inode_not_available(inode)) [[unlikely]] 
+        if (File_not_available(file)) [[unlikely]] 
             return false;
 
-        if (less_then(buffer_size, inode->size + 1)) [[unlikely]] 
+        if (less_then(buffer_size, file->size + 1)) [[unlikely]] 
             return false;
 
         runtime::Memory_Manipulation::copy_memory_block(out_buffer, 
-                                                        inode->data, 
-                                                        inode->size);
-        out_buffer[inode->size] = '\0';
+                                                        file->data, 
+                                                        file->size);
+        out_buffer[file->size] = '\0';
 
         return true;
     }
 
-    bool MoleculeOS_File_System::read_file_binary_at(const Inode* inode,
+    bool MoleculeOS_File_System::read_file_binary_at(const File* file,
                                                      uint8_t* out_buffer,
                                                      const uint32_t buffer_size,
                                                      const uint32_t offset,
                                                      const uint32_t length) 
                                                      noexcept {
-        if (read_file_at_guard(inode, offset, length)) [[unlikely]] 
+        if (read_file_at_guard(file, offset, length)) [[unlikely]] 
             return false;
 
         if (less_then(buffer_size, length)) [[unlikely]] 
             return false;
 
         runtime::Memory_Manipulation::copy_memory_block(out_buffer, 
-                                                        (inode->data + offset), 
+                                                        (file->data + offset), 
                                                         length);
     
         return true;
     }
 
-    bool MoleculeOS_File_System::read_file_as_string_at(const Inode* inode, 
+    bool MoleculeOS_File_System::read_file_as_string_at(const File* file, 
                                                         char* out_buffer,
                                                         const uint32_t buffer_size,
                                                         const uint32_t offset, 
                                                         const uint32_t length) 
                                                         noexcept {
-        if (read_file_at_guard(inode, offset, length)) [[unlikely]] 
+        if (read_file_at_guard(file, offset, length)) [[unlikely]] 
             return false;
 
         if (less_then(buffer_size, (length + 1))) [[unlikely]] 
             return false;
 
         runtime::Memory_Manipulation::copy_memory_block(out_buffer, 
-                                                        (inode->data + offset),
+                                                        (file->data + offset),
                                                         length);
         out_buffer[length] = '\0';
         return true;
     }
 
-    bool MoleculeOS_File_System::set_file_content_binary(Inode* inode,
+    bool MoleculeOS_File_System::set_file_content_binary(File* file,
                                                          const uint8_t* in_buffer,
                                                          const uint32_t length)
                                                          noexcept {
-        if (set_file_content_guard(inode, length)) [[unlikely]]
+        if (set_file_content_guard(file, length)) [[unlikely]]
             return false;
 
-        runtime::Memory_Manipulation::copy_memory_block(inode->data, 
+        runtime::Memory_Manipulation::copy_memory_block(file->data, 
                                                         in_buffer, 
                                                         length);
-        recalculate_file_size(inode);
+        recalculate_file_size(file);
         return true;
     }
 
-    bool MoleculeOS_File_System::set_file_content_as_string(Inode* inode,
+    bool MoleculeOS_File_System::set_file_content_as_string(File* file,
                                                             const char* in_buffer,
                                                             const uint32_t length) 
                                                             noexcept {
-        if (set_file_content_guard(inode, length)) [[unlikely]]
+        if (set_file_content_guard(file, length)) [[unlikely]]
             return false;
 
-        runtime::Memory_Manipulation::copy_memory_block(inode->data, 
+        runtime::Memory_Manipulation::copy_memory_block(file->data, 
                                                         in_buffer, 
                                                         length);
-        recalculate_file_size(inode);
+        recalculate_file_size(file);
         return true;
     }
 
-    bool MoleculeOS_File_System::write_file_binary_at(Inode* inode,
+    bool MoleculeOS_File_System::write_file_binary_at(File* file,
                                                       const uint8_t* in_buffer,
                                                       const uint32_t buffer_size,
                                                       const uint32_t offset,
                                                       const uint32_t length)
                                                       noexcept {
-        if (write_fill_at_guard(inode, offset, length, buffer_size)) [[unlikely]]
+        if (write_fill_at_guard(file, offset, length, buffer_size)) [[unlikely]]
             return false;
 
-        runtime::Memory_Manipulation::copy_memory_block((inode->data + offset), 
+        runtime::Memory_Manipulation::copy_memory_block((file->data + offset), 
                                                         in_buffer, 
                                                         length);
-        recalculate_file_size(inode);
+        recalculate_file_size(file);
         return true;
     }
 
-    bool MoleculeOS_File_System::write_file_string_at(Inode* inode,
+    bool MoleculeOS_File_System::write_file_string_at(File* file,
                                                       const char* in_buffer,
                                                       const uint32_t buffer_size,
                                                       const uint32_t offset,
                                                       const uint32_t length) 
                                                       noexcept {
-        if (write_fill_at_guard(inode, offset, length, buffer_size)) [[unlikely]]
+        if (write_fill_at_guard(file, offset, length, buffer_size)) [[unlikely]]
             return false;
 
-        runtime::Memory_Manipulation::copy_memory_block((inode->data + offset), 
+        runtime::Memory_Manipulation::copy_memory_block((file->data + offset), 
                                                         in_buffer, 
                                                         length);
-        recalculate_file_size(inode);
+        recalculate_file_size(file);
         return true;
     }
 } // namespace kernel::filesystem

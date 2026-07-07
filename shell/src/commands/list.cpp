@@ -26,23 +26,23 @@ namespace shell::commands
         runtime::Text_Output::reset();
         runtime::Text_Output::put_string("Files:\n");
 
-        const auto& inodes = kernel::filesystem::MoleculeOS_File_System::get_inodes();
-        for (const auto& inode : inodes) {
-            if (!inode.in_use)
+        const auto& files = kernel::filesystem::MoleculeOS_File_System::get_files();
+        for (const auto& file : files) {
+            if (!file.in_use)
                 continue;
 
-            if (inode.name[0] == '\0') [[unlikely]] {
-                static const char* error_message = "\t- [INVALID INODE]\n";
+            if (file.name[0] == '\0') [[unlikely]] {
+                static const char* error_message = "\t- [INVALID FILE]\n";
                 runtime::Text_Output::put_string(error_message);
                 continue;
             }
 
             runtime::Text_Output::put_string("\t- ");
-            runtime::Text_Output::put_string(inode.name);
+            runtime::Text_Output::put_string(file.name);
 
-            if (inode.format[0] != '\0') {
+            if (file.format[0] != '\0') {
                 runtime::Text_Output::put_char('.');
-                runtime::Text_Output::put_string(inode.format);
+                runtime::Text_Output::put_string(file.format);
             }
 
             runtime::Text_Output::put_char('\n');

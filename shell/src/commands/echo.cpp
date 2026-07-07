@@ -134,8 +134,8 @@ namespace
     
         auto* inode = 
             kernel::filesystem::MoleculeOS_File_System::
-            get_inode_by_name_and_format(parsed_filename.name.data(),
-                                         parsed_filename.format.data());
+            get_file_by_name_and_format(parsed_filename.name.data(),
+                                        parsed_filename.format.data());
         if (!inode)
             inode = kernel::filesystem::MoleculeOS_File_System::
                     create_file(parsed_filename.name.data(),
@@ -168,8 +168,8 @@ void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
     }
 
     auto* inode = kernel::filesystem::MoleculeOS_File_System::
-                  get_inode_by_name_and_format(parsed_filename.name.data(),
-                                               parsed_filename.format.data());
+                  get_file_by_name_and_format(parsed_filename.name.data(),
+                                              parsed_filename.format.data());
     if (!inode) {
         shell::commands::print_command_error(command_name);
         shell::commands::print_command_error("file not found\n");

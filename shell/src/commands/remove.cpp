@@ -35,7 +35,7 @@ namespace shell::commands
         }
 
         auto* inode = kernel::filesystem::MoleculeOS_File_System::
-                      get_inode_by_name_and_format(parsed.name.data(),
+                      get_file_by_name_and_format(parsed.name.data(),
                                                   parsed.format.data());
 
         if (!inode) [[unlikely]] {

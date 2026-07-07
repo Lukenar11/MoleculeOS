@@ -6,8 +6,7 @@ LICENSE:
 
 DESCRIPTION:
     This file contains the internal implementation of the file system.
-    The file system is a flat, inode-based, 
-    custom file system residing directly in RAM.
+    The file system is a flat custom file system residing directly in RAM.
 
 NOTES:
     Since the file system resides directly in RAM, 
@@ -33,9 +32,9 @@ NOTES:
 namespace
 {
     [[nodiscard]]
-    inline constexpr bool inode_not_available(const kernel::filesystem::Inode* inode)
+    inline constexpr bool File_not_available(const kernel::filesystem::File* file)
                                               noexcept {
-        return !inode || !inode->in_use; 
+        return !file || !file->in_use; 
     }
 
     [[nodiscard]]
@@ -51,33 +50,33 @@ namespace
     }
 
     [[nodiscard]]
-    inline constexpr bool read_file_at_guard(const kernel::filesystem::Inode* inode,
+    inline constexpr bool read_file_at_guard(const kernel::filesystem::File* file,
                                              const uint32_t offset, 
                                              const uint32_t length) noexcept {
-        if (inode_not_available(inode)) 
+        if (File_not_available(file)) 
             return true;
 
-        if (greader_then(offset, inode->size)) 
+        if (greader_then(offset, file->size)) 
             return true;
 
-        if (greader_then((offset + length), inode->size)) 
+        if (greader_then((offset + length), file->size)) 
             return true;
 
         return false;
     }
 
     [[nodiscard]]
-    inline constexpr bool write_fill_at_guard(const kernel::filesystem::Inode* inode,
+    inline constexpr bool write_fill_at_guard(const kernel::filesystem::File* file,
                                               const uint32_t offset,
                                               const uint32_t length, 
                                               const uint32_t buffer_size) noexcept {
-        if (inode_not_available(inode)) 
+        if (File_not_available(file)) 
             return true;
 
-        if (greader_then(offset, inode->size)) 
+        if (greader_then(offset, file->size)) 
             return true;
 
-        if (greader_then((offset + length), inode->size)) 
+        if (greader_then((offset + length), file->size)) 
             return true;
 
         if (less_then(buffer_size, length)) 
@@ -87,9 +86,9 @@ namespace
     }
 
     [[nodiscard]]
-    inline constexpr bool set_file_content_guard(const kernel::filesystem::Inode* inode,
+    inline constexpr bool set_file_content_guard(const kernel::filesystem::File* file,
                                                  const uint32_t length) noexcept {
-        if (inode_not_available(inode)) 
+        if (File_not_available(file)) 
             return true;
 
         if (greader_then(length, kernel::filesystem::MAX_FILE_SIZE)) 
@@ -103,70 +102,70 @@ namespace kernel::filesystem
 {
     class MoleculeOS_File_System final {
     private:
-        static inline runtime::Array<Inode, MAX_FILES_PER_DIRECTORY> inodes;
+        static inline runtime::Array<File, MAX_FILES_PER_DIRECTORY> files;
 
-        static void recalculate_file_size(Inode* inode) noexcept;
+        static void recalculate_file_size(File* file) noexcept;
 
         [[nodiscard]] 
-        static Inode* allocate_inode() noexcept;
+        static File* allocate_File() noexcept;
 
     public:
         [[nodiscard]]
         static bool is_valid_file_name_or_formant_char(const char symbol) noexcept;
 
         [[nodiscard]]
-        static Inode* get_inode_by_name_and_format(const char* filename, 
-                                                   const char* format) noexcept;
+        static File* get_file_by_name_and_format(const char* filename, 
+                                                 const char* format) noexcept;
 
         [[nodiscard]]
-        static Inode* create_file(const char* filename, const char* format) noexcept;
+        static File* create_file(const char* filename, const char* format) noexcept;
 
-        static void delete_file(Inode* inode) noexcept;
+        static void delete_file(File* file) noexcept;
 
-        static bool get_file_content_binary(const Inode* inode, 
+        static bool get_file_content_binary(const File* file, 
                                             uint8_t* out_buffer,
                                             const uint32_t buffer_size) noexcept;
 
-        static bool get_file_content_as_string(const Inode* inode, 
+        static bool get_file_content_as_string(const File* file, 
                                                char* out_buffer,
                                                const uint32_t buffer_size) noexcept;
 
-        static bool read_file_binary_at(const Inode* inode,  
+        static bool read_file_binary_at(const File* file,  
                                         uint8_t* out_buffer,
                                         const uint32_t buffer_size, 
                                         const uint32_t offset, 
                                         const uint32_t length) noexcept;
 
-        static bool read_file_as_string_at(const Inode* inode, 
-                                          char* out_buffer,
-                                          const uint32_t buffer_size, 
-                                          const uint32_t offset, 
-                                          const uint32_t length) noexcept;
+        static bool read_file_as_string_at(const File* file, 
+                                           char* out_buffer,
+                                           const uint32_t buffer_size, 
+                                           const uint32_t offset, 
+                                           const uint32_t length) noexcept;
 
-        static bool set_file_content_binary(Inode* inode, 
+        static bool set_file_content_binary(File* file, 
                                             const uint8_t* in_buffer,
                                             const uint32_t buffer_size) noexcept; 
 
-        static bool set_file_content_as_string(Inode* inode, 
-                                              const char* in_buffer,
-                                              const uint32_t buffer_size) noexcept;
+        static bool set_file_content_as_string(File* file, 
+                                               const char* in_buffer,
+                                               const uint32_t buffer_size) noexcept;
 
-        static bool write_file_binary_at(Inode* inode,
+        static bool write_file_binary_at(File* file,
                                          const uint8_t* in_buffer,
                                          const uint32_t buffer_size,
                                          const uint32_t offset,
                                          const uint32_t length) noexcept;
 
-        static bool write_file_string_at(Inode* inode,
+        static bool write_file_string_at(File* file,
                                          const char* in_buffer,
                                          const uint32_t buffer_size,
                                          const uint32_t offset,
                                          const uint32_t length) noexcept;
 
         [[nodiscard]]
-        static inline constexpr const runtime::Array<Inode, MAX_FILES_PER_DIRECTORY>& get_inodes()
+        static inline constexpr const runtime::Array<File, MAX_FILES_PER_DIRECTORY>& get_files()
         noexcept {
-            return inodes;
+            return files;
         }
 
         MoleculeOS_File_System() noexcept = default;
