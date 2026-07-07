@@ -107,7 +107,7 @@ namespace
         uint32_t j = 0;
         for (; i < arguments.size(); i++) {
             const char argument = arguments[i];
-            if ((argument == spache_char) || (argument == null_char)) [[unlikely]
+            if ((argument == spache_char) || (argument == null_char)) [[unlikely]]
                 break;
 
             filename[j++] = argument;
