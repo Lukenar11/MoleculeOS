@@ -31,13 +31,13 @@ namespace drivers::ps2
 {
     class Keyboard_Input final {
     private:
-        static inline constexpr uint8_t LOWEST_BIT = 0x01;
+        static inline constexpr uint8_t LOWEST_BIT           = 0x01;
         static inline constexpr uint8_t ALOWED_SCANCODE_SIZE = 128;
 
         static inline constexpr uint16_t KEYBOARD_STATUS_PORT = 0x64;
-        static inline constexpr uint16_t KEYBOARD_DATA_PORT = 0x60;
+        static inline constexpr uint16_t KEYBOARD_DATA_PORT   = 0x60;
     
-        static inline bool shift_is_pressed = false;
+        static inline bool shift_is_pressed    = false;
         static inline bool capslock_is_enabled = false;
 
         static inline bool has_pending_scancode() noexcept {

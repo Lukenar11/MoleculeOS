@@ -72,6 +72,6 @@ namespace drivers::ps2
 
         const char symbol = get_key();
         if (symbol != '\0')
-            scancode_buffer.push(symbol, false);
+            scancode_buffer.push(symbol);
     }
 } // namespace drivers::ps2

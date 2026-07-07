@@ -24,25 +24,25 @@ NOTES:
 
 namespace drivers::vga 
 {
-    constexpr uint32_t TEXT_MODE_SCREEN_WIDTH = 80;
+    constexpr uint32_t TEXT_MODE_SCREEN_WIDTH  = 80;
     constexpr uint32_t TEXT_MODE_SCREEN_HEIGHT = 25;
 
     enum class Text_Mode_Colors : uint8_t {
-        BLACK = 0x00,
-        BLUE = 0x01,
-        GREEN = 0x02,
-        CYAN = 0x03,
-        RED = 0x04,
-        MAGENTA = 0x05,
-        BROWN = 0x06,
-        LIGHT_GREY = 0x07,
-        DARK_GREY = 0x08,
-        LIGHT_BLUE = 0x09,
-        LIGHT_GREEN = 0x0A,
-        LIGHT_CYAN = 0x0B,
-        LIGHT_RED = 0x0C,
+        BLACK         = 0x00,
+        BLUE          = 0x01,
+        GREEN         = 0x02,
+        CYAN          = 0x03,
+        RED           = 0x04,
+        MAGENTA       = 0x05,
+        BROWN         = 0x06,
+        LIGHT_GREY    = 0x07,
+        DARK_GREY     = 0x08,
+        LIGHT_BLU     = 0x09,
+        LIGHT_GREEN   = 0x0A,
+        LIGHT_CYAN    = 0x0B,
+        LIGHT_RED     = 0x0C,
         LIGHT_MAGENTA = 0x0D,
-        YELLOW = 0x0E,
-        WHITE = 0x0F
+        YELLOW        = 0x0E,
+        WHITE         = 0x0F
     };
 } // namespace drivers::vga

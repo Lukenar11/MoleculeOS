@@ -87,7 +87,7 @@ namespace
     }
 
     [[nodiscard]]
-    inline constexpr bool set_file_content_guard(const kernel::filesystem::Inode* inode, 
+    inline constexpr bool set_file_content_guard(const kernel::filesystem::Inode* inode,
                                                  const uint32_t length) noexcept {
         if (inode_not_available(inode)) 
             return true;
@@ -128,8 +128,8 @@ namespace kernel::filesystem
                                             const uint32_t buffer_size) noexcept;
 
         static bool get_file_content_as_string(const Inode* inode, 
-                                              char* out_buffer,
-                                              const uint32_t buffer_size) noexcept;
+                                               char* out_buffer,
+                                               const uint32_t buffer_size) noexcept;
 
         static bool read_file_binary_at(const Inode* inode,  
                                         uint8_t* out_buffer,

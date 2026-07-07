@@ -47,7 +47,7 @@ namespace shell::interpreter
     };
 
     bool Interpreter::tokenize_input_buffer() {
-        const uint32_t null = 0;
+        const uint32_t null    = 0;
         bool tokenize_commands = true;
         for (uint32_t i = null; i < input_buffer_index; ++i) [[likely]] {
             const char key = input_buffer[i];
@@ -64,9 +64,9 @@ namespace shell::interpreter
             }
 
             auto& target_buffer = (tokenize_commands) ? commands : arguments;
-            auto& target_index = (tokenize_commands) ? commands_index : arguments_index;
+            auto& target_index  = (tokenize_commands) ? commands_index : arguments_index;
             if (!append_char(target_buffer, target_index, key)) [[unlikely]] {
-                static const char* command_buffer_error_message = "Command buffer";
+                static const char* command_buffer_error_message  = "Command buffer";
                 static const char* argument_buffer_error_message = "Argument buffer";
 
                 const char* overflow_error_message = (tokenize_commands) 
@@ -78,7 +78,7 @@ namespace shell::interpreter
             }
         }
 
-        commands[commands_index] = NULL_TERMINATOR;
+        commands[commands_index]   = NULL_TERMINATOR;
         arguments[arguments_index] = NULL_TERMINATOR;
 
         return true;
@@ -91,9 +91,8 @@ namespace shell::interpreter
 
             static const char* error_message = "Error: arguments without command.\n\n";
             runtime::Text_Output::put_string(error_message);
-            
+        
             set_default_text_color();
-
             return false;
         }
 
@@ -128,15 +127,15 @@ namespace shell::interpreter
 
     constexpr void Interpreter::flush_interpreter_pipeline() noexcept {
         const char null_terminator = NULL_TERMINATOR;
-        const uint32_t null = 0;
+        const uint32_t null        = 0;
         
         input_buffer.fill(null_terminator);
         commands.fill(null_terminator);
         arguments.fill(null_terminator);
 
         input_buffer_index = null;
-        commands_index = null;
-        arguments_index = null;
+        commands_index     = null;
+        arguments_index    = null;
     }
 
     void Interpreter::step(const char& key) {

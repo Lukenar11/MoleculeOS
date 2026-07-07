@@ -25,6 +25,7 @@ extern irq_common_handler
 %define KERNEL_DATA_SEGMENT_SELECTOR 0x10
 
 section .text
+
 irq_common_stub:
     push eax
     push ecx
@@ -40,32 +41,32 @@ irq_common_stub:
     push ds
 
     ; set kernel data segment
-    mov ax, KERNEL_DATA_SEGMENT_SELECTOR
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
+    mov  ax, KERNEL_DATA_SEGMENT_SELECTOR
+    mov  ds, ax
+    mov  es, ax
+    mov  fs, ax
+    mov  gs, ax
 
     ; pointer to "Register_Dump"
     push esp
     call irq_common_handler
-    add esp, 4
+    add  esp, 4
 
-    pop ds
-    pop es
-    pop fs
-    pop gs
+    pop  ds
+    pop  es
+    pop  fs
+    pop  gs
 
-    pop edi
-    pop esi
-    pop ebp
-    pop ebx
-    pop edx
-    pop ecx
-    pop eax
+    pop  edi
+    pop  esi
+    pop  ebp
+    pop  ebx
+    pop  edx
+    pop  ecx
+    pop  eax
 
     ; remove "interrupt_number" + "error_code"
-    add esp, 8
+    add  esp, 8
 
     iretd
     

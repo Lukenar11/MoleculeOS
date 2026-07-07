@@ -27,12 +27,12 @@ namespace kernel::heap
     private:
         static inline constexpr uint32_t MEMORY_BLOCK_BYTE_SIZE = 8;
 
-        static inline uint32_t total_memory_blocks = 0;
+        static inline uint32_t total_memory_blocks        = 0;
         static inline uint32_t required_memory_pool_space = 0;
 
-        static inline uint8_t* memory_pool_ptr = nullptr;
-        static inline uint16_t* allocation_sizes;
-        static inline bool* free_memory_blocks;
+        static inline uint8_t* memory_pool_ptr   = nullptr;
+        static inline uint16_t* allocation_sizes = nullptr;
+        static inline bool* free_memory_blocks   = nullptr;
 
         static void* set_allocation_sizes_entry(const uint32_t blocks_neede, 
                                                 const uint32_t i) 

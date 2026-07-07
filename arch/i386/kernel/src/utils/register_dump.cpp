@@ -22,5 +22,6 @@ NOTES:
 
 namespace kernel
 {
-    static_assert(sizeof(Register_Dump) == 16 * 4, "Register_Dump size mismatch!");
+    static_assert(sizeof(Register_Dump) == 16 * 4, 
+                  "\"Register_Dump\" size mismatch!");
 } // namespace kernel

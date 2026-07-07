@@ -18,13 +18,16 @@ NOTES:
 
 #include <drivers_api.hpp>
 
-namespace kernel::irq
+namespace
 {
     struct IRQ_Handler_Entry final {
         uint8_t index = 0;
         void (*handler)(kernel::Register_Dump*);
     };
+}
 
+namespace kernel::irq
+{
     inline constexpr IRQ_Handler_Entry irq_handler_table[] = {
         { 0, nullptr}, 
         { 1, drivers::ps2::Keyboard_Input::keyboard_irq_handler},

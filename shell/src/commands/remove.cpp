@@ -34,10 +34,9 @@ namespace shell::commands
             return;
         }
 
-        auto* inode = kernel::filesystem::MoleculeOS_File_System::get_inode_by_name_and_format(
-            parsed.name.data(),
-            parsed.format.data()
-        );
+        auto* inode = kernel::filesystem::MoleculeOS_File_System::
+                      get_inode_by_name_and_format(parsed.name.data(),
+                                                  parsed.format.data());
 
         if (!inode) [[unlikely]] {
             static const char* error_message = "file does not exist";
@@ -49,7 +48,6 @@ namespace shell::commands
         }
 
         kernel::filesystem::MoleculeOS_File_System::delete_file(inode);
-
         command_end();
     }
 } // namespace shell::commands

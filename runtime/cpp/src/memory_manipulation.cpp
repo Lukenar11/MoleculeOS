@@ -16,8 +16,3 @@ NOTES:
 */
 
 #include "memory_manipulation.hpp"
-
-namespace runtime
-{
-    Memory_Manipulation memory_manip;
-} // namespace runtime

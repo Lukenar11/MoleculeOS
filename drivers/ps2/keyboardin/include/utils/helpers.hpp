@@ -45,13 +45,13 @@ namespace drivers::ps2
     };
 
     enum class Special_Keyboard_Keys : uint8_t {
-        LEFT_SHIFT = 0x2A,
-        RIGHT_SHIFT = 0x36,
-        KEYBOARD_RELEASE = 0x80,
-        LEFT_SHIFT_RELEASE = 0xAA,
+        LEFT_SHIFT          = 0x2A,
+        RIGHT_SHIFT         = 0x36,
+        KEYBOARD_RELEASE    = 0x80,
+        LEFT_SHIFT_RELEASE  = 0xAA,
         RIGHT_SHIFT_RELEASE = 0xB6,
-        CAPSLOCK = 0x3A,
-        CTRL = 0x64,
-        REBOOT_COMMAND = 0xFE,
+        CAPSLOCK            = 0x3A,
+        CTRL                = 0x64,
+        REBOOT_COMMAND      = 0xFE,
     };
 } // namespace drivers::ps2

@@ -39,11 +39,11 @@ namespace drivers::vga
     }
 
     void Text_Mode::clear_screen(const Text_Mode_Colors& background) noexcept {
-        const uint8_t color = make_color(Text_Mode_Colors::BLACK, background);
+        const uint8_t color  = make_color(Text_Mode_Colors::BLACK, background);
         const uint16_t entry = make_symbol_entry(' ', color);
 
         const uint32_t n = TEXT_MODE_SCREEN_WIDTH * TEXT_MODE_SCREEN_HEIGHT;
-        for (uint32_t i = 0; i < n; i++) [[likely]]
+        for (uint32_t i = 0; i < n; i++)
             VGA_TEXT_MODE_SCREEN_FRAME_BUFFER[i] = entry;
     }
 } // namespace drivers::vga

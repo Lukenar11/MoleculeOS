@@ -49,7 +49,7 @@ namespace
     auto& extract_filename_after_input_redirect(const char* redict_operator_pos,
                                                 const runtime::Array<char,64>& arguments)
                                                 noexcept {
-        const char null_char = '\0';
+        const char null_char  = '\0';
         const char space_char = ' ';
 
         static runtime::Array<char,64> filename;
@@ -84,7 +84,7 @@ namespace
     auto& extract_text_after_redict_operator(const char* redict_operator_pos, 
                                              const runtime::Array<char, 64>& arguments)
                                              noexcept {
-        const char null_char = '\0';
+        const char null_char   = '\0';
         const char spache_char = ' ';
 
         static runtime::Array<char, 64> filename;
@@ -132,21 +132,20 @@ namespace
             return;
         }
     
-        auto* inode = kernel::filesystem::MoleculeOS_File_System::get_inode_by_name_and_format(
-            parsed_filename.name.data(),
-            parsed_filename.format.data()
-        );
+        auto* inode = 
+            kernel::filesystem::MoleculeOS_File_System::
+            get_inode_by_name_and_format(parsed_filename.name.data(),
+                                         parsed_filename.format.data());
         if (!inode)
-            inode = kernel::filesystem::MoleculeOS_File_System::create_file(
-                parsed_filename.name.data(),
-                parsed_filename.format.data()
-            );
+            inode = kernel::filesystem::MoleculeOS_File_System::
+                    create_file(parsed_filename.name.data(),
+                                parsed_filename.format.data());
 
-        kernel::filesystem::MoleculeOS_File_System::set_file_content_as_string(
-            inode,
-            file_instream.data(),
-            runtime::String_Manipulation::get_string_length(file_instream.data())
-        );
+        kernel::filesystem::MoleculeOS_File_System::
+        set_file_content_as_string(inode,
+                                   file_instream.data(),
+                                   runtime::
+                                   String_Manipulation::get_string_length(file_instream.data()));
     }
 }
 
@@ -165,18 +164,15 @@ void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
     if (parsed_filename.error[0] != '\0') {
         shell::commands::print_command_error(command_name);
         shell::commands::print_command_error(parsed_filename.error.data());
-
         return;
     }
 
-    auto* inode = kernel::filesystem::MoleculeOS_File_System::get_inode_by_name_and_format(
-        parsed_filename.name.data(),
-        parsed_filename.format.data()
-    );
+    auto* inode = kernel::filesystem::MoleculeOS_File_System::
+                  get_inode_by_name_and_format(parsed_filename.name.data(),
+                                               parsed_filename.format.data());
     if (!inode) {
         shell::commands::print_command_error(command_name);
         shell::commands::print_command_error("file not found\n");
-
         return;
     }
 
@@ -184,18 +180,14 @@ void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
     if (needed_size > buffer.size()) {
         shell::commands::print_command_error(command_name);
         shell::commands::print_command_error("file too large\n");
-
         return;
     }
 
-    if (!kernel::filesystem::MoleculeOS_File_System::get_file_content_as_string(
-            inode,
-            buffer.data(),
-            needed_size
-        )) {
+    if (!kernel::filesystem::MoleculeOS_File_System::get_file_content_as_string(inode,
+                                                                                buffer.data(),
+                                                                                needed_size)) {
         shell::commands::print_command_error(command_name);
         shell::commands::print_command_error("could not read file\n");
-
         return;
     }
 
@@ -220,16 +212,14 @@ namespace shell::commands
         static runtime::Array<char, 64> filename;
         const char null_char = '\0';
 
-        const char* file_outstrem_redict_operator_pos = 
-            runtime::String_Manipulation::find_char_in_string(
-                arguments.begin(), 
-                '<'
-            );
+        const char* file_outstrem_redict_operator_pos = runtime::String_Manipulation::
+                                                        find_char_in_string(arguments.begin(),
+                                                                            '<');
+
         if (file_outstrem_redict_operator_pos != nullptr) {
-            const char* pos = runtime::String_Manipulation::find_char_in_string(
-                file_outstrem_redict_operator_pos + 1, 
-                '<'
-            );
+            const char* pos = runtime::String_Manipulation::
+                              find_char_in_string(file_outstrem_redict_operator_pos + 1, '<');
+
             if (pos != nullptr) [[unlikely]] {
                 print_command_error(command_name);
                 print_command_error("multiple redirect operators\n");
@@ -238,10 +228,8 @@ namespace shell::commands
                 return;
             }
         
-            filename = extract_filename_after_input_redirect(
-                file_outstrem_redict_operator_pos,
-                arguments
-            );
+            filename = extract_filename_after_input_redirect(file_outstrem_redict_operator_pos,
+                                                             arguments);
         
             handle_file_outstream(filename);
         
@@ -258,10 +246,9 @@ namespace shell::commands
                 '>'
             );
         if (file_intstrem_redict_operator_pos != nullptr) {
-            const char* pos = runtime::String_Manipulation::find_char_in_string(
-                file_intstrem_redict_operator_pos + 1,
-                '>'
-            );
+            const char* pos = runtime::String_Manipulation::
+                              find_char_in_string(file_intstrem_redict_operator_pos + 1,
+                                                  '>');
             if (pos != nullptr) [[unlikely]] {
                 print_command_error(command_name);
                 print_command_error("multiple redirect operators\n");
@@ -270,15 +257,12 @@ namespace shell::commands
                 return;
             }
             
-            file_stream = extract_file_instream_befor_redict_operator(
-                file_intstrem_redict_operator_pos, 
-                arguments
-            );
+            file_stream = 
+                extract_file_instream_befor_redict_operator(file_intstrem_redict_operator_pos,
+                                                            arguments);
 
-            filename = extract_text_after_redict_operator(
-                file_intstrem_redict_operator_pos, 
-                arguments
-            );
+            filename = extract_text_after_redict_operator(file_intstrem_redict_operator_pos, 
+                                                          arguments);
 
             handle_file_instream(filename, file_stream);
 

@@ -26,10 +26,10 @@ NOTES:
 namespace kernel::idt 
 {
     struct IDT_Entry final {
-        uint16_t base_low = 0;
-        uint16_t selector = 0;
-        uint8_t always_0 = 0;
-        uint8_t flags = 0;
+        uint16_t base_low  = 0;
+        uint16_t selector  = 0;
+        uint8_t always_0   = 0;
+        uint8_t flags      = 0;
         uint16_t base_high = 0;
     } __attribute__((packed));
 } // namespace kernel::idt 

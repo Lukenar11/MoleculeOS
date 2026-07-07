@@ -17,6 +17,7 @@
 global sleep
 
 section .text
+
 sleep:
     hlt
     ret

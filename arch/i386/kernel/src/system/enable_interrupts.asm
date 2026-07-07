@@ -15,6 +15,7 @@
 global enable_interrupts
 
 section .text
+
 enable_interrupts:
     sti
     ret

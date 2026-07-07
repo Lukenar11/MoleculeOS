@@ -41,7 +41,6 @@ namespace kernel
             terminal.step();
         }
 
-        
         system::panic(
             "Unexpected return from the \"kernel_main\" scheduler main loop"
         );

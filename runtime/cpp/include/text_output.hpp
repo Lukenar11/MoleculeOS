@@ -38,11 +38,9 @@ namespace runtime
         
         static inline const bool does_blink = false;
         static inline uint8_t cursor_color = 
-            drivers::vga::Text_Mode::make_color(
-                drivers::vga::Text_Mode_Colors::LIGHT_GREY, 
-                drivers::vga::Text_Mode_Colors::BLACK,
-                does_blink
-            );
+            drivers::vga::Text_Mode::make_color(drivers::vga::Text_Mode_Colors::LIGHT_GREY,
+                                                drivers::vga::Text_Mode_Colors::BLACK,
+                                                does_blink);
 
         static void new_line() noexcept;
         static void put_base(uint32_t value, const uint32_t base) noexcept;

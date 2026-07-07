@@ -28,19 +28,18 @@ namespace kernel::idt
         //     system::panic("IDT index out of range", "Check \"idt_init_table\"");
         
         const uint32_t base = reinterpret_cast<uint32_t>(handler);
-        const uint16_t word_mask = 0xFFFF;
 
         IDT_Entry& idt_entry = idt[index];
-        idt_entry.base_low = base & word_mask;
-        idt_entry.base_high = (base >> 16) & word_mask;
-        idt_entry.selector = CODE_SEGMENT_SELECTOR;
-        idt_entry.always_0 = 0;
-        idt_entry.flags = FLAGS;
+        idt_entry.base_low   = base & WORLD_MASK;
+        idt_entry.base_high  = (base >> 16) & WORLD_MASK;
+        idt_entry.selector   = CODE_SEGMENT_SELECTOR;
+        idt_entry.always_0   = 0;
+        idt_entry.flags      = FLAGS;
     }
 
     Interrupt_Descriptor_Table::Interrupt_Descriptor_Table() noexcept {
         idt_ptr.limit = (sizeof(IDT_Entry) * idt.size()) - 1;
-        idt_ptr.base = reinterpret_cast<uint32_t>(idt.begin());
+        idt_ptr.base  = reinterpret_cast<uint32_t>(idt.begin());
 
         for (auto& idt_entry : idt)
             idt_entry = IDT_Entry{};

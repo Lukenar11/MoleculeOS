@@ -24,25 +24,25 @@ global word_output
 section .text
 
 byte_input:
-    xor eax, eax
-    mov dx, [esp+4]
-    in al, dx
+    xor eax,  eax
+    mov dx,  [esp+4]
+    in  al,   dx
     ret
 
 word_input:
-    xor eax, eax
-    mov dx, [esp+4] 
-    in ax, dx
+    xor eax,  eax
+    mov dx,  [esp+4] 
+    in  ax,   dx
     ret
 
 byte_output:
     mov dx, [esp+4] 
     mov al, [esp+8]
-    out dx, al
+    out dx,  al
     ret
 
 word_output:
     mov dx, [esp+4] 
     mov ax, [esp+8] 
-    out dx, ax
+    out dx,  ax
     ret

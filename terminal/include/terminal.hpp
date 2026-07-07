@@ -48,17 +48,13 @@ namespace terminal
                                          const noexcept;
 
         inline constexpr void draw_user_cursor() const noexcept {
-            draw_user_cursor_with_color(
-                drivers::vga::Text_Mode_Colors::LIGHT_GREY,
-                drivers::vga::Text_Mode_Colors::LIGHT_GREY
-            );
+            draw_user_cursor_with_color(drivers::vga::Text_Mode_Colors::LIGHT_GREY,
+                                        drivers::vga::Text_Mode_Colors::LIGHT_GREY);
         }
 
         inline constexpr void erase_user_cursor() const noexcept {
-            draw_user_cursor_with_color(
-                drivers::vga::Text_Mode_Colors::LIGHT_GREY,
-                drivers::vga::Text_Mode_Colors::BLACK
-            );
+            draw_user_cursor_with_color(drivers::vga::Text_Mode_Colors::LIGHT_GREY,
+                                        drivers::vga::Text_Mode_Colors::BLACK);
         }
 
     public:

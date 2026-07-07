@@ -1,3 +1,18 @@
+/*
+LICENSE:
+    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+    MIT Licensed
+    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+
+DESCRIPTION:
+    This header defines a minimal, fixed-size circular buffer template.
+
+NOTES:
+    The code is completely defined and declared in the header, 
+    because of the typical C++ template chaos 😂 and 
+    so that the compiler can inline certain methods.
+*/
+
 #pragma once
 
 #include <array.hpp>
@@ -23,8 +38,8 @@ namespace runtime
             }
 
             buffer[buffer_head] = item;
-            buffer_head = (buffer_head + 1) % S;
-            buffer_is_full = (buffer_head == buffer_tail);
+            buffer_head         = (buffer_head + 1) % S;
+            buffer_is_full      = (buffer_head == buffer_tail);
             return true;
         }
 
@@ -32,9 +47,9 @@ namespace runtime
             if (empty())
                 return false;
 
-            item = buffer[buffer_tail];
+            item           = buffer[buffer_tail];
             buffer_is_full = false;
-            buffer_tail = (buffer_tail + 1) % S;
+            buffer_tail    = (buffer_tail + 1) % S;
             return true;
         }
 
@@ -59,13 +74,13 @@ namespace runtime
         }
 
         inline void reset() noexcept {
-            buffer_head = buffer_tail;
+            buffer_head    = buffer_tail;
             buffer_is_full = false;
         }
 
         inline constexpr Circular_Buffer() noexcept {
-            buffer_head = 0;
-            buffer_tail = 0;
+            buffer_head    = 0;
+            buffer_tail    = 0;
             buffer_is_full = false;
         }
 

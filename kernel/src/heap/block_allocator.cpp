@@ -19,16 +19,16 @@ namespace kernel::heap
 {
     void Block_Allocator::init(const uint8_t* begin, const uint8_t* end) noexcept {
         const uint32_t memory_pool_start = reinterpret_cast<uint32_t>(begin);
-        const uint32_t memory_pool_end = reinterpret_cast<uint32_t>(end);
-        const uint32_t memory_pool_size = memory_pool_end - memory_pool_start;
+        const uint32_t memory_pool_end   = reinterpret_cast<uint32_t>(end);
+        const uint32_t memory_pool_size  = memory_pool_end - memory_pool_start;
 
-        total_memory_blocks = memory_pool_size / MEMORY_BLOCK_BYTE_SIZE;
+        total_memory_blocks        = memory_pool_size / MEMORY_BLOCK_BYTE_SIZE;
         required_memory_pool_space = total_memory_blocks * MEMORY_BLOCK_BYTE_SIZE;
 
-        allocation_sizes = reinterpret_cast<uint16_t*>(memory_pool_start);
-        free_memory_blocks = reinterpret_cast<bool*>(
-            memory_pool_start + total_memory_blocks * sizeof(uint16_t)
-        );
+        allocation_sizes   = reinterpret_cast<uint16_t*>(memory_pool_start);
+        free_memory_blocks = reinterpret_cast<bool*>(memory_pool_start + 
+                                                     total_memory_blocks * 
+                                                     sizeof(uint16_t));
 
         const uint32_t aligned_start = (memory_pool_start + (MEMORY_BLOCK_BYTE_SIZE - 1))
                                        & ~(MEMORY_BLOCK_BYTE_SIZE - 1);
@@ -76,8 +76,8 @@ namespace kernel::heap
         if (allocated_bytes == 0) [[unlikely]]
             return nullptr;
 
-        const uint32_t blocks_needed = (allocated_bytes + MEMORY_BLOCK_BYTE_SIZE - 1)
-                                       / MEMORY_BLOCK_BYTE_SIZE;
+        const uint32_t blocks_needed = (allocated_bytes + MEMORY_BLOCK_BYTE_SIZE - 1) / 
+                                        MEMORY_BLOCK_BYTE_SIZE;
         if (blocks_needed > total_memory_blocks) [[unlikely]]
             system::panic("Requested allocation exceeds heap capacity");
 
@@ -103,7 +103,8 @@ namespace kernel::heap
             block_ptr >= memory_pool_ptr + required_memory_pool_space) [[unlikely]]
             system::panic("Attempted to free pointer outside heap");
 
-        const uint32_t memory_offset = static_cast<uint32_t>(block_ptr - memory_pool_ptr);
+        const uint32_t memory_offset           = static_cast<uint32_t>(block_ptr - 
+                                                                       memory_pool_ptr);
         const uint32_t memory_pool_start_index = memory_offset / MEMORY_BLOCK_BYTE_SIZE;
         if (memory_pool_start_index >= total_memory_blocks) [[unlikely]]
             system::panic("Invalid block index during deallocation");

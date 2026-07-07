@@ -32,11 +32,14 @@ namespace kernel::idt
 {
     class Interrupt_Descriptor_Table final {
     private:
+        static constexpr uint8_t FLAGS                 = 0x8E;
+        static constexpr uint8_t ZERO_BYTE             = 0x00;
         static constexpr uint8_t CODE_SEGMENT_SELECTOR = 0x08;
-        static constexpr uint8_t FLAGS = 0x8E;
+        static constexpr uint16_t WORLD_MASK           = 0xFFFF;
+        static constexpr uint32_t IDT_ENTRY_COUNT      = 256;
 
-        runtime::Array<IDT_Entry, 256> idt;
-        IDT_Descriptor_PTR idt_ptr;
+        runtime::Array<IDT_Entry, IDT_ENTRY_COUNT> idt;
+        IDT_Descriptor_PTR idt_ptr = nullptr;
 
         void set_gate(const uint8_t index, void (*handler)()) noexcept;
 

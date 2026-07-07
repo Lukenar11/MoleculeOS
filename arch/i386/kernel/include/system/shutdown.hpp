@@ -28,8 +28,8 @@ NOTES:
 namespace
 {
     struct Shutdown_Command_Mapping final {
-        uint16_t port = 0;
-        uint16_t value = 0;
+        uint16_t port     = 0;
+        uint16_t value    = 0;
         bool is_8bit_mode = false;
     };
 

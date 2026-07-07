@@ -17,6 +17,7 @@
 global hang
 
 section .text
+
 hang:
 .halt_loop:
     cli

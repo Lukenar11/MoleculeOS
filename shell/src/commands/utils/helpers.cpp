@@ -25,17 +25,14 @@ namespace shell::commands
         parsed_filename.format.fill('\0');
         parsed_filename.error.fill('\0');
 
-        uint32_t file_name_index = 0;
+        uint32_t file_name_index   = 0;
         uint32_t file_format_index = 0;
-        bool is_file_name = true;
+        bool is_file_name          = true;
 
         if (arguments[0] == '\0') [[unlikely]] {
             static const char* error_message = "missing argument";
-            runtime::String_Manipulation::copy_string(
-                parsed_filename.error.data(), 
-                error_message
-            );
-
+            runtime::String_Manipulation::copy_string(parsed_filename.error.data(), 
+                                                      error_message);
             return parsed_filename;
         }
     
@@ -48,32 +45,29 @@ namespace shell::commands
             if (arguments[i] == '\0') [[unlikely]]
                 break;
 
-            if ((is_file_name && 
-                 !append_char(parsed_filename.name, file_name_index, arguments[i])) ||
+            if ((is_file_name && !append_char(parsed_filename.name, 
+                                              file_name_index, 
+                                            arguments[i])) ||
                 (file_name_index >= kernel::filesystem::MAX_FILENAME_LENGTH)) {
                 static const char* error_message = "filename too long";
-                runtime::String_Manipulation::copy_string(
-                    parsed_filename.error.data(), 
-                    error_message
-                );
+                runtime::String_Manipulation::copy_string(parsed_filename.error.data(),
+                                                          error_message);
 
                 return parsed_filename;
             }
             
-            if (!(is_file_name || 
-                  append_char(parsed_filename.format, file_format_index, arguments[i])) || 
+            if (!(is_file_name || append_char(parsed_filename.format, 
+                                              file_format_index, 
+                                              arguments[i])) || 
                 (file_format_index >= kernel::filesystem::MAX_FILE_FORMAT_NAME_LENGTH)) {
                 static const char* error_message = "format too long";
-                runtime::String_Manipulation::copy_string(
-                    parsed_filename.error.data(), 
-                    error_message
-                );
-
+                runtime::String_Manipulation::copy_string(parsed_filename.error.data(), 
+                                                          error_message);
                 return parsed_filename;
             }
         }
 
-        parsed_filename.name[file_name_index + 1] = '\0';
+        parsed_filename.name[file_name_index + 1]     = '\0';
         parsed_filename.format[file_format_index + 1] = '\0';
     
         for (uint32_t i = 0; parsed_filename.name[i] != '\0'; i++) [[likely]]
@@ -81,24 +75,18 @@ namespace shell::commands
                     parsed_filename.name[i]
                 )) {
                 static const char* error_message = "not a valid File Name";
-                runtime::String_Manipulation::copy_string(
-                    parsed_filename.error.data(),
-                    error_message
-                );
-
+                runtime::String_Manipulation::copy_string(parsed_filename.error.data(),
+                                                          error_message);
                 return parsed_filename;
             }
 
         for (uint32_t i = 0; parsed_filename.format[i] != '\0'; i++) [[likely]]
             if (!kernel::filesystem::MoleculeOS_File_System::is_valid_file_name_or_formant_char(
-                parsed_filename.format[i]
+                    parsed_filename.format[i]
             )) {
                 static const char* error_message = "not a valid File Format";
-                runtime::String_Manipulation::copy_string(
-                    parsed_filename.error.data(), 
-                    error_message
-                );
-
+                runtime::String_Manipulation::copy_string(parsed_filename.error.data(), 
+                                                          error_message);
                 return parsed_filename;
             }
 

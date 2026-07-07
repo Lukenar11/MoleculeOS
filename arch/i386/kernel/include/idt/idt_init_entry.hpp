@@ -25,13 +25,16 @@ NOTES:
 #include <stdint.h>
 #include <stddef.h>
 
-namespace kernel::idt 
+namespace
 {
     struct IDT_INIT_Entry final {
         uint8_t index = 0;
         void (*handler)();
     };
+}
 
+namespace kernel::idt 
+{
     inline constexpr IDT_INIT_Entry idt_init_table[] = {
         { 0, isr::isr_0 }, { 1, isr::isr_1 }, { 2, isr::isr_2 },
         { 3, isr::isr_3 }, { 4, isr::isr_4 }, { 5, isr::isr_5 },

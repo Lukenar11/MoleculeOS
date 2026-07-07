@@ -26,7 +26,7 @@ namespace runtime
         static inline void* copy_memory_block(void* dest_ptr, 
                                               const void* src_ptr, 
                                               uint32_t size) noexcept {
-            uint8_t* dest = static_cast<uint8_t*>(dest_ptr);
+            uint8_t* dest      = static_cast<uint8_t*>(dest_ptr);
             const uint8_t* src = static_cast<const uint8_t*>(src_ptr);
             while (size--)
                 *dest++ = *src++;
@@ -37,7 +37,7 @@ namespace runtime
         static inline void* move_memory_block(void* dest_ptr, 
                                               const void* src_ptr, 
                                               uint32_t size) noexcept {
-            uint8_t* dest = static_cast<uint8_t*>(dest_ptr);
+            uint8_t* dest      = static_cast<uint8_t*>(dest_ptr);
             const uint8_t* src = static_cast<const uint8_t*>(src_ptr);
 
             if (reinterpret_cast<uint32_t>(dest) < 
@@ -58,7 +58,7 @@ namespace runtime
                                              int32_t value, 
                                              uint32_t size) noexcept {
             uint8_t* dest = static_cast<uint8_t*>(dest_ptr);
-            uint8_t byte = static_cast<uint8_t>(value);
+            uint8_t byte  = static_cast<uint8_t>(value);
             while (size--)
                 *dest++ = byte;
 

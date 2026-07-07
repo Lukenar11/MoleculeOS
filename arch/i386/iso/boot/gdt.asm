@@ -36,17 +36,18 @@ gdt_descriptor:
     dd gdt_start
 
 section .text
+
 load_gdt:
     lgdt [gdt_descriptor]
 
-    mov ax, KERNEL_DATA_SEGMENT_SELECTOR
-    mov ds, ax
-    mov es, ax
-    mov fs, ax
-    mov gs, ax
-    mov ss, ax
+    mov   ax, KERNEL_DATA_SEGMENT_SELECTOR
+    mov   ds, ax
+    mov   es, ax
+    mov   fs, ax
+    mov   gs, ax
+    mov   ss, ax
 
-    jmp 0x08:.flush
+    jmp   0x08:.flush
 
 .flush:
     ret

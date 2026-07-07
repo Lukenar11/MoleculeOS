@@ -36,24 +36,25 @@ namespace
     [[nodiscard]]
     inline constexpr uint32_t make_hash(const char* command) noexcept {
         const uint32_t mul_32 = 5;
-        uint32_t hash = 0;
+        uint32_t hash         = 0;
         while (*command) [[likely]] {
             hash = (hash << mul_32) - hash + static_cast<char>(*command);
             command++;
         }
+
         return hash;
     }
 
     constexpr shell::interpreter::Command_Entry shell_command_table[] = {
-        {make_hash("help"), [](auto& _) -> void {shell::commands::help();}},
-        {make_hash("info"), [](auto& _) -> void {shell::commands::info();}},
-        {make_hash("clear"), [](auto& _) -> void {shell::commands::clear();}},
-        {make_hash("reboot"), [](auto& _) -> void {shell::commands::reboot();}},
-        {make_hash("shutdown"), [](auto& _) -> void {shell::commands::shutdown();}},
-        {make_hash("echo"), [](auto& arguments) -> void {shell::commands::echo(arguments);}},
-        {make_hash("create"), [](auto& arguments) -> void {shell::commands::create(arguments);}},
-        {make_hash("list"), [](auto& _) -> void {shell::commands::list();}},
-        {make_hash("remove"), [](auto& arguments) -> void {shell::commands::remove(arguments);}}
+        {make_hash("help"),     [](auto& _)         -> void {shell::commands::help();}},
+        {make_hash("info"),     [](auto& _)         -> void {shell::commands::info();}},
+        {make_hash("clear"),    [](auto& _)         -> void {shell::commands::clear();}},
+        {make_hash("reboot"),   [](auto& _)         -> void {shell::commands::reboot();}},
+        {make_hash("shutdown"), [](auto& _)         -> void {shell::commands::shutdown();}},
+        {make_hash("echo"),     [](auto& arguments) -> void {shell::commands::echo(arguments);}},
+        {make_hash("create"),   [](auto& arguments) -> void {shell::commands::create(arguments);}},
+        {make_hash("list"),     [](auto& _)         -> void {shell::commands::list();}},
+        {make_hash("remove"),   [](auto& arguments) -> void {shell::commands::remove(arguments);}}
     };
 }
 
@@ -72,17 +73,13 @@ namespace shell::interpreter
         uint32_t arguments_index = 0;
 
         static inline void set_error_message_text_color() noexcept {
-            runtime::Text_Output::set_text_color(
-                drivers::vga::Text_Mode_Colors::LIGHT_MAGENTA,
-                drivers::vga::Text_Mode_Colors::BLACK
-            );
+            runtime::Text_Output::set_text_color(drivers::vga::Text_Mode_Colors::LIGHT_MAGENTA,
+                                                 drivers::vga::Text_Mode_Colors::BLACK);
         }
 
         static inline void set_default_text_color() noexcept {
-            runtime::Text_Output::set_text_color(
-                drivers::vga::Text_Mode_Colors::LIGHT_GREY,
-                drivers::vga::Text_Mode_Colors::BLACK
-            );
+            runtime::Text_Output::set_text_color(drivers::vga::Text_Mode_Colors::LIGHT_GREY,
+                                                 drivers::vga::Text_Mode_Colors::BLACK);
         }
 
         template <typename Arr>
