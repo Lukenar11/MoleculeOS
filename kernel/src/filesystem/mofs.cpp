@@ -52,7 +52,7 @@ namespace kernel::filesystem
         if (((symbol >= 'A') && (symbol <= 'Z')) ||
             ((symbol >= 'a') && (symbol <= 'z')) ||
             ((symbol >= '0') && (symbol <= '9')) ||
-            (symbol == '_') || (symbol == '-')) [[likely]]
+             (symbol == '_') || (symbol == '-')) [[likely]]
             return true;
 
         return false;

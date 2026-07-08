@@ -27,7 +27,8 @@ namespace kernel::system
             if (entry.is_8bit_mode) [[unlikely]] {
                 const uint8_t value = entry.value & 0xFF;
                 runtime::byte_output(entry.port, value);
-            } else [[likely]] {
+            } 
+            else [[likely]] {
                 runtime::word_output(entry.port, entry.value);
             }
 

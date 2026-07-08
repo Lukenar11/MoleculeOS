@@ -83,13 +83,11 @@ namespace kernel::heap
 
         uint32_t i = 0;
         uint32_t j = 0;
-        while (i <= total_memory_blocks - blocks_needed) {
-            if (fiend_enough_free_memory_blocks(i, blocks_needed, &j)) {
+        while (i <= total_memory_blocks - blocks_needed)
+            if (fiend_enough_free_memory_blocks(i, blocks_needed, &j))
                 return set_allocation_sizes_entry(blocks_needed, i);
-            } else {
+            else
                 i += j + 1;
-            }
-        }
         
         return nullptr;
     }
