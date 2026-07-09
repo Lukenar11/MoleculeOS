@@ -5,9 +5,11 @@
 # 
 
 COMMON_FLAGS += \
+	-Idrivers/ata/pio/include \
 	-Idrivers/ps2/keyboardin/include \
 	-Idrivers/vga/textmode/include
 
+include drivers/ata/pio/src/Makefile
 include drivers/ps2/keyboardin/src/Makefile
 include drivers/vga/textmode/src/Makefile
 

@@ -18,6 +18,7 @@
 
 global byte_input
 global word_input
+global word_input_stream
 global byte_output
 global word_output
 
@@ -33,6 +34,13 @@ word_input:
     xor eax,  eax
     mov dx,  [esp+4] 
     in  ax,   dx
+    ret
+
+word_input_stream:
+    mov dx,  [esp+4] 
+    mov ecx, [esp+8] 
+    mov edi, [esp+12]
+    rep insw
     ret
 
 byte_output:

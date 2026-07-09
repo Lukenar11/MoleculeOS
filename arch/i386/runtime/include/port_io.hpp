@@ -27,6 +27,10 @@ namespace runtime
     extern "C" {
         uint8_t byte_input(uint16_t port);
         uint16_t word_input(uint16_t port);
+
+        void word_input_stream(uint16_t port, 
+                               uint32_t word_count,
+                               uint16_t* buffer);
     
         void byte_output(uint16_t port, uint8_t value);
         void word_output(uint16_t port, uint16_t value);
