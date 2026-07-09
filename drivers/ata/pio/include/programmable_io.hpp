@@ -15,7 +15,7 @@ NOTES:
     Some methods are defined only in the header so that the 
     compiler can inline them more easily.
 
-    The 'delay()' method introduces a delay of approximately 500 ns, 
+    The 'delay()' method introduces a delay of approximately 500ns, 
     since the ATA standard requires a 400ns delay in some cases.
     Because this method uses an ATA bus read operation (which takes approximately 100ns) 
     to generate the delay—rather than fixed timer logic—the additional approximately 100ns 
