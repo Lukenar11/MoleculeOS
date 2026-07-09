@@ -5,7 +5,7 @@
 # 
 
 OBJS += \
-	$(BUILD)/programmable_io.o 
+	$(BUILD)/programmable_input_output.o 
 
 $(BUILD)/%.o: drivers/ata/pio/src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

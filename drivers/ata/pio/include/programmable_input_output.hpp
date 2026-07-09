@@ -5,21 +5,22 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This file implements an ATA PIO driver.
+    This file implements an ATA-PIO driver.
 
-    This driver receives the relative LBA address, the number of sectors to be read, 
-    and a pointer; it then reads these sectors from the hard drive 
-    using programmable I/O and uses the pointer to write the read data to RAM.
+    This driver receives a relative LBA address, the number of sectors to be read, 
+    and a pointer; it then reads these sectors from the 
+    hard disk using programmable I/O and writes the data to RAM.
 
 NOTES:
-    Some methods are defined only in the header so that the 
+    Some methods are defined only in the header file so that the 
     compiler can inline them more easily.
 
-    The 'delay()' method introduces a delay of approximately 500ns, 
-    since the ATA standard requires a 400ns delay in some cases.
-    Because this method uses an ATA bus read operation (which takes approximately 100ns) 
-    to generate the delay—rather than fixed timer logic—the additional approximately 100ns 
-    is included as a safety margin.
+    The 'delay()' method causes a delay of approximately 500 ns, 
+    since the ATA standard requires a delay of 400 ns in some cases.
+    The 'delay()' method works by performing a read operation over the ATA bus multiple times
+    (each of which takes about 100 ns); 
+    however, since the read operation does not take exactly 100 ns, 
+    this method introduces a delay of 500 ns as a safety measure.
 */
 
 #pragma once
@@ -27,9 +28,31 @@ NOTES:
 #include <stdint.h>
 #include <port_io.hpp>
 
+namespace
+{
+    [[nodiscard]]
+    inline bool ata_pio_read_guard(const uint32_t partition_length, 
+                                   const uint32_t relative_lba, 
+                                   const uint32_t to_transfer) noexcept {
+        if (partition_length == 0) [[unlikely]]
+            return false;
+
+        if (relative_lba > partition_length) [[unlikely]]
+            return false;
+
+        if (to_transfer > partition_length) [[unlikely]]
+            return false;
+
+        if (relative_lba > partition_length - to_transfer) [[unlikely]]
+            return false;
+
+        return true;
+    }
+} // namespace
+
 namespace drivers::ata
 {
-    class Programmable_IO final {
+    class Programmable_Input_Output final {
     private:
         static constexpr uint8_t ATA_BSY  = 0x80;
         static constexpr uint8_t ATA_DRQ  = 0x08;
@@ -62,26 +85,31 @@ namespace drivers::ata
         static inline uint16_t io_port_base     = 0;
         static inline uint8_t master_save_flags = 0;
 
+        [[nodiscard]]
         static inline uint16_t status_port() noexcept { 
             return static_cast<uint16_t>(io_port_base + 7); 
         }
 
+        [[nodiscard]]
         static inline uint16_t dcr_port() noexcept { 
             return device_control; 
         }
 
+        [[nodiscard]]
         static bool poll_until_drq_or_error() noexcept;
+
+        [[nodiscard]]
         static bool read_and_poll_disk(uint16_t*& dest_buffer, 
                                        uint32_t& command_count, 
                                        uint32_t& sectors_to_read, 
                                        uint32_t& relative_lba) noexcept;
 
+        [[nodiscard]]
         static inline uint8_t shift_and_mask(const uint32_t val,
                                              const uint32_t shift,
                                              const uint32_t mask) noexcept {
             return static_cast<uint8_t>(((val >> shift) & mask));
         }
-
 
         static bool pio_28bit_read(uint16_t*& dest_buffer, 
                                    uint32_t& sectors_to_read, 
@@ -98,5 +126,8 @@ namespace drivers::ata
         static bool read(int32_t& sectors_to_read, 
                          uint16_t*& dest_buffer, 
                          uint32_t& relative_lba) noexcept;
+
+        Programmable_Input_Output() noexcept = default;
+        ~Programmable_Input_Output() noexcept = default;
     };
 } // namespace drivers::ata
