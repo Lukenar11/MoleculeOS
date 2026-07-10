@@ -25,6 +25,7 @@ NOTES:
 #include "system/panic.hpp"
 #include <kernel_arch_api.hpp>
 #include <terminal_api.hpp>
+#include <drivers_api.hpp>
 
 namespace kernel
 {
@@ -33,6 +34,9 @@ namespace kernel
         kernel_arch_init();
 
         heap::Block_Allocator::init(&heap::heap_start, &heap::heap_end);
+
+        // @todo implement ATA Identify
+        drivers::ata::Programmable_Input_Output::init(2048, 0, 0x1F0, 0x3F6, 0x00);
 
         // schedul MoleculeOS
         static terminal::Terminal terminal;

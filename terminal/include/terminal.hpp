@@ -63,6 +63,4 @@ namespace terminal
         Terminal() noexcept;
         ~Terminal() noexcept = default;
     };
-
-    extern Terminal terminal;
 } // namespace terminal

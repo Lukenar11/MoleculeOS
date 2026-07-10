@@ -64,8 +64,8 @@ $(KERNEL): $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $^
 
 $(OS_HDD):
-    dd if=/dev/zero of=$(OS_HDD) bs=512 count=2048
-    echo -n "MoleculeOS" | dd of=$(OS_HDD) bs=1 seek=0 conv=notrunc
+	dd if=/dev/zero of=$(OS_HDD) bs=512 count=2048
+	echo -n "MoleculeOS" | dd of=$(OS_HDD) bs=1 seek=0 conv=notrunc
 
 iso: $(KERNEL)
 	mkdir -p $(ISO)/boot/grub
@@ -73,7 +73,7 @@ iso: $(KERNEL)
 	cp arch/i386/iso/boot/grub/grub.cfg $(ISO)/boot/grub/grub.cfg
 	grub-mkrescue -o $(ISO_OUT) $(ISO)
 
-run: iso
+run: iso $(OS_HDD)
 	qemu-system-i386 -hda $(OS_HDD) -cdrom $(ISO_OUT)
 
 clean:

@@ -86,16 +86,6 @@ namespace drivers::ata
         static inline uint8_t master_save_flags = 0;
 
         [[nodiscard]]
-        static inline uint16_t status_port() noexcept { 
-            return static_cast<uint16_t>(io_port_base + 7); 
-        }
-
-        [[nodiscard]]
-        static inline uint16_t dcr_port() noexcept { 
-            return device_control; 
-        }
-
-        [[nodiscard]]
         static bool poll_until_drq_or_error() noexcept;
 
         [[nodiscard]]
@@ -123,11 +113,27 @@ namespace drivers::ata
         static void reset_driver(const uint16_t dcr_port) noexcept;
 
     public:
+        [[nodiscard]]
+        static inline uint16_t status_port() noexcept { 
+            return static_cast<uint16_t>(io_port_base + 7); 
+        }
+
+        [[nodiscard]]
+        static inline uint16_t dcr_port() noexcept { 
+            return device_control; 
+        }
+
+        static void init(const uint32_t partition_len,
+                         const uint32_t lba_start,
+                         const uint16_t io_base,
+                         const uint16_t device_ctrl,
+                         const uint8_t master_flags) noexcept;
+
         static bool read(int32_t& sectors_to_read, 
                          uint16_t*& dest_buffer, 
                          uint32_t& relative_lba) noexcept;
 
-        Programmable_Input_Output() noexcept = default;
+        Programmable_Input_Output() noexcept  = default;
         ~Programmable_Input_Output() noexcept = default;
     };
 } // namespace drivers::ata

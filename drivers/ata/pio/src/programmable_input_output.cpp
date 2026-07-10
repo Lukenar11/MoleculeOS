@@ -31,10 +31,11 @@ namespace drivers::ata
         uint32_t timeout = 5'000'000;
         while (timeout--) {
             const uint8_t status = runtime::byte_input(status_port());
+
             if (status & ATA_ERR) [[unlikely]]
                 return false;
 
-            if (!(status & ATA_DRDY) && (status & ATA_DRQ)) 
+            if (!(status & ATA_BSY) && (status & ATA_DRQ))
                 return true;
         }
 
@@ -88,11 +89,7 @@ namespace drivers::ata
         runtime::byte_output(io_port_base + 3, shift_and_mask(absolute_lba, 0, BYTE_MASK));
         runtime::byte_output(io_port_base + 4, shift_and_mask(absolute_lba, 8, BYTE_MASK));
         runtime::byte_output(io_port_base + 5, shift_and_mask(absolute_lba, 16, BYTE_MASK));
-        runtime::byte_output(io_port_base + 6, shift_and_mask(absolute_lba, 
-                                                              24, 
-                                                              (NIBBLE_MASK | 
-                                                               master_save_flags |
-                                                               0xE0)));
+        runtime::byte_output(io_port_base + 6, ((absolute_lba >> 24) & 0x0F) | 0xE0);
 
         runtime::byte_output(status_port(), READ_SECTORS);
 
@@ -165,6 +162,18 @@ namespace drivers::ata
         }
     }
 
+    void Programmable_Input_Output::init(const uint32_t partition_len,
+                                         const uint32_t lba_start,
+                                         const uint16_t io_base,
+                                         const uint16_t device_ctrl,
+                                         const uint8_t master_flags) noexcept {
+        partition_length  = partition_len;
+        lba_start_addr    = lba_start;
+        io_port_base      = io_base;
+        device_control    = device_ctrl;
+        master_save_flags = master_flags;
+    }
+
     bool Programmable_Input_Output::read(int32_t& sectors_to_read,
                                          uint16_t*& dest_buffer,
                                          uint32_t& relative_lba) noexcept {
@@ -186,8 +195,8 @@ namespace drivers::ata
         }
 
         const uint8_t initial_status = runtime::byte_input(status_port());
-        if (initial_status & ATA_DRDY) {
-            if (!poll_until_drq_or_error()) [[unlikely]] {
+        if (initial_status & ATA_BSY) {
+            if (!poll_until_drq_or_error()) {
                 reset_driver(dcr_port());
                 return false;
             }
