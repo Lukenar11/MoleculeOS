@@ -15,12 +15,13 @@ modular learning and experimentation system that makes the fundamental building 
 - Interrupt Descriptor Table (IDT)
 - Global Descriptor Table (GDT)
 - Simple endless-loop scheduling
-- linear-area-allocator System Heap
+- simple ATA-PIO-driver
+- block-allocator System Heap
 - PS/2 Keyboard input
 - Shell Interpreter
 - Simple Terminal
 - grub Boot-Setup
-- inode-based custom direct RAM flat file-system
+- custom direct RAM flat file-system
 - central APIs for all componentes
 - strict separation between architecture-specific and non-architecture-specific code
 
