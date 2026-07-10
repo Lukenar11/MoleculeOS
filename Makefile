@@ -18,6 +18,7 @@ KERNEL = $(BUILD)/MoleculeOS.elf
 
 ISO_KERNEL = $(ISO)/boot/kernel.elf
 ISO_OUT = build/MoleculeOS.iso
+OS_HDD = build/HardDrive.img
 
 LINKER = tools/linker.ld
 TARGET = -target i386-pc-none-elf
@@ -62,6 +63,10 @@ dirs:
 $(KERNEL): $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $^
 
+$(OS_HDD):
+    dd if=/dev/zero of=$(OS_HDD) bs=512 count=2048
+    echo -n "MoleculeOS" | dd of=$(OS_HDD) bs=1 seek=0 conv=notrunc
+
 iso: $(KERNEL)
 	mkdir -p $(ISO)/boot/grub
 	cp $(KERNEL) $(ISO_KERNEL)
@@ -69,7 +74,7 @@ iso: $(KERNEL)
 	grub-mkrescue -o $(ISO_OUT) $(ISO)
 
 run: iso
-	qemu-system-i386 -cdrom $(ISO_OUT)
+	qemu-system-i386 -hda $(OS_HDD) -cdrom $(ISO_OUT)
 
 clean:
 	rm -rf build

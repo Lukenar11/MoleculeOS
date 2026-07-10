@@ -16,3 +16,5 @@ NOTES:
 #include "drivers/vga/textmode/include/utils/helpers.hpp"
 #include "drivers/ps2/keyboardin/include/keyboard_input.hpp"
 #include "drivers/ps2/keyboardin/include/utils/helpers.hpp"
+#include "drivers/ata/pio/include/programmable_input_output.hpp"
+#include "drivers/ata/pio/include/utils/helpers.hpp"
