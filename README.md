@@ -22,7 +22,7 @@ modular learning and experimentation system that makes the fundamental building 
 - Simple Terminal
 - grub Boot-Setup
 - custom direct RAM flat file-system
-- central APIs for all componentes
+- central APIs for all components
 - strict separation between architecture-specific and non-architecture-specific code
 
 ---
@@ -61,13 +61,13 @@ Below is the current state of MoleculeOS running in QEMU (deliberately triggered
 To build and run MoleculeOS, the following software is required:
 
 - **Grub** (for the Boot setup and configurations)
-- **NASM** (Netwide Assembler for assembeling the Bootloader and Assembly Fiels in the Kernel)
+- **NASM** (Netwide Assembler for assembling the Bootloader and Assembly Files in the Kernel)
 - **Clang++** (for compiling the 32‑bit kernel and the C++ runtime, requires i386 target support)
-- **Clang** (for compiling the C Runtime and C komponentes in the Kernel, requires i386 target support)
+- **Clang** (for compiling the C Runtime and C components in the Kernel, requires i386 target support)
 - **Make** (for Building and running the Project)
 - **ld.lld** (for the linking)
 - **QEMU** (for running the OS in a virtual machine)
-- **WSL** (Windows Subsystem for Linux, if you work under Windows) (for using Grub and run Shell Skripts)
+- **WSL** (Windows Subsystem for Linux, if you work under Windows) (for using Grub and run Shell Scripts)
 
 ---
 
