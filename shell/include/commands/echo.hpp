@@ -8,7 +8,7 @@ DESCRIPTION:
     This file contains the internal implementation of 
     one of the terminal commands available in MoleculeOS.
 
-    This command prints text to the screan or handle file streams.
+    This command prints text to the screen or handle file streams.
     
     The commands can be called by the 
     shell interpreter from a table generated at compile time, 

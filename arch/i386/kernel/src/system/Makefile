@@ -18,4 +18,4 @@ $(BUILD)/%.o: arch/i386/kernel/src/system/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD)/%.o: arch/i386/kernel/src/system/%.asm
-	nasm $(ASMFLAGS) $< -o $@
+	nasm $(ASM_FLAGS) $< -o $@

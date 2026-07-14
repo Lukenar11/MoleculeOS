@@ -27,6 +27,6 @@ namespace shell::interpreter
 {
     struct Command_Entry final {
         uint32_t hash = 0;
-        void (*function)(const runtime::Array<char, 64>& argumentes);
+        void (*function)(const runtime::Array<char, 64>& arguments);
     };
 } // namespace shell::interpreter

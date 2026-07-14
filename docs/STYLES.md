@@ -595,8 +595,14 @@ A practical example of all the rules:
 
             char get_key() noexcept;
 
-            Keyboard_Input() noexcept = default;
-            ~Keyboard_Input() noexcept = default;
+            Keyboard_Input() noexcept  = default;
+ noexcept = default;
+ noexcept  = default;
+ noexcept = default;
+            ~Keyboard_Input() noexcept  = default;
+ noexcept = default;
+ noexcept  = default;
+ noexcept = default;
         };
 
         extern Keyboard_Input keyboard_input;

@@ -13,4 +13,4 @@ $(BUILD)/%.o: arch/i386/kernel/src/irq/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD)/%.o: arch/i386/kernel/src/irq/%.asm
-	nasm $(ASMFLAGS) $< -o $@
+	nasm $(ASM_FLAGS) $< -o $@

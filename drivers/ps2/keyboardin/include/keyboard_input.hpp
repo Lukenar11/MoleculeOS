@@ -31,14 +31,14 @@ namespace drivers::ps2
 {
     class Keyboard_Input final {
     private:
-        static inline constexpr uint8_t LOWEST_BIT           = 0x01;
-        static inline constexpr uint8_t ALOWED_SCANCODE_SIZE = 128;
+        static inline constexpr uint8_t LOWEST_BIT            = 0x01;
+        static inline constexpr uint8_t ALLOWED_SCANCODE_SIZE = 128;
 
         static inline constexpr uint16_t KEYBOARD_STATUS_PORT = 0x64;
         static inline constexpr uint16_t KEYBOARD_DATA_PORT   = 0x60;
     
         static inline bool shift_is_pressed    = false;
-        static inline bool capslock_is_enabled = false;
+        static inline bool caps_is_enabled = false;
 
         static inline bool has_pending_scancode() noexcept {
             return runtime::byte_input(KEYBOARD_STATUS_PORT) & LOWEST_BIT;
@@ -47,11 +47,11 @@ namespace drivers::ps2
         static char get_key() noexcept;
 
     public:
-        static inline runtime::Circular_Buffer<char, ALOWED_SCANCODE_SIZE> scancode_buffer;
+        static inline runtime::Circular_Buffer<char, ALLOWED_SCANCODE_SIZE> scancode_buffer;
         
         static void keyboard_irq_handler(kernel::Register_Dump*) noexcept;
     
-        Keyboard_Input() noexcept = default;
+        Keyboard_Input() noexcept  = default;
         ~Keyboard_Input() noexcept = default;
     };
 } // namespace drivers::ps2

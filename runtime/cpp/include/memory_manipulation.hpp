@@ -81,7 +81,7 @@ namespace runtime
             return 0;
         }
 
-        Memory_Manipulation() noexcept = default;
+        Memory_Manipulation() noexcept  = default;
         ~Memory_Manipulation() noexcept = default;
     };
 } // namespace runtime

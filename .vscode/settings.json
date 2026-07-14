@@ -22,5 +22,25 @@
     "search.exclude": {
         "build": true
     },
-    "C_Cpp.errorSquiggles": "disabled"
+    "C_Cpp.errorSquiggles": "disabled",
+    "cSpell.words": [
+        "Bochs",
+        "DRDY",
+        "eflags",
+        "endrep",
+        "insw",
+        "intstrem",
+        "lgdt",
+        "Lukenar",
+        "Matthes",
+        "multiboot",
+        "nasm",
+        "Netwide",
+        "outstrem",
+        "popf",
+        "pushf",
+        "redict",
+        "resb",
+        "SRST"
+    ]
 }

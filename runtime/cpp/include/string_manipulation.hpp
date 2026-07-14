@@ -73,7 +73,7 @@ namespace runtime
             return static_cast<uint8_t>(*a_ptr) - static_cast<uint8_t>(*b_ptr);
         }
 
-        String_Manipulation() noexcept = default;
+        String_Manipulation() noexcept  = default;
         ~String_Manipulation() noexcept = default;
     };
 } // namespace runtime

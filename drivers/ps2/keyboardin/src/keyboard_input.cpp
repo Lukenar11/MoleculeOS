@@ -41,22 +41,22 @@ namespace drivers::ps2
             shift_is_pressed = false;
             return '\0';
         
-        case static_cast<uint8_t>(Special_Keyboard_Keys::CAPSLOCK):
-            capslock_is_enabled = !capslock_is_enabled;
+        case static_cast<uint8_t>(Special_Keyboard_Keys::CAPS):
+            caps_is_enabled = !caps_is_enabled;
             return '\0';
         }
     
         if (scancode & static_cast<uint8_t>(Special_Keyboard_Keys::KEYBOARD_RELEASE))
             return '\0';
     
-        if (scancode >= ALOWED_SCANCODE_SIZE)
+        if (scancode >= ALLOWED_SCANCODE_SIZE)
             return '\0';
     
         char character = (shift_is_pressed) 
                          ? us_qwerty_shift_key_mapping[scancode] 
                          : us_qwerty_std_key_mapping[scancode]; 
 
-        if (capslock_is_enabled) [[unlikely]] {
+        if (caps_is_enabled) [[unlikely]] {
             if ((character >= 'a') && (character <= 'z'))
                 character -= 32;
             else if ((character >= 'A') && (character <= 'Z'))

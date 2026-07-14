@@ -5,7 +5,7 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    The function "kernel_arch_init" is calles from "kernel_main" and 
+    The function "kernel_arch_init" is calls from "kernel_main" and 
     initializes core subsystems such as the IDT and remap the PIC.
 
 NOTES:

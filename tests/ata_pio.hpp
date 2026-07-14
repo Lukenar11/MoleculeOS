@@ -8,7 +8,7 @@
 
 namespace tests
 {
-    void read_sektor() noexcept {
+    void read_sector() noexcept {
         using namespace drivers::ata;
 
         runtime::Text_Output::reset();
@@ -41,7 +41,7 @@ namespace tests
         kernel::system::hang();
     }
 
-    void read_sektor_with_heap() noexcept {
+    void read_sector_with_heap() noexcept {
         using namespace drivers::ata;
 
         runtime::Text_Output::reset();
@@ -106,44 +106,4 @@ namespace tests
 
         kernel::system::hang();
     }
-
-// 
-// 
-// uint16_t buffer[256];
-// int32_t sectors = 1;
-// uint32_t lba = partition_length + 10;
-// 
-// bool ok = Programmable_Input_Output::read(sectors, buffer, lba);
-// 
-// 
-// int32_t sectors = 9999;
-// bool ok = Programmable_Input_Output::read(sectors, buffer, 0);
-// 
-// 
-// io_port_base = 0x0000; // ungültig
-// 
-// 
-// dd if=/dev/zero of=big.img bs=512 count=10000000
-// 
-// 
-// uint16_t buffer[256];
-// int32_t sectors = 1;
-// uint32_t lba = 0x10000000; // > 28-bit limit
-// 
-// bool ok = Programmable_Input_Output::read(sectors, buffer, lba);
-// 
-// 
-// for (int i = 0; i < 10000; ++i) {
-//     uint16_t buffer[256];
-//     int32_t sectors = 1;
-//     bool ok = Programmable_Input_Output::read(sectors, buffer, i % 16);
-// }
-// 
-// 
-// uint16_t* buffer = reinterpret_cast<uint16_t*>(
-//     kernel::heap::block.allocate(SECTOR_WORD_SIZE * sizeof(uint16_t))
-// );
-// 
-// 
-
-} // namespace tests 
+} // namespace tests

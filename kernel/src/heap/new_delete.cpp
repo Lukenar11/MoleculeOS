@@ -10,7 +10,7 @@ DESCRIPTION:
     in compliance with the C++ standard.
 
     The overloaded 'new' and 'delete' operators are essentially wrappers around 
-    the heap class methodes '.allocate()' and '.deallocate()'.
+    the heap class methods '.allocate()' and '.deallocate()'.
 
 NOTES:
     Since the C++ standard requires this, 'new' and 'delete' must be used in the 

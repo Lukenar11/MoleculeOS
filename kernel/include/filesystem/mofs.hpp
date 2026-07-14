@@ -44,7 +44,7 @@ namespace
     }
 
     [[nodiscard]]
-    inline constexpr bool greader_then(const uint32_t a, 
+    inline constexpr bool greater_then(const uint32_t a, 
                                        const uint32_t b) noexcept {
         return a > b; 
     }
@@ -56,10 +56,10 @@ namespace
         if (File_not_available(file)) 
             return true;
 
-        if (greader_then(offset, file->size)) 
+        if (greater_then(offset, file->size)) 
             return true;
 
-        if (greader_then((offset + length), file->size)) 
+        if (greater_then((offset + length), file->size)) 
             return true;
 
         return false;
@@ -73,10 +73,10 @@ namespace
         if (File_not_available(file)) 
             return true;
 
-        if (greader_then(offset, file->size)) 
+        if (greater_then(offset, file->size)) 
             return true;
 
-        if (greader_then((offset + length), file->size)) 
+        if (greater_then((offset + length), file->size)) 
             return true;
 
         if (less_then(buffer_size, length)) 
@@ -91,7 +91,7 @@ namespace
         if (File_not_available(file)) 
             return true;
 
-        if (greader_then(length, kernel::filesystem::MAX_FILE_SIZE)) 
+        if (greater_then(length, kernel::filesystem::MAX_FILE_SIZE)) 
             return true;
 
         return false;
@@ -168,7 +168,7 @@ namespace kernel::filesystem
             return files;
         }
 
-        MoleculeOS_File_System() noexcept = default;
+        MoleculeOS_File_System() noexcept  = default;
         ~MoleculeOS_File_System() noexcept = default;
     };
 } // namespace kernel::filesystem

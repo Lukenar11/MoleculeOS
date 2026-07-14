@@ -8,7 +8,7 @@ DESCRIPTION:
     This file contains the internal implementation of 
     one of the terminal commands available in MoleculeOS.
 
-    This command prints text to the screan or handle file streams.
+    This command prints text to the screen or handle file streams.
 
     The commands can be called by the 
     shell interpreter from a table generated at compile time, 
@@ -84,8 +84,8 @@ namespace
     auto& extract_text_after_redict_operator(const char* redict_operator_pos, 
                                              const runtime::Array<char, 64>& arguments)
                                              noexcept {
-        const char null_char   = '\0';
-        const char spache_char = ' ';
+        const char null_char  = '\0';
+        const char space_char = ' ';
 
         static runtime::Array<char, 64> filename;
         filename.fill(null_char);
@@ -94,7 +94,7 @@ namespace
             return filename;
 
         uint32_t i = (redict_operator_pos - arguments.begin()) + 1;
-        while (arguments[i] == spache_char)
+        while (arguments[i] == space_char)
             i++;
 
         if (arguments[i] == null_char) {
@@ -107,7 +107,7 @@ namespace
         uint32_t j = 0;
         for (; i < arguments.size(); i++) {
             const char argument = arguments[i];
-            if ((argument == spache_char) || (argument == null_char)) [[unlikely]]
+            if ((argument == space_char) || (argument == null_char)) [[unlikely]]
                 break;
 
             filename[j++] = argument;

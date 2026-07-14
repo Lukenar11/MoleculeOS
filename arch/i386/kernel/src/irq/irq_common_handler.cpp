@@ -8,7 +8,7 @@ DESCRIPTION:
     C interface for the general IRQ handler, 
     which is called by "irq_common_stub".
 
-    All hardware interruptstubs (irq_0–irq_15) 
+    All hardware interrupt stubs (irq_0–irq_15) 
     pass their register state to this function,
     which performs uniform processing before the required
     End-of-Interrupt (EOI) signal is sent to the PIC.

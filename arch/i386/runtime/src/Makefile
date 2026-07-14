@@ -11,4 +11,4 @@ $(BUILD)/%.o: arch/i386/runtime/src/%.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD)/%.o: arch/i386/runtime/src/%.asm
-	nasm $(ASMFLAGS) $< -o $@
+	nasm $(ASM_FLAGS) $< -o $@

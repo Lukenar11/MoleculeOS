@@ -47,7 +47,7 @@ namespace runtime
         inline constexpr const T* begin() const noexcept { return buffer; }
         inline constexpr const T* end() const noexcept { return buffer + S; }
 
-        // get first/last array-elememt
+        // get first/last array-element
         inline constexpr T& front() noexcept { return buffer[0]; }
         inline constexpr T& back() noexcept { return buffer[S - 1]; }
 
@@ -58,13 +58,13 @@ namespace runtime
         inline constexpr T* data() noexcept { return buffer; }
         inline constexpr const T* data() const noexcept { return buffer; }
 
-        // Repace array-data with "value"
+        // Replace array-data with "value"
         inline constexpr void fill(const T& value) noexcept {
             for (uint32_t i = 0; i < S; i++)
                 buffer[i] = value; 
         }
 
-        Array() noexcept = default;
+        Array() noexcept  = default;
         ~Array() noexcept = default;
     };
 } // namespace runtime

@@ -38,7 +38,7 @@ COMMON_FLAGS = $(TARGET) \
 
 CFLAGS = $(COMMON_FLAGS) -c -std=c17 -D__I386__
 CXXFLAGS = $(COMMON_FLAGS) -std=c++20 -D__I386__
-ASMFLAGS = -f elf32
+ASM_FLAGS = -f elf32
 
 LDFLAGS  = -T $(LINKER) -m elf_i386 -nostdlib -static
 

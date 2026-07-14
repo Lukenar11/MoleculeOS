@@ -12,4 +12,4 @@ $(BUILD)/%.o: arch/i386/kernel/src/idt/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD)/%.o: arch/i386/kernel/src/idt/%.asm
-	nasm $(ASMFLAGS) $< -o $@
+	nasm $(ASM_FLAGS) $< -o $@

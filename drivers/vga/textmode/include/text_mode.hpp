@@ -62,7 +62,7 @@ namespace drivers::vga
 
         static void clear_screen(const Text_Mode_Colors& color) noexcept;
 
-        Text_Mode() noexcept = default;
+        Text_Mode() noexcept  = default;
         ~Text_Mode() noexcept = default;
     };
 } // namespace drivers::vga

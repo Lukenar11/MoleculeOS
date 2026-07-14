@@ -5,7 +5,7 @@
 ;     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 ;
 ; DESCRIPTION:
-;     This file exposes the low-level CPU interrupt enebling routine.
+;     This file exposes the low-level CPU interrupt enabling routine.
 ;     The routine uses the i386 instruction "sti" to disable interrupts.
 ;
 ; NOTES:

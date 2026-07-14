@@ -11,4 +11,4 @@ OBJS += \
 	$(BUILD)/gdt.o
 
 $(BUILD)/%.o: arch/i386/iso/boot/%.asm
-	nasm $(ASMFLAGS) $< -o $@
+	nasm $(ASM_FLAGS) $< -o $@

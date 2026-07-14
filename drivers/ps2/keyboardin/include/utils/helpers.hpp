@@ -50,7 +50,7 @@ namespace drivers::ps2
         KEYBOARD_RELEASE    = 0x80,
         LEFT_SHIFT_RELEASE  = 0xAA,
         RIGHT_SHIFT_RELEASE = 0xB6,
-        CAPSLOCK            = 0x3A,
+        CAPS                = 0x3A,
         CTRL                = 0x64,
         REBOOT_COMMAND      = 0xFE,
     };

@@ -32,8 +32,8 @@ _start:
 
     call load_gdt
 
-    mov  esp, kernel_stack_top
-    and  esp, STACK_ALIGN_16_MASK
+    mov esp, kernel_stack_top
+    and esp, STACK_ALIGN_16_MASK
 
-    jmp  kernel_main
+    jmp kernel_main
     

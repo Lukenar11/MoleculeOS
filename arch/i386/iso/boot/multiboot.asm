@@ -5,16 +5,16 @@
 ;     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 ;
 ; DESCRIPTION:
-;     This file defines the Multiboot header required by Multiboot‑compliant
-;     bootloaders such as GRUB. 
+;     This file defines the multiboot header required by multiboot‑compliant
+;     boot loaders such as GRUB. 
 ;        
 ;     The header contains the magic value, flags,
 ;     and checksum that allow the bootloader to recognize and load the
 ;     kernel binary correctly.
 ;
-;     The Multiboot header must be placed within the first 8 KiB of the
+;     The multiboot header must be placed within the first 8 KiB of the
 ;     kernel image and aligned to a 4‑byte boundary to satisfy the
-;     Multiboot specification.
+;     multiboot specification.
 ;
 ; NOTES:
 ;     The checksum is computed such that:

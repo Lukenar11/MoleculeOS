@@ -38,7 +38,7 @@ namespace kernel
         // @todo implement ATA Identify
         drivers::ata::Programmable_Input_Output::init(2048, 0, 0x1F0, 0x3F6, 0x00);
 
-        // schedul MoleculeOS
+        // schedule MoleculeOS
         static terminal::Terminal terminal;
         while (true) {
             system::sleep();

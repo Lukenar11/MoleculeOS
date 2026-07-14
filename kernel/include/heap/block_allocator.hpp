@@ -34,7 +34,7 @@ namespace kernel::heap
         static inline uint16_t* allocation_sizes = nullptr;
         static inline bool* free_memory_blocks   = nullptr;
 
-        static void* set_allocation_sizes_entry(const uint32_t blocks_neede, 
+        static void* set_allocation_sizes_entry(const uint32_t blocks_needed, 
                                                 const uint32_t i) 
                                                 noexcept;
 
@@ -50,7 +50,7 @@ namespace kernel::heap
         static void* allocate(const uint32_t allocated_bytes) noexcept;
         static void deallocate(void* ptr) noexcept;
 
-        Block_Allocator() noexcept = default;
+        Block_Allocator() noexcept  = default;
         ~Block_Allocator() noexcept = default;
     };
 } // namespace kernel::heap

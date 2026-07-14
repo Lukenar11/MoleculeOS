@@ -39,8 +39,8 @@ int_%+i:
 %endrep
 
 trigger_interrupt:
-    mov  eax, [esp+4]
-    cmp  eax, LAST_INTERRUPT_TABLE_ENTRY
+    mov eax, [esp+4]
+    cmp eax, LAST_INTERRUPT_TABLE_ENTRY
     ja  .done
     jmp [interrupt_table+eax*4]
 

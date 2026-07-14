@@ -79,7 +79,7 @@ namespace runtime
             cursor_y = y;
         }
     
-        Text_Output() noexcept = default;
+        Text_Output() noexcept  = default;
         ~Text_Output() noexcept = default;
     };
 } // namespace runtime

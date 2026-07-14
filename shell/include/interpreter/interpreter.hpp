@@ -106,7 +106,7 @@ namespace shell::interpreter
     public:
         void step(const char& key);
 
-        Interpreter() noexcept = default;
+        Interpreter() noexcept  = default;
         ~Interpreter() noexcept = default;
     };
 } // namespace shell::interpreter

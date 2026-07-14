@@ -25,19 +25,19 @@ global word_output
 section .text
 
 byte_input:
-    xor eax,  eax
-    mov dx,  [esp+4]
-    in  al,   dx
+    xor eax, eax
+    mov  dx, [esp+4]
+    in   al, dx
     ret
 
 word_input:
-    xor eax,  eax
-    mov dx,  [esp+4] 
-    in  ax,   dx
+    xor eax, eax
+    mov  dx, [esp+4] 
+    in   ax, dx
     ret
 
 word_input_stream:
-    mov dx,  [esp+4] 
+    mov  dx, [esp+4] 
     mov ecx, [esp+8] 
     mov edi, [esp+12]
     rep insw
@@ -46,11 +46,11 @@ word_input_stream:
 byte_output:
     mov dx, [esp+4] 
     mov al, [esp+8]
-    out dx,  al
+    out dx, al
     ret
 
 word_output:
     mov dx, [esp+4] 
     mov ax, [esp+8] 
-    out dx,  ax
+    out dx, ax
     ret

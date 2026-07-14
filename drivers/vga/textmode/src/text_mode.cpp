@@ -28,7 +28,7 @@ namespace drivers::vga
                                 const uint8_t color, 
                                 const uint32_t x, 
                                 const uint32_t y) noexcept {
-        // VGA-Area Over/Underflow gurard
+        // VGA-Area Over/Underflow gard
         if (x >= TEXT_MODE_SCREEN_WIDTH || 
             y >= TEXT_MODE_SCREEN_HEIGHT) [[unlikely]]
             return;
