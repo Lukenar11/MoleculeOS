@@ -12,9 +12,11 @@ NOTES:
 
 #pragma once
 
-#include "drivers/vga/textmode/include/text_mode.hpp"
-#include "drivers/vga/textmode/include/utils/helpers.hpp"
-#include "drivers/ps2/keyboardin/include/keyboard_input.hpp"
-#include "drivers/ps2/keyboardin/include/utils/helpers.hpp"
-#include "drivers/ata/pio/include/programmable_input_output.hpp"
-#include "drivers/ata/pio/include/utils/helpers.hpp"
+#include "drivers/include/vga/text_mode.hpp"
+#include "drivers/include/utils/vga_text_mode_helpers.hpp"
+
+#include "drivers/include/ps2/keyboard_in.hpp"
+#include "drivers/include/utils/ps2_keyboard_in_helpers.hpp"
+
+#include "drivers/include/ata/pio.hpp"
+#include "drivers/include/utils/ata_pio_helpers.hpp"

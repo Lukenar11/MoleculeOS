@@ -4,14 +4,12 @@
 # https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 # 
 
-COMMON_FLAGS += \
-	-Idrivers/ata/pio/include \
-	-Idrivers/ps2/keyboardin/include \
-	-Idrivers/vga/textmode/include
+COMMON_FLAGS += -Idrivers/include/ata \
+				-Idrivers/include/ps2 \
+				-Idrivers/include/vga \
+				-Idrivers/include/utils \
 
-include drivers/ata/pio/src/Makefile
-include drivers/ps2/keyboardin/src/Makefile
-include drivers/vga/textmode/src/Makefile
+include drivers/src/Makefile
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)

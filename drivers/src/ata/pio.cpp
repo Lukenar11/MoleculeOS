@@ -25,7 +25,7 @@ NOTES:
     For the sake of simplicity, support for 48-bit LBA addresses has been omitted.
 */
 
-#include "programmable_input_output.hpp"
+#include "../ata/pio.hpp"
 
 namespace drivers::ata
 {

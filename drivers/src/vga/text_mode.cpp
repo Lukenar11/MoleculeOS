@@ -20,7 +20,7 @@ NOTES:
     because they are so small that the compiler can inline them.
 */
 
-#include "text_mode.hpp"
+#include "../vga/text_mode.hpp"
 
 namespace drivers::vga 
 {
