@@ -37,8 +37,8 @@ namespace drivers::ps2
         static inline constexpr uint16_t KEYBOARD_STATUS_PORT = 0x64;
         static inline constexpr uint16_t KEYBOARD_DATA_PORT   = 0x60;
     
-        static inline bool shift_is_pressed    = false;
-        static inline bool caps_is_enabled = false;
+        static inline bool shift_is_pressed = false;
+        static inline bool caps_is_enabled  = false;
 
         static inline bool has_pending_scancode() noexcept {
             return runtime::byte_input(KEYBOARD_STATUS_PORT) & LOWEST_BIT;
