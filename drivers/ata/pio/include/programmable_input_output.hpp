@@ -21,13 +21,16 @@ NOTES:
     (each of which takes about 100 ns); 
     however, since the read operation does not take exactly 100 ns, 
     this method introduces a delay of 500 ns as a safety measure.
+
+    For the sake of simplicity, support for 48-bit LBA addresses has been omitted.
 */
 
 #pragma once
 
 #include <stdint.h>
 #include <port_io.hpp>
-#include <text_output.hpp>
+#include <kernel_arch_api.hpp>
+#include <array.hpp>
 
 namespace
 {
@@ -55,11 +58,15 @@ namespace drivers::ata
 {
     class Programmable_Input_Output final {
     private:
-        static constexpr uint8_t ATA_BSY  = 0x80;
-        static constexpr uint8_t ATA_DRQ  = 0x08;
-        static constexpr uint8_t ATA_ERR  = 0x01;
-        static constexpr uint8_t ATA_DF   = 0x20;
-        static constexpr uint8_t ATA_DRDY = 0x40;
+        static constexpr uint8_t ATA_BSY      = 0x80;
+        static constexpr uint8_t ATA_DRQ      = 0x08;
+        static constexpr uint8_t ATA_ERR      = 0x01;
+        static constexpr uint8_t ATA_DF       = 0x20;
+        static constexpr uint8_t ATA_DRDY     = 0x40;
+        static constexpr uint8_t ATA_IDENTIFY = 0xEC;
+
+        static constexpr uint32_t ATA_LBA28_OVERFLOW_MARKER = 0xFFFF'FFFF;
+        static constexpr uint32_t ATA_LBA28_MAX_ADDRESS     = 0x0FFF'FFFF;
 
         static constexpr uint8_t SRST              = 0x04;
         static constexpr uint8_t DCR_DEFAULT       = 0x00;
@@ -69,25 +76,33 @@ namespace drivers::ata
         static constexpr uint8_t READ_SECTORS      = 0x20;
         static constexpr uint8_t READ_SECTORS_EXT  = 0x24;
 
-        static constexpr uint8_t MASTER = 0xE0;
-        static constexpr uint8_t SLAVE  = 0xF0;
+
+        static constexpr uint16_t IDE_PRIMARY_IO_BASE    = 0x1F0;
+        static constexpr uint16_t IDE_PRIMARY_DCR_BASE   = 0x3F6;
+        static constexpr uint16_t IDE_SECONDARY_IO_BASE  = 0x170;
+        static constexpr uint16_t IDE_SECONDARY_DCR_BASE = 0x376;
+
+        static constexpr uint8_t MASTER        = 0xE0;
+        static constexpr uint8_t SLAVE         = 0xF0;
+        static constexpr uint8_t MASTER_SELECT = 0xA0;
+        static constexpr uint8_t SLAVE_SELECT  = 0xB0;
 
         static constexpr uint8_t NIBBLE_MASK       = 0x0F;
         static constexpr uint8_t BYTE_MASK         = 0xFF;
         static constexpr uint32_t DOUBLE_WORD_MASK = 0x0FFFFFFF;
 
-        static constexpr uint32_t SECTOR_WORD_SIZE = 0x0100;
+        static constexpr uint32_t SECTOR_WORD_SIZE = 256;
 
         static constexpr uint32_t MAX_ALLOWED_SECTOR_COUNT = 128;
         static constexpr uint32_t CHUNK_SECTORS            = 8;
         static_assert(CHUNK_SECTORS <= MAX_ALLOWED_SECTOR_COUNT, 
                       "CHUNK_SECTORS <= MAX_ALLOWED_SECTOR_COUNT");
 
-        static inline uint32_t partition_length = 0;
-        static inline uint32_t lba_start_addr   = 0;
-        static inline uint16_t device_control   = 0;
-        static inline uint16_t io_port_base     = 0;
-        static inline uint8_t master_save_flags = 0;
+        static inline uint32_t partition_length   = 0;
+        static inline uint32_t lba_start_address  = 0;
+        static inline uint16_t device_control_reg = 0;
+        static inline uint16_t io_port_base       = 0;
+        static inline uint8_t master_save_flags   = 0;
 
         [[nodiscard]]
         static bool poll_until_drq_or_error() noexcept;
@@ -117,6 +132,16 @@ namespace drivers::ata
         static void delay() noexcept;
         static void reset_driver(const uint16_t dcr_port) noexcept;
 
+        static bool identify_drive(const uint16_t io_base,
+                                   const uint16_t control_reg,
+                                   const bool is_master,
+                                   uint16_t identify_data[SECTOR_WORD_SIZE])
+                                   noexcept;
+
+        static bool probe_and_configure_channel(const uint16_t io_port,
+                                                const uint16_t control_reg) 
+                                                noexcept;
+                                      
     public:
         [[nodiscard]]
         static inline uint16_t status_port() noexcept { 
@@ -125,14 +150,10 @@ namespace drivers::ata
 
         [[nodiscard]]
         static inline uint16_t dcr_port() noexcept { 
-            return device_control; 
+            return device_control_reg; 
         }
 
-        static void init(const uint32_t partition_len,
-                         const uint32_t lba_start,
-                         const uint16_t io_base,
-                         const uint16_t device_ctrl,
-                         const uint8_t master_flags) noexcept;
+        static void init() noexcept;
 
         static bool read(int32_t& sectors_to_read, 
                          uint16_t*& dest_buffer, 

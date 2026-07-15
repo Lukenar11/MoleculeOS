@@ -21,6 +21,8 @@ NOTES:
     (each of which takes about 100 ns); 
     however, since the read operation does not take exactly 100 ns, 
     this method introduces a delay of 500 ns as a safety measure.
+
+    For the sake of simplicity, support for 48-bit LBA addresses has been omitted.
 */
 
 #include "programmable_input_output.hpp"
@@ -75,7 +77,7 @@ namespace drivers::ata
                                                   uint32_t& sectors_to_read,
                                                   uint32_t& relative_lba) 
                                                   noexcept {
-        const uint32_t absolute_lba = relative_lba + lba_start_addr;
+        const uint32_t absolute_lba = relative_lba + lba_start_address;
         uint32_t to_transfer = (sectors_to_read > CHUNK_SECTORS) 
                                ? CHUNK_SECTORS 
                                : sectors_to_read;
@@ -127,16 +129,83 @@ namespace drivers::ata
         }
     }
 
-    void Programmable_Input_Output::init(const uint32_t partition_len,
-                                         const uint32_t lba_start,
-                                         const uint16_t io_base,
-                                         const uint16_t device_ctrl,
-                                         const uint8_t master_flags) noexcept {
-        partition_length  = partition_len;
-        lba_start_addr    = lba_start;
-        io_port_base      = io_base;
-        device_control    = device_ctrl;
-        master_save_flags = master_flags;
+    bool Programmable_Input_Output::identify_drive(const uint16_t io_base,
+                                                   const uint16_t control_reg,
+                                                   const bool is_master,
+                                                   uint16_t identify_data[SECTOR_WORD_SIZE])
+                                                   noexcept {
+        device_control_reg = control_reg;
+        reset_driver(control_reg);
+
+        io_port_base               = io_base;
+        const uint8_t drive_select = (is_master) 
+                                     ? MASTER_SELECT 
+                                     : SLAVE_SELECT;
+
+        runtime::byte_output(status_port() - 1, drive_select);
+        delay();
+        runtime::byte_output(status_port(), ATA_IDENTIFY);
+        delay();
+        
+        if (!poll_until_drq_or_error()) [[unlikely]]
+            return false;
+
+        runtime::word_input_stream(io_base, SECTOR_WORD_SIZE, identify_data);
+        return true;
+    }
+
+    bool Programmable_Input_Output::probe_and_configure_channel(const uint16_t io_port,
+                                                                const uint16_t control_reg) 
+                                                                noexcept {
+        uint16_t identify_data[SECTOR_WORD_SIZE] = {0};
+        for (int i = 0; i < 2; ++i) {
+            const bool is_master = (i == 0);
+
+            if (!identify_drive(io_port, 
+                                control_reg, 
+                                is_master, 
+                                identify_data)) {
+                reset_driver(control_reg);
+                continue;
+            }
+
+            const uint32_t storage_size = (static_cast<uint32_t>(identify_data[61]) << 16) |
+                                           static_cast<uint32_t>(identify_data[60]);
+
+            io_port_base       = io_port;
+            device_control_reg = control_reg;
+            master_save_flags  = (is_master) ? MASTER : SLAVE;
+            lba_start_address  = 0;
+
+            if (storage_size == ATA_LBA28_OVERFLOW_MARKER)
+                partition_length = ATA_LBA28_MAX_ADDRESS;
+            else
+                partition_length = storage_size;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    void Programmable_Input_Output::init() noexcept {
+        struct Channel final { 
+            uint16_t io_port; 
+            uint16_t control_reg; 
+        };
+
+        const Channel channels[] = { 
+            {IDE_PRIMARY_IO_BASE,   IDE_PRIMARY_DCR_BASE}, 
+            {IDE_SECONDARY_IO_BASE, IDE_SECONDARY_DCR_BASE} 
+        };
+
+        for (const auto& channel : channels) {
+            if (probe_and_configure_channel(channel.io_port, 
+                                            channel.control_reg)) [[unlikely]]
+                return;
+        }
+
+        kernel::system::panic("ATA init from IDENTIFY failed, no device detected");
     }
 
     bool Programmable_Input_Output::read(int32_t& sectors_to_read,
@@ -149,7 +218,8 @@ namespace drivers::ata
             return true;
         }
 
-        if (static_cast<uint32_t>(sectors_to_read) > MAX_ALLOWED_SECTOR_COUNT) [[unlikely]]
+        if (static_cast<uint32_t>(sectors_to_read) >
+            MAX_ALLOWED_SECTOR_COUNT) [[unlikely]]
             return false;
 
         const uint32_t max_sectors = partition_length - 1;
