@@ -27,6 +27,7 @@ NOTES:
 
 #include <stdint.h>
 #include <port_io.hpp>
+#include <text_output.hpp>
 
 namespace
 {
@@ -68,6 +69,9 @@ namespace drivers::ata
         static constexpr uint8_t READ_SECTORS      = 0x20;
         static constexpr uint8_t READ_SECTORS_EXT  = 0x24;
 
+        static constexpr uint8_t MASTER = 0xE0;
+        static constexpr uint8_t SLAVE  = 0xF0;
+
         static constexpr uint8_t NIBBLE_MASK       = 0x0F;
         static constexpr uint8_t BYTE_MASK         = 0xFF;
         static constexpr uint32_t DOUBLE_WORD_MASK = 0x0FFFFFFF;
@@ -89,25 +93,26 @@ namespace drivers::ata
         static bool poll_until_drq_or_error() noexcept;
 
         [[nodiscard]]
-        static bool read_and_poll_disk(uint16_t*& dest_buffer, 
-                                       uint32_t& command_count, 
-                                       uint32_t& sectors_to_read, 
-                                       uint32_t& relative_lba) noexcept;
+        static bool poll_disk_read(uint16_t*& dest_buffer, 
+                                   uint32_t& command_count, 
+                                   uint32_t& sectors_to_read, 
+                                   uint32_t& relative_lba) noexcept;
 
         [[nodiscard]]
-        static inline uint8_t shift_and_mask(const uint32_t val,
+        static inline constexpr uint8_t shift_and_mask(const uint32_t val,
                                              const uint32_t shift,
-                                             const uint32_t mask) noexcept {
-            return static_cast<uint8_t>(((val >> shift) & mask));
+                                             const uint8_t mask,
+                                             const uint8_t add_mask=0x00) 
+                                             noexcept {
+            if (add_mask == 0x00) [[likely]]
+                return static_cast<uint8_t>(((val >> shift) & mask));
+            else [[unlikely]]
+                return static_cast<uint8_t>(((val >> shift) & mask) | add_mask);
         }
 
-        static bool pio_28bit_read(uint16_t*& dest_buffer, 
-                                   uint32_t& sectors_to_read, 
-                                   uint32_t& relative_lba) noexcept;
-
-        static bool pio_48bit_read(uint16_t*& dest_buffer, 
-                                   uint32_t& sectors_to_read, 
-                                   uint32_t& relative_lba) noexcept;
+        static bool pio_disk_read(uint16_t*& dest_buffer, 
+                                  uint32_t& sectors_to_read, 
+                                  uint32_t& relative_lba) noexcept;
 
         static void delay() noexcept;
         static void reset_driver(const uint16_t dcr_port) noexcept;

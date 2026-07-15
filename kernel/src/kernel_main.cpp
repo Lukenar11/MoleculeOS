@@ -27,6 +27,8 @@ NOTES:
 #include <terminal_api.hpp>
 #include <drivers_api.hpp>
 
+#include "tests/ata_pio.hpp"
+
 namespace kernel
 {
     extern "C" [[noreturn]]
@@ -37,6 +39,8 @@ namespace kernel
 
         // @todo implement ATA Identify
         drivers::ata::Programmable_Input_Output::init(2048, 0, 0x1F0, 0x3F6, 0x00);
+
+        tests::read_sector();
 
         // schedule MoleculeOS
         static terminal::Terminal terminal;

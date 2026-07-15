@@ -42,11 +42,11 @@ namespace drivers::ata
         return false;
     }
 
-    bool Programmable_Input_Output::read_and_poll_disk(uint16_t*& dest_buffer,
-                                                       uint32_t& command_count,
-                                                       uint32_t& sectors_to_read,
-                                                       uint32_t& relative_lba) 
-                                                       noexcept {
+    bool Programmable_Input_Output::poll_disk_read(uint16_t*& dest_buffer,
+                                                   uint32_t& command_count,
+                                                   uint32_t& sectors_to_read,
+                                                   uint32_t& relative_lba) 
+                                                   noexcept {
         while (command_count > 0) {
             delay();
 
@@ -71,10 +71,10 @@ namespace drivers::ata
         return true;
     }
 
-    bool Programmable_Input_Output::pio_28bit_read(uint16_t*& dest_buffer, 
-                                                   uint32_t& sectors_to_read,
-                                                   uint32_t& relative_lba) 
-                                                   noexcept {
+    bool Programmable_Input_Output::pio_disk_read(uint16_t*& dest_buffer, 
+                                                  uint32_t& sectors_to_read,
+                                                  uint32_t& relative_lba) 
+                                                  noexcept {
         const uint32_t absolute_lba = relative_lba + lba_start_addr;
         uint32_t to_transfer = (sectors_to_read > CHUNK_SECTORS) 
                                ? CHUNK_SECTORS 
@@ -89,54 +89,19 @@ namespace drivers::ata
         runtime::byte_output(io_port_base + 3, shift_and_mask(absolute_lba, 0, BYTE_MASK));
         runtime::byte_output(io_port_base + 4, shift_and_mask(absolute_lba, 8, BYTE_MASK));
         runtime::byte_output(io_port_base + 5, shift_and_mask(absolute_lba, 16, BYTE_MASK));
-        runtime::byte_output(io_port_base + 6, ((absolute_lba >> 24) & 0x0F) | 0xE0);
+        runtime::byte_output(io_port_base + 6, shift_and_mask(absolute_lba, 
+                                                              24, 
+                                                              NIBBLE_MASK, 
+                                                              MASTER));
 
         runtime::byte_output(status_port(), READ_SECTORS);
 
-        if (!read_and_poll_disk(dest_buffer, 
-                                to_transfer, 
-                                sectors_to_read, 
-                                relative_lba))
+        if (!poll_disk_read(dest_buffer, 
+                            to_transfer, 
+                            sectors_to_read, 
+                            relative_lba))
             return false;
 
-
-        const uint8_t final_status = runtime::byte_input(status_port());
-        return !(final_status & ATA_ERR || final_status & ATA_DF);
-    }
-
-    bool Programmable_Input_Output::pio_48bit_read(uint16_t*& dest_buffer, 
-                                                   uint32_t& sectors_to_read,
-                                                   uint32_t& relative_lba) 
-                                                   noexcept {
-        const uint32_t absolute_lba = relative_lba + lba_start_addr;
-        uint32_t to_transfer = (sectors_to_read > CHUNK_SECTORS) 
-                               ? CHUNK_SECTORS 
-                               : sectors_to_read;
-
-        if (!ata_pio_read_guard(partition_length, 
-                                relative_lba, 
-                                to_transfer)) [[unlikely]]
-            return false;
-
-        runtime::byte_output(io_port_base + 2, shift_and_mask(to_transfer, 8, BYTE_MASK));
-        runtime::byte_output(io_port_base + 3, shift_and_mask(absolute_lba, 24, BYTE_MASK));
-        runtime::byte_output(io_port_base + 4, shift_and_mask(absolute_lba, 32, BYTE_MASK));
-        runtime::byte_output(io_port_base + 5, 0);
-
-        runtime::byte_output(io_port_base + 2, shift_and_mask(to_transfer, 0, BYTE_MASK));
-        runtime::byte_output(io_port_base + 3, shift_and_mask(absolute_lba, 0, BYTE_MASK));
-        runtime::byte_output(io_port_base + 4, shift_and_mask(absolute_lba, 8, BYTE_MASK));
-        runtime::byte_output(io_port_base + 5, shift_and_mask(absolute_lba, 16, BYTE_MASK));
-
-        runtime::byte_output(io_port_base + 6, (master_save_flags & DRIVE_SELECT_BASE) | 
-                                                DRDY);
-        runtime::byte_output(status_port(), READ_SECTORS_EXT);
-
-        if (!read_and_poll_disk(dest_buffer, 
-                                to_transfer, 
-                                sectors_to_read, 
-                                relative_lba))
-            return false;
 
         const uint8_t final_status = runtime::byte_input(status_port());
         return !(final_status & ATA_ERR || final_status & ATA_DF);
@@ -202,25 +167,12 @@ namespace drivers::ata
             }
         }
 
-        bool requires_48bit_addressing = false;
-        if (relative_lba > DOUBLE_WORD_MASK || 
-            lba_start_addr > DOUBLE_WORD_MASK || 
-            (lba_start_addr + relative_lba) > DOUBLE_WORD_MASK || 
-            (lba_start_addr + relative_lba + sectors_to_read) > DOUBLE_WORD_MASK) {
-            requires_48bit_addressing = true;
-        }
-
         bool read_success = true;
         uint32_t sectors_count = static_cast<uint32_t>(sectors_to_read);
         while (sectors_count > 0) {
-            if (requires_48bit_addressing)
-                read_success = pio_48bit_read(dest_buffer, 
-                                              sectors_count, 
-                                              relative_lba);
-            else
-                read_success = pio_28bit_read(dest_buffer, 
-                                              sectors_count, 
-                                              relative_lba);
+            read_success = pio_disk_read(dest_buffer, 
+                                         sectors_count, 
+                                         relative_lba);
 
             if (!read_success) [[unlikely]] {
                 reset_driver(dcr_port());
