@@ -19,7 +19,7 @@ NOTES:
     the compiler can therefore probably inline it.
 */
 
-#include "keyboard_input.hpp"
+#include "../ps2/keyboard_in.hpp"
 
 namespace drivers::ps2
 {
