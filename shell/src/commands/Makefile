@@ -5,13 +5,18 @@
 # 
 
 OBJS += \
-	$(BUILD)/commands.o \
-	$(BUILD)/create.o \
-	$(BUILD)/echo.o \
-	$(BUILD)/help.o \
-	$(BUILD)/info.o \
-	$(BUILD)/list.o \
-	$(BUILD)/remove.o
+    $(BUILD)/shell/src/commands/utils/helpers.o \
+    $(BUILD)/shell/src/commands/create.o \
+    $(BUILD)/shell/src/commands/echo.o \
+    $(BUILD)/shell/src/commands/help.o \
+    $(BUILD)/shell/src/commands/info.o \
+    $(BUILD)/shell/src/commands/list.o \
+    $(BUILD)/shell/src/commands/remove.o
 
-$(BUILD)/%.o: shell/src/commands/%.cpp
+$(BUILD)/shell/src/commands/%.o: shell/src/commands/%.cpp
+	@mkdir -p $(dir $@)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD)/shell/src/commands/utils/%.o: shell/src/commands/utils/%.cpp
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@

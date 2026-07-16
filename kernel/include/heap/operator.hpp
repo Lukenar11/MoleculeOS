@@ -19,7 +19,7 @@ NOTES:
 
 #pragma once
 
-#include "block_allocator.hpp"
+#include "heap/block.hpp"
 #include <stdint.h>
 
 void* operator new(const size_t allocated_bytes);

@@ -24,9 +24,9 @@ NOTES:
 
 #pragma once
 
-#include "commands/commands.hpp"
+#include "../commands/commands.hpp"
 #include "utils/command_entry.hpp"
-#include "utils/append_char.hpp"
+#include "../utils/append_char.hpp"
 #include <stdint.h>
 #include <array.hpp>
 #include <text_output.hpp>

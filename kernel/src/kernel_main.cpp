@@ -21,8 +21,7 @@ NOTES:
     it is declared as "extern C" to ensure compatibility.
 */
 
-#include "system/sleep.hpp"
-#include "system/panic.hpp"
+#include "heap/helpers.hpp"
 #include <kernel_arch_api.hpp>
 #include <terminal_api.hpp>
 #include <drivers_api.hpp>

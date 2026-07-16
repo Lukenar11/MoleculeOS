@@ -22,7 +22,7 @@ NOTES:
     I put them in the header so the compiler can inline them.
 */
 
-#include "interpreter/interpreter.hpp"
+#include "../interpreter/interpreter.hpp"
 
 namespace shell::interpreter
 {

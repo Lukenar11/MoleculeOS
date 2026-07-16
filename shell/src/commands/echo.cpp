@@ -18,7 +18,7 @@ DESCRIPTION:
 NOTES:
 */
 
-#include "commands/echo.hpp"
+#include "echo.hpp"
 
 namespace
 {

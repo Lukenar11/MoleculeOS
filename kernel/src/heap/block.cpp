@@ -13,7 +13,7 @@ DESCRIPTION:
 NOTES:
 */
 
-#include "heap/block_allocator.hpp"
+#include "heap/block.hpp"
 
 namespace kernel::heap
 {

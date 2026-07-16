@@ -15,4 +15,4 @@ NOTES:
     it's included in the header so the compiler can inline it.
 */
 
-#include "utils/append_char.hpp"
+// #include "utils/append_char.hpp"

@@ -17,7 +17,7 @@ NOTES:
     global namespace and not in the 'kernel::heap' namespace.
 */
 
-#include "heap/new_delete.hpp"
+#include "heap/operator.hpp"
 
 void* operator new(const size_t allocated_bytes)
 {

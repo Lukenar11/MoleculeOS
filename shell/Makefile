@@ -5,10 +5,13 @@
 # 
 
 COMMON_FLAGS += \
-	-Ishell/include
+	-Ishell/include/utils \
+	-Ishell/include/commands \
+	-Ishell/include/commands/utils \
+	-Ishell/include/commands/interpreter \
+	-Ishell/include/commands/interpreter/utils \
 
 include shell/src/commands/Makefile
-include shell/src/commands/utils/Makefile
 include shell/src/interpreter/Makefile
 
 $(BUILD_DIR):

@@ -4,8 +4,8 @@
 # https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 # 
 
-OBJS += \
-	$(BUILD)/interpreter.o
+OBJS += $(BUILD)/shell/src/interpreter/interpreter.o
 
-$(BUILD)/%.o: shell/src/interpreter/%.cpp
+$(BUILD)/shell/src/interpreter/%.o: shell/src/interpreter/%.cpp
+	@mkdir -p $(dir $@)
 	$(CXX) $(CXXFLAGS) -c $< -o $@

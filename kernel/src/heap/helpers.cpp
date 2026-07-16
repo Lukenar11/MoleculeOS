@@ -17,4 +17,4 @@ NOTES:
     in the linker script (linker.ld).
 */
 
-#include "utils/heap_pos_marker.hpp"
+#include "heap/helpers.hpp"

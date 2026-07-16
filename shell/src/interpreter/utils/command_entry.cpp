@@ -18,4 +18,4 @@ NOTES:
     containing the parsed argument string, this avoids dynamic memory usage.
 */
 
-#include "utils/command_entry.hpp"
+// #include "command_entry.hpp"
