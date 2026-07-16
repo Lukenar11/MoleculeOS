@@ -24,9 +24,9 @@ NOTES:
 
 #pragma once
 
-#include "../commands/commands.hpp"
-#include "utils/command_entry.hpp"
-#include "../utils/append_char.hpp"
+#include "commands.hpp"
+#include "utils/shell_helpers.hpp"
+#include "utils/utils.hpp"
 #include <stdint.h>
 #include <array.hpp>
 #include <text_output.hpp>
@@ -45,7 +45,7 @@ namespace
         return hash;
     }
 
-    constexpr shell::interpreter::Command_Entry shell_command_table[] = {
+    constexpr shell::Command_Entry shell_command_table[] = {
         {make_hash("help"),     [](auto& _)         -> void {shell::commands::help();}},
         {make_hash("info"),     [](auto& _)         -> void {shell::commands::info();}},
         {make_hash("clear"),    [](auto& _)         -> void {shell::commands::clear();}},
@@ -58,12 +58,10 @@ namespace
     };
 }
 
-namespace shell::interpreter
+namespace shell
 {
-    class Interpreter final {
+    class Shell final {
     private:
-        static constexpr char NULL_TERMINATOR = '\0';
-
         runtime::Array<char, 128> input_buffer;
         runtime::Array<char, 64> commands;
         runtime::Array<char, 64> arguments;
@@ -101,12 +99,12 @@ namespace shell::interpreter
         bool tokenize_input_buffer();
         void parse_commands() noexcept;
             
-        constexpr void flush_interpreter_pipeline() noexcept;
+        constexpr void flush_shell_pipeline() noexcept;
 
     public:
         void step(const char& key);
 
-        Interpreter() noexcept  = default;
-        ~Interpreter() noexcept = default;
+        Shell() noexcept  = default;
+        ~Shell() noexcept = default;
     };
-} // namespace shell::interpreter
+} // namespace shell

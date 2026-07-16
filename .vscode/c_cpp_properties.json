@@ -21,6 +21,7 @@
                 "${workspaceFolder}",
                 "${workspaceFolder}/kernel/include",
                 "${workspaceFolder}/kernel/include/heap",
+                "${workspaceFolder}/kernel/include/filesystem",
                 "${workspaceFolder}/runtime/cpp/include",
                 "${workspaceFolder}/runtime/apis",
                 "${workspaceFolder}/runtime/apis/arch",
@@ -35,8 +36,8 @@
                 "${workspaceFolder}/drivers/include/vga",
                 "${workspaceFolder}/drivers/include/utils/",
                 "${workspaceFolder}/shell/include",
-                "${workspaceFolder}/shell/include/interpreter",
-                "${workspaceFolder}/shell/include/commands"
+                "${workspaceFolder}/shell/include/commands",
+                "${workspaceFolder}/shell/include/utils"
             ],
             "defines": [
                 "__I386__"

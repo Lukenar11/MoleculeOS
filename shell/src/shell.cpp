@@ -5,9 +5,9 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This is the command interpreter used by the MoleculeOS shell. 
+    This is the command Shell used by the MoleculeOS shell. 
             
-    The interpreter receives raw keyboard input, 
+    The Shell receives raw keyboard input, 
     tokenizes the input string, separates command and arguments,
     and dispatches the 
     appropriate handler based on a compile‑time hash lookup table.
@@ -22,13 +22,13 @@ NOTES:
     I put them in the header so the compiler can inline them.
 */
 
-#include "../interpreter/interpreter.hpp"
+#include "shell.hpp"
 
-namespace shell::interpreter
+namespace shell
 {
-    void Interpreter::print_overflow_error(const char* error_message_for, 
-                                           const uint32_t max_buffer_size) 
-                                           const noexcept {
+    void Shell::print_overflow_error(const char* error_message_for, 
+                                     const uint32_t max_buffer_size)
+                                     const noexcept {
         static const char* error_messages[] = {
             "SHELL ERROR:\n\t",
             " overflow. Max size: ",
@@ -46,19 +46,18 @@ namespace shell::interpreter
         set_default_text_color();
     };
 
-    bool Interpreter::tokenize_input_buffer() {
-        const uint32_t null    = 0;
+    bool Shell::tokenize_input_buffer() {
         bool tokenize_commands = true;
-        for (uint32_t i = null; i < input_buffer_index; ++i) [[likely]] {
+        for (uint32_t i = 0; i < input_buffer_index; ++i) [[likely]] {
             const char key = input_buffer[i];
 
-            if (key == NULL_TERMINATOR) [[unlikely]]
+            if (key == '\0') [[unlikely]]
                 break;
 
-            if (tokenize_commands && commands_index == null && key == ' ')
+            if (tokenize_commands && commands_index == 0 && key == ' ')
                 continue;
 
-            if (key == ' ' && arguments_index == null) {
+            if (key == ' ' && arguments_index == 0) {
                 tokenize_commands = false;
                 continue;
             }
@@ -78,15 +77,14 @@ namespace shell::interpreter
             }
         }
 
-        commands[commands_index]   = NULL_TERMINATOR;
-        arguments[arguments_index] = NULL_TERMINATOR;
+        commands[commands_index]   = '\0';
+        arguments[arguments_index] = '\0';
 
         return true;
     }
 
-    bool Interpreter::validate_tokens() noexcept {
-        const uint32_t null = 0;
-        if (commands_index == null && arguments_index > null) [[unlikely]] {
+    bool Shell::validate_tokens() noexcept {
+        if (commands_index == 0 && arguments_index > 0) [[unlikely]] {
             set_error_message_text_color();
 
             static const char* error_message = "Error: arguments without command.\n\n";
@@ -96,7 +94,7 @@ namespace shell::interpreter
             return false;
         }
 
-        if (commands_index == null || commands[null] == NULL_TERMINATOR) [[unlikely]] {
+        if (commands_index == 0 || commands[0] == '\0') [[unlikely]] {
             static const char* error_message = "No command entered.\n\n";
             runtime::Text_Output::put_string(error_message);
 
@@ -106,7 +104,7 @@ namespace shell::interpreter
         return true;
     }
 
-    void Interpreter::parse_commands() noexcept {
+    void Shell::parse_commands() noexcept {
         const uint32_t command_hash = make_hash(commands.data());
         for (const auto& entry : shell_command_table) [[likely]]
             if (entry.hash == command_hash) {
@@ -125,24 +123,21 @@ namespace shell::interpreter
         set_default_text_color();
     }
 
-    constexpr void Interpreter::flush_interpreter_pipeline() noexcept {
-        const char null_terminator = NULL_TERMINATOR;
-        const uint32_t null        = 0;
-        
-        input_buffer.fill(null_terminator);
-        commands.fill(null_terminator);
-        arguments.fill(null_terminator);
+    constexpr void Shell::flush_shell_pipeline() noexcept {
+        input_buffer.fill('\0');
+        commands.fill('\0');
+        arguments.fill('\0');
 
-        input_buffer_index = null;
-        commands_index     = null;
-        arguments_index    = null;
+        input_buffer_index = 0;
+        commands_index     = 0;
+        arguments_index    = 0;
     }
 
-    void Interpreter::step(const char& key) {
+    void Shell::step(const char& key) {
         if (key == '\b') {
             if (input_buffer_index > 0) {
                 --input_buffer_index;
-                input_buffer[input_buffer_index] = NULL_TERMINATOR;
+                input_buffer[input_buffer_index] = '\0';
             }
             return;
         }
@@ -152,17 +147,16 @@ namespace shell::interpreter
             if (is_tokenized && validate_tokens())
                 parse_commands();
 
-            flush_interpreter_pipeline();
+            flush_shell_pipeline();
             return;
         }
 
         if (append_char(input_buffer, input_buffer_index, key))
             return;
 
-        static const char* error_message = "Input buffer";
         runtime::Text_Output::put_char('\n');
-        print_overflow_error(error_message, input_buffer.size());
+        print_overflow_error("Input buffer", input_buffer.size());
 
-        flush_interpreter_pipeline();
+        flush_shell_pipeline();
     }
-} // namespace shell::interpreter
+} // namespace shell

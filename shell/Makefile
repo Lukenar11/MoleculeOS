@@ -4,15 +4,11 @@
 # https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 # 
 
-COMMON_FLAGS += \
-	-Ishell/include/utils \
-	-Ishell/include/commands \
-	-Ishell/include/commands/utils \
-	-Ishell/include/commands/interpreter \
-	-Ishell/include/commands/interpreter/utils \
+COMMON_FLAGS += -Ishell/include \
+				-Ishell/include/utils \
+				-Ishell/include/commands \
 
-include shell/src/commands/Makefile
-include shell/src/interpreter/Makefile
+include shell/src/Makefile
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)

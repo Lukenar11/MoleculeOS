@@ -62,7 +62,7 @@ namespace terminal
             erase_user_cursor();
 
             runtime::Text_Output::put_char(key);
-            interpreter.step(key);
+            shell.step(key);
 
             draw_user_cursor();
 

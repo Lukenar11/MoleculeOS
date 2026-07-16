@@ -41,7 +41,7 @@ namespace terminal
 {
     class Terminal final {
     private:
-        shell::interpreter::Interpreter interpreter;
+        shell::Shell shell;
 
         void draw_user_cursor_with_color(const drivers::vga::Text_Mode_Colors& foreground,
                                          const drivers::vga::Text_Mode_Colors& background) 

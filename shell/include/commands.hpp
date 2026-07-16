@@ -18,12 +18,12 @@ NOTES:
 
 #pragma once
 
-#include "clear.hpp"
-#include "create.hpp"
-#include "echo.hpp"
-#include "help.hpp"
-#include "info.hpp"
-#include "list.hpp"
-#include "reboot.hpp"
-#include "remove.hpp"
-#include "shutdown.hpp"
+#include "commands/clear.hpp"
+#include "commands/create.hpp"
+#include "commands/echo.hpp"
+#include "commands/help.hpp"
+#include "commands/info.hpp"
+#include "commands/list.hpp"
+#include "commands/reboot.hpp"
+#include "commands/remove.hpp"
+#include "commands/shutdown.hpp"
