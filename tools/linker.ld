@@ -33,10 +33,10 @@ SECTIONS
     .bss : { 
         *(.bss*) 
         *(COMMON) 
-    }
 
-    . = ALIGN(8);
-    heap_start = .;
-    . += 265K;
-    heap_end = .;
+        . = ALIGN(8);
+        heap_start = .;
+        . += 265K;
+        heap_end = .;
+    }
 }
