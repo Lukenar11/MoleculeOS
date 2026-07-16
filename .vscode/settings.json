@@ -22,7 +22,9 @@
     "search.exclude": {
         "build": true
     },
+
     "C_Cpp.errorSquiggles": "disabled",
+    
     "cSpell.words": [
         "Bochs",
         "DRDY",
@@ -41,6 +43,7 @@
         "pushf",
         "redict",
         "resb",
+        "rodata",
         "SRST"
     ]
 }

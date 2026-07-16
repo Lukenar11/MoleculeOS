@@ -6,7 +6,7 @@
 
 COMMON_FLAGS += -Iarch/i386/runtime/include \
 
-include arch/i386/runtime/src/Makefile
+include arch/i386/iso/boot/Makefile
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)

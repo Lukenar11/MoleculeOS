@@ -51,14 +51,8 @@ include kernel/Makefile
 include terminal/Makefile
 include shell/Makefile
 
-all: dirs $(KERNEL)
-
 $(BUILD):
 	mkdir -p $(BUILD)
-
-dirs:
-	mkdir -p build/bin
-	mkdir -p build/iso/boot/grub
 
 $(KERNEL): $(OBJS)
 	$(LD) $(LDFLAGS) -o $@ $^
