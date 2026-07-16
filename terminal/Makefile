@@ -4,8 +4,7 @@
 # https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 # 
 
-COMMON_FLAGS += \
-	-Iterminal/include
+COMMON_FLAGS += -Iterminal/include \
 
 include terminal/src/Makefile
 

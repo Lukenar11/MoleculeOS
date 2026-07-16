@@ -4,8 +4,7 @@
 # https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 # 
 
-OBJS += \
-	$(BUILD)/terminal.o
+OBJS += $(BUILD)/terminal.o \
 
 $(BUILD)/%.o: terminal/src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
