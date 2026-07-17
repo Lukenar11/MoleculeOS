@@ -54,3 +54,10 @@ word_output:
     mov ax, [esp+8] 
     out dx, ax
     ret
+
+word_output_stream:
+    mov  dx, [esp+4] 
+    mov ecx, [esp+8] 
+    mov edi, [esp+12]
+    rep outsw
+    ret

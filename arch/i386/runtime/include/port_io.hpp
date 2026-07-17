@@ -34,5 +34,9 @@ namespace runtime
     
         void byte_output(uint16_t port, uint8_t value);
         void word_output(uint16_t port, uint16_t value);
+
+        void word_output_stream(uint16_t port, 
+                                uint32_t word_count,
+                                uint16_t* buffer);
     }
 } // namespace runtime
