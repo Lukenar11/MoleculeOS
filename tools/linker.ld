@@ -8,7 +8,7 @@ ENTRY(_start)
 
 SECTIONS 
 {
-    . = 1M;
+    . = 1024 * 1024;
 
     .multiboot : {
         KEEP(*(.multiboot))
@@ -34,9 +34,14 @@ SECTIONS
         *(.bss*) 
         *(COMMON) 
 
+        . = ALIGN(16);
+        stack_bottom = .;
+        . += 16 * 1024;
+        stack_top = .;
+
         . = ALIGN(8);
         heap_start = .;
-        . += 265K;
+        . += 256 * 1024;
         heap_end = .;
     }
 }

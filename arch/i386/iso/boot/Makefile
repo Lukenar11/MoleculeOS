@@ -5,9 +5,7 @@
 # 
 
 OBJS += $(BUILD)/_start.o \
-		$(BUILD)/kernel_stack.o \
 		$(BUILD)/multiboot.o \
-		$(BUILD)/gdt.o
 
 $(BUILD)/%.o: arch/i386/iso/boot/%.asm
 	nasm $(ASM_FLAGS) $< -o $@

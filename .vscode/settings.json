@@ -33,6 +33,7 @@
         "insw",
         "intstrem",
         "lgdt",
+        "lidt",
         "Lukenar",
         "Matthes",
         "multiboot",

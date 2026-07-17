@@ -5,35 +5,67 @@
 ;     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 ;
 ; DESCRIPTION:
-;     This file contains the kernel entry point "_start", which is the first
-;     executed instruction after the bootloader transfers control to
-;     the kernel.
-;
-;     The routine loads the Global Descriptor Table (GDT), initializes the
-;     kernel stack, aligns it to a 16-byte boundary, and then jumps into
-;     the C++ high-level entry point "kernel_main".
 ;
 ; NOTES:
-;     The internal implementation of "kernel_stack_top" 
-;     is located in "kernel_stack.asm".
-;     The internal implementation of "load_gdt" is located in "gdt.asm".
 ;
 
 extern kernel_main
-extern kernel_stack_top
-extern load_gdt
+extern stack_bottom
+extern stack_top
 global _start
 
-%define STACK_ALIGN_16_MASK 0xFFFFFFF0
+%define KERNEL_DATA_SEGMENT_SELECTOR 0x10
+
+section .gdt
+align 8
+
+gdt_start:
+    ; Null Descriptor
+    dw 0x0000   ; Limit (bits 0..15)
+    dw 0x0000   ; Base (bits 0..15)
+    db 0x00     ; Base (bits 16..23)
+    db 0x00     ; Access
+    db 0x00     ; Flags + Limit (bits 16..19)
+    db 0x00     ; Base (bits 24..31)
+
+    ; Kernel Code Segment
+    dw 0xFFFF   ; Limit (bits 0..15)
+    dw 0x0000   ; Base (bits 0..15)
+    db 0x00     ; Base (bits 16..23)
+    db 0x9A     ; Access
+    db 0xCF     ; Flags + Limit (bits 16..19)
+    db 0x00     ; Base (bits 24..31)
+
+    ; Kernel Data Segment
+    dw 0xFFFF   ; Limit (bits 0..15)
+    dw 0x0000   ; Base (bits 0..15)
+    db 0x00     ; Base (bits 16..23)
+    db 0x92     ; Access
+    db 0xCF     ; Flags + Limit (bits 16..19)
+    db 0x00     ; Base (bits 24..31)
+gdt_end:
+
+gdt_descriptor:
+    dw gdt_end-gdt_start-1
+    dd gdt_start
 
 section .text
+
 _start:
     cli
 
-    call load_gdt
+    lgdt [gdt_descriptor]
 
-    mov esp, kernel_stack_top
-    and esp, STACK_ALIGN_16_MASK
+    mov ax, KERNEL_DATA_SEGMENT_SELECTOR
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    mov ss, ax
 
+    jmp 0x08:.flush
+
+.flush:
+    mov esp, stack_top
     jmp kernel_main
     
