@@ -13,7 +13,7 @@
 ;     controller, PIC, PIT, and VGA hardware.
 ; 
 ; NOTES:
-;     The interface is a header file called "port_io.hpp"
+;     The interface is a header file called 'port_io.hpp'
 ;
 
 global byte_input
