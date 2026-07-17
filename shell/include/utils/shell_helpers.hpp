@@ -27,6 +27,6 @@ namespace shell
 {
     struct Command_Entry final {
         uint32_t hash = 0;
-        void (*function)(const runtime::Array<char, 64>& arguments);
+        void (*function)(const runtime::Array<char, 64>& args);
     };
 } // namespace shell

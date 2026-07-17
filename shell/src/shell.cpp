@@ -8,7 +8,7 @@ DESCRIPTION:
     This is the command Shell used by the MoleculeOS shell. 
             
     The Shell receives raw keyboard input, 
-    tokenizes the input string, separates command and arguments,
+    tokenizes the input string, separates command and args,
     and dispatches the 
     appropriate handler based on a compile‑time hash lookup table.
     
@@ -57,13 +57,13 @@ namespace shell
             if (tokenize_commands && commands_index == 0 && key == ' ')
                 continue;
 
-            if (key == ' ' && arguments_index == 0) {
+            if (key == ' ' && args_index == 0) {
                 tokenize_commands = false;
                 continue;
             }
 
-            auto& target_buffer = (tokenize_commands) ? commands : arguments;
-            auto& target_index  = (tokenize_commands) ? commands_index : arguments_index;
+            auto& target_buffer = (tokenize_commands) ? commands : args;
+            auto& target_index  = (tokenize_commands) ? commands_index : args_index;
             if (!append_char(target_buffer, target_index, key)) [[unlikely]] {
                 static const char* command_buffer_error_message  = "Command buffer";
                 static const char* argument_buffer_error_message = "Argument buffer";
@@ -78,16 +78,16 @@ namespace shell
         }
 
         commands[commands_index]   = '\0';
-        arguments[arguments_index] = '\0';
+        args[args_index] = '\0';
 
         return true;
     }
 
     bool Shell::validate_tokens() noexcept {
-        if (commands_index == 0 && arguments_index > 0) [[unlikely]] {
+        if (commands_index == 0 && args_index > 0) [[unlikely]] {
             set_error_message_text_color();
 
-            static const char* error_message = "Error: arguments without command.\n\n";
+            static const char* error_message = "Error: args without command.\n\n";
             runtime::Text_Output::put_string(error_message);
         
             set_default_text_color();
@@ -108,7 +108,7 @@ namespace shell
         const uint32_t command_hash = make_hash(commands.data());
         for (const auto& entry : shell_command_table) [[likely]]
             if (entry.hash == command_hash) {
-                entry.function(arguments);
+                entry.function(args);
                 return;
             }
 
@@ -126,11 +126,11 @@ namespace shell
     constexpr void Shell::flush_shell_pipeline() noexcept {
         input_buffer.fill('\0');
         commands.fill('\0');
-        arguments.fill('\0');
+        args.fill('\0');
 
         input_buffer_index = 0;
         commands_index     = 0;
-        arguments_index    = 0;
+        args_index    = 0;
     }
 
     void Shell::step(const char& key) {

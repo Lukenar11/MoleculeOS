@@ -17,7 +17,7 @@ NOTES:
 
 namespace shell::commands
 {
-    Parsed_File_Name& parse_filename(const runtime::Array<char, 64>& arguments) noexcept {
+    Parsed_File_Name& parse_filename(const runtime::Array<char, 64>& args) noexcept {
         static Parsed_File_Name parsed_filename;
 
         parsed_filename.name.fill('\0');
@@ -28,25 +28,25 @@ namespace shell::commands
         uint32_t file_format_index = 0;
         bool is_file_name          = true;
 
-        if (arguments[0] == '\0') [[unlikely]] {
+        if (args[0] == '\0') [[unlikely]] {
             static const char* error_message = "missing argument";
             runtime::String_Manipulation::copy_string(parsed_filename.error.data(), 
                                                       error_message);
             return parsed_filename;
         }
     
-        for (uint32_t i = 0; arguments[i] != '\0'; i++) [[likely]] {
-            if (arguments[i] == '.') {
+        for (uint32_t i = 0; args[i] != '\0'; i++) [[likely]] {
+            if (args[i] == '.') {
                 is_file_name = false;
                 continue;
             }
 
-            if (arguments[i] == '\0') [[unlikely]]
+            if (args[i] == '\0') [[unlikely]]
                 break;
 
             if ((is_file_name && !append_char(parsed_filename.name, 
                                               file_name_index, 
-                                              arguments[i])) ||
+                                              args[i])) ||
                 (file_name_index >= kernel::filesystem::MAX_FILENAME_LENGTH)) {
                 static const char* error_message = "filename too long";
                 runtime::String_Manipulation::copy_string(parsed_filename.error.data(),
@@ -57,7 +57,7 @@ namespace shell::commands
             
             if (!(is_file_name || append_char(parsed_filename.format, 
                                               file_format_index, 
-                                              arguments[i])) || 
+                                              args[i])) || 
                 (file_format_index >= kernel::filesystem::MAX_FILE_FORMAT_NAME_LENGTH)) {
                 static const char* error_message = "format too long";
                 runtime::String_Manipulation::copy_string(parsed_filename.error.data(), 

@@ -45,5 +45,5 @@ namespace shell::commands
         runtime::Text_Output::put_char('\n');
     }
 
-    Parsed_File_Name& parse_filename(const runtime::Array<char, 64>& arguments) noexcept;
+    Parsed_File_Name& parse_filename(const runtime::Array<char, 64>& args) noexcept;
 } // namespace shell::commands

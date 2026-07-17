@@ -26,5 +26,5 @@ NOTES:
 
 namespace shell::commands
 {
-    void create(const runtime::Array<char, 64>& arguments) noexcept;
+    void create(const runtime::Array<char, 64>& args) noexcept;
 } // namespace shell::commands

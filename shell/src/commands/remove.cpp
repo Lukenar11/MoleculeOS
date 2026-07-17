@@ -22,10 +22,10 @@ NOTES:
 
 namespace shell::commands
 {
-    void remove(const runtime::Array<char, 64>& arguments) noexcept {
+    void remove(const runtime::Array<char, 64>& args) noexcept {
         static const char* command_name = "remove: ";
 
-        Parsed_File_Name parsed = parse_filename(arguments);
+        Parsed_File_Name parsed = parse_filename(args);
         if (parsed.error.data()[0] != '\0') [[unlikely]] {
             print_command_error(command_name);
             print_command_error(parsed.error.data());

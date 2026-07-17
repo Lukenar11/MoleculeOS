@@ -318,9 +318,9 @@ Examples (without exceeding the character limit):
     return (number < 10) ? '0' : 'A';
 ```
 
-### Function Calls with Long Arguments
+### Function Calls with Long args
 
-Example (with long arguments):
+Example (with long args):
 
 ```cpp
     kernel::system::panic(
@@ -329,7 +329,7 @@ Example (with long arguments):
     );
 ```
 
-Example (with short arguments):
+Example (with short args):
 
 ```cpp
     runtime::text_output.put_string("Hello, World!\n");
@@ -1049,7 +1049,7 @@ The shell consists of two modules: the interpreter and the command implementatio
 and the only link between them is the **shell_command_table** in the interpreter
 - `interpreter` is responsible for providing an argument array, 
 calling the respective command implementations via the **shell_command_table**, and analyzing and handling syntax errors and buffer errors.
-- The command implementation is responsible for parsing the passed arguments and handling any errors.
+- The command implementation is responsible for parsing the passed args and handling any errors.
 - Must not access the hardware directly
 - Must not use drivers directly
 - The interpreter must not be aware of the commands' logic, except for their function pointers.

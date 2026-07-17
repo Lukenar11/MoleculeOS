@@ -23,7 +23,7 @@ NOTES:
 namespace
 {
     auto& extract_file_instream_befor_redict_operator(const char* redict_operator_pos, 
-                                                      const runtime::Array<char, 64>& arguments)
+                                                      const runtime::Array<char, 64>& args)
                                                       noexcept {
         const char null_char = '\0';
         static runtime::Array<char, 64> file_instream;
@@ -34,12 +34,12 @@ namespace
 
         uint32_t j = 0;
 
-        uint32_t file_instream_end = redict_operator_pos - arguments.begin();
+        uint32_t file_instream_end = redict_operator_pos - args.begin();
         for (uint32_t i = 0; i < file_instream_end; i++) {
-            if (arguments[i] == null_char) [[unlikely]]
+            if (args[i] == null_char) [[unlikely]]
                 break;
 
-            file_instream[j++] = arguments[i];
+            file_instream[j++] = args[i];
         }
 
         file_instream[j] = null_char;
@@ -47,7 +47,7 @@ namespace
     }
 
     auto& extract_filename_after_input_redirect(const char* redict_operator_pos,
-                                                const runtime::Array<char,64>& arguments)
+                                                const runtime::Array<char,64>& args)
                                                 noexcept {
         const char null_char  = '\0';
         const char space_char = ' ';
@@ -58,19 +58,19 @@ namespace
         if (!redict_operator_pos) [[unlikely]]
             return filename;
 
-        uint32_t i = (redict_operator_pos - arguments.begin()) + 1;
+        uint32_t i = (redict_operator_pos - args.begin()) + 1;
 
-        while (arguments[i] == space_char) 
+        while (args[i] == space_char) 
             i++;
 
-        if (arguments[i] == null_char) {
+        if (args[i] == null_char) {
             shell::commands::print_command_error("echo: missing filename\n");
             return filename;
         }
 
         uint32_t j = 0;
-        for (; i < arguments.size(); i++) {
-            char argument = arguments[i];
+        for (; i < args.size(); i++) {
+            char argument = args[i];
             if ((argument == space_char) || (argument == null_char))
                 break;
         
@@ -82,7 +82,7 @@ namespace
     }
 
     auto& extract_text_after_redict_operator(const char* redict_operator_pos, 
-                                             const runtime::Array<char, 64>& arguments)
+                                             const runtime::Array<char, 64>& args)
                                              noexcept {
         const char null_char  = '\0';
         const char space_char = ' ';
@@ -93,11 +93,11 @@ namespace
         if (!redict_operator_pos) [[unlikely]]
             return filename;
 
-        uint32_t i = (redict_operator_pos - arguments.begin()) + 1;
-        while (arguments[i] == space_char)
+        uint32_t i = (redict_operator_pos - args.begin()) + 1;
+        while (args[i] == space_char)
             i++;
 
-        if (arguments[i] == null_char) {
+        if (args[i] == null_char) {
             shell::commands::print_command_error("echo: missing filename\n");
 
             filename[0] = null_char;
@@ -105,8 +105,8 @@ namespace
         }
 
         uint32_t j = 0;
-        for (; i < arguments.size(); i++) {
-            const char argument = arguments[i];
+        for (; i < args.size(); i++) {
+            const char argument = args[i];
             if ((argument == space_char) || (argument == null_char)) [[unlikely]]
                 break;
 
@@ -197,10 +197,10 @@ void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
 
 namespace shell::commands
 {
-    void echo(const runtime::Array<char, 64>& arguments) noexcept {
+    void echo(const runtime::Array<char, 64>& args) noexcept {
         const char* command_name = "echo: ";
 
-        if (arguments[0] == '\0') [[unlikely]] {
+        if (args[0] == '\0') [[unlikely]] {
             print_command_error(command_name);
             print_command_error("missing argument");
 
@@ -213,7 +213,7 @@ namespace shell::commands
         const char null_char = '\0';
 
         const char* file_outstrem_redict_operator_pos = runtime::String_Manipulation::
-                                                        find_char_in_string(arguments.begin(),
+                                                        find_char_in_string(args.begin(),
                                                                             '<');
 
         if (file_outstrem_redict_operator_pos != nullptr) {
@@ -229,7 +229,7 @@ namespace shell::commands
             }
         
             filename = extract_filename_after_input_redirect(file_outstrem_redict_operator_pos,
-                                                             arguments);
+                                                             args);
         
             handle_file_outstream(filename);
         
@@ -242,7 +242,7 @@ namespace shell::commands
 
         const char* file_intstrem_redict_operator_pos = 
             runtime::String_Manipulation::find_char_in_string(
-                arguments.begin(), 
+                args.begin(), 
                 '>'
             );
         if (file_intstrem_redict_operator_pos != nullptr) {
@@ -259,10 +259,10 @@ namespace shell::commands
             
             file_stream = 
                 extract_file_instream_befor_redict_operator(file_intstrem_redict_operator_pos,
-                                                            arguments);
+                                                            args);
 
             filename = extract_text_after_redict_operator(file_intstrem_redict_operator_pos, 
-                                                          arguments);
+                                                          args);
 
             handle_file_instream(filename, file_stream);
 
@@ -273,7 +273,7 @@ namespace shell::commands
             return;
         }
 
-        runtime::Text_Output::put_string(arguments.data());
+        runtime::Text_Output::put_string(args.data());
 
         command_end();
     }

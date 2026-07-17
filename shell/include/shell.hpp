@@ -8,7 +8,7 @@ DESCRIPTION:
     This is the command interpreter used by the MoleculeOS shell. 
         
     The interpreter receives raw keyboard input, 
-    tokenizes the input string, separates command and arguments,
+    tokenizes the input string, separates command and args,
     and dispatches the 
     appropriate handler based on a compile‑time hash lookup table.
     
@@ -46,15 +46,15 @@ namespace
     }
 
     constexpr shell::Command_Entry shell_command_table[] = {
-        {make_hash("help"),     [](auto& _)         -> void {shell::commands::help();}},
-        {make_hash("info"),     [](auto& _)         -> void {shell::commands::info();}},
-        {make_hash("clear"),    [](auto& _)         -> void {shell::commands::clear();}},
-        {make_hash("reboot"),   [](auto& _)         -> void {shell::commands::reboot();}},
-        {make_hash("shutdown"), [](auto& _)         -> void {shell::commands::shutdown();}},
-        {make_hash("echo"),     [](auto& arguments) -> void {shell::commands::echo(arguments);}},
-        {make_hash("create"),   [](auto& arguments) -> void {shell::commands::create(arguments);}},
-        {make_hash("list"),     [](auto& _)         -> void {shell::commands::list();}},
-        {make_hash("remove"),   [](auto& arguments) -> void {shell::commands::remove(arguments);}}
+        {make_hash("help"),     [](auto& _)    -> void {shell::commands::help();}},
+        {make_hash("info"),     [](auto& _)    -> void {shell::commands::info();}},
+        {make_hash("clear"),    [](auto& _)    -> void {shell::commands::clear();}},
+        {make_hash("reboot"),   [](auto& _)    -> void {shell::commands::reboot();}},
+        {make_hash("shutdown"), [](auto& _)    -> void {shell::commands::shutdown();}},
+        {make_hash("echo"),     [](auto& args) -> void {shell::commands::echo(args);}},
+        {make_hash("create"),   [](auto& args) -> void {shell::commands::create(args);}},
+        {make_hash("list"),     [](auto& _)    -> void {shell::commands::list();}},
+        {make_hash("remove"),   [](auto& args) -> void {shell::commands::remove(args);}}
     };
 }
 
@@ -64,11 +64,11 @@ namespace shell
     private:
         runtime::Array<char, 128> input_buffer;
         runtime::Array<char, 64> commands;
-        runtime::Array<char, 64> arguments;
+        runtime::Array<char, 64> args;
 
         uint32_t input_buffer_index = 0;
         uint32_t commands_index = 0;
-        uint32_t arguments_index = 0;
+        uint32_t args_index = 0;
 
         static inline void set_error_message_text_color() noexcept {
             runtime::Text_Output::set_text_color(drivers::vga::Text_Mode_Colors::LIGHT_MAGENTA,
