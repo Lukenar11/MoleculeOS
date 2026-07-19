@@ -24,25 +24,17 @@ namespace kernel::irq
 {
     extern "C"
     void irq_common_handler(Register_Dump* reg_dump) {
-        const uint8_t end_of_interrupt     = 0x20;
-        const uint8_t min_interrupt_vector = 0x28;
-        const uint8_t max_interrupt_vector = 0x2F;
-        const uint8_t max_irq_event_number = 15;
-
         const uint8_t interrupt_vector = reg_dump->interrupt_number;
-        const uint8_t irq_event        = interrupt_vector - end_of_interrupt;
+        const uint8_t irq_event        = interrupt_vector - EOF;
 
-        if ((irq_event <= max_irq_event_number) && 
-            (kernel::irq::irq_handler_table[irq_event].handler != nullptr)) 
-            kernel::irq::irq_handler_table[irq_event].handler(reg_dump);
+        if ((irq_event <= MAX_IRQ_EVENT_NUM) && 
+            (irq_handler_table[irq_event].handler != nullptr)) 
+            irq_handler_table[irq_event].handler(reg_dump);
     
-        if ((interrupt_vector >= min_interrupt_vector) && 
-            (interrupt_vector <= max_interrupt_vector)) {
-            const uint16_t slave_pic_command_port = 0xA0;
-            runtime::byte_output(slave_pic_command_port, end_of_interrupt);
-        }
-    
-        const uint16_t master_pic_command_port = 0x20;
-        runtime::byte_output(master_pic_command_port, end_of_interrupt);
+        if ((interrupt_vector >= MIN_INTERRUPT_VECTOR) && 
+            (interrupt_vector <= MAX_INTERRUPT_VECTOR))
+            runtime::byte_output(SLAVE_PIC_CMD_PORT, EOF);
+
+        runtime::byte_output(MASTER_PIC_CMD_PORT, EOF);
     }
 } // namespace kernel::irq

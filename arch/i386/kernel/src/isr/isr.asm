@@ -9,7 +9,7 @@
 ;     of the Programmable Interrupt Controller (PIC).
 ;
 ; NOTES:
-;     The C interface is a header file called "isr.h".
+;     The interface is a header file called "isr.hpp".
 ;
 
 extern isr_common_handler
