@@ -32,6 +32,7 @@ namespace kernel::system
         }
 
         runtime::byte_output(keyboard_ctrl, reboot_command);
+
         panic("Reboot failed");
     }
 } // namespace kernel::system

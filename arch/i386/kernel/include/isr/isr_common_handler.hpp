@@ -23,7 +23,7 @@ NOTES:
 
 #pragma once
 
-#include "helpers.hpp"
+#include "utils/exception_names.hpp"
 #include "utils/register_dump.hpp"
 #include "system/hang.hpp"
 #include "system/panic.hpp"

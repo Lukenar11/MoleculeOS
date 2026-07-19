@@ -8,7 +8,7 @@
 ;     This file defines the entry point (_start) 
 ;     that is called by an external boot loader (GRUB).
 ;
-;     This entry point initializes the GDT and the stack, 
+;     This entry point initializes the GDT, the stack
 ;     and starts the kernel by calling 'kernel_main'.
 ;
 ; NOTES:
