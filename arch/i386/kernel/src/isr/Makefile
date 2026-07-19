@@ -7,7 +7,7 @@
 OBJS += \
 	$(BUILD)/isr_common_handler.o \
 	$(BUILD)/isr_common_stub.o \
-	$(BUILD)/exception_names.o \
+	$(BUILD)/helpers.o \
 	$(BUILD)/isr.o
 
 $(BUILD)/%.o: arch/i386/kernel/src/isr/%.cpp

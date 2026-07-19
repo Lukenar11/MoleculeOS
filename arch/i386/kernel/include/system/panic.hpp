@@ -18,7 +18,7 @@ NOTES:
 
 #pragma once
 
-#include "isr/utils/exception_names.hpp"
+#include "isr/helpers.hpp"
 #include "system/trigger_interrupt.hpp"
 
 namespace kernel::system

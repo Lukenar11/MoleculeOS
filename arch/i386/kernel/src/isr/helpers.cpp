@@ -11,7 +11,7 @@ DESCRIPTION:
 NOTES:
 */
 
-#include "isr/utils/exception_names.hpp"
+#include "isr/helpers.hpp"
 
 namespace kernel::isr
 {
