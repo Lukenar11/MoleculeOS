@@ -26,12 +26,15 @@
     "C_Cpp.errorSquiggles": "disabled",
     
     "cSpell.words": [
+        "ACPI",
         "Bochs",
         "DRDY",
         "eflags",
+        "endmacro",
         "endrep",
         "insw",
         "intstrem",
+        "iretd",
         "lgdt",
         "lidt",
         "Lukenar",
