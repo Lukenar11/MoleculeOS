@@ -5,6 +5,8 @@
 #include <array.hpp>
 #include <drivers_api.hpp>
 #include <kernel_arch_api.hpp>
+#include <memory_manipulation.hpp>
+#include <string_manipulation.hpp>
 
 namespace tests
 {
@@ -23,7 +25,10 @@ namespace tests
                                         Programmable_Input_Output::status_port()
                                       ));
 
-        if (Programmable_Input_Output::read(sectors, buffer_ptr, lba))
+        if (Programmable_Input_Output::run(drivers::ata::Driver_Operations::READ,
+                                           sectors, 
+                                           buffer_ptr, 
+                                           lba))
             runtime::Text_Output::put_string("\nRead Success\n\n");
         else
             runtime::Text_Output::put_string("\nRead NOT Success\n\n");
@@ -60,7 +65,10 @@ namespace tests
                                         Programmable_Input_Output::status_port()
                                       ));
 
-        if (Programmable_Input_Output::read(sectors, ptr, lba))
+        if (Programmable_Input_Output::run(drivers::ata::Driver_Operations::READ,
+                                           sectors, 
+                                           ptr, 
+                                           lba))
             runtime::Text_Output::put_string("\nRead Success\n\n");
         else
             runtime::Text_Output::put_string("\nRead NOT Success\n\n");
@@ -94,7 +102,10 @@ namespace tests
                                       ));
 
         for (uint32_t lba = 0; lba < 16; ++lba)
-            if (Programmable_Input_Output::read(sectors, buffer_ptr, lba))
+            if (Programmable_Input_Output::run(drivers::ata::Driver_Operations::READ,
+                                               sectors, 
+                                               buffer_ptr, 
+                                               lba))
                 runtime::Text_Output::put_string("\nRead Success\n\n");
             else
                 runtime::Text_Output::put_string("\nRead NOT Success\n\n");
@@ -105,5 +116,28 @@ namespace tests
                                       ));
 
         kernel::system::hang();
+    }
+
+    void read_and_write_sector() noexcept {
+        using namespace drivers::ata;
+
+        runtime::Array<uint16_t, 256> buffer;
+
+        const char* message_to_write = "Dawn of Ashes!";
+        const uint32_t length = runtime::String_Manipulation::get_string_length(message_to_write);
+        
+        buffer.fill(0);
+        runtime::Memory_Manipulation::copy_memory_block(buffer.begin(), 
+                                                        message_to_write, 
+                                                        length);
+
+        uint16_t* buffer_ptr = buffer.begin();
+        int32_t sectors = 1;
+        uint32_t lba = 0;
+        Programmable_Input_Output::run(drivers::ata::Driver_Operations::WRITE, 
+                                       sectors, 
+                                       buffer_ptr, 
+                                       lba);
+        read_sector();
     }
 } // namespace tests

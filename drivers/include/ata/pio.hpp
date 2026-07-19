@@ -7,9 +7,9 @@ LICENSE:
 DESCRIPTION:
     This file implements an ATA-PIO driver.
 
-    This driver receives a relative LBA address, the number of sectors to be read, 
-    and a pointer; it then reads these sectors from the 
-    hard disk using programmable I/O and writes the data to RAM.
+    This driver contains the operation to be performed (READ/WRITE), 
+    a pointer, the number of sectors, the relative LBA address, 
+    and will either perform a hard drive read operation or a hard drive write operation.
 
 NOTES:
     Some methods are defined only in the header file so that the 
@@ -27,6 +27,7 @@ NOTES:
 
 #pragma once
 
+#include "../utils/ata_pio_helpers.hpp"
 #include <stdint.h>
 #include <port_io.hpp>
 #include <kernel_arch_api.hpp>
@@ -58,24 +59,27 @@ namespace drivers::ata
 {
     class Programmable_Input_Output final {
     private:
-        static constexpr uint8_t ATA_BSY      = 0x80;
-        static constexpr uint8_t ATA_DRQ      = 0x08;
-        static constexpr uint8_t ATA_ERR      = 0x01;
-        static constexpr uint8_t ATA_DF       = 0x20;
-        static constexpr uint8_t ATA_DRDY     = 0x40;
-        static constexpr uint8_t ATA_IDENTIFY = 0xEC;
+        static constexpr uint8_t ATA_BSY         = 0x80;
+        static constexpr uint8_t ATA_DRQ         = 0x08;
+        static constexpr uint8_t ATA_ERR         = 0x01;
+        static constexpr uint8_t ATA_DF          = 0x20;
+        static constexpr uint8_t ATA_DRDY        = 0x40;
+        static constexpr uint8_t ATA_IDENTIFY    = 0xEC;
 
-        static constexpr uint32_t ATA_LBA28_OVERFLOW_MARKER = 0xFFFF'FFFF;
-        static constexpr uint32_t ATA_LBA28_MAX_ADDRESS     = 0x0FFF'FFFF;
+        static constexpr uint32_t ATA_LBA28_OVERFLOW_MARKER = 0xFFFFFFFF;
+        static constexpr uint32_t ATA_LBA28_MAX_ADDRESS     = 0x0FFFFFFF;
 
         static constexpr uint8_t SRST              = 0x04;
         static constexpr uint8_t DCR_DEFAULT       = 0x00;
         static constexpr uint8_t BSY               = 0xC0;
         static constexpr uint8_t DRDY              = 0x40;
         static constexpr uint8_t DRIVE_SELECT_BASE = 0x50;
+        static constexpr uint8_t FLUSH_CACHE       = 0xE7;
+        static constexpr uint8_t FLUSH_CACHE_EXT   = 0xEA;
         static constexpr uint8_t READ_SECTORS      = 0x20;
         static constexpr uint8_t READ_SECTORS_EXT  = 0x24;
-
+        static constexpr uint8_t WRITE_SECTORS     = 0x30;
+        static constexpr uint8_t WRITE_SECTORS_EXT = 0x34;
 
         static constexpr uint16_t IDE_PRIMARY_IO_BASE    = 0x1F0;
         static constexpr uint16_t IDE_PRIMARY_DCR_BASE   = 0x3F6;
@@ -105,29 +109,16 @@ namespace drivers::ata
         static inline uint8_t master_save_flags   = 0;
 
         [[nodiscard]]
-        static bool poll_until_drq_or_error() noexcept;
-
-        [[nodiscard]]
-        static bool poll_disk_read(uint16_t*& dest_buffer, 
-                                   uint32_t& command_count, 
-                                   uint32_t& sectors_to_read, 
-                                   uint32_t& relative_lba) noexcept;
-
-        [[nodiscard]]
         static inline constexpr uint8_t shift_and_mask(const uint32_t val,
-                                             const uint32_t shift,
-                                             const uint8_t mask,
-                                             const uint8_t add_mask=0x00) 
-                                             noexcept {
+                                                      const uint32_t shift,
+                                                      const uint8_t mask,
+                                                      const uint8_t add_mask=0x00) 
+                                                      noexcept {
             if (add_mask == 0x00) [[likely]]
                 return static_cast<uint8_t>(((val >> shift) & mask));
             else [[unlikely]]
                 return static_cast<uint8_t>(((val >> shift) & mask) | add_mask);
         }
-
-        static bool pio_disk_read(uint16_t*& dest_buffer, 
-                                  uint32_t& sectors_to_read, 
-                                  uint32_t& relative_lba) noexcept;
 
         static void delay() noexcept;
         static void reset_driver(const uint16_t dcr_port) noexcept;
@@ -141,7 +132,23 @@ namespace drivers::ata
         static bool probe_and_configure_channel(const uint16_t io_port,
                                                 const uint16_t control_reg) 
                                                 noexcept;
-                                      
+
+        [[nodiscard]]
+        static bool poll_until_drq_or_error() noexcept;
+
+        [[nodiscard]]
+        static bool poll_and_read_or_write_disk(Driver_Operations op,
+                                                uint16_t*& buffer, 
+                                                uint32_t& command_count, 
+                                                uint32_t& sector_count, 
+                                                uint32_t& relative_lba) noexcept;
+
+        [[nodiscard]]
+        static bool start_pio_disk_read_or_write(Driver_Operations op,
+                                                 uint16_t*& dest_buffer, 
+                                                 uint32_t& sector_count, 
+                                                 uint32_t& relative_lba) noexcept;
+
     public:
         [[nodiscard]]
         static inline uint16_t status_port() noexcept { 
@@ -155,9 +162,10 @@ namespace drivers::ata
 
         static void init() noexcept;
 
-        static bool read(int32_t& sectors_to_read, 
-                         uint16_t*& dest_buffer, 
-                         uint32_t& relative_lba) noexcept;
+        static bool run(Driver_Operations op,
+                        int32_t& sector_count, 
+                        uint16_t*& buffer, 
+                        uint32_t& relative_lba) noexcept;
 
         Programmable_Input_Output() noexcept  = default;
         ~Programmable_Input_Output() noexcept = default;

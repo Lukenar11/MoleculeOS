@@ -21,6 +21,7 @@ global word_input
 global word_input_stream
 global byte_output
 global word_output
+global word_output_stream
 
 section .text
 
@@ -37,10 +38,15 @@ word_input:
     ret
 
 word_input_stream:
-    mov  dx, [esp+4] 
-    mov ecx, [esp+8] 
-    mov edi, [esp+12]
+    push edi
+
+    mov  dx, [esp+8]
+    mov ecx, [esp+12]
+    mov edi, [esp+16]
+    cld
     rep insw
+
+    pop edi
     ret
 
 byte_output:
@@ -56,8 +62,13 @@ word_output:
     ret
 
 word_output_stream:
-    mov  dx, [esp+4] 
-    mov ecx, [esp+8] 
-    mov edi, [esp+12]
+    push esi
+
+    mov  dx, [esp+8]
+    mov ecx, [esp+12]
+    mov esi, [esp+16]
+    cld
     rep outsw
+
+    pop esi
     ret

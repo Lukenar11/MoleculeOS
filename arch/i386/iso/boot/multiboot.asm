@@ -20,6 +20,8 @@
 ;     The checksum is computed such that:
 ;     magic + flags + checksum == 0 (mod 2^32)
 ;
+;     The magic values must be have this name convention and signature.
+;
 
 section .multiboot
 align 4
