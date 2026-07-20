@@ -5,7 +5,7 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This file contains the high-level text output system, 
+    This file contains the high-level text output sys, 
     which provides formatted and unformatted print functions 
     on the VGA text mode driver.
 

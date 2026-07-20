@@ -8,7 +8,7 @@ DESCRIPTION:
     This file contains the internal implementation of 
     one of the terminal commands available in MoleculeOS.
 
-    This command turns the System off.
+    This command turns the sys off.
 
     The commands can be called by the 
     shell interpreter from a table generated at compile time, 
@@ -27,6 +27,6 @@ NOTES:
 namespace shell::commands
 {
     inline void shutdown() noexcept { 
-        kernel::system::shutdown(); 
+        kernel::sys::shutdown(); 
     }
 } // namespace shell::commands

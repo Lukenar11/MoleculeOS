@@ -13,8 +13,8 @@ NOTES:
 
 #pragma once
 
-#include "kernel/include/filesystem/mofs.hpp"
-#include "kernel/include/filesystem/helpers.hpp"
+#include "kernel/include/filesys/mofs.hpp"
+#include "kernel/include/filesys/helpers.hpp"
 
 #include "kernel/include/heap/block.hpp"
 #include "kernel/include/heap/operator.hpp"

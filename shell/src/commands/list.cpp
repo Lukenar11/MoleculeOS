@@ -26,7 +26,7 @@ namespace shell::commands
         runtime::Text_Output::reset();
         runtime::Text_Output::put_string("Files:\n");
 
-        const auto& files = kernel::filesystem::MoleculeOS_File_System::get_files();
+        const auto& files = kernel::filesys::MoleculeOS_File_sys::get_files();
         for (const auto& file : files) {
             if (!file.in_use)
                 continue;

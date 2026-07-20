@@ -4,9 +4,15 @@
 # https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 # 
 
-OBJS += \
-	$(BUILD)/idt.o \
-	$(BUILD)/load_idt.o
+OBJS += $(BUILD)/idt.o \
+		$(BUILD)/irq_handler.o \
+		$(BUILD)/irq_stub.o \
+		$(BUILD)/irq.o \
+		$(BUILD)/isr_handler.o \
+		$(BUILD)/isr_helpers.o \
+		$(BUILD)/isr_stub.o \
+		$(BUILD)/isr.o \
+		$(BUILD)/load_idt.o \
 
 $(BUILD)/%.o: arch/i386/kernel/src/idt/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

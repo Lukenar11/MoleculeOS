@@ -200,7 +200,7 @@ namespace drivers::ata
                 return;
         }
 
-        kernel::system::panic("ATA init from IDENTIFY failed, no device detected");
+        kernel::sys::panic("ATA init from IDENTIFY failed, no device detected");
     }
 
     bool Programmable_Input_Output::run(const Driver_Operations op,

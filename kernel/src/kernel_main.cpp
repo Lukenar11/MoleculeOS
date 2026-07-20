@@ -8,7 +8,7 @@ DESCRIPTION:
     This file contains the kernel entry point "kernel_main," which
     is called directly after the bootloader hands control over to the kernel.
 
-    The function initializes core subsystems such as the IDT with the
+    The function initializes core subsyss such as the IDT with the
     function "init_kernel", performs a simple interrupt- and 
     endless-loop-driven scheduling, and starts the shell.
 
@@ -26,8 +26,6 @@ NOTES:
 #include <terminal_api.hpp>
 #include <drivers_api.hpp>
 
-#include "tests/ata_pio.hpp"
-
 namespace kernel
 {
     extern "C" [[noreturn]]
@@ -37,15 +35,13 @@ namespace kernel
         heap::Block_Allocator::init(&heap::heap_start, &heap::heap_end);
         drivers::ata::Programmable_Input_Output::init();
 
-        tests::read_sector_with_heap();
-
         // schedule MoleculeOS
         static terminal::Terminal terminal;
         while (true) {
-            system::sleep();
+            sys::sleep();
             terminal.step();
         }
 
-        system::panic("Unexpected return from the \"kernel_main\" scheduler main loop");
+        sys::panic("Unexpected return from the \"kernel_main\" scheduler main loop");
     }
 }

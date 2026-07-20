@@ -43,7 +43,7 @@ namespace tests
                                         Programmable_Input_Output::status_port()
                                       ));
 
-        kernel::system::hang();
+        kernel::sys::hang();
     }
 
     void read_sector_with_heap() noexcept {
@@ -84,7 +84,7 @@ namespace tests
                                       ));
                                       
         delete[] ptr;
-        kernel::system::hang();
+        kernel::sys::hang();
     }
 
     void multiple_reads() {
@@ -115,7 +115,7 @@ namespace tests
                                         Programmable_Input_Output::status_port()
                                       ));
 
-        kernel::system::hang();
+        kernel::sys::hang();
     }
 
     void read_and_write_sector() noexcept {

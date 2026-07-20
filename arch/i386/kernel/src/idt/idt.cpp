@@ -13,7 +13,7 @@ DESCRIPTION:
 
 NOTES:
     The global 'idt' object is created in "init_kernel" 
-    and not directly like other system components in the source file, 
+    and not directly like other sys components in the source file, 
     otherwise the compiler would remove it 
     since it does not see any direct usage related to other components.
 */
@@ -24,9 +24,6 @@ namespace kernel::idt
 {
     void Interrupt_Descriptor_Table::set_gate(const uint8_t index, 
                                               void (*handler)()) noexcept {
-        // if (index >= idt.size()) [[unlikely]]
-        //     system::panic("IDT index out of range", "Check \"idt_init_table\"");
-        
         const uint32_t base = reinterpret_cast<uint32_t>(handler);
 
         IDT_Entry& idt_entry = idt[index];

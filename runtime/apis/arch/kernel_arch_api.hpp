@@ -22,13 +22,13 @@ NOTES:
 #pragma once
 
 #ifdef __I386__
-#include "arch/i386/kernel/include/utils/register_dump.hpp"
+#include "arch/i386/kernel/include/utils/regs.hpp"
 #include "arch/i386/kernel/include/kernel_arch_init.hpp"
-#include "arch/i386/kernel/include/system/cpu_flags.hpp"
-#include "arch/i386/kernel/include/system/enable_interrupts.hpp"
-#include "arch/i386/kernel/include/system/hang.hpp"
-#include "arch/i386/kernel/include/system/reboot.hpp"
-#include "arch/i386/kernel/include/system/shutdown.hpp"
-#include "arch/i386/kernel/include/system/sleep.hpp"
-#include "arch/i386/kernel/include/system/panic.hpp"
+#include "arch/i386/kernel/include/sys/eflags.hpp"
+#include "arch/i386/kernel/include/sys/interrupts.hpp"
+#include "arch/i386/kernel/include/sys/halt.hpp"
+#include "arch/i386/kernel/include/sys/reboot.hpp"
+#include "arch/i386/kernel/include/sys/shutdown.hpp"
+#include "arch/i386/kernel/include/sys/sleep.hpp"
+#include "arch/i386/kernel/include/sys/panic.hpp"
 #endif

@@ -6,7 +6,7 @@ LICENSE:
 
 DESCRIPTION:
     This defines the fixed-width integer types used throughout the
-    system.
+    sys.
 
     These typedefs provide consistent and predictable integer
     sizes across all compilation units, independent of compiler or
@@ -14,12 +14,12 @@ DESCRIPTION:
 
 NOTES:
     This implementation is intentionally minimal and written in C to
-    ensure compatibility with both C and C++ components of the system,
+    ensure compatibility with both C and C++ components of the sys,
     especially those interacting with Assembly routines.
 
-    The system does not rely on the host system's standard library, so
+    The sys does not rely on the host sys's standard library, so
     this header replaces the functionality normally provided by the
-    system's "<stdint.h>".
+    sys's "<stdint.h>".
 */
 
 #ifndef STDINT_H

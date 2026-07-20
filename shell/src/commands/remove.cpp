@@ -34,7 +34,7 @@ namespace shell::commands
             return;
         }
 
-        auto* inode = kernel::filesystem::MoleculeOS_File_System::
+        auto* inode = kernel::filesys::MoleculeOS_File_sys::
                       get_file_by_name_and_format(parsed.name.data(),
                                                   parsed.format.data());
 
@@ -47,7 +47,7 @@ namespace shell::commands
             return;
         }
 
-        kernel::filesystem::MoleculeOS_File_System::delete_file(inode);
+        kernel::filesys::MoleculeOS_File_sys::delete_file(inode);
         command_end();
     }
 } // namespace shell::commands

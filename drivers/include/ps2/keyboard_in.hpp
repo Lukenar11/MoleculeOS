@@ -49,7 +49,7 @@ namespace drivers::ps2
     public:
         static inline runtime::Circular_Buffer<char, ALLOWED_SCANCODE_SIZE> scancode_buffer;
         
-        static void keyboard_irq_handler(kernel::Register_Dump*) noexcept;
+        static void keyboard_irq_handler(kernel::Registers*) noexcept;
     
         Keyboard_Input() noexcept  = default;
         ~Keyboard_Input() noexcept = default;

@@ -6,7 +6,7 @@ LICENSE:
 
 DESCRIPTION:
     This library defines basic routines for memory manipulation
-    that can be used system-wide.
+    that can be used sys-wide.
 
     The routines include copying, moving, comparing, and filling memory
 

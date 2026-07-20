@@ -10,7 +10,7 @@ MoleculeOS Coding & Naming Style Guide
 
 Examples:
 - `PIC_Mapping`
-- `Register_Dump`
+- `Registers`
 - `IDT_INIT_Entry`
 - `Shell`
 
@@ -64,7 +64,7 @@ Examples:
 
 Examples:
 - `drivers/`
-- `filesystem/`
+- `filesys/`
 - `keyboardin/`
 - `arch/`
 
@@ -224,7 +224,7 @@ Example:
 
 ```cpp
     #include "drivers/vga/textmode/include/textmode.hpp"   // needed first
-    #include "kernel/include/system/kernel_system_sleep.h" // needed afterward
+    #include "kernel/include/sys/kernel_sys_sleep.h" // needed afterward
     #include <array>     // used first in the code
     #include <stdint.h>  // used afterward
 ```
@@ -281,7 +281,7 @@ Examples:
 ```
 
 ```cpp
-    namespace kernel::system
+    namespace kernel::sys
     {
         void panic(const char* error_message, 
                    const char* troubleshooting_message) noexcept {
@@ -323,7 +323,7 @@ Examples (without exceeding the character limit):
 Example (with long args):
 
 ```cpp
-    kernel::system::panic(
+    kernel::sys::panic(
         "Unexpected return from the \"kernel_main\" scheduler main loop",
         "This should never happen.\nPlease report this to the developer."
     );
@@ -466,10 +466,10 @@ and may only use the APIs of other components.
 - Classes may contain a maximum of 15 methods
 - A file may be no longer than 350 lines
 - Enums, structs, and classes must be marked as `final`.
-- Classes may only be used for encapsulation and for the constructor and destructor system
+- Classes may only be used for encapsulation and for the constructor and destructor sys
 - A class that does not use a constructor, destructor, or both must mark them as `noexcept` and `default` in the header
 - Anything that can be named (e.g., functions, variables) must not use abbreviations unless they are widely recognized 
-(both in the scripting language community and in the system programming community) and should be written out clearly and self-explanatorily.
+(both in the scripting language community and in the sys programming community) and should be written out clearly and self-explanatorily.
 - Even if only a header is needed, you must create an empty source file containing the header comment and an include statement for the header, 
 to maintain a consistent file structure.
 - The empty .cpp file contains only header includes and header comments.
@@ -933,7 +933,7 @@ Each driver is a **standalone block** that contains **various modules**:
 
 - Drivers must **not** depend on one another  
 - Drivers must use **only runtime**  
-- Drivers must **not directly** call kernel subsystems  
+- Drivers must **not directly** call kernel subsyss  
 - Drivers should be as **simple** as possible and serve only as a **HAL (Hardware Abstraction Layer)**
 - Each new driver must be included in the file `runtime\apis\drivers_api.hpp`.
 - Even internal runtime components, such as “text_output,” must use the central APIs.
@@ -987,11 +987,11 @@ Each driver is a **standalone block** that contains **various modules**:
 
 ## 3.8 Kernel Structure
 
-The kernel consists of clearly separated subsystems
+The kernel consists of clearly separated subsyss
 
 ### Rules
 
-- Each subsystem has **a clearly defined area of responsibility**  
+- Each subsys has **a clearly defined area of responsibility**  
 - No mixing of logic  
 - No global variables except for intentionally defined kernel singletons
 - As few dependencies as possible between its components
@@ -1004,7 +1004,7 @@ The kernel consists of clearly separated subsystems
     |   |
     |   ├── utils/
     |   |
-    |   |   # Kernel Subsystem/Komponente structure
+    |   |   # Kernel Subsys/Komponente structure
     |   ├── heap/
     |   |   |
     |   |   ├── utils/
@@ -1013,14 +1013,14 @@ The kernel consists of clearly separated subsystems
     |   |   |
     |   |   └── ...
     |   |
-    |   |   # Kernel Subsystems/Komponentes
+    |   |   # Kernel Subsyss/Komponentes
     |   └── ...
     |
     └── src/
         |
         ├── utils/
         |
-        |   # Kernel Subsystem/Komponente structure
+        |   # Kernel Subsys/Komponente structure
         ├── idt/
         |   |
         |   ├── utils/
@@ -1029,7 +1029,7 @@ The kernel consists of clearly separated subsystems
         |   |
         |   └── ...
         |
-        |   # Kernel Subsystems/Komponentes
+        |   # Kernel Subsyss/Komponentes
         ├── ...
         |
         └── kernel_main.cpp
@@ -1104,7 +1104,7 @@ The commands must have no connection to the interpreter, except for the argument
 The terminal is a high-level UI that uses the keyboard driver and the shell internally.
 
 ### Rules
-- It should interact as little as possible with other system components
+- It should interact as little as possible with other sys components
 - It does not execute or contain any logic directly in the background
 - It passes commands to the shell character by character
 - It does not execute commands.
@@ -1175,7 +1175,7 @@ The `arch/` directory contains all architecture-specific code
 - No RTTI (`dynamic_cast` and `typeid` are prohibited)
 - No recursion
 - No virtual methods
-- No dynamic memory allocation, unless explicitly permitted by the subsystem
+- No dynamic memory allocation, unless explicitly permitted by the subsys
 - No use of the C++ Standard Library
 - No global variables except for intentionally defined singletons
 - All functions must be `noexcept`, unless this is impossible

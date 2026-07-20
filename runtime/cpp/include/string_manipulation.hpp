@@ -6,7 +6,7 @@ LICENSE:
 
 DESCRIPTION:
     This library defines basic routines for string manipulation
-    that can be used system-wide.
+    that can be used sys-wide.
 
     The routines include copying, shifting, comparing, and filling strings
 

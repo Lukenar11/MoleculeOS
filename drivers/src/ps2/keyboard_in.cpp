@@ -66,7 +66,7 @@ namespace drivers::ps2
         return character;
     }
 
-    void Keyboard_Input::keyboard_irq_handler(kernel::Register_Dump*) noexcept {
+    void Keyboard_Input::keyboard_irq_handler(kernel::Registers*) noexcept {
         if (!has_pending_scancode()) [[unlikely]]
             return;
 

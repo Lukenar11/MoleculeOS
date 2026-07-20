@@ -133,15 +133,15 @@ namespace
         }
     
         auto* inode = 
-            kernel::filesystem::MoleculeOS_File_System::
+            kernel::filesys::MoleculeOS_File_sys::
             get_file_by_name_and_format(parsed_filename.name.data(),
                                         parsed_filename.format.data());
         if (!inode)
-            inode = kernel::filesystem::MoleculeOS_File_System::
+            inode = kernel::filesys::MoleculeOS_File_sys::
                     create_file(parsed_filename.name.data(),
                                 parsed_filename.format.data());
 
-        kernel::filesystem::MoleculeOS_File_System::
+        kernel::filesys::MoleculeOS_File_sys::
         set_file_content_as_string(inode,
                                    file_instream.data(),
                                    runtime::
@@ -152,7 +152,7 @@ namespace
 void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
     const char* command_name = "echo: ";
 
-    static runtime::Array<char, kernel::filesystem::MAX_FILE_SIZE> buffer;
+    static runtime::Array<char, kernel::filesys::MAX_FILE_SIZE> buffer;
     buffer.fill('\0');
 
     static shell::commands::Parsed_File_Name parsed_filename;
@@ -167,7 +167,7 @@ void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
         return;
     }
 
-    auto* inode = kernel::filesystem::MoleculeOS_File_System::
+    auto* inode = kernel::filesys::MoleculeOS_File_sys::
                   get_file_by_name_and_format(parsed_filename.name.data(),
                                               parsed_filename.format.data());
     if (!inode) {
@@ -183,7 +183,7 @@ void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
         return;
     }
 
-    if (!kernel::filesystem::MoleculeOS_File_System::get_file_content_as_string(inode,
+    if (!kernel::filesys::MoleculeOS_File_sys::get_file_content_as_string(inode,
                                                                                 buffer.data(),
                                                                                 needed_size)) {
         shell::commands::print_command_error(command_name);

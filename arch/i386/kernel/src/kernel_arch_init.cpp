@@ -6,7 +6,7 @@ LICENSE:
 
 DESCRIPTION:
     The function "kernel_arch_init" is calls from "kernel_main" and 
-    initializes core subsystems such as the IDT and remap the PIC.
+    initializes core subsyss such as the IDT and remap the PIC.
 
 NOTES:
 */
@@ -41,6 +41,6 @@ namespace kernel
         for (const auto& entry : pic_mappings)
             runtime::byte_output(entry.port, entry.value);
 
-        system::enable_interrupts();
+        sys::enable_interrupts();
     }
 } // namespace kernel

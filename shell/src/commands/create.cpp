@@ -34,7 +34,7 @@ namespace shell::commands
             return;
         }
 
-        auto* inode = kernel::filesystem::MoleculeOS_File_System::create_file(parsed.name.data(),
+        auto* inode = kernel::filesys::MoleculeOS_File_sys::create_file(parsed.name.data(),
                                                                               parsed.format.data());
         if (!inode) [[unlikely]] {
             static const char* error_message = "file does already exists";

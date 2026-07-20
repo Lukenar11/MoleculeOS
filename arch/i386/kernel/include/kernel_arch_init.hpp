@@ -6,7 +6,7 @@ LICENSE:
 
 DESCRIPTION:
     The function "kernel_arch_init" is calles from "kernel_main" and 
-    initializes core subsystems such as the IDT and remap the PIC.
+    initializes core subsyss such as the IDT and remap the PIC.
 
 NOTES:
 */
@@ -14,7 +14,7 @@ NOTES:
 #pragma once
 
 #include "idt/idt.hpp"
-#include "system/enable_interrupts.hpp"
+#include "sys/interrupts.hpp"
 #include <stdint.h>
 #include <io_arch_api.hpp>
 

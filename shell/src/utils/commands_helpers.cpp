@@ -47,7 +47,7 @@ namespace shell::commands
             if ((is_file_name && !append_char(parsed_filename.name, 
                                               file_name_index, 
                                               args[i])) ||
-                (file_name_index >= kernel::filesystem::MAX_FILENAME_LENGTH)) {
+                (file_name_index >= kernel::filesys::MAX_FILENAME_LENGTH)) {
                 static const char* error_message = "filename too long";
                 runtime::String_Manipulation::copy_string(parsed_filename.error.data(),
                                                           error_message);
@@ -58,7 +58,7 @@ namespace shell::commands
             if (!(is_file_name || append_char(parsed_filename.format, 
                                               file_format_index, 
                                               args[i])) || 
-                (file_format_index >= kernel::filesystem::MAX_FILE_FORMAT_NAME_LENGTH)) {
+                (file_format_index >= kernel::filesys::MAX_FILE_FORMAT_NAME_LENGTH)) {
                 static const char* error_message = "format too long";
                 runtime::String_Manipulation::copy_string(parsed_filename.error.data(), 
                                                           error_message);
@@ -70,7 +70,7 @@ namespace shell::commands
         parsed_filename.format[file_format_index + 1] = '\0';
     
         for (uint32_t i = 0; parsed_filename.name[i] != '\0'; i++)
-            if (!kernel::filesystem::MoleculeOS_File_System::
+            if (!kernel::filesys::MoleculeOS_File_sys::
                  is_valid_file_name_or_formant_char(parsed_filename.name[i])) {
                 static const char* error_message = "not a valid File Name";
                 runtime::String_Manipulation::copy_string(parsed_filename.error.data(),
@@ -79,7 +79,7 @@ namespace shell::commands
             }
 
         for (uint32_t i = 0; parsed_filename.format[i] != '\0'; i++)
-            if (!kernel::filesystem::MoleculeOS_File_System::
+            if (!kernel::filesys::MoleculeOS_File_sys::
                  is_valid_file_name_or_formant_char(parsed_filename.format[i])) {
                 static const char* error_message = "not a valid File Format";
                 runtime::String_Manipulation::copy_string(parsed_filename.error.data(), 

@@ -9,7 +9,7 @@ OBJS += $(BUILD)/mofs.o \
 		$(BUILD)/operator.o \
 		$(BUILD)/kernel_main.o \
 
-$(BUILD)/%.o: kernel/src/filesystem/%.cpp
+$(BUILD)/%.o: kernel/src/filesys/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD)/%.o: kernel/src/heap/%.cpp

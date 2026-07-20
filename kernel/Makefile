@@ -5,7 +5,7 @@
 # 
 
 COMMON_FLAGS += -Ikernel/include \
-				-Ikernel/include/filesystem \
+				-Ikernel/include/filesys \
 				-Ikernel/include/heap \
 
 include kernel/src/Makefile

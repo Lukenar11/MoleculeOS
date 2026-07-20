@@ -12,8 +12,8 @@ DESCRIPTION:
     command interpreter, and manages the execution flow of user commands.
     
     The shell acts as a central, 
-    user-visible system element that coordinates input processing, 
-    command parsing, and output through the kernel's text output subsystem.
+    user-visible sys element that coordinates input processing, 
+    command parsing, and output through the kernel's text output subsys.
     
     The shell also provides a cursor and cursor blink for the user.
         

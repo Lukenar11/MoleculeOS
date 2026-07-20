@@ -15,7 +15,7 @@
             "name": "Run MoleculeOS in QEMU",
             "type": "cppdbg",
             "request": "launch",
-            "program": "/usr/bin/qemu-system-i386",
+            "program": "/usr/bin/qemu-sys-i386",
             "args": [
                 "-cdrom",
                 "${workspaceFolder}/build/MoleculeOS.iso"

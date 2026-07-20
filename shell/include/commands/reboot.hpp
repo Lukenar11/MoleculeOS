@@ -8,7 +8,7 @@ DESCRIPTION:
     This file contains the internal implementation of 
     one of the terminal commands available in MoleculeOS.
 
-    This command restarts the system.
+    This command restarts the sys.
 
     The commands can be called by the 
     shell interpreter from a table generated at compile time, 
@@ -27,6 +27,6 @@ NOTES:
 namespace shell::commands
 {
     inline void reboot() noexcept { 
-        kernel::system::reboot(); 
+        kernel::sys::reboot(); 
     }
 } // namespace shell::commands

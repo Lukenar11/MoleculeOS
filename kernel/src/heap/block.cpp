@@ -5,7 +5,7 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This class defines the entire system heap using a block allocator.
+    This class defines the entire sys heap using a block allocator.
     The allocator uses linker-defined symbols 
     ("heap_start" and "heap_end") to determine the valid heap area and 
     moves a single pointer with each allocation by the amount x.
@@ -22,13 +22,13 @@ namespace kernel::heap
         const uint32_t end_addr   = reinterpret_cast<uint32_t>(end);
 
         if (end_addr <= start_addr) [[unlikely]]
-            system::panic("Invalid memory range for heap initialization");
+            sys::panic("Invalid memory range for heap initialization");
 
         const uint32_t total_raw_bytes = static_cast<uint32_t>(end_addr - start_addr);
         total_memory_blocks            = total_raw_bytes / (MEMORY_BLOCK_BYTE_SIZE +
                                          sizeof(uint16_t) + sizeof(uint8_t));
         if (total_memory_blocks <= 0) [[unlikely]]
-            system::panic("Heap area too small");
+            sys::panic("Heap area too small");
 
         allocation_sizes   = reinterpret_cast<uint16_t*>(start_addr);
         free_memory_blocks = reinterpret_cast<bool*>(start_addr + 
@@ -85,7 +85,7 @@ namespace kernel::heap
     [[nodiscard]]
     void* Block_Allocator::allocate(const uint32_t allocated_bytes) noexcept {
         if (memory_pool_ptr == nullptr) [[unlikely]]
-            system::panic("Block allocator not initialized");
+            sys::panic("Block allocator not initialized");
 
         if (allocated_bytes == 0) [[unlikely]]
             return nullptr;
@@ -115,17 +115,17 @@ namespace kernel::heap
         const uint8_t* block_ptr = reinterpret_cast<uint8_t*>(ptr);
         if (block_ptr < memory_pool_ptr || 
             block_ptr >= memory_pool_ptr + required_memory_pool_space) [[unlikely]]
-            system::panic("Attempted to free pointer outside heap");
+            sys::panic("Attempted to free pointer outside heap");
 
         const uint32_t memory_offset = static_cast<uint32_t>(block_ptr - memory_pool_ptr);
         if (memory_offset % MEMORY_BLOCK_BYTE_SIZE != 0) [[unlikely]]
-            system::panic("Attempted to free misaligned pointer");
+            sys::panic("Attempted to free misaligned pointer");
 
         const uint32_t memory_pool_start_index = memory_offset / MEMORY_BLOCK_BYTE_SIZE;
         const uint32_t memory_blocks_to_free = allocation_sizes[memory_pool_start_index];
 
         if (memory_blocks_to_free == 0) [[unlikely]]
-            system::panic("Double free or freeing memory that was not allocated");
+            sys::panic("Double free or freeing memory that was not allocated");
 
         const bool _true = true;
         for (uint32_t i = 0; i < memory_blocks_to_free; ++i)
