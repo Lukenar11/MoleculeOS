@@ -24,9 +24,9 @@ NOTES:
 
 #include "filesys/helpers.hpp"
 #include <array.hpp>
-#include <kernel_arch_api.hpp>
-#include <memory_manipulation.hpp>
-#include <string_manipulation.hpp>
+#include <kernel_api.hpp>
+#include <memory_manip.hpp>
+#include <string_manip.hpp>
 #include <stdint.h>
 
 namespace

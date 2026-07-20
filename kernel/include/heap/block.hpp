@@ -18,7 +18,7 @@ NOTES:
 #include "heap/helpers.hpp"
 #include <stdint.h>
 #include <array.hpp>
-#include <kernel_arch_api.hpp>
+#include <kernel_api.hpp>
 #include <text_output.hpp>
 
 namespace kernel::heap

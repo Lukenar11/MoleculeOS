@@ -22,7 +22,7 @@ NOTES:
 */
 
 #include "heap/helpers.hpp"
-#include <kernel_arch_api.hpp>
+#include <kernel_api.hpp>
 #include <terminal_api.hpp>
 #include <drivers_api.hpp>
 

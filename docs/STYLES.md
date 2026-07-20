@@ -573,7 +573,7 @@ A practical example of all the rules:
 
     #include "utils/helpers.hpp"
     #include <stdint.h>
-    #include <io_arch_api.hpp>
+    #include <io_api.hpp>
 
     namespace drivers::ps2 
     {
@@ -946,7 +946,7 @@ Each driver is a **standalone block** that contains **various modules**:
     runtime/
     │   # Central APIs (e.g. "drivers_api.hpp", "drivers_api.hpp")
     ├─ apis/
-    │   │   # Standard APIs for architecture-specific components (e.g. "kernel_arch_api.hpp", "io_arch_api.hpp")
+    │   │   # Standard APIs for architecture-specific components (e.g. "kernel_arch_api.hpp", "io_api.hpp")
     │   ├── arch/
     │   |   |   
     │   |   └── ... *.hpp / *.h

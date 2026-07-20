@@ -30,7 +30,7 @@ NOTES:
 #include "../utils/ata_pio_helpers.hpp"
 #include <stdint.h>
 #include <port_io.hpp>
-#include <kernel_arch_api.hpp>
+#include <kernel_api.hpp>
 #include <array.hpp>
 
 namespace

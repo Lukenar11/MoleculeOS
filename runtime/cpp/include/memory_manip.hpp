@@ -21,7 +21,7 @@ NOTES:
 
 namespace runtime
 {
-    class Memory_Manipulation final {
+    class memory_manip final {
     public:
         static inline void* copy_memory_block(void* dest_ptr, 
                                               const void* src_ptr, 
@@ -81,7 +81,7 @@ namespace runtime
             return 0;
         }
 
-        Memory_Manipulation() noexcept  = default;
-        ~Memory_Manipulation() noexcept = default;
+        memory_manip() noexcept  = default;
+        ~memory_manip() noexcept = default;
     };
 } // namespace runtime

@@ -4,9 +4,9 @@
 #include <text_output.hpp>
 #include <array.hpp>
 #include <drivers_api.hpp>
-#include <kernel_arch_api.hpp>
-#include <memory_manipulation.hpp>
-#include <string_manipulation.hpp>
+#include <kernel_api.hpp>
+#include <memory_manip.hpp>
+#include <string_manip.hpp>
 
 namespace tests
 {
@@ -127,7 +127,7 @@ namespace tests
         const uint32_t length = runtime::String_Manipulation::get_string_length(message_to_write);
         
         buffer.fill(0);
-        runtime::Memory_Manipulation::copy_memory_block(buffer.begin(), 
+        runtime::memory_manip::copy_memory_block(buffer.begin(), 
                                                         message_to_write, 
                                                         length);
 

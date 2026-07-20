@@ -17,7 +17,7 @@ NOTES:
 #include "sys/panic.hpp"
 #include <stdint.h>
 #include <drivers_api.hpp>
-#include <io_arch_api.hpp>
+#include <io_api.hpp>
 
 namespace kernel::sys
 {

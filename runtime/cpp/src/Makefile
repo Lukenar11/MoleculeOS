@@ -4,16 +4,11 @@
 # https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 # 
 
-OBJS += \
-	$(BUILD)/text_output.o \
-	$(BUILD)/memory_manipulation.o \
-	$(BUILD)/string_manipulation.o \
-	$(BUILD)/compiler_c_api.o \
-	$(BUILD)/text_output.o \
-	$(BUILD)/circular_buffer.o \
-	$(BUILD)/memory_manipulation.o \
-	$(BUILD)/string_manipulation.o \
-	$(BUILD)/compiler_c_api.o \
+OBJS += $(BUILD)/text_output.o \
+		$(BUILD)/memory_manip.o \
+		$(BUILD)/circular_buffer.o \
+		$(BUILD)/string_manip.o \
+		$(BUILD)/compiler_c_api.o \
 
 $(BUILD)/%.o: runtime/cpp/src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

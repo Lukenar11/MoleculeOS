@@ -24,8 +24,12 @@ NOTES:
 #include "../utils/ps2_keyboard_in_helpers.hpp"
 #include <stdint.h>
 #include <circular_buffer.hpp>
-#include <io_arch_api.hpp>
-#include <kernel_arch_api.hpp>
+#include <io_api.hpp>
+#include <kernel_api.hpp>
+
+namespace kernel {
+    struct Registers;
+}
 
 namespace drivers::ps2 
 {

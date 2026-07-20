@@ -18,3 +18,17 @@ NOTES:
 
 #include "kernel/include/heap/block.hpp"
 #include "kernel/include/heap/operator.hpp"
+
+#ifdef __I386__
+#include "arch/i386/kernel/include/utils/regs.hpp"
+
+#include "arch/i386/kernel/include/kernel_arch_init.hpp"
+
+#include "arch/i386/kernel/include/sys/eflags.hpp"
+#include "arch/i386/kernel/include/sys/interrupts.hpp"
+#include "arch/i386/kernel/include/sys/halt.hpp"
+#include "arch/i386/kernel/include/sys/reboot.hpp"
+#include "arch/i386/kernel/include/sys/shutdown.hpp"
+#include "arch/i386/kernel/include/sys/sleep.hpp"
+#include "arch/i386/kernel/include/sys/panic.hpp"
+#endif

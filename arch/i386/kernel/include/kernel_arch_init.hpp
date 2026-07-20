@@ -16,7 +16,7 @@ NOTES:
 #include "idt/idt.hpp"
 #include "sys/interrupts.hpp"
 #include <stdint.h>
-#include <io_arch_api.hpp>
+#include <io_api.hpp>
 
 namespace kernel
 {

@@ -20,7 +20,7 @@ NOTES:
 #include <text_output.hpp>
 #include <stdint.h>
 #include <array.hpp>
-#include <string_manipulation.hpp>
+#include <string_manip.hpp>
 
 namespace shell::commands
 {

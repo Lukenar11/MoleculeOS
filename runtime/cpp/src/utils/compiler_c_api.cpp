@@ -22,19 +22,19 @@ NOTES:
 extern "C"
 {
     void* memcpy(void* dest_ptr, const void* src_ptr, uint32_t size) {
-        return runtime::Memory_Manipulation::copy_memory_block(dest_ptr, src_ptr, size);
+        return runtime::memory_manip::copy_memory_block(dest_ptr, src_ptr, size);
     }
 
     void* memmove(void* dest_ptr, const void* src_ptr, uint32_t size) {
-        return runtime::Memory_Manipulation::move_memory_block(dest_ptr, src_ptr, size);
+        return runtime::memory_manip::move_memory_block(dest_ptr, src_ptr, size);
     }
 
     void* memset(void* dest_ptr, int32_t value, uint32_t size) {
-        return runtime::Memory_Manipulation::set_memory_block(dest_ptr, value, size);
+        return runtime::memory_manip::set_memory_block(dest_ptr, value, size);
     }
 
     int32_t memcmp(const void* a_ptr, const void* b_ptr, uint32_t size) {
-        return runtime::Memory_Manipulation::compare_memory_block(a_ptr, b_ptr, size);
+        return runtime::memory_manip::compare_memory_block(a_ptr, b_ptr, size);
     }
 
     void strncpy(char* dest_ptr, const char* src_ptr, uint32_t size) {

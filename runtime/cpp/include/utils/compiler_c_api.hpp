@@ -17,8 +17,8 @@ NOTES:
     The actual API used by the compiler is the file "string.h".
 */
 
-#include <memory_manipulation.hpp>
-#include <string_manipulation.hpp>
+#include <memory_manip.hpp>
+#include <string_manip.hpp>
 
 extern "C"
 {

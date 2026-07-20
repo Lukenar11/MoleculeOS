@@ -5,14 +5,14 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This library defines basic routines for string manipulation
+    This library defines basic routines for memory manipulation
     that can be used sys-wide.
 
-    The routines include copying, shifting, comparing, and filling strings
+    The routines include copying, moving, comparing, and filling memory
 
 NOTES:
     Because of the C API for the compiler, the methods are defined in the
     header so that the compiler can inline them.
 */
 
-#include <string_manipulation.hpp>
+#include <memory_manip.hpp>
