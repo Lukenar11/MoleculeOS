@@ -137,17 +137,17 @@ namespace drivers::ata
         static bool poll_until_drq_or_error() noexcept;
 
         [[nodiscard]]
-        static bool poll_and_read_or_write_disk(Driver_Operations op,
-                                                uint16_t*& buffer, 
-                                                uint32_t& command_count, 
-                                                uint32_t& sector_count, 
-                                                uint32_t& relative_lba) noexcept;
+        static bool poll_and_read_or_write_disk(const Driver_Operations op,
+                                                uint16_t* buffer,
+                                                uint32_t sector_count) 
+                                                noexcept;
 
         [[nodiscard]]
-        static bool start_pio_disk_read_or_write(Driver_Operations op,
-                                                 uint16_t*& dest_buffer, 
-                                                 uint32_t& sector_count, 
-                                                 uint32_t& relative_lba) noexcept;
+        static bool start_pio_disk_read_or_write(const Driver_Operations op,
+                                                 uint16_t* buffer, 
+                                                 const uint32_t sector_count,
+                                                 const uint32_t relative_lba) 
+                                                 noexcept;
 
     public:
         [[nodiscard]]
@@ -162,10 +162,10 @@ namespace drivers::ata
 
         static void init() noexcept;
 
-        static bool run(Driver_Operations op,
-                        int32_t& sector_count, 
-                        uint16_t*& buffer, 
-                        uint32_t& relative_lba) noexcept;
+        static bool run(const Driver_Operations op,
+                        uint32_t sector_count,
+                        uint16_t* buffer,
+                        uint32_t relative_lba) noexcept;
 
         Programmable_Input_Output() noexcept  = default;
         ~Programmable_Input_Output() noexcept = default;

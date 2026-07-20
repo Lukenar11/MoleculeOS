@@ -51,13 +51,13 @@ namespace tests
 
         runtime::Text_Output::reset();
 
-        const uint32_t reserved_bytes = 512;
+        const uint32_t reserved_words = 265;
 
         uint32_t lba = 0;
         int32_t sectors = 1;
-        uint16_t* ptr = new uint16_t[reserved_bytes];
+        uint16_t* ptr = new uint16_t[reserved_words];
 
-        for (uint32_t i = 0; i < reserved_bytes; i++)
+        for (uint32_t i = 0; i < reserved_words; i++)
             ptr[i] = 0;
 
         runtime::Text_Output::put_string("Status before read: ");
@@ -73,7 +73,7 @@ namespace tests
         else
             runtime::Text_Output::put_string("\nRead NOT Success\n\n");
 
-        for (uint32_t i = 0; i < reserved_bytes; i++) {
+        for (uint32_t i = 0; i < reserved_words; i++) {
             runtime::Text_Output::put_char(static_cast<uint8_t>(ptr[i] & 0xFF));
             runtime::Text_Output::put_char(static_cast<uint8_t>((ptr[i] >> 8) & 0xFF));
         }
@@ -82,12 +82,12 @@ namespace tests
         runtime::Text_Output::put_hex(runtime::byte_input(
                                         Programmable_Input_Output::status_port()
                                       ));
-
+                                      
         delete[] ptr;
         kernel::system::hang();
     }
 
-    void test_multiple_reads() {
+    void multiple_reads() {
         using namespace drivers::ata;
 
         runtime::Text_Output::reset();

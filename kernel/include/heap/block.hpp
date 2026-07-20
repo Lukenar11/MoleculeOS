@@ -25,7 +25,7 @@ namespace kernel::heap
 {
     class Block_Allocator final {
     private:
-        static inline constexpr uint32_t MEMORY_BLOCK_BYTE_SIZE = 8;
+        static inline constexpr uint32_t MEMORY_BLOCK_BYTE_SIZE = 16;
 
         static inline uint32_t total_memory_blocks        = 0;
         static inline uint32_t required_memory_pool_space = 0;

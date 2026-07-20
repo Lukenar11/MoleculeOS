@@ -26,6 +26,8 @@ NOTES:
 #include <terminal_api.hpp>
 #include <drivers_api.hpp>
 
+#include "tests/ata_pio.hpp"
+
 namespace kernel
 {
     extern "C" [[noreturn]]
@@ -34,6 +36,8 @@ namespace kernel
 
         heap::Block_Allocator::init(&heap::heap_start, &heap::heap_end);
         drivers::ata::Programmable_Input_Output::init();
+
+        tests::read_sector_with_heap();
 
         // schedule MoleculeOS
         static terminal::Terminal terminal;

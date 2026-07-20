@@ -123,13 +123,11 @@ namespace drivers::ata
         return false;
     }
 
-    bool Programmable_Input_Output::poll_and_read_or_write_disk(Driver_Operations op,
-                                                                uint16_t*& buffer,
-                                                                uint32_t& command_count,
-                                                                uint32_t& sector_count,
-                                                                uint32_t& relative_lba) 
+    bool Programmable_Input_Output::poll_and_read_or_write_disk(const Driver_Operations op,
+                                                                uint16_t* buffer,
+                                                                const uint32_t sector_count) 
                                                                 noexcept {
-        while (command_count > 0) {
+        for (uint32_t i = 0; i < sector_count; ++i) {
             delay();
 
             if (!poll_until_drq_or_error()) [[unlikely]]
@@ -140,39 +138,29 @@ namespace drivers::ata
                                            SECTOR_WORD_SIZE,
                                            buffer);
             else
-                runtime::word_output_stream(io_port_base, 
-                                            SECTOR_WORD_SIZE, 
+                runtime::word_output_stream(io_port_base,
+                                            SECTOR_WORD_SIZE,
                                             buffer);
+
             buffer += SECTOR_WORD_SIZE;
             delay();
-
-            relative_lba++;
-            --command_count;
-            --sector_count;
-
-            if (sector_count == 0)
-                break;
         }
 
         return true;
     }
 
-    bool Programmable_Input_Output::start_pio_disk_read_or_write(Driver_Operations op,
-                                                                 uint16_t*& buffer, 
-                                                                 uint32_t& sector_count,
-                                                                 uint32_t& relative_lba) 
+    bool Programmable_Input_Output::start_pio_disk_read_or_write(const Driver_Operations op,
+                                                                 uint16_t* buffer, 
+                                                                 const uint32_t sector_count,
+                                                                 const uint32_t relative_lba) 
                                                                  noexcept {
-        const uint32_t absolute_lba = relative_lba + lba_start_address;
-        uint32_t to_transfer = (sector_count > CHUNK_SECTORS) 
-                               ? CHUNK_SECTORS 
-                               : sector_count;
-
         if (!ata_pio_read_guard(partition_length, 
                                 relative_lba, 
-                                to_transfer)) [[unlikely]]
+                                sector_count)) [[unlikely]]
             return false;
 
-        runtime::byte_output(io_port_base + 2, static_cast<uint8_t>(to_transfer));
+        const uint32_t absolute_lba = relative_lba + lba_start_address;
+        runtime::byte_output(io_port_base + 2, static_cast<uint8_t>(sector_count));
         runtime::byte_output(io_port_base + 3, shift_and_mask(absolute_lba, 0, BYTE_MASK));
         runtime::byte_output(io_port_base + 4, shift_and_mask(absolute_lba, 8, BYTE_MASK));
         runtime::byte_output(io_port_base + 5, shift_and_mask(absolute_lba, 16, BYTE_MASK));
@@ -188,9 +176,7 @@ namespace drivers::ata
 
         if (!poll_and_read_or_write_disk(op,
                                          buffer, 
-                                         to_transfer, 
-                                         sector_count, 
-                                         relative_lba))
+                                         sector_count))
             return false;
 
         const uint8_t final_status = runtime::byte_input(status_port());
@@ -217,27 +203,25 @@ namespace drivers::ata
         kernel::system::panic("ATA init from IDENTIFY failed, no device detected");
     }
 
-    bool Programmable_Input_Output::run(Driver_Operations op,
-                                        int32_t& sector_count,
-                                        uint16_t*& buffer,
-                                        uint32_t& relative_lba) noexcept {
-        if (sector_count <= 0) [[unlikely]] {
+    bool Programmable_Input_Output::run(const Driver_Operations op,
+                                        uint32_t sector_count,
+                                        uint16_t* buffer,
+                                        uint32_t relative_lba) noexcept {
+        if (sector_count == 0) [[unlikely]] {
             reset_driver(dcr_port());
             sector_count = 0;
 
             return true;
         }
 
-        if (static_cast<uint32_t>(sector_count) >
-            MAX_ALLOWED_SECTOR_COUNT) [[unlikely]]
+        if (sector_count > MAX_ALLOWED_SECTOR_COUNT) [[unlikely]]
             return false;
 
         const uint32_t max_sectors = partition_length - 1;
         if (relative_lba > max_sectors || 
-            static_cast<uint32_t>(sector_count) > max_sectors || 
-            relative_lba > (max_sectors - static_cast<uint32_t>(sector_count + 1))) {
+            sector_count > max_sectors || 
+            relative_lba > (max_sectors - sector_count + 1)) [[unlikely]]
             return false;
-        }
 
         const uint8_t initial_status = runtime::byte_input(status_port());
         if (initial_status & ATA_BSY) {
@@ -247,23 +231,24 @@ namespace drivers::ata
             }
         }
 
-        bool read_success = true;
-        uint32_t sectors_count = static_cast<uint32_t>(sector_count);
-        while (sectors_count > 0) {
-            read_success = start_pio_disk_read_or_write(op,
-                                                        buffer, 
-                                                        sectors_count, 
-                                                        relative_lba);
-
-            if (!read_success) [[unlikely]] {
+        while (sector_count > 0) {
+            const uint32_t chunk = (sector_count > CHUNK_SECTORS)
+                                   ? CHUNK_SECTORS
+                                   : sector_count;
+        
+            if (!start_pio_disk_read_or_write(op,
+                                              buffer,
+                                              chunk,
+                                              relative_lba)) {
                 reset_driver(dcr_port());
-                sector_count = sectors_count;
-
                 return false;
             }
-        }
         
-        sector_count = sectors_count;
-        return read_success;
+            buffer       += chunk * SECTOR_WORD_SIZE;
+            relative_lba += chunk;
+            sector_count -= chunk;
+        }
+
+        return true;
     }
 } // namespace drivers::ata
