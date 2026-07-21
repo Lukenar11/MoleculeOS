@@ -17,7 +17,7 @@ NOTES:
 
 #pragma once
 
-namespace kernel::isr
+namespace kernel::idt::isr
 {
     extern "C" {
         void isr_0();   // Divide Error

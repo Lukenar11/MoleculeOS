@@ -21,6 +21,11 @@ NOTES:
 #include "isr_helpers.hpp"
 #include "sys/interrupts.hpp"
 
+namespace
+{
+    constexpr uint32_t CUSTOM_PANIC_INTERRUPT = 15;
+}
+
 namespace kernel::sys
 {
     void panic(const char* message) noexcept;

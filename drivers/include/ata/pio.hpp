@@ -36,9 +36,10 @@ NOTES:
 namespace
 {
     [[nodiscard]]
-    inline bool ata_pio_read_guard(const uint32_t partition_length, 
-                                   const uint32_t relative_lba, 
-                                   const uint32_t to_transfer) noexcept {
+    inline bool ata_pio_read_and_write_guard(const uint32_t partition_length, 
+                                              const uint32_t relative_lba, 
+                                              const uint32_t to_transfer) 
+                                              noexcept {
         if (partition_length == 0) [[unlikely]]
             return false;
 

@@ -21,9 +21,7 @@ NOTES:
 namespace kernel::sys
 {
     void panic(const char* message) noexcept {
-        const uint32_t custom_panic_idt_interrupt = 15;
-
-        isr::exception_names[custom_panic_idt_interrupt] = const_cast<char*>(message);
-        trigger_interrupt(custom_panic_idt_interrupt);
+        idt::isr::exception_names[CUSTOM_PANIC_INTERRUPT] = const_cast<char*>(message);
+        trigger_interrupt(CUSTOM_PANIC_INTERRUPT);
     }
 } // namespace kernel::sys

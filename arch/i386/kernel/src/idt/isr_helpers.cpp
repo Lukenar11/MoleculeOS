@@ -11,7 +11,7 @@ DESCRIPTION:
 NOTES:
 */
 
-namespace kernel::isr
+namespace kernel::idt::isr
 {
     char* exception_names[] = {
         "Division by Zero",

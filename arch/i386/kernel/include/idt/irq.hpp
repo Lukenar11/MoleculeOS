@@ -17,7 +17,7 @@ NOTES:
 
 #pragma once
 
-namespace kernel::irq
+namespace kernel::idt::irq
 {
     extern "C" {
         void irq_0();   // Timer Interrupt

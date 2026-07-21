@@ -24,6 +24,7 @@ NOTES:
 #include <stdint.h>
 #include <array.hpp>
 #include <io_api.hpp>
+#include <text_output.hpp>
 
 namespace
 {

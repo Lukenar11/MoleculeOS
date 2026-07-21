@@ -20,7 +20,7 @@ NOTES:
 
 #include "irq_handler.hpp"
 
-namespace kernel::irq
+namespace kernel::idt::irq
 {
     extern "C"
     void irq_common_handler(Registers* reg_dump) {

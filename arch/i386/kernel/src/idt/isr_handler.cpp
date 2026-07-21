@@ -23,7 +23,7 @@ NOTES:
 
 #include "isr_handler.hpp"
 
-namespace kernel::isr
+namespace kernel::idt::isr
 {
     extern "C"
     void isr_common_handler(Registers* reg_dump) {

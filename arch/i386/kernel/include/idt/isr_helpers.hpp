@@ -13,7 +13,7 @@ NOTES:
 
 #pragma once
 
-namespace kernel::isr
+namespace kernel::idt::isr
 {
     extern char* exception_names[];
 } // namespace kernel::irq

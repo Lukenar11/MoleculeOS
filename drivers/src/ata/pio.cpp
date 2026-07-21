@@ -154,9 +154,9 @@ namespace drivers::ata
                                                                  const uint32_t sector_count,
                                                                  const uint32_t relative_lba) 
                                                                  noexcept {
-        if (!ata_pio_read_guard(partition_length, 
-                                relative_lba, 
-                                sector_count)) [[unlikely]]
+        if (!ata_pio_read_and_write_guard(partition_length, 
+                                          relative_lba, 
+                                          sector_count)) [[unlikely]]
             return false;
 
         const uint32_t absolute_lba = relative_lba + lba_start_address;

@@ -27,7 +27,7 @@ NOTES:
 
 namespace
 {
-    inline constexpr kernel::irq::IRQ_Handler_Entry irq_handler_table[] = {
+    inline constexpr kernel::idt::irq::IRQ_Handler_Entry irq_handler_table[] = {
         { 0, nullptr}, 
         { 1, drivers::ps2::Keyboard_Input::keyboard_irq_handler},
         { 2, nullptr}, 
@@ -55,7 +55,7 @@ namespace
     constexpr uint16_t SLAVE_PIC_CMD_PORT  = 0xA0;
 }
 
-namespace kernel::irq
+namespace kernel::idt::irq
 {
     extern "C"
     void irq_common_handler(Registers* reg_dump);

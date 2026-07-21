@@ -3,7 +3,7 @@
 #include "utils/regs.hpp"
 #include <stdint.h>
 
-namespace kernel::irq
+namespace kernel::idt::irq
 {
     struct IRQ_Handler_Entry final {
         uint8_t index = 0;

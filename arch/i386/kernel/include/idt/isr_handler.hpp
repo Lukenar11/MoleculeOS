@@ -37,7 +37,7 @@ static inline constexpr void print_reg_dump(const char* label,
     runtime::Text_Output::put_hex(value);
 }
 
-namespace kernel::isr
+namespace kernel::idt::isr
 {
     extern "C"
     void isr_common_handler(Registers* reg_dump);
