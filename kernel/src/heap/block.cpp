@@ -152,7 +152,9 @@ namespace kernel::heap
         if (!new_ptr)
             return nullptr;
 
-        const uint32_t n = (old_size < new_size) ? old_size : new_size;
+        const uint32_t n = (old_size < new_size) 
+                                   ? old_size 
+                                   : new_size;
         runtime::Memory_Manipulation::copy_memory_block(new_ptr, ptr, n);
 
         deallocate(ptr);
@@ -170,7 +172,7 @@ namespace kernel::heap
 
         const bool _true = true;
         for (uint32_t i = 0; i < memory_block_count; ++i)
-            memory_block_count[memory_block_index + i] = _true;
+            free_memory_blocks[memory_block_index + i] = _true;
 
         allocation_sizes[memory_block_index] = 0;
     }
