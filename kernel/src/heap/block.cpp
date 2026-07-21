@@ -17,52 +17,57 @@ NOTES:
 
 namespace kernel::heap
 {
-    void Block_Allocator::init(const uint8_t* begin, const uint8_t* end) noexcept {
+    void Block_Allocator::init(const uint8_t* begin, 
+                               const uint8_t* end) noexcept {
         const uint32_t start_addr = reinterpret_cast<uint32_t>(begin);
         const uint32_t end_addr   = reinterpret_cast<uint32_t>(end);
 
-        if (end_addr <= start_addr) [[unlikely]]
+        if (end_addr <= start_addr)
             sys::panic("Invalid memory range for heap initialization");
 
-        const uint32_t total_raw_bytes = static_cast<uint32_t>(end_addr - start_addr);
-        total_memory_blocks            = total_raw_bytes / (MEMORY_BLOCK_BYTE_SIZE +
-                                         sizeof(uint16_t) + sizeof(uint8_t));
-        if (total_memory_blocks <= 0) [[unlikely]]
+        const uint32_t total_raw_bytes = end_addr - start_addr;
+
+        total_memory_blocks = total_raw_bytes / MEMORY_BLOCK_BYTE_SIZE;
+        if (total_memory_blocks == 0)
             sys::panic("Heap area too small");
 
-        allocation_sizes   = reinterpret_cast<uint16_t*>(start_addr);
-        free_memory_blocks = reinterpret_cast<bool*>(start_addr + 
-                                                     (total_memory_blocks *
-                                                      sizeof(uint16_t)));
+        const uint32_t bitmap_word_count = (total_memory_blocks + 31) / 32;
 
-        int32_t data_pool_start = start_addr +
-                                  (total_memory_blocks * sizeof(uint16_t)) +
-                                  (total_memory_blocks * sizeof(bool));
+        allocation_sizes = reinterpret_cast<uint16_t*>(start_addr);
+
+        free_memory_bitmap = reinterpret_cast<uint32_t*>(start_addr + 
+                                                         total_memory_blocks * 
+                                                         sizeof(uint16_t));
+
+        uint32_t data_pool_start = start_addr +
+                                   total_memory_blocks * sizeof(uint16_t) +
+                                   bitmap_word_count * sizeof(uint32_t);
 
         data_pool_start = (data_pool_start + (MEMORY_BLOCK_BYTE_SIZE - 1)) &
                           ~(MEMORY_BLOCK_BYTE_SIZE - 1);
 
         required_memory_pool_space = total_memory_blocks * MEMORY_BLOCK_BYTE_SIZE;
-        if (data_pool_start + required_memory_pool_space > end_addr) [[unlikely]] {
+
+        if (data_pool_start + required_memory_pool_space > end_addr) {
             total_memory_blocks--;
             required_memory_pool_space = total_memory_blocks * MEMORY_BLOCK_BYTE_SIZE;
         }
 
         memory_pool_ptr = reinterpret_cast<uint8_t*>(data_pool_start);
 
+        const uint32_t set_all_free = 0xFFFF'FFFF;
+        for (uint32_t i = 0; i < bitmap_word_count; ++i)
+            free_memory_bitmap[i] = set_all_free;
+
         const uint32_t null = 0;
-        const bool _true    = true;
-        for (uint32_t i = 0; i < total_memory_blocks; ++i) {
-            allocation_sizes[i]   = null;
-            free_memory_blocks[i] = _true;
-        }
+        for (uint32_t i = 0; i < total_memory_blocks; ++i)
+            allocation_sizes[i] = null;
     }
 
-    void* Block_Allocator::set_allocation_sizes_entry(const uint32_t blocks_needed,
+    void* Block_Allocator::set_allocation_sizes_entry(const uint32_t blocks_needed, 
                                                       const uint32_t i) noexcept {
-        const bool _false = false;
         for (uint32_t k = 0; k < blocks_needed; ++k)
-            free_memory_blocks[i + k] = _false;
+            set_block_used(i + k);
 
         allocation_sizes[i] = static_cast<uint16_t>(blocks_needed);
         return &memory_pool_ptr[i * MEMORY_BLOCK_BYTE_SIZE];
@@ -73,7 +78,7 @@ namespace kernel::heap
                                                           uint32_t* j) noexcept {
         *j = 0;
         while (*j < blocks_needed) {
-            if (!free_memory_blocks[i + *j])
+            if (!is_block_free(i + *j))
                 return false;
 
             (*j)++;
@@ -162,18 +167,15 @@ namespace kernel::heap
     }
 
     void Block_Allocator::deallocate(void* ptr) noexcept {
-        uint32_t memory_block_index = 0;
-        uint32_t memory_block_count = 0;
+        uint32_t block_index = 0;
+        uint32_t block_count = 0;
 
-        if (!get_allocation_info(ptr, 
-                                 memory_block_index, 
-                                 memory_block_count)) [[unlikely]]
+        if (!get_allocation_info(ptr, block_index, block_count))
             sys::panic("Invalid free");
 
-        const bool _true = true;
-        for (uint32_t i = 0; i < memory_block_count; ++i)
-            free_memory_blocks[memory_block_index + i] = _true;
+        for (uint32_t k = 0; k < block_count; ++k)
+            set_block_free(block_index + k);
 
-        allocation_sizes[memory_block_index] = 0;
+        allocation_sizes[block_index] = 0;
     }
 } // namespace kernel::heap

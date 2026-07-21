@@ -30,9 +30,21 @@ namespace kernel::heap
         static inline uint32_t total_memory_blocks        = 0;
         static inline uint32_t required_memory_pool_space = 0;
 
-        static inline uint8_t* memory_pool_ptr   = nullptr;
-        static inline uint16_t* allocation_sizes = nullptr;
-        static inline bool* free_memory_blocks   = nullptr;
+        static inline uint8_t* memory_pool_ptr     = nullptr;
+        static inline uint16_t* allocation_sizes   = nullptr;
+        static inline uint32_t* free_memory_bitmap = nullptr;
+
+        static inline void set_block_used(const uint32_t i) noexcept {
+            free_memory_bitmap[i >> 5] &= ~(1u << (i & 31));
+        }
+
+        static inline void set_block_free(const uint32_t i) noexcept {
+            free_memory_bitmap[i >> 5] |= (1u << (i & 31));
+        }
+
+        static inline bool is_block_free(const uint32_t i) noexcept {
+            return free_memory_bitmap[i >> 5] & (1u << (i & 31));
+        }
 
         static void* set_allocation_sizes_entry(const uint32_t blocks_needed, 
                                                 const uint32_t i) 

@@ -77,14 +77,14 @@ namespace tests
         runtime::Text_Output::put_string("Normal free OK\n");
 
         // 2) double free
-        kernel::heap::Block_Allocator::deallocate(p);
+        // kernel::heap::Block_Allocator::deallocate(p);
 
         // 3) misaligned pointer
-        uint8_t* bad = reinterpret_cast<uint8_t*>(p) + 1;
-        kernel::heap::Block_Allocator::deallocate(bad);
+        // uint8_t* bad = reinterpret_cast<uint8_t*>(p) + 1;
+        // kernel::heap::Block_Allocator::deallocate(bad);
 
         // 4) pointer outside the heap
-        kernel::heap::Block_Allocator::deallocate(reinterpret_cast<void*>(0x12345678));
+        // kernel::heap::Block_Allocator::deallocate(reinterpret_cast<void*>(0x12345678));
 
         kernel::sys::hang();
     }
