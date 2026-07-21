@@ -24,6 +24,7 @@ NOTES:
 #include <stdint.h>
 #include <array.hpp>
 #include <io_api.hpp>
+#include <string_manip.hpp>
 #include <text_output.hpp>
 
 namespace
@@ -39,6 +40,15 @@ namespace
         {.port=0x00F4, .value=0x0000, .is_8bit_mode=true },   // QEMU ISA exit
         {.port=0xB004, .value=0x2000, .is_8bit_mode=false},   // Bochs shutdown
         {.port=0x4004, .value=0x3400, .is_8bit_mode=false}    // VirtualBox shutdown
+    };
+
+    const char* message_if_hardware_shutdown_not_success[] = {
+        "##############################################################",
+        "#                                                            #",
+        "#                The system has shut down;                   #",
+        "# you can safely unplug your computer from the power outlet. #",
+        "#                                                            #",
+        "##############################################################"
     };
 }
 

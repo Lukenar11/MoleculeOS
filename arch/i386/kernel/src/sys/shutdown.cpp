@@ -35,6 +35,24 @@ namespace kernel::sys
             restore_eflags(cpu_flags);
         }
 
-        panic("Shutdown failed");
+        runtime::Text_Output::reset();
+
+        const uint32_t line_count = sizeof(message_if_hardware_shutdown_not_success) / 
+                                    sizeof(message_if_hardware_shutdown_not_success[0]);
+        const uint32_t start_y = (drivers::vga::TEXT_MODE_SCREEN_HEIGHT - line_count) / 2;
+
+        uint32_t length = 0;
+        uint32_t x_pos  = 0;
+        for (uint32_t i = 0; i < line_count; ++i) {
+            length = runtime::String_Manipulation::get_string_length(
+                         message_if_hardware_shutdown_not_success[i]
+                     );
+            x_pos = (drivers::vga::TEXT_MODE_SCREEN_WIDTH - length) / 2;
+
+            runtime::Text_Output::set_cursor(x_pos, start_y + i);
+            runtime::Text_Output::put_string(message_if_hardware_shutdown_not_success[i]);
+        }
+
+        sys::hang();
     }
 } // namespace kernel::sys

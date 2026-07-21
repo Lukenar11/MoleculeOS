@@ -15,5 +15,5 @@ NOTES:
 
 namespace kernel::idt::isr
 {
-    extern char* exception_names[];
+    extern const char* exception_names[];
 } // namespace kernel::irq

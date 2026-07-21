@@ -11,9 +11,11 @@ DESCRIPTION:
 NOTES:
 */
 
+#include "idt/isr_helpers.hpp"
+
 namespace kernel::idt::isr
 {
-    char* exception_names[] = {
+    const char* exception_names[] = {
         "Division by Zero",
         "Debug",
         "Non-Maskable Interrupt",
