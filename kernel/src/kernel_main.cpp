@@ -21,7 +21,6 @@ NOTES:
     it is declared as "extern C" to ensure compatibility.
 */
 
-#include "heap/helpers.hpp"
 #include <kernel_api.hpp>
 #include <terminal_api.hpp>
 #include <drivers_api.hpp>

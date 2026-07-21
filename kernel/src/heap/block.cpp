@@ -82,6 +82,29 @@ namespace kernel::heap
         return true;
     }
 
+    bool Block_Allocator::get_allocation_info(void* ptr, 
+                                              uint32_t& index, 
+                                              uint32_t& blocks) noexcept {
+        if ((ptr == nullptr) || (memory_pool_ptr == nullptr))
+            return false;
+
+        const uint8_t* block_ptr = reinterpret_cast<uint8_t*>(ptr);
+        if (block_ptr < memory_pool_ptr ||
+            block_ptr >= memory_pool_ptr + required_memory_pool_space)
+            return false;
+
+        const uint32_t offset = static_cast<uint32_t>(block_ptr - memory_pool_ptr);
+        if (offset % MEMORY_BLOCK_BYTE_SIZE != 0)
+            return false;
+
+        index  = offset / MEMORY_BLOCK_BYTE_SIZE;
+        blocks = allocation_sizes[index];
+        if (blocks == 0)
+            return false;
+
+        return true;
+    }
+
     [[nodiscard]]
     void* Block_Allocator::allocate(const uint32_t allocated_bytes) noexcept {
         if (memory_pool_ptr == nullptr) [[unlikely]]
@@ -108,29 +131,47 @@ namespace kernel::heap
         return nullptr;
     }
 
+    [[nodiscard]]
+    void* Block_Allocator::reallocate(void* ptr, const uint32_t new_size) noexcept {
+        if (ptr == nullptr) [[unlikely]]
+            return allocate(new_size);
+
+        if (new_size == 0) [[unlikely]] {
+            deallocate(ptr);
+            return nullptr;
+        }
+
+        uint32_t index      = 0;
+        uint32_t old_blocks = 0;
+        if (!get_allocation_info(ptr, index, old_blocks)) [[unlikely]]
+            sys::panic("Invalid realloc");
+
+        const uint32_t old_size = old_blocks * MEMORY_BLOCK_BYTE_SIZE;
+
+        void* new_ptr = allocate(new_size);
+        if (!new_ptr)
+            return nullptr;
+
+        const uint32_t n = (old_size < new_size) ? old_size : new_size;
+        runtime::Memory_Manipulation::copy_memory_block(new_ptr, ptr, n);
+
+        deallocate(ptr);
+        return new_ptr;
+    }
+
     void Block_Allocator::deallocate(void* ptr) noexcept {
-        if ((ptr == nullptr) || (memory_pool_ptr == nullptr)) [[unlikely]]
-            return;
+        uint32_t memory_block_index = 0;
+        uint32_t memory_block_count = 0;
 
-        const uint8_t* block_ptr = reinterpret_cast<uint8_t*>(ptr);
-        if (block_ptr < memory_pool_ptr || 
-            block_ptr >= memory_pool_ptr + required_memory_pool_space) [[unlikely]]
-            sys::panic("Attempted to free pointer outside heap");
-
-        const uint32_t memory_offset = static_cast<uint32_t>(block_ptr - memory_pool_ptr);
-        if (memory_offset % MEMORY_BLOCK_BYTE_SIZE != 0) [[unlikely]]
-            sys::panic("Attempted to free misaligned pointer");
-
-        const uint32_t memory_pool_start_index = memory_offset / MEMORY_BLOCK_BYTE_SIZE;
-        const uint32_t memory_blocks_to_free = allocation_sizes[memory_pool_start_index];
-
-        if (memory_blocks_to_free == 0) [[unlikely]]
-            sys::panic("Double free or freeing memory that was not allocated");
+        if (!get_allocation_info(ptr, 
+                                 memory_block_index, 
+                                 memory_block_count)) [[unlikely]]
+            sys::panic("Invalid free");
 
         const bool _true = true;
-        for (uint32_t i = 0; i < memory_blocks_to_free; ++i)
-            free_memory_blocks[memory_pool_start_index + i] = _true;
+        for (uint32_t i = 0; i < memory_block_count; ++i)
+            memory_block_count[memory_block_index + i] = _true;
 
-        allocation_sizes[memory_pool_start_index] = 0;
+        allocation_sizes[memory_block_index] = 0;
     }
 } // namespace kernel::heap

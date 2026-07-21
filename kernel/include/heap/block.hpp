@@ -19,7 +19,7 @@ NOTES:
 #include <stdint.h>
 #include <array.hpp>
 #include <kernel_api.hpp>
-#include <text_output.hpp>
+#include <string_manip.hpp>
 
 namespace kernel::heap
 {
@@ -42,12 +42,20 @@ namespace kernel::heap
                                                     const uint32_t blocks_needed,
                                                     uint32_t* j)
                                                     noexcept;
-
+    
     public:
         static void init(const uint8_t* begin, const uint8_t* end) noexcept;
+
+        static bool get_allocation_info(void* ptr, 
+                                        uint32_t& index, 
+                                        uint32_t& blocks) noexcept;
         
-        [[nodiscard]]
+        [[nodiscard]] 
         static void* allocate(const uint32_t allocated_bytes) noexcept;
+
+        [[nodiscard]]
+        static void* reallocate(void* ptr, const uint32_t new_size) noexcept;
+
         static void deallocate(void* ptr) noexcept;
 
         Block_Allocator() noexcept  = default;

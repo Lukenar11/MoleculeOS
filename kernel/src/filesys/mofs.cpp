@@ -24,7 +24,9 @@ namespace kernel::filesys
     File* MoleculeOS_File_sys::allocate_File() noexcept {
         for (auto& file : files)
             if (!file.in_use) {
-                runtime::memory_manip::set_memory_block(&file, 0, sizeof(file));
+                runtime::Memory_Manipulation::set_memory_block(&file, 
+                                                               0, 
+                                                               sizeof(file));
                 file.in_use = true;
                 return &file;
             }
@@ -48,7 +50,7 @@ namespace kernel::filesys
     }
 
     bool MoleculeOS_File_sys::is_valid_file_name_or_formant_char(const char symbol)
-                                                                    noexcept {
+                                                                 noexcept {
         if (((symbol >= 'A') && (symbol <= 'Z')) ||
             ((symbol >= 'a') && (symbol <= 'z')) ||
             ((symbol >= '0') && (symbol <= '9')) ||
@@ -119,15 +121,15 @@ namespace kernel::filesys
         file->in_use = false;
         file->size   = 0;
 
-        runtime::memory_manip::set_memory_block(file->name, 
+        runtime::Memory_Manipulation::set_memory_block(file->name, 
                                                        '\0', 
                                                        MAX_FILENAME_LENGTH);
 
-        runtime::memory_manip::set_memory_block(file->format, 
+        runtime::Memory_Manipulation::set_memory_block(file->format, 
                                                        '\0', 
                                                        MAX_FILE_FORMAT_NAME_LENGTH);
 
-        runtime::memory_manip::set_memory_block(file->data, 
+        runtime::Memory_Manipulation::set_memory_block(file->data, 
                                                        0, 
                                                        MAX_FILE_SIZE);
     }
@@ -142,7 +144,7 @@ namespace kernel::filesys
         if (less_then(buffer_size, file->size)) [[unlikely]] 
             return false;
 
-        runtime::memory_manip::copy_memory_block(out_buffer, 
+        runtime::Memory_Manipulation::copy_memory_block(out_buffer, 
                                                         file->data, 
                                                         file->size);
         return true;
@@ -158,7 +160,7 @@ namespace kernel::filesys
         if (less_then(buffer_size, file->size + 1)) [[unlikely]] 
             return false;
 
-        runtime::memory_manip::copy_memory_block(out_buffer, 
+        runtime::Memory_Manipulation::copy_memory_block(out_buffer, 
                                                         file->data, 
                                                         file->size);
         out_buffer[file->size] = '\0';
@@ -178,7 +180,7 @@ namespace kernel::filesys
         if (less_then(buffer_size, length)) [[unlikely]] 
             return false;
 
-        runtime::memory_manip::copy_memory_block(out_buffer, 
+        runtime::Memory_Manipulation::copy_memory_block(out_buffer, 
                                                         (file->data + offset), 
                                                         length);
     
@@ -197,7 +199,7 @@ namespace kernel::filesys
         if (less_then(buffer_size, (length + 1))) [[unlikely]] 
             return false;
 
-        runtime::memory_manip::copy_memory_block(out_buffer, 
+        runtime::Memory_Manipulation::copy_memory_block(out_buffer, 
                                                         (file->data + offset),
                                                         length);
         out_buffer[length] = '\0';
@@ -211,7 +213,7 @@ namespace kernel::filesys
         if (set_file_content_guard(file, length)) [[unlikely]]
             return false;
 
-        runtime::memory_manip::copy_memory_block(file->data, 
+        runtime::Memory_Manipulation::copy_memory_block(file->data, 
                                                         in_buffer, 
                                                         length);
         recalculate_file_size(file);
@@ -225,7 +227,7 @@ namespace kernel::filesys
         if (set_file_content_guard(file, length)) [[unlikely]]
             return false;
 
-        runtime::memory_manip::copy_memory_block(file->data, 
+        runtime::Memory_Manipulation::copy_memory_block(file->data, 
                                                         in_buffer, 
                                                         length);
         recalculate_file_size(file);
@@ -241,7 +243,7 @@ namespace kernel::filesys
         if (write_fill_at_guard(file, offset, length, buffer_size)) [[unlikely]]
             return false;
 
-        runtime::memory_manip::copy_memory_block((file->data + offset), 
+        runtime::Memory_Manipulation::copy_memory_block((file->data + offset), 
                                                         in_buffer, 
                                                         length);
         recalculate_file_size(file);
@@ -257,7 +259,7 @@ namespace kernel::filesys
         if (write_fill_at_guard(file, offset, length, buffer_size)) [[unlikely]]
             return false;
 
-        runtime::memory_manip::copy_memory_block((file->data + offset), 
+        runtime::Memory_Manipulation::copy_memory_block((file->data + offset), 
                                                         in_buffer, 
                                                         length);
         recalculate_file_size(file);

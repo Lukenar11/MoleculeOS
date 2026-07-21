@@ -22,27 +22,38 @@ NOTES:
 extern "C"
 {
     void* memcpy(void* dest_ptr, const void* src_ptr, uint32_t size) {
-        return runtime::memory_manip::copy_memory_block(dest_ptr, src_ptr, size);
+        return runtime::Memory_Manipulation::copy_memory_block(dest_ptr, 
+                                                               src_ptr,
+                                                               size);
     }
 
     void* memmove(void* dest_ptr, const void* src_ptr, uint32_t size) {
-        return runtime::memory_manip::move_memory_block(dest_ptr, src_ptr, size);
+        return runtime::Memory_Manipulation::move_memory_block(dest_ptr, 
+                                                               src_ptr,
+                                                               size);
     }
 
     void* memset(void* dest_ptr, int32_t value, uint32_t size) {
-        return runtime::memory_manip::set_memory_block(dest_ptr, value, size);
+        return runtime::Memory_Manipulation::set_memory_block(dest_ptr, 
+                                                              value,
+                                                              size);
     }
 
     int32_t memcmp(const void* a_ptr, const void* b_ptr, uint32_t size) {
-        return runtime::memory_manip::compare_memory_block(a_ptr, b_ptr, size);
+        return runtime::Memory_Manipulation::compare_memory_block(a_ptr,
+                                                                  b_ptr, 
+                                                                  size);
     }
 
     void strncpy(char* dest_ptr, const char* src_ptr, uint32_t size) {
-        runtime::String_Manipulation::copy_string_part(dest_ptr, src_ptr, size);
+        runtime::String_Manipulation::copy_string_part(dest_ptr, 
+                                                       src_ptr, 
+                                                       size);
     }
 
     void strcpy(char* dest_ptr, const char* src_ptr) {
-        runtime::String_Manipulation::copy_string(dest_ptr, src_ptr);
+        runtime::String_Manipulation::copy_string(dest_ptr, 
+                                                  src_ptr);
     }
 
     uint32_t strlen(const char *string) {
@@ -50,10 +61,12 @@ extern "C"
     }
 
     int32_t strcmp(const char* a_ptr, const char* b_ptr) {
-        return runtime::String_Manipulation::compare_strings(a_ptr, b_ptr);
+        return runtime::String_Manipulation::compare_strings(a_ptr, 
+                                                             b_ptr);
     }
 
     const char* strchr(const char* string, int32_t symbol) {
-        return runtime::String_Manipulation::find_char_in_string(string, symbol);
+        return runtime::String_Manipulation::find_char_in_string(string, 
+                                                                 symbol);
     }
 }

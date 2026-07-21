@@ -55,7 +55,9 @@ namespace tests
 
         uint32_t lba = 0;
         int32_t sectors = 1;
-        uint16_t* ptr = new uint16_t[reserved_words];
+        uint16_t* ptr = static_cast<uint16_t*>(
+            kernel::heap::Block_Allocator::allocate(reserved_words * 2)
+        );
 
         for (uint32_t i = 0; i < reserved_words; i++)
             ptr[i] = 0;
@@ -83,7 +85,7 @@ namespace tests
                                         Programmable_Input_Output::status_port()
                                       ));
                                       
-        delete[] ptr;
+        kernel::heap::Block_Allocator::deallocate(ptr);
         kernel::sys::hang();
     }
 
@@ -127,7 +129,7 @@ namespace tests
         const uint32_t length = runtime::String_Manipulation::get_string_length(message_to_write);
         
         buffer.fill(0);
-        runtime::memory_manip::copy_memory_block(buffer.begin(), 
+        runtime::Memory_Manipulation::copy_memory_block(buffer.begin(), 
                                                         message_to_write, 
                                                         length);
 
