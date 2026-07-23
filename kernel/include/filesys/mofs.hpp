@@ -5,11 +5,11 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This file contains the internal implementation of the file sys.
-    The file sys is a flat custom file sys residing directly in RAM.
+    This file contains the internal implementation of the file system.
+    The file system is a flat custom file system residing directly in RAM.
 
 NOTES:
-    Since the file sys resides directly in RAM, 
+    Since the file system resides directly in RAM, 
     all files—along with their contents—are deleted upon 
     shutting down or restarting the sys.
 

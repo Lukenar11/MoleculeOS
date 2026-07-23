@@ -5,12 +5,12 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This is the "RegisterDump structure", which represents the
+    This is the "register-dump structure", which represents the
     exact CPU state saved by the ISR and IRQ assembly stubs before
-    transferring control to the C-level handlers.
+    transferring control to the handlers.
 
 NOTES:
-    This structure is marked as packed ("__attribute__((packed));") 
+    This structure is marked as packed ('__attribute__((packed))') 
     to prevent the compiler from inserting padding bytes. 
     
     The layout of this structure must match the stack layout created by

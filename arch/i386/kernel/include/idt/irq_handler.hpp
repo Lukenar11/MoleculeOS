@@ -5,17 +5,15 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    C interface for the general IRQ handler, 
-    which is called by "irq_common_stub".
+    C++ interface for the general 'IRQ handler', 
+    which is called by 'irq_stub'.
 
-    All hardware interrupt stubs (irq_0–irq_15) 
+    All hardware interrupt stubs ('irq_0'...'irq_15') 
     pass their register state to this function, 
     which performs uniform processing before the required
     End-of-Interrupt (EOI) signal is sent to the PIC.
 
 NOTES:
-    Since this function is called by an assembly routine, 
-    it is declared as "extern "C"" to ensure compatibility.
 */
 
 #pragma once
@@ -58,5 +56,5 @@ namespace
 namespace kernel::idt::irq
 {
     extern "C"
-    void irq_common_handler(Registers* reg_dump);
+    void irq_handler(Registers* reg_dump);
 } // namespace kernel::irq

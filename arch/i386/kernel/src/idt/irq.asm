@@ -6,16 +6,16 @@
 ;
 ; DESCRIPTION:
 ;     Each function corresponds to a specific hardware interrupt line 
-;     of the Programmable Interrupt Controller (PIC).
+;     of the 'Programmable Interrupt Controller' (PIC).
 ;
 ; NOTES:
-;     The interface is a header file called "irq.hpp".
+;     The interface is a header file called 'irq.hpp'.
 ;
 
-extern irq_common_handler
-extern irq_common_stub
-global irq_0, irq_1, irq_2, irq_3, irq_4, irq_5, irq_6, irq_7, \
-       irq_8, irq_9, irq_10, irq_11, irq_12, irq_13, irq_14, irq_15
+extern irq_handler
+extern irq_stub
+global irq_0, irq_1, irq_2,  irq_3,  irq_4,  irq_5,  irq_6,  irq_7,  \
+       irq_8, irq_9, irq_10, irq_11, irq_12, irq_13, irq_14, irq_15, \
 
 section .text
 
@@ -24,7 +24,7 @@ irq_%1:
     cli
     push dword 0    ; error code
     push dword %2   ; interrupt number
-    jmp  irq_common_stub
+    jmp  irq_stub
 %endmacro
 
 IRQ  0, 32  ; (irq_0) Timer Interrupt

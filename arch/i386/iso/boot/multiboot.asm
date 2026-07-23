@@ -1,26 +1,26 @@
 ;
 ; LICENSE:
-;     Copyright (c) 2026 Lukenar11 (Luke Matthes)
-;     MIT Licensed
-;     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+;    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+;    MIT Licensed
+;    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 ;
 ; DESCRIPTION:
-;     This file defines the multiboot header required by multiboot‑compliant
-;     boot loaders such as GRUB. 
+;    This file defines the multiboot header required by multiboot‑compliant
+;    boot loaders such as GRUB. 
 ;        
-;     The header contains the magic value, flags,
-;     and checksum that allow the bootloader to recognize and load the
-;     kernel binary correctly.
+;    The header contains the magic value, flags,
+;    and checksum that allow the bootloader to recognize and load the
+;    kernel binary correctly.
 ;
-;     The multiboot header must be placed within the first 8 KiB of the
-;     kernel image and aligned to a 4‑byte boundary to satisfy the
-;     multiboot specification.
+;    The multiboot header must be placed within the first 8 KiB of the
+;    kernel image and aligned to a 4‑byte boundary to satisfy the
+;    multiboot specification.
 ;
 ; NOTES:
-;     The checksum is computed such that:
-;     magic + flags + checksum == 0 (mod 2^32)
-;
-;     The magic values must be have this name convention and signature.
+;    The checksum is computed such that:
+;    magic + flags + checksum == 0 (mod 2^32)
+
+;    The magic values must be have this name convention and signature.
 ;
 
 section .multiboot

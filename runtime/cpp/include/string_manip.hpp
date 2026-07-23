@@ -6,7 +6,7 @@ LICENSE:
 
 DESCRIPTION:
     This library defines basic routines for string manipulation
-    that can be used sys-wide.
+    that can be used system-wide.
 
     The routines include copying, shifting, comparing, and filling strings
 
@@ -23,7 +23,8 @@ namespace runtime
 {
     class String_Manipulation final {
     public:
-        static  inline void copy_string(char* dest_ptr, const char* src_ptr) noexcept {
+        static  inline void copy_string(char* dest_ptr, 
+                                        const char* src_ptr) noexcept {
             while ((*dest_ptr++ = *src_ptr++));
         }
 
@@ -63,8 +64,8 @@ namespace runtime
             return length;
         }
 
-        static inline int32_t compare_strings(const char* a_ptr, const char* b_ptr) 
-                                              noexcept {
+        static inline int32_t compare_strings(const char* a_ptr, 
+                                              const char* b_ptr) noexcept {
             while (*a_ptr && (*a_ptr == *b_ptr)) {
                 ++a_ptr;
                 ++b_ptr;

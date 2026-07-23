@@ -8,7 +8,7 @@ DESCRIPTION:
     This file implements an ATA-PIO driver.
 
     This driver contains the operation to be performed (READ/WRITE), 
-    a pointer, the number of sectors, the relative LBA address, 
+    a pointer, the number of sectors, the relative 'LBA-address', 
     and will either perform a hard drive read operation or a hard drive write operation.
 
 NOTES:
@@ -22,7 +22,7 @@ NOTES:
     however, since the read operation does not take exactly 100 ns, 
     this method introduces a delay of 500 ns as a safety measure.
 
-    For the sake of simplicity, support for 48-bit LBA addresses has been omitted.
+    For the sake of simplicity, support for 48-bit 'LBA-addresses' has been omitted.
 */
 
 #include "../ata/pio.hpp"

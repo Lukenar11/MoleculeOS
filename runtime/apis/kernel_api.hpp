@@ -6,9 +6,14 @@ LICENSE:
 
 DESCRIPTION:
     This file defines a central API for 
-    all non-architecture-dependent kernel functions.
+    all kernel functions.
 
 NOTES:
+    Macros that have been defined based on the selected architecture are 
+    compiler-specific, e.g. '__i386__' (in GCC/Clang), '_M_IX86' (in MSVC), 
+    'i386' (in some cross-compilers), or may not be available at all,
+    which is why custom macros are defined for this purpose, 
+    e.g. '__I386__' for i386 as shown here.
 */
 
 #pragma once
@@ -27,6 +32,5 @@ NOTES:
 #include "arch/i386/kernel/include/sys/halt.hpp"
 #include "arch/i386/kernel/include/sys/reboot.hpp"
 #include "arch/i386/kernel/include/sys/shutdown.hpp"
-#include "arch/i386/kernel/include/sys/sleep.hpp"
 #include "arch/i386/kernel/include/sys/panic.hpp"
 #endif

@@ -5,14 +5,11 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    Each function corresponds to a specific hardware interrupt line
-    of the Programmable Interrupt Controller (PIC).
+    Each function corresponds to a specific hardware interrupt line 
+    of the 'Programmable Interrupt Controller' (PIC).
 
 NOTES:
-    Since this function is called by an assembly routine, 
-    it is declared as "extern "C"" to ensure compatibility.
-    
-    The internal implementation is located in "irq.asm".
+    The internal implementation is located in 'irq.asm'.
 */
 
 #pragma once

@@ -1,19 +1,22 @@
 /*
-LICENSE:
     Copyright (c) 2026 Lukenar11 (Luke Matthes)
     MIT Licensed
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This file contains all meta-informations and 
-    the file structure about the file sys.
+    This file contains the internal implementation of the file system.
+    The file system is a flat custom file system residing directly in RAM.
 
 NOTES:
-    Each file-structure represents a file with meta infos, the file contains the
-    file name, format, the data, the size and a using info.
+    Since the file system resides directly in RAM, 
+    all files—along with their contents—are deleted upon 
+    shutting down or restarting the sys.
 
-    An array of file instances is created from the file structure,
-    which then represents all the files.
+    One method are placed in the header 
+    because they are so small that the compiler can inline them.
+
+    Some functions are placed in the header 
+    because they are so small that the compiler can inline them.
 */
 
 #include "filesys/mofs.hpp"

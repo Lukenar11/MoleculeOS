@@ -1,18 +1,18 @@
 ;
 ; LICENSE:
-;     Copyright (c) 2026 Lukenar11 (Luke Matthes)
-;     MIT Licensed
-;     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+;    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+;    MIT Licensed
+;    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 ;
 ; DESCRIPTION:
-;     This file defines the entry point (_start) 
-;     that is called by an external boot loader (GRUB).
+;    This file defines the entry point (_start) 
+;    that is called by an external boot loader (GRUB).
 ;
-;     This entry point initializes the GDT, the stack
-;     and starts the kernel by calling 'kernel_main'.
+;    This entry point initializes the GDT, the stack
+;    and starts the kernel by calling 'kernel_main'.
 ;
 ; NOTES:
-;     The entry point must be named '_start', as GRUB expects it to be.
+;    The entry point must be named '_start', as GRUB expects it to be.
 ;
 
 extern kernel_main

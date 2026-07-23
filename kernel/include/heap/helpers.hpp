@@ -12,7 +12,7 @@ DESCRIPTION:
     to determine the valid heap range.
 
 NOTES:
-    The internal definitions of "heap_start" and "heap_end" are located
+    The internal definitions of 'heap_start' and 'heap_end' are located
     in the linker script (linker.ld).
 */
 

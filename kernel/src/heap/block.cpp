@@ -5,10 +5,9 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This class defines the entire sys heap using a block allocator.
-    The allocator uses linker-defined symbols 
-    ("heap_start" and "heap_end") to determine the valid heap area and 
-    moves a single pointer with each allocation by the amount x.
+    This class defines the entire system heap using a 'block allocator'.
+    The allocator uses linker-defined symbols (heap_start & heap_end)
+    to determine the valid heap area.
 
 NOTES:
 */

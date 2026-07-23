@@ -9,10 +9,10 @@ DESCRIPTION:
     of the Programmable Interrupt Controller (PIC).
 
 NOTES:
-    Since this function is called by an assembly routine, 
-    it is declared as "extern "C"" to ensure compatibility.
+    Each function corresponds to a specific hardware interrupt line 
+    of the 'Programmable Interrupt Controller' (PIC).
 
-    The internal implementation is located in "isr.asm".
+    The internal implementation is located in 'isr.asm'.
 */
 
 #pragma once

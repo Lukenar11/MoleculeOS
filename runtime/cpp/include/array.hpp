@@ -7,7 +7,7 @@ LICENSE:
 DESCRIPTION:
     This header defines a minimal, fixed-size array template.
 
-    Unlike "std::array", this implementation avoids dependencies on the
+    Unlike "'std::array', this implementation avoids dependencies on the
     C++ standard library, which is unavailable in kernel mode.
 
 NOTES:

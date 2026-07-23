@@ -5,8 +5,9 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    The function "kernel_arch_init" is calles from "kernel_main" and 
-    initializes core subsyss such as the IDT and remap the PIC.
+    This function is called from 'kernel_main' and 
+    initializes all architecture specific components/systems
+    such as the IDT and remap the PIC.
 
 NOTES:
 */
@@ -17,6 +18,26 @@ NOTES:
 #include "sys/interrupts.hpp"
 #include <stdint.h>
 #include <io_api.hpp>
+
+namespace 
+{
+    struct PIC_Mapping final {
+        uint16_t port = 0;
+        uint8_t value = 0;
+    };
+
+    const PIC_Mapping pic_mappings[] = {
+        {.port=0x0020, .value=0x11},  // init master IPC
+        {.port=0x00A0, .value=0x11},  // init slave IPC
+        {.port=0x0021, .value=0x20},  // set master interrupt vector offsets
+        {.port=0x00A1, .value=0x28},  // set slave interrupt vector offsets
+        {.port=0x0021, .value=0x04},  // tell master where the slave is connected
+        {.port=0x00A1, .value=0x02},  // tell slave its cascade identity
+        {.port=0x0021, .value=0x01},  // set master 8086/88 mode
+        {.port=0x00A1, .value=0x01},  // set slave 8086/88 mode
+        {.port=0x0021, .value=0xFD}   // enable IRQ 1 (PS/2 controller)
+    };
+}
 
 namespace kernel
 {

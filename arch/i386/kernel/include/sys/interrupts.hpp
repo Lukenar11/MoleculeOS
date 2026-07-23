@@ -9,7 +9,7 @@ DESCRIPTION:
     The routine uses the i386 instruction "sti" to disable interrupts.
 
 NOTES:
-    The internal implementation is located in "enable_interrupts.asm".
+    The internal implementation is located in 'interrupts.hpp'.
 */
 
 #pragma once

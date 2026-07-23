@@ -1,19 +1,21 @@
 ;
 ; LICENSE:
-;     Copyright (c) 2026 Lukenar11 (Luke Matthes)
-;     MIT Licensed
-;     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+;    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+;    MIT Licensed
+;    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 ; 
 ; DESCRIPTION:
-;     This declares the low-level routines for performing x86 port
-;     I/O operations. 
+;    This declares the low-level routines for performing x86 port
+;    I/O operations. 
 ;     
-;     These routines provide byte- and word-level access
-;     to hardware I/O ports and are used by drivers such as the PS/2
-;     controller, PIC, PIT, and VGA hardware.
+;    These routines provide byte- and word-level access
+;    to hardware I/O ports and are used by drivers such as the PS/2
+;    controller, PIC, PIT, and VGA hardware.
+;
+;    The routines are using the i386 instructions 'in', 'out' and 'insw', 'outsw'.
 ; 
 ; NOTES:
-;     The interface is a header file called 'port_io.hpp'
+;    The interface is a header file called 'port_io.hpp'
 ;
 
 global byte_input

@@ -5,15 +5,17 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    Class for creating and loading the Interrupt Descriptor Table (IDT). 
+    Class for creating and loading the 'Interrupt Descriptor Table' (IDT). 
 
-    This class reserves a 256-entry IDT,
-    initializes all interrupt gates using the "IDT_INIT_Entry" table and
-    loads the final descriptor into the CPU using the "load_idt" function.
+    This class reserves a 256-entry 'IDT',
+    initializes all interrupt gates using the 'IDT_INIT_Entry' table and
+    loads the final descriptor into the CPU using the 'load_idt' function.
+
+    'IDT_Descriptor_PTR' is used to have a pointer which loads the 'IDT'.
 
 NOTES:
-    The global "idt" object is created in "init_kernel" 
-    and not directly like other sys components in the source file, 
+    The static 'idt' object is created in 'kernel_arch_init_arch_init' 
+    and not directly like other system components in the source file, 
     otherwise the compiler would remove it 
     since it does not see any direct usage related to other components.
 */

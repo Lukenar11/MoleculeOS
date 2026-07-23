@@ -5,29 +5,15 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
     
 DESCRIPTION:
-    This is the main shell class that provides the
-    high-quality command interface for interacting with the kernel.
+    This class is the main terminal class, 
+    which delivers a high-level UI for the user and uses the shell internally.
 
-    The shell reads keyboard input, forwards characters to the 
-    command interpreter, and manages the execution flow of user commands.
-    
-    The shell acts as a central, 
-    user-visible sys element that coordinates input processing, 
-    command parsing, and output through the kernel's text output subsys.
-    
-    The shell also provides a cursor and cursor blink for the user.
+    The terminal draws ans updates the user cursor and 
+    gives the shell char per char user inputs.
         
 NOTES:
-    The implementation is based on the PS/2 keyboard driver 
-    for input and the interpreter class for command processing.
-
-    The shell itself contains no parsing logic 
-    and serves solely as a control layer and provides a cursor.
-
-    Since "draw_user_cursor" and "erase_user_cursor" are quite simple, 
-    I only declared them in the header so that the compiler can inline them, 
-    because the 
-    compiler can see and optimize headers more easily than source files.
+    Some methods are placed in the header 
+    because they are so small that the compiler can inline them.
 */
 
 #pragma once

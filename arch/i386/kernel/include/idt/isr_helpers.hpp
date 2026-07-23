@@ -5,7 +5,7 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This table is used by the "isr_common_handler" to display 
+    This table is used by the 'isr_handler' to display 
     meaningful diagnostic messages during exception reporting.
 
 NOTES:

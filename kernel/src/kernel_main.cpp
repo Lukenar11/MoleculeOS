@@ -5,20 +5,17 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This file contains the kernel entry point "kernel_main," which
+    This file contains the kernel entry point 'kernel_main', which
     is called directly after the bootloader hands control over to the kernel.
 
-    The function initializes core subsyss such as the IDT with the
-    function "init_kernel", performs a simple interrupt- and 
+    The function initializes core subsyss such as the 'IDT' with the
+    function 'kernel_arch_init", performs a simple interrupt- and 
     endless-loop-driven scheduling, and starts the shell.
 
 NOTES:
-    This "kernel_main" function must never return. If execution reaches the 
-    end of "kernel_main", 
+    This 'kernel_main' function must never return. 
+    If execution reaches the end of 'kernel_main', 
     a kernel panic is triggered to prevent undefined behavior.
-
-    Since this function is called by an assembly routine,
-    it is declared as "extern C" to ensure compatibility.
 */
 
 #include <kernel_api.hpp>

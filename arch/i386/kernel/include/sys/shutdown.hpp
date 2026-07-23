@@ -14,7 +14,7 @@ NOTES:
     or works on real hardware but is extremely complex to implement.
 
     This routine is emulator-specific and only works on 
-    QEMU, Bochs and VirtualBox.
+    'QEMU', 'Bochs' and 'VirtualBox'.
 */
 
 #pragma once

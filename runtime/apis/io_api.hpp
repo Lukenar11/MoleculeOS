@@ -5,11 +5,8 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This file defines a central runtime API for all architecture-dependent functions.
-
-    This API works by including all architecture-specific components from 'arch', 
-    and preprocessor '#ifdef' cascades ensure that only the includes for the 
-    respective architecture are compiled.
+    This file defines a central runtime API for 
+    all architecture-dependent I/O functions.
 
 NOTES:
     Macros that have been defined based on the selected architecture are 

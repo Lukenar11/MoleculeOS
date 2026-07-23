@@ -5,8 +5,8 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This File contains a enum class for the 
-    ATA-PIO-driver operation representation and commands.
+    This File contains a 'enum class' for the 
+    ATA-PIO-driver operation and commands representation.
 
 NOTES:
 */

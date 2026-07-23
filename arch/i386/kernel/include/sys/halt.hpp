@@ -5,13 +5,13 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This header exposes the low-level CPU halt routine.
+    This file exposes the low-level CPU halt routine.
 
     The routine disables interrupts and enters an infinite halt loop,
     ensuring that the CPU remains in a safe, non-executing state.
 
 NOTES:
-    The internal implementation is located in "hang.asm".
+    The internal implementation is located in 'halt.hpp'.
 */
 
 #pragma once

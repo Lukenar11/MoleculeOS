@@ -5,18 +5,16 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This is a PS/2 keyboard input driver, 
+    This is a 'PS/2' keyboard input driver, 
     for reading translated keypresses from the keyboard controller (i8042).
 
     The driver reads raw scancodes from the data port, applies modifier
-    state such as Shift and CapsLock, and returns the resulting ASCII
+    state such as 'Shift' and 'CapsLock', and returns the resulting ASCII
     character to other components like the shell.
 
 NOTES:
-    The function "has_pending_scancode" is intentionally in the header because
-    the compiler can see and optimize header files better than source files; 
-    since this function is so small, 
-    the compiler can therefore probably inline it.
+    Some methods are placed in the header 
+    because they are so small that the compiler can inline them.
 */
 
 #pragma once

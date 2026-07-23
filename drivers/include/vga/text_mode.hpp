@@ -7,7 +7,7 @@ LICENSE:
 DESCRIPTION:
     This is a VGA text mode driver, which provides a
     low‑level interface for writing characters and colors directly to
-    the VGA text buffer located at physical address 0xB8000.
+    the VGA text buffer located at physical address '0xB8000'.
 
     The driver offers utilities for constructing color attributes,
     composing character entries, and writing text to specific screen
@@ -30,8 +30,8 @@ namespace drivers::vga
     class Text_Mode final {
     private:
         static inline constexpr uint8_t BLINK_MODE_BIT = 0x80;
-        static inline volatile uint16_t* const VGA_TEXT_MODE_SCREEN_FRAME_BUFFER =
-            reinterpret_cast<volatile uint16_t*>(0xB8000);
+        static inline volatile uint16_t* 
+        const VGA_TEXT_MODE_SCREEN_FRAME_BUFFER = reinterpret_cast<volatile uint16_t*>(0xB8000);
 
     public:
         [[nodiscard]]

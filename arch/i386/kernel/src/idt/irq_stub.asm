@@ -6,27 +6,27 @@
 ;
 ; DESCRIPTION:
 ;     This routine saves the full CPU register state, switches to the kernel
-;     data segment, and forwards control to the "irq_common_handler".
+;     data segment, and forwards control to the 'irq_handler'.
 ;
 ; NOTES:
-;     The stack layout created here must match the "RegisterDump" structure
+;     The stack layout created here must match the 'Registers' structure
 ;     exactly. 
 ;
 ;     Any deviation will corrupt the register dump and may cause
 ;     undefined behavior.
 ;
 ;     After the handler returns, this stub restores all registers, removes
-;     the pushed interrupt number and error code, and returns using "iretd".
+;     the pushed interrupt number and error code, and returns using 'iretd'.
 ;
 
-global irq_common_stub
-extern irq_common_handler
+global irq_stub
+extern irq_handler
 
 %define KERNEL_DATA_SEGMENT_SELECTOR 0x10
 
 section .text
 
-irq_common_stub:
+irq_stub:
     push eax
     push ecx
     push edx
@@ -41,32 +41,32 @@ irq_common_stub:
     push ds
 
     ; set kernel data segment
-    mov  ax, KERNEL_DATA_SEGMENT_SELECTOR
-    mov  ds, ax
-    mov  es, ax
-    mov  fs, ax
-    mov  gs, ax
+    mov ax, KERNEL_DATA_SEGMENT_SELECTOR
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
 
     ; pointer to "Registers"
     push esp
-    call irq_common_handler
+    call irq_handler
     add  esp, 4
 
-    pop  ds
-    pop  es
-    pop  fs
-    pop  gs
+    pop ds
+    pop es
+    pop fs
+    pop gs
 
-    pop  edi
-    pop  esi
-    pop  ebp
-    pop  ebx
-    pop  edx
-    pop  ecx
-    pop  eax
+    pop edi
+    pop esi
+    pop ebp
+    pop ebx
+    pop edx
+    pop ecx
+    pop eax
 
     ; remove "interrupt_number" + "error_code"
-    add  esp, 8
+    add esp, 8
 
     iretd
     

@@ -5,16 +5,15 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This file contains the high-level text output sys, 
+    This file contains the high-level text output system, 
     which provides formatted and unformatted print functions 
-    on the VGA text mode driver.
+    on the 'VGA text mode driver'.
 
     It provides character output, string output, 
     integer formatting, hexadecimal and binary print output, 
-    pointer formatting, as well as a lightweight printf implementation 
-    and supports setting various text colors.
+    pointer formatting and supports setting various text and cursor colors.
 
-    The "Text_Output" class manages its own cursor state, 
+    The 'Text_Output' class manages its own cursor state, 
     color configuration, and line management, 
     allowing structured and readable output during runtime.
     

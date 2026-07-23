@@ -8,7 +8,7 @@ DESCRIPTION:
     This file contains the internal implementation of 
     one of the terminal commands available in MoleculeOS.
 
-    This command turns the sys off.
+    This command turns the system off.
 
     The commands can be called by the 
     shell interpreter from a table generated at compile time, 

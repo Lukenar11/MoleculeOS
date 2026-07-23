@@ -10,11 +10,9 @@ DESCRIPTION:
 
 NOTES:
     This header must not be used in code; it is included only because all 
-    C and C++ compilers require a basic C runtime environment and 
+    C and C++ compilers require a basic 'C runtime' environment and 
     do not accept user-defined implementations whose names or
-    signatures differ from those described in the C standard.
-
-    The actual API used by the compiler is the file "string.h".
+    signatures differ from those described in the 'C standard'.
 */
 
 #include "utils/compiler_c_api.hpp"

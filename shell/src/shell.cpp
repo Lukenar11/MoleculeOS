@@ -5,21 +5,16 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This is the command Shell used by the MoleculeOS shell. 
-            
-    The Shell receives raw keyboard input, 
-    tokenizes the input string, separates command and args,
+    This is the command interpreter used by the MoleculeOS shell. 
+        
+    The interpreter receives raw keyboard input, 
+    tokenizes the input string, separates command and arguments,
     and dispatches the 
     appropriate handler based on a compile‑time hash lookup table.
     
 NOTES:
-    The "make_hash" function and the "shell_command_table" 
-    are intentionally declared only in the header 
-    to ensure that the hash lookup table can be created at compile time.
-
-    Since the functions "set_error_message_text_color" and 
-    "set_error_message_text_color" are so short, 
-    I put them in the header so the compiler can inline them.
+    Some methods are placed in the header 
+    because they are so small that the compiler can inline them.
 */
 
 #include "shell.hpp"

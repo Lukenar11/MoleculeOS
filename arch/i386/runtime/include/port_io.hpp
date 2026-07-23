@@ -12,10 +12,10 @@ DESCRIPTION:
     to hardware I/O ports and are used by drivers such as the PS/2
     controller, PIC, PIT, and VGA hardware.
 
-    The routines are using the i386 instructions "in" and "out".
+    The routines are using the i386 instructions 'in', 'out' and 'insw', 'outsw'.
 
 NOTES:
-    The internal implementation is located in "load_idt.asm".
+    The internal implementation is located in 'load_idt.asm'.
 */
 
 #pragma once
