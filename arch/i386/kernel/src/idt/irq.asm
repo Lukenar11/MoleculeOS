@@ -15,7 +15,7 @@
 extern irq_handler
 extern irq_stub
 global irq_0, irq_1, irq_2,  irq_3,  irq_4,  irq_5,  irq_6,  irq_7,  \
-       irq_8, irq_9, irq_10, irq_11, irq_12, irq_13, irq_14, irq_15, \
+       irq_8, irq_9, irq_10, irq_11, irq_12, irq_13, irq_14, irq_15
 
 section .text
 

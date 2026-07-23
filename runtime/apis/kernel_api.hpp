@@ -1,4 +1,4 @@
-/* 
+/**
 LICENSE:
     Copyright (c) 2026 Lukenar11 (Luke Matthes)
     MIT Licensed

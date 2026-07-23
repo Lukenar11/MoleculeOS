@@ -1,4 +1,4 @@
-/*
+/**
 LICENSE:
     Copyright (c) 2026 Lukenar11 (Luke Matthes)
     MIT Licensed
@@ -26,7 +26,7 @@ namespace
         uint8_t value = 0;
     };
 
-    const PIC_Mapping pic_mappings[] = {
+    constexpr PIC_Mapping pic_mappings[] = {
         {.port=0x0020, .value=0x11},  // init master IPC
         {.port=0x00A0, .value=0x11},  // init slave IPC
         {.port=0x0021, .value=0x20},  // set master interrupt vector offsets
