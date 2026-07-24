@@ -18,7 +18,7 @@ NOTES:
 
 #pragma once
 
-#include "isr_helpers.hpp"
+#include "utils/isr_helpers.hpp"
 #include "sys/interrupts.hpp"
 
 namespace

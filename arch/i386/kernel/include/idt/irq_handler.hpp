@@ -18,7 +18,7 @@ NOTES:
 
 #pragma once
 
-#include "irq_helpers.hpp"
+#include "idt/utils/irq_helpers.hpp"
 #include "utils/regs.hpp"
 #include <drivers_api.hpp>
 #include <io_api.hpp>

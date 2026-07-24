@@ -19,7 +19,7 @@ NOTES:
 
 #pragma once
 
-#include "isr_helpers.hpp"
+#include "idt/utils/isr_helpers.hpp"
 #include "utils/regs.hpp"
 #include "sys/halt.hpp"
 #include "sys/panic.hpp"

@@ -6,6 +6,7 @@
 
 COMMON_FLAGS += -Iarch/i386/kernel/include \
 				-Iarch/i386/kernel/include/idt \
+				-Iarch/i386/kernel/include/idt/utils \
 				-Iarch/i386/kernel/include/sys \
 				-Iarch/i386/kernel/include/utils \
 

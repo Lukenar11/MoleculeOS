@@ -22,9 +22,9 @@ NOTES:
 
 #pragma once
 
-#include "idt_helpers.hpp"
-#include "isr.hpp"
-#include "irq.hpp"
+#include "idt/utils/idt_helpers.hpp"
+#include "idt/isr.hpp"
+#include "idt/irq.hpp"
 #include "load_idt.hpp"
 #include <kernel_api.hpp>
 #include <stdint.h>
