@@ -20,14 +20,53 @@ NOTES:
 
 #include "create.hpp"
 
+static bool split_file_name_and_size(const runtime::Array<char, 64>& args,
+                                     runtime::Array<char, 64>& filename,
+                                     uint32_t& file_size) noexcept {
+    using namespace runtime;
+
+    file_size = 1024;
+
+    String_Manipulation::copy_string(filename.data(), args.data());
+
+    char* last_space = nullptr;
+    for (char* filename_ptr = filename.data(); *filename_ptr != '\0'; ++filename_ptr) {
+        if (*filename_ptr == ' ')
+            last_space = filename_ptr;
+    }
+
+    if (last_space == nullptr)
+        return false;
+
+    char* size_ptr = last_space + 1;
+    if (*size_ptr == '\0')
+        return false;
+
+    for (char* p = size_ptr; *p != '\0'; ++p) {
+        if (!String_Manipulation::is_digit(*p))
+            return false;
+    }
+
+    file_size = String_Manipulation::string_to_int(size_ptr);
+    *last_space = '\0';
+
+    return true;
+}
+
 namespace shell::commands
 {
     void create(const runtime::Array<char, 64>& args) noexcept {
         using namespace kernel::filesys;
+        using namespace runtime;
 
         static const char* command_name = "create: ";
 
-        Parsed_File_Name& parsed_filename = parse_filename(args);
+        Array<char, 64> filename_args;
+        uint32_t file_size;
+
+        split_file_name_and_size(args, filename_args, file_size);
+
+        Parsed_File_Name& parsed_filename = parse_filename(filename_args);
         if (parsed_filename.error.data()[0] != '\0') [[unlikely]] {
             print_command_error(command_name);
             print_command_error(parsed_filename.error.data());
@@ -36,11 +75,12 @@ namespace shell::commands
             return;
         }
 
-        I_Node* inode = MoleculeOS_File_System_2::create_file(parsed_filename.name.data(),
-                                                              parsed_filename.format.data(),
-                                                              1024);
+        const I_Node* inode = MoleculeOS_File_System_2::create_file(parsed_filename.name.data(),
+                                                                    parsed_filename.format.data(),
+                                                                    file_size);
         if (!inode) [[unlikely]] {
             static const char* error_message = "file does already exists";
+
             print_command_error(command_name);
             print_command_error(error_message);
 

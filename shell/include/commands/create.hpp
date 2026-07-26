@@ -21,8 +21,15 @@ NOTES:
 #pragma once
 
 #include "../utils/commands_helpers.hpp"
+#include "../utils/utils.hpp"
 #include <kernel_api.hpp>
 #include <array.hpp>
+#include <string_manip.hpp>
+
+static bool split_file_name_and_size(const runtime::Array<char, 64>& args,
+                                     runtime::Array<char, 64>& filename,
+                                     uint32_t& file_size) noexcept;
+
 
 namespace shell::commands
 {
