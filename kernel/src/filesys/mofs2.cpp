@@ -35,6 +35,22 @@ namespace kernel::filesys
 
         return hash;
     }
+    
+    bool MoleculeOS_File_System_2::file_already_exists(const I_Node& inode, 
+                                                       const char* name, 
+                                                       const char* format,
+                                                       const uint32_t name_hash,
+                                                       const uint32_t format_hash) 
+                                                       noexcept {
+        using namespace runtime;
+
+        if ((inode.name_hash == name_hash) && (inode.format_hash == format_hash))
+            if ((String_Manipulation::compare_strings(name, inode.file_name.data()) == 0) &&
+                (String_Manipulation::compare_strings(format, inode.file_format.data()) == 0))
+                return true;
+        
+        return false;
+    }
 
     I_Node* MoleculeOS_File_System_2::create_file(const char* name, 
                                                   const char* format, 
@@ -42,21 +58,18 @@ namespace kernel::filesys
                                                   noexcept {
         using namespace runtime;
 
-        if (String_Manipulation::get_string_length(name) > MAX_FILE_NAME_LENGTH) [[unlikely]]
-            return nullptr;
-
-        if (String_Manipulation::get_string_length(format) > MAX_FILE_FORMAT_LENGTH) [[unlikely]]
-            return nullptr;
-
-        if (byte_size == 0) [[unlikely]]
+        if (!name_and_format_guard(name, format)) [[unlikely]]
             return nullptr;
 
         const uint32_t name_hash   = to_fnv1a_hash(name);
         const uint32_t format_hash = to_fnv1a_hash(format);
 
         for (uint32_t i = 0; i < inode_table.size(); i++) {
-            if ((inode_table[i].name_hash == name_hash) && 
-                (inode_table[i].format_hash == format_hash)) [[unlikely]]
+            if (file_already_exists(inode_table[i], 
+                                    name, 
+                                    format,
+                                    name_hash,
+                                    format_hash)) [[unlikely]]
                 return nullptr;
 
             if (inode_table[i].file_data_ptr == nullptr) {
@@ -64,12 +77,13 @@ namespace kernel::filesys
                 if (ptr == nullptr) [[unlikely]]
                     return nullptr;
 
+
                 inode_table[i].file_byte_size = byte_size;
                 inode_table[i].file_data_ptr  = ptr;
                 inode_table[i].format_hash    = format_hash;
                 inode_table[i].name_hash      = name_hash;
 
-                String_Manipulation::copy_string(inode_table[i].file_format.data(), format);                
+                String_Manipulation::copy_string(inode_table[i].file_format.data(), format);               
                 String_Manipulation::copy_string(inode_table[i].file_name.data(), name);
 
                 return &inode_table[i];
@@ -83,21 +97,20 @@ namespace kernel::filesys
                                                const char* format) noexcept {
         using namespace runtime;
 
-        if (String_Manipulation::get_string_length(name) > 
-            MAX_FILE_NAME_LENGTH) [[unlikely]] 
+        if (!name_and_format_guard(name, format)) [[unlikely]]
             return false;
             
-        if (String_Manipulation::get_string_length(format) > 
-            MAX_FILE_FORMAT_LENGTH) [[unlikely]]
-            return false;
-
         const uint32_t name_hash   = to_fnv1a_hash(name);
         const uint32_t format_hash = to_fnv1a_hash(format);
 
         for (uint32_t i = 0; i < inode_table.size(); i++) {
-            if ((inode_table[i].name_hash == name_hash) && 
-                (inode_table[i].format_hash == format_hash)) [[unlikely]] {
-                heap::Block_Allocator::deallocate(inode_table[i].file_data_ptr);
+            if (file_already_exists(inode_table[i], 
+                                    name, 
+                                    format,
+                                    name_hash,
+                                    format_hash)) [[likely]] {
+                if (inode_table[i].file_data_ptr != nullptr) [[unlikely]]
+                    heap::Block_Allocator::deallocate(inode_table[i].file_data_ptr);
 
                 inode_table[i].file_name.fill('\0');
                 inode_table[i].file_format.fill('\0');

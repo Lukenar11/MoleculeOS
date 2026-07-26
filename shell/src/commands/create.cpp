@@ -20,37 +20,45 @@ NOTES:
 
 #include "create.hpp"
 
-static bool split_file_name_and_size(const runtime::Array<char, 64>& args,
+static void split_file_name_and_size(const runtime::Array<char, 64>& args,
                                      runtime::Array<char, 64>& filename,
-                                     uint32_t& file_size) noexcept {
+                                     uint32_t& file_size) 
+                                     noexcept {
     using namespace runtime;
 
     file_size = 1024;
 
     String_Manipulation::copy_string(filename.data(), args.data());
 
+    char* filename_ptr = filename.data();
+
+    while (*filename_ptr == ' ') 
+        ++filename_ptr;
+
+    if (filename_ptr != filename.data())
+        String_Manipulation::copy_string(filename.data(), filename_ptr);
+
     char* last_space = nullptr;
-    for (char* filename_ptr = filename.data(); *filename_ptr != '\0'; ++filename_ptr) {
+
+    for (char* filename_ptr = filename.data(); *filename_ptr != '\0'; ++filename_ptr)
         if (*filename_ptr == ' ')
             last_space = filename_ptr;
-    }
 
     if (last_space == nullptr)
-        return false;
+        return;
 
     char* size_ptr = last_space + 1;
     if (*size_ptr == '\0')
-        return false;
+        return;
 
-    for (char* p = size_ptr; *p != '\0'; ++p) {
-        if (!String_Manipulation::is_digit(*p))
-            return false;
-    }
+    for (char* i_ptr = size_ptr; *i_ptr != '\0'; ++i_ptr)
+        if (!String_Manipulation::is_digit(*i_ptr))
+            return;
 
-    file_size = String_Manipulation::string_to_int(size_ptr);
+    file_size   = String_Manipulation::string_to_int(size_ptr);
     *last_space = '\0';
 
-    return true;
+    return;
 }
 
 namespace shell::commands
@@ -79,7 +87,7 @@ namespace shell::commands
                                                                     parsed_filename.format.data(),
                                                                     file_size);
         if (!inode) [[unlikely]] {
-            static const char* error_message = "file does already exists";
+            static const char* error_message = "file could not be created";
 
             print_command_error(command_name);
             print_command_error(error_message);

@@ -26,10 +26,9 @@ NOTES:
 #include <array.hpp>
 #include <string_manip.hpp>
 
-static bool split_file_name_and_size(const runtime::Array<char, 64>& args,
+static void split_file_name_and_size(const runtime::Array<char, 64>& args,
                                      runtime::Array<char, 64>& filename,
                                      uint32_t& file_size) noexcept;
-
 
 namespace shell::commands
 {

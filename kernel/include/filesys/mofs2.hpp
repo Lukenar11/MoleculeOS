@@ -28,6 +28,30 @@ NOTES:
 #include <stdint.h>
 #include <string_manip.hpp>
 
+namespace
+{
+    inline bool name_and_format_guard(const char* name, 
+                                      const char* format) noexcept {
+        using namespace runtime;
+        using namespace kernel::filesys;
+
+        if (!name || !format) [[unlikely]] 
+            return false;
+
+        const uint32_t name_length   = String_Manipulation::get_string_length(name);
+        const uint32_t format_length = String_Manipulation::get_string_length(format);
+
+        if (name_length == 0 || 
+            name_length > MAX_FILE_NAME_LENGTH) [[unlikely]] 
+            return false;
+
+        if (format_length > MAX_FILE_FORMAT_LENGTH) [[unlikely]]
+            return false;
+
+        return true;
+    }
+}
+
 namespace kernel::filesys
 {
     class MoleculeOS_File_System_2 final {
@@ -36,10 +60,17 @@ namespace kernel::filesys
 
         static uint32_t to_fnv1a_hash(const char* txt) noexcept;
 
+        static bool file_already_exists(const I_Node& inode, 
+                                        const char* name, 
+                                        const char* format,
+                                        const uint32_t name_hash,
+                                        const uint32_t format_hash) 
+                                        noexcept;
+
     public:
 
-        static inline constexpr const runtime::Array<I_Node, 256>& get_inode_table() 
-        noexcept {
+        static inline constexpr 
+        const runtime::Array<I_Node, 256>& get_inode_table() noexcept {
             return inode_table;
         };
 

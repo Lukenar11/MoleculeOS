@@ -66,8 +66,8 @@ namespace shell::commands
             }
         }
 
-        parsed_filename.name[file_name_index + 1]     = '\0';
-        parsed_filename.format[file_format_index + 1] = '\0';
+        parsed_filename.name[file_name_index]     = '\0';
+        parsed_filename.format[file_format_index] = '\0';
     
         for (uint32_t i = 0; parsed_filename.name[i] != '\0'; i++)
             if (!kernel::filesys::MoleculeOS_File_System_2::

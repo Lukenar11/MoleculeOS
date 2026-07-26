@@ -19,8 +19,8 @@ namespace kernel::filesys
     constexpr uint32_t MAX_FILE_FORMAT_LENGTH = 4;
 
     struct I_Node final {
-        runtime::Array<char, MAX_FILE_NAME_LENGTH> file_name;
-        runtime::Array<char, MAX_FILE_FORMAT_LENGTH> file_format;
+        runtime::Array<char, MAX_FILE_NAME_LENGTH + 1> file_name;
+        runtime::Array<char, MAX_FILE_FORMAT_LENGTH + 1> file_format;
         uint32_t name_hash      = 0;
         uint32_t format_hash    = 0;
         uint32_t file_byte_size = 0;
