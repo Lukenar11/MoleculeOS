@@ -75,17 +75,6 @@ namespace shell
                                                  drivers::vga::Text_Mode_Colors::BLACK);
         }
 
-        template <typename Arr>
-        inline constexpr bool append_char(Arr& buffer, 
-                                          uint32_t& index,
-                                          const char symbol) noexcept {
-            if (index < buffer.size()) [[likely]] {
-                buffer[index++] = symbol;
-                return true;
-            }
-            return false;
-        }
-
         void print_overflow_error(const char* error_message_for, 
                                   const uint32_t max_buffer_size) const noexcept;
 
@@ -94,7 +83,7 @@ namespace shell
         bool tokenize_input_buffer();
         void parse_commands() noexcept;
             
-        constexpr void flush_shell_pipeline() noexcept;
+        constexpr void flush_pipeline() noexcept;
 
     public:
         void step(const char& key);

@@ -118,7 +118,7 @@ namespace shell
         set_default_text_color();
     }
 
-    constexpr void Shell::flush_shell_pipeline() noexcept {
+    constexpr void Shell::flush_pipeline() noexcept {
         input_buffer.fill('\0');
         commands.fill('\0');
         args.fill('\0');
@@ -142,7 +142,7 @@ namespace shell
             if (is_tokenized && validate_tokens())
                 parse_commands();
 
-            flush_shell_pipeline();
+            flush_pipeline();
             return;
         }
 
@@ -152,6 +152,6 @@ namespace shell
         runtime::Text_Output::put_char('\n');
         print_overflow_error("Input buffer", input_buffer.size());
 
-        flush_shell_pipeline();
+        flush_pipeline();
     }
 } // namespace shell
