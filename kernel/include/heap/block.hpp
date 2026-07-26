@@ -18,7 +18,7 @@ NOTES:
 #include <stdint.h>
 #include <array.hpp>
 #include <kernel_api.hpp>
-#include <string_manip.hpp>
+#include <memory_manip.hpp>
 
 namespace kernel::heap
 {

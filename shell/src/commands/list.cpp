@@ -26,26 +26,28 @@ namespace shell::commands
         runtime::Text_Output::reset();
         runtime::Text_Output::put_string("Files:\n");
 
-        const auto& files = kernel::filesys::MoleculeOS_File_sys::get_files();
-        for (const auto& file : files) {
-            if (!file.in_use)
+        const auto& inodes = kernel::filesys::MoleculeOS_File_System_2::get_inode_table();
+        for (const auto& inode : inodes) {
+            if (inode.file_data_ptr == nullptr)
                 continue;
 
-            if (file.name[0] == '\0') [[unlikely]] {
+            if (inode.file_name[0] == '\0') [[unlikely]] {
                 static const char* error_message = "\t- [INVALID FILE]\n";
                 runtime::Text_Output::put_string(error_message);
                 continue;
             }
 
             runtime::Text_Output::put_string("\t- ");
-            runtime::Text_Output::put_string(file.name);
+            runtime::Text_Output::put_string(inode.file_name.data());
 
-            if (file.format[0] != '\0') {
+            if (inode.file_format[0] != '\0') {
                 runtime::Text_Output::put_char('.');
-                runtime::Text_Output::put_string(file.format);
+                runtime::Text_Output::put_string(inode.file_format.data());
             }
 
-            runtime::Text_Output::put_char('\n');
+            runtime::Text_Output::put_string(" (");
+            runtime::Text_Output::put_uint(inode.file_byte_size);
+            runtime::Text_Output::put_string(" Bytes)\n");
         }
 
         runtime::Text_Output::put_char('\n');

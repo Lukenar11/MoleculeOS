@@ -4,7 +4,7 @@
 # https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 # 
 
-OBJS += $(BUILD)/mofs.o \
+OBJS += $(BUILD)/mofs2.o \
 		$(BUILD)/block.o \
 		$(BUILD)/kernel_main.o \
 

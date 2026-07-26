@@ -112,23 +112,19 @@ namespace runtime
         case '\b':
             if (cursor_x > 0) {
                 cursor_x--;
-                drivers::vga::Text_Mode::put_char_at(
-                    ' ', 
-                    cursor_color, 
-                    cursor_x, 
-                    cursor_y
-                );
+                drivers::vga::Text_Mode::put_char_at(' ', 
+                                                     cursor_color, 
+                                                     cursor_x, 
+                                                     cursor_y);
             }
             break;
 
         case '\t':
             for (uint32_t i = 0; i < 4; ++i) {
-                drivers::vga::Text_Mode::put_char_at(
-                    ' ', 
-                    cursor_color, 
-                    cursor_x, 
-                    cursor_y
-                );
+                drivers::vga::Text_Mode::put_char_at(' ', 
+                                                     cursor_color, 
+                                                     cursor_x, 
+                                                     cursor_y);
                 cursor_x++;
 
                 if (cursor_x >= drivers::vga::TEXT_MODE_SCREEN_WIDTH) [[unlikely]]
@@ -141,12 +137,10 @@ namespace runtime
             break;
 
         default:
-            drivers::vga::Text_Mode::put_char_at(
-                symbol, 
-                cursor_color, 
-                cursor_x, 
-                cursor_y
-            );
+            drivers::vga::Text_Mode::put_char_at(symbol, 
+                                                 cursor_color, 
+                                                 cursor_x, 
+                                                 cursor_y);
             cursor_x++;
 
             if (cursor_x >= drivers::vga::TEXT_MODE_SCREEN_WIDTH) [[unlikely]]

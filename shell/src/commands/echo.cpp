@@ -132,67 +132,67 @@ namespace
             return;
         }
     
-        auto* inode = 
-            kernel::filesys::MoleculeOS_File_sys::
-            get_file_by_name_and_format(parsed_filename.name.data(),
-                                        parsed_filename.format.data());
-        if (!inode)
-            inode = kernel::filesys::MoleculeOS_File_sys::
-                    create_file(parsed_filename.name.data(),
-                                parsed_filename.format.data());
-
-        kernel::filesys::MoleculeOS_File_sys::
-        set_file_content_as_string(inode,
-                                   file_instream.data(),
-                                   runtime::
-                                   String_Manipulation::get_string_length(file_instream.data()));
+        // auto* inode = 
+        //     kernel::filesys::MoleculeOS_File_System_2::
+        //     get_file_by_name_and_format(parsed_filename.name.data(),
+        //                                 parsed_filename.format.data());
+        // if (!inode)
+        //     inode = kernel::filesys::MoleculeOS_File_System_2::
+        //             create_file(parsed_filename.name.data(),
+        //                         parsed_filename.format.data());
+// 
+        // kernel::filesys::MoleculeOS_File_System_2::
+        // set_file_content_as_string(inode,
+        //                            file_instream.data(),
+        //                            runtime::
+        //                            String_Manipulation::get_string_length(file_instream.data()));
     }
 }
 
 void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
     const char* command_name = "echo: ";
 
-    static runtime::Array<char, kernel::filesys::MAX_FILE_SIZE> buffer;
-    buffer.fill('\0');
+    // static runtime::Array<char, kernel::filesys::MAX_FILE_SIZE> buffer;
+    // buffer.fill('\0');
+// 
+    // static shell::commands::Parsed_File_Name parsed_filename;
+    // parsed_filename.name.fill('\0');
+    // parsed_filename.format.fill('\0');
+    // parsed_filename.error.fill('\0');
+// 
+    // parsed_filename = shell::commands::parse_filename(filename);
+    // if (parsed_filename.error[0] != '\0') {
+    //     shell::commands::print_command_error(command_name);
+    //     shell::commands::print_command_error(parsed_filename.error.data());
+    //     return;
+    // }
 
-    static shell::commands::Parsed_File_Name parsed_filename;
-    parsed_filename.name.fill('\0');
-    parsed_filename.format.fill('\0');
-    parsed_filename.error.fill('\0');
+    // auto* inode = kernel::filesys::MoleculeOS_File_System_2::
+    //               get_file_by_name_and_format(parsed_filename.name.data(),
+    //                                           parsed_filename.format.data());
+    // if (!inode) {
+        // shell::commands::print_command_error(command_name);
+        // shell::commands::print_command_error("file not found\n");
+        // return;
+    // }
 
-    parsed_filename = shell::commands::parse_filename(filename);
-    if (parsed_filename.error[0] != '\0') {
-        shell::commands::print_command_error(command_name);
-        shell::commands::print_command_error(parsed_filename.error.data());
-        return;
-    }
+    // const uint32_t needed_size = inode->size + 1;
+    // if (needed_size > buffer.size()) {
+    //     shell::commands::print_command_error(command_name);
+    //     shell::commands::print_command_error("file too large\n");
+    //     return;
+    // }
 
-    auto* inode = kernel::filesys::MoleculeOS_File_sys::
-                  get_file_by_name_and_format(parsed_filename.name.data(),
-                                              parsed_filename.format.data());
-    if (!inode) {
-        shell::commands::print_command_error(command_name);
-        shell::commands::print_command_error("file not found\n");
-        return;
-    }
+    // if (!kernel::filesys::MoleculeOS_File_System_2::get_file_content_as_string(inode,
+    //                                                                             buffer.data(),
+    //                                                                             needed_size)) {
+        // shell::commands::print_command_error(command_name);
+        // shell::commands::print_command_error("could not read file\n");
+        // return;
+    // }
 
-    const uint32_t needed_size = inode->size + 1;
-    if (needed_size > buffer.size()) {
-        shell::commands::print_command_error(command_name);
-        shell::commands::print_command_error("file too large\n");
-        return;
-    }
-
-    if (!kernel::filesys::MoleculeOS_File_sys::get_file_content_as_string(inode,
-                                                                                buffer.data(),
-                                                                                needed_size)) {
-        shell::commands::print_command_error(command_name);
-        shell::commands::print_command_error("could not read file\n");
-        return;
-    }
-
-    for (uint32_t i = 0; buffer[i] != '\0'; i++)
-        runtime::Text_Output::put_char(buffer[i]);
+    // for (uint32_t i = 0; buffer[i] != '\0'; i++)
+    //     runtime::Text_Output::put_char(buffer[i]);
 }
 
 namespace shell::commands

@@ -74,6 +74,21 @@ namespace runtime
             return static_cast<uint8_t>(*a_ptr) - static_cast<uint8_t>(*b_ptr);
         }
 
+        static inline int32_t string_to_int(const char* txt) noexcept {
+            uint32_t multiplier = 1; 
+            uint32_t result     = 0;
+
+            for (uint32_t i = get_string_length(txt) - 1; i >= 0; i--) {
+                result += multiplier * (txt[i] - '0');
+                multiplier *= 10;
+            }
+            return result;
+        }
+
+        static inline bool is_digit(const char symbol) noexcept {
+            return (symbol >= '0') && (symbol <= '9');
+        }
+
         String_Manipulation() noexcept  = default;
         ~String_Manipulation() noexcept = default;
     };

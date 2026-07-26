@@ -23,22 +23,21 @@ NOTES:
 namespace shell::commands
 {
     void remove(const runtime::Array<char, 64>& args) noexcept {
+        using namespace kernel::filesys;
+        
         static const char* command_name = "remove: ";
 
-        Parsed_File_Name parsed = parse_filename(args);
-        if (parsed.error.data()[0] != '\0') [[unlikely]] {
+        Parsed_File_Name& parsed_filename = parse_filename(args);
+        if (parsed_filename.error.data()[0] != '\0') [[unlikely]] {
             print_command_error(command_name);
-            print_command_error(parsed.error.data());
+            print_command_error(parsed_filename.error.data());
 
             command_end();
             return;
         }
 
-        auto* inode = kernel::filesys::MoleculeOS_File_sys::
-                      get_file_by_name_and_format(parsed.name.data(),
-                                                  parsed.format.data());
-
-        if (!inode) [[unlikely]] {
+        if (!MoleculeOS_File_System_2::delete_file(parsed_filename.name.data(),
+                                                   parsed_filename.format.data())) [[unlikely]] {
             static const char* error_message = "file does not exist";
             print_command_error(command_name);
             print_command_error(error_message);
@@ -47,7 +46,6 @@ namespace shell::commands
             return;
         }
 
-        kernel::filesys::MoleculeOS_File_sys::delete_file(inode);
         command_end();
     }
 } // namespace shell::commands

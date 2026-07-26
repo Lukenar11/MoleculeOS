@@ -18,7 +18,7 @@ NOTES:
 
 #pragma once
 
-#include "kernel/include/filesys/mofs.hpp"
+#include "kernel/include/filesys/mofs2.hpp"
 #include "kernel/include/filesys/helpers.hpp"
 #include "kernel/include/heap/block.hpp"
 
