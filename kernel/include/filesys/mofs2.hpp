@@ -68,9 +68,7 @@ namespace kernel::filesys
                                         noexcept;
 
     public:
-
-        static inline constexpr 
-        const runtime::Array<I_Node, 256>& get_inode_table() noexcept {
+        static inline constexpr const runtime::Array<I_Node, 256>& get_inode_table() noexcept {
             return inode_table;
         };
 

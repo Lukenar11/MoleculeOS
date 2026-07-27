@@ -77,7 +77,6 @@ namespace kernel::filesys
                 if (ptr == nullptr) [[unlikely]]
                     return nullptr;
 
-
                 inode_table[i].file_byte_size = byte_size;
                 inode_table[i].file_data_ptr  = ptr;
                 inode_table[i].format_hash    = format_hash;

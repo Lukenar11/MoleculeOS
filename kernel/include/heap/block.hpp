@@ -49,10 +49,10 @@ namespace kernel::heap
                                                 const uint32_t i) 
                                                 noexcept;
 
-        static bool fiend_enough_free_memory_blocks(const uint32_t i, 
-                                                    const uint32_t blocks_needed,
-                                                    uint32_t* j)
-                                                    noexcept;
+        static bool find_enough_free_memory_blocks(const uint32_t i, 
+                                                   const uint32_t blocks_needed,
+                                                   uint32_t* j)
+                                                   noexcept;
     
     public:
         static void init(const uint8_t* begin, const uint8_t* end) noexcept;
