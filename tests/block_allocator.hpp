@@ -5,7 +5,7 @@
 
 namespace tests
 {
-    void reallocate() {
+    void reallocate() noexcept {
         runtime::Text_Output::reset();
         runtime::Text_Output::put_string("=== reallocate basic test ===\n");
 
@@ -48,7 +48,7 @@ namespace tests
         kernel::sys::hang();
     }
 
-    void reallocate_special() {
+    void reallocate_special() noexcept {
         runtime::Text_Output::reset();
         runtime::Text_Output::put_string("=== reallocate special cases ===\n");
 
@@ -67,7 +67,7 @@ namespace tests
         kernel::sys::hang();
     }
 
-    void deallocate() {
+    void deallocate() noexcept {
         runtime::Text_Output::reset();
         runtime::Text_Output::put_string("=== deallocate checks ===\n");
 
@@ -89,7 +89,7 @@ namespace tests
         kernel::sys::hang();
     }
 
-    void get_allocation_info() {
+    void get_allocation_info() noexcept {
         runtime::Text_Output::reset();
         runtime::Text_Output::put_string("=== get_allocation_info test ===\n");
 

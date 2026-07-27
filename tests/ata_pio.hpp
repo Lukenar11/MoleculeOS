@@ -89,7 +89,7 @@ namespace tests
         kernel::sys::hang();
     }
 
-    void multiple_reads() {
+    void multiple_reads() noexcept {
         using namespace drivers::ata;
 
         runtime::Text_Output::reset();
