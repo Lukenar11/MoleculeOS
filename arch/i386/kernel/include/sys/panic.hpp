@@ -28,5 +28,6 @@ namespace
 
 namespace kernel::sys
 {
+    [[noreturn]]
     void panic(const char* message) noexcept;
 } // namespace kernel::sys

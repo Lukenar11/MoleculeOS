@@ -79,6 +79,40 @@ namespace kernel::filesys
         static bool delete_file(const char* file_name, 
                                 const char* file_format) noexcept;
 
+        static I_Node* find_file(const char* name,
+                                 const char* format) noexcept;
+
+        static bool write_file(I_Node* inode,
+                               const uint32_t offset,
+                               const uint32_t length,
+                               const uint32_t data_size,
+                               const uint8_t* data) noexcept;
+
+        static bool append_file(I_Node* inode,
+                                const uint8_t* data,
+                                const uint32_t data_size) noexcept;
+
+        static bool clear_file(I_Node* inode) noexcept;
+
+        static bool rename_file(const char* old_name,
+                                const char* old_format,
+                                const char* new_name,
+                                const char* new_format) noexcept;
+
+        static bool copy_file(const char* src_name,
+                              const char* src_format,
+                              const char* dest_name,
+                              const char* dest_format) noexcept;
+
+        static bool read_file(I_Node* inode,
+                              uint8_t* buffer,
+                              const uint32_t buffer_size,
+                              const uint32_t offset,
+                              const uint32_t length) noexcept;
+
+        static bool resize_file_size(I_Node* inode,
+                                     uint32_t new_size) noexcept;
+
         static bool is_valid_name_or_format_char(const char symbol) noexcept;
     };
 } // namespace kernel::filesys

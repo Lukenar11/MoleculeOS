@@ -20,6 +20,7 @@ NOTES:
 
 namespace kernel::sys
 {
+    [[noreturn]]
     void panic(const char* message) noexcept {
         idt::isr::exception_names[CUSTOM_PANIC_INTERRUPT] = const_cast<char*>(message);
         trigger_interrupt(CUSTOM_PANIC_INTERRUPT);

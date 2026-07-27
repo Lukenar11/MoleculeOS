@@ -21,9 +21,10 @@ namespace kernel::filesys
     struct I_Node final {
         runtime::Array<char, MAX_FILE_NAME_LENGTH + 1> file_name;
         runtime::Array<char, MAX_FILE_FORMAT_LENGTH + 1> file_format;
-        uint32_t name_hash      = 0;
-        uint32_t format_hash    = 0;
-        uint32_t file_byte_size = 0;
-        void* file_data_ptr     = 0;
+        uint32_t name_hash           = 0;
+        uint32_t format_hash         = 0;
+        uint32_t used_data_byte_size = 0;
+        uint32_t file_byte_size      = 0;
+        void* file_data_ptr          = 0;
     };
 } // namespace kernel::filesys

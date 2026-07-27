@@ -28,12 +28,14 @@ COMMON_FLAGS = $(TARGET) \
 	-march=i386 -m32 \
 	-ffreestanding -fno-builtin \
 	-fno-stack-protector \
+	-fomit-frame-pointer \
 	-fno-rtti -fno-exceptions \
 	-fno-pie -no-pie \
 	-fvisibility=hidden \
 	-fdata-sections -ffunction-sections \
 	-Wall -Wextra -Wignored-qualifiers \
 	-fno-threadsafe-statics \
+	-flto \
 	-Os -fno-omit-frame-pointer
 
 CFLAGS = $(COMMON_FLAGS) -c -std=c17 -D__I386__
