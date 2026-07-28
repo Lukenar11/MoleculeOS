@@ -323,10 +323,10 @@ Examples (without exceeding the character limit):
 Example (with long args):
 
 ```cpp
-    kernel::sys::panic(
-        "Unexpected return from the \"kernel_main\" scheduler main loop",
-        "This should never happen.\nPlease report this to the developer."
-    );
+    kernel::filesys::MoleculeOS_File_System_2::copy_file(src_parsed.name.data(),
+                                                         src_parsed.format.data(),
+                                                         dest_parsed.name.data(),
+                                                         dest_parsed.format.data());
 ```
 
 Example (with short args):
@@ -585,27 +585,19 @@ A practical example of all the rules:
             static constexpr uint16_t KEYBOARD_STATUS_PORT = 0x64;
             static constexpr uint16_t KEYBOARD_DATA_PORT = 0x60;
 
-            bool shift_is_pressed = false;
-            bool capslock_is_enabled = false;
+            static bool shift_is_pressed = false;
+            static bool capslock_is_enabled = false;
 
         public:
-            inline bool has_pending_scancode() const noexcept {
+            static inline bool has_pending_scancode() const noexcept {
                 return rintime::byte_input(KEYBOARD_STATUS_PORT) & LOWEST_BIT;
             }
 
-            char get_key() noexcept;
+            static char get_key() noexcept;
 
             Keyboard_Input() noexcept  = default;
- noexcept = default;
- noexcept  = default;
- noexcept = default;
-            ~Keyboard_Input() noexcept  = default;
- noexcept = default;
- noexcept  = default;
- noexcept = default;
+            ~Keyboard_Input() noexcept = default;
         };
-
-        extern Keyboard_Input keyboard_input;
     } // namespace drivers::ps2
 ```
 
