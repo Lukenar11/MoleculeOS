@@ -22,28 +22,30 @@ NOTES:
 
 namespace shell::commands
 {
-    auto& extract_file_instream_befor_redict_operator(const char* redict_operator_pos, 
-                                                      const runtime::Array<char, 64>& args)
-                                                      noexcept {
-        const char null_char = '\0';
-        static runtime::Array<char, 64> file_instream;
-        file_instream.fill(null_char);
+    runtime::Array<char,64>& extract_echo_text(const runtime::Array<char,64>& args,
+                                               const char* redirect_pos) 
+                                               noexcept {
+        static runtime::Array<char,64> text;
+        text.fill('\0');
 
-        if (!redict_operator_pos) [[unlikely]]
-            return file_instream;
-
-        uint32_t j = 0;
-
-        uint32_t file_instream_end = redict_operator_pos - args.begin();
-        for (uint32_t i = 0; i < file_instream_end; i++) {
-            if (args[i] == null_char) [[unlikely]]
-                break;
-
-            file_instream[j++] = args[i];
+        uint32_t start = 0;
+        if (args[0] == 'e' && args[1] == 'c' && args[2] == 'h' && args[3] == 'o') {
+            start = 4;
+            while (args[start] == ' ')
+                start++;
         }
 
-        file_instream[j] = null_char;
-        return file_instream;
+        uint32_t end = redirect_pos - args.begin();
+        uint32_t j   = 0;
+        for (uint32_t i = start; i < end; i++) {
+            if (args[i] == '\0')
+                break;
+
+            text[j++] = args[i];
+        }
+
+        text[j] = '\0';
+        return text;
     }
 
     auto& extract_filename_after_input_redirect(const char* redict_operator_pos,
@@ -121,6 +123,7 @@ namespace shell::commands
                               const runtime::Array<char, 64>& file_instream) 
                               noexcept {
         using namespace kernel::filesys;
+        using namespace runtime;
 
         static shell::commands::Parsed_File_Name parsed_filename;
         parsed_filename.name.fill('\0');
@@ -140,12 +143,10 @@ namespace shell::commands
             inode = MoleculeOS_File_System_2::create_file(parsed_filename.name.data(),
                                                           parsed_filename.format.data(),
                                                           file_instream.size());
-
-        MoleculeOS_File_System_2::append_file(inode,
-                                              reinterpret_cast<const uint8_t*>(
-                                                file_instream.data()
-                                              ),
-                                              file_instream.size());
+            
+        const int32_t length = String_Manipulation::get_string_length(file_instream.data());
+        const auto& instream = reinterpret_cast<const uint8_t*>(file_instream.data());
+        MoleculeOS_File_System_2::append_file(inode, instream, length);
     }
 
     void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
@@ -259,12 +260,9 @@ namespace shell::commands
                 return;
             }
             
-            file_stream = 
-                extract_file_instream_befor_redict_operator(file_intstrem_redict_operator_pos,
-                                                            args);
-
-            filename = extract_text_after_redict_operator(file_intstrem_redict_operator_pos, 
-                                                          args);
+            file_stream = extract_echo_text(args, file_intstrem_redict_operator_pos);
+            filename    = extract_text_after_redict_operator(file_intstrem_redict_operator_pos, 
+                                                             args);
 
             handle_file_instream(filename, file_stream);
 

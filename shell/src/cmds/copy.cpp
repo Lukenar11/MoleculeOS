@@ -5,22 +5,11 @@ namespace shell::commands
     void copy(const runtime::Array<char, 64>& args) noexcept {
         using namespace kernel::filesys;
 
-        static Parsed_File_Name old_parsed_filename;
-        old_parsed_filename.error.fill('\0');
-        old_parsed_filename.name.fill('\0');
-        old_parsed_filename.format.fill('\0');
-
-        static Parsed_File_Name new_parsed_filename;
-        new_parsed_filename.error.fill('\0');
-        new_parsed_filename.name.fill('\0');
-        new_parsed_filename.format.fill('\0');
-
-        static const char* command_name = "rename: ";
+        static const char* command_name = "copy: ";
 
         if (args[0] == '\0') {
             print_command_error(command_name);
             print_command_error("missing arguments");
-
             command_end();
             return;
         }
@@ -32,59 +21,55 @@ namespace shell::commands
         if (split_index == 0 || split_index >= args.size()) {
             print_command_error(command_name);
             print_command_error("invalid arguments");
-
             command_end();
             return;
         }
 
-        static runtime::Array<char, 64> old_filename;
-        old_filename.fill('\0');
+        static runtime::Array<char, 64> src_filename;
+        src_filename.fill('\0');
 
         for (uint32_t i = 0; i < split_index; i++)
-            old_filename[i] = args[i];
+            src_filename[i] = args[i];
 
-        static runtime::Array<char, 64> new_filename;
-        new_filename.fill('\0');
+        static runtime::Array<char, 64> dest_filename;
+        dest_filename.fill('\0');
 
-        uint32_t new_filename_index = 0;
+        uint32_t dest_index = 0;
         for (uint32_t i = split_index + 1; i < args.size(); i++) {
             if (args[i] == '\0')
                 break;
 
-            new_filename[new_filename_index++] = args[i];
+            dest_filename[dest_index++] = args[i];
         }
 
         runtime::Text_Output::put_char('\n');
 
-        old_parsed_filename = parse_filename(old_filename);
-        if (old_parsed_filename.error.data()[0] != '\0') {
+        Parsed_File_Name src_parsed = parse_filename(src_filename);
+        if (src_parsed.error.data()[0] != '\0') {
             print_command_error(command_name);
-            print_command_error(old_parsed_filename.error.data());
-
+            print_command_error(src_parsed.error.data());
             command_end();
             return;
         }
 
-        new_parsed_filename = parse_filename(new_filename);
-        if (new_parsed_filename.error.data()[0] != '\0') {
+        Parsed_File_Name dest_parsed = parse_filename(dest_filename);
+        if (dest_parsed.error.data()[0] != '\0') {
             print_command_error(command_name);
-            print_command_error(new_parsed_filename.error.data());
-
+            print_command_error(dest_parsed.error.data());
             command_end();
             return;
         }
 
-        if (!MoleculeOS_File_System_2::copy_file(old_parsed_filename.name.data(),
-                                                 old_parsed_filename.format.data(),
-                                                 new_parsed_filename.name.data(),
-                                                 new_parsed_filename.format.data())) {
+        if (!MoleculeOS_File_System_2::copy_file(src_parsed.name.data(),
+                                                 src_parsed.format.data(),
+                                                 dest_parsed.name.data(),
+                                                 dest_parsed.format.data())) {
             print_command_error(command_name);
             print_command_error("copy failed");
-
             command_end();
             return;
         }
 
         command_end();
     }
-} // namespace shell::commands
+}
