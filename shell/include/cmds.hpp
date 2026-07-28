@@ -28,3 +28,4 @@ NOTES:
 #include "cmds/remove.hpp"
 #include "cmds/shutdown.hpp"
 #include "cmds/rename.hpp"
+#include "cmds/copy.hpp"

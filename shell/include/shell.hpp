@@ -50,7 +50,8 @@ namespace
         {make_hash("create"),   [](auto& args) -> void {shell::commands::create(args);}},
         {make_hash("list"),     [](auto& _)    -> void {shell::commands::list();}},
         {make_hash("remove"),   [](auto& args) -> void {shell::commands::remove(args);}},
-        {make_hash("rename"),   [](auto& args) -> void {shell::commands::rename(args);}}
+        {make_hash("rename"),   [](auto& args) -> void {shell::commands::rename(args);}},
+        {make_hash("copy"),     [](auto& args) -> void {shell::commands::copy(args);}}
     };
 }
 
