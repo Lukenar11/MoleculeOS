@@ -20,7 +20,7 @@ NOTES:
 
 #include "cmds/echo.hpp"
 
-namespace
+namespace shell::commands
 {
     auto& extract_file_instream_befor_redict_operator(const char* redict_operator_pos, 
                                                       const runtime::Array<char, 64>& args)
@@ -120,6 +120,8 @@ namespace
     void handle_file_instream(const runtime::Array<char, 64>& filename,
                               const runtime::Array<char, 64>& file_instream) 
                               noexcept {
+        using namespace kernel::filesys;
+
         static shell::commands::Parsed_File_Name parsed_filename;
         parsed_filename.name.fill('\0');
         parsed_filename.format.fill('\0');
@@ -131,72 +133,72 @@ namespace
             shell::commands::print_command_error(parsed_filename.error.data());
             return;
         }
-    
-        // auto* inode = 
-        //     kernel::filesys::MoleculeOS_File_System_2::
-        //     get_file_by_name_and_format(parsed_filename.name.data(),
-        //                                 parsed_filename.format.data());
-        // if (!inode)
-        //     inode = kernel::filesys::MoleculeOS_File_System_2::
-        //             create_file(parsed_filename.name.data(),
-        //                         parsed_filename.format.data());
-// 
-        // kernel::filesys::MoleculeOS_File_System_2::
-        // set_file_content_as_string(inode,
-        //                            file_instream.data(),
-        //                            runtime::
-        //                            String_Manipulation::get_string_length(file_instream.data()));
+
+        I_Node* inode = MoleculeOS_File_System_2::find_file(parsed_filename.name.data(),
+                                                            parsed_filename.format.data());
+        if (!inode)
+            inode = MoleculeOS_File_System_2::create_file(parsed_filename.name.data(),
+                                                          parsed_filename.format.data(),
+                                                          file_instream.size());
+
+        MoleculeOS_File_System_2::append_file(inode,
+                                              reinterpret_cast<const uint8_t*>(
+                                                file_instream.data()
+                                              ),
+                                              file_instream.size());
     }
-}
 
-void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
-    const char* command_name = "echo: ";
+    void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
+        using namespace kernel::filesys;
+        using namespace kernel::heap;
 
-    // static runtime::Array<char, kernel::filesys::MAX_FILE_SIZE> buffer;
-    // buffer.fill('\0');
-// 
-    // static shell::commands::Parsed_File_Name parsed_filename;
-    // parsed_filename.name.fill('\0');
-    // parsed_filename.format.fill('\0');
-    // parsed_filename.error.fill('\0');
-// 
-    // parsed_filename = shell::commands::parse_filename(filename);
-    // if (parsed_filename.error[0] != '\0') {
-    //     shell::commands::print_command_error(command_name);
-    //     shell::commands::print_command_error(parsed_filename.error.data());
-    //     return;
-    // }
+        const char* command_name = "echo: ";
 
-    // auto* inode = kernel::filesys::MoleculeOS_File_System_2::
-    //               get_file_by_name_and_format(parsed_filename.name.data(),
-    //                                           parsed_filename.format.data());
-    // if (!inode) {
-        // shell::commands::print_command_error(command_name);
-        // shell::commands::print_command_error("file not found\n");
-        // return;
-    // }
+        Parsed_File_Name parsed_filename = parse_filename(filename);
+        if (parsed_filename.error[0] != '\0') {
+            print_command_error(command_name);
+            print_command_error(parsed_filename.error.data());
+            return;
+        }
 
-    // const uint32_t needed_size = inode->size + 1;
-    // if (needed_size > buffer.size()) {
-    //     shell::commands::print_command_error(command_name);
-    //     shell::commands::print_command_error("file too large\n");
-    //     return;
-    // }
+        I_Node* inode = MoleculeOS_File_System_2::find_file(parsed_filename.name.data(),
+                                                            parsed_filename.format.data());
+        if (!inode) {
+            print_command_error(command_name);
+            print_command_error("file not found\n");
+            return;
+        }
 
-    // if (!kernel::filesys::MoleculeOS_File_System_2::get_file_content_as_string(inode,
-    //                                                                             buffer.data(),
-    //                                                                             needed_size)) {
-        // shell::commands::print_command_error(command_name);
-        // shell::commands::print_command_error("could not read file\n");
-        // return;
-    // }
+        const uint32_t size = inode->used_data_byte_size + 1;
+        uint8_t* buffer = static_cast<uint8_t*>(Block_Allocator::allocate(size));
+        if (!buffer) {
+            print_command_error(command_name);
+            print_command_error("heap allocation failed\n");
 
-    // for (uint32_t i = 0; buffer[i] != '\0'; i++)
-    //     runtime::Text_Output::put_char(buffer[i]);
-}
+            Block_Allocator::deallocate(buffer);
+            return;
+        }
 
-namespace shell::commands
-{
+        if (!MoleculeOS_File_System_2::read_file(inode,
+                                                 buffer,
+                                                 size,
+                                                 0,
+                                                 inode->used_data_byte_size)) {
+            print_command_error(command_name);
+            print_command_error("could not read file\n");
+
+            Block_Allocator::deallocate(buffer);
+            return;
+        }
+
+        buffer[inode->used_data_byte_size] = '\0';
+
+        for (uint32_t i = 0; buffer[i] != '\0'; i++)
+            runtime::Text_Output::put_char(buffer[i]);
+
+        Block_Allocator::deallocate(buffer);
+    }
+
     void echo(const runtime::Array<char, 64>& args) noexcept {
         const char* command_name = "echo: ";
 
