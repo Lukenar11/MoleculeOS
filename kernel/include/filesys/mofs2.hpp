@@ -111,7 +111,7 @@ namespace kernel::filesys
                               const uint32_t length) noexcept;
 
         static bool resize_file_size(I_Node* inode,
-                                     uint32_t new_size) noexcept;
+                                     const uint32_t new_size) noexcept;
 
         static bool is_valid_name_or_format_char(const char symbol) noexcept;
     };

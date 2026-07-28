@@ -126,8 +126,6 @@ namespace tests
 
     void error_cases() noexcept {
         using namespace kernel::filesys;
-
-        runtime::Text_Output::reset();
         
         I_Node* a = MoleculeOS_File_System_2::find_file("backup", "bin");
 
@@ -146,8 +144,6 @@ namespace tests
         MoleculeOS_File_System_2::create_file("x", "txt", 10);
         fs_print(!MoleculeOS_File_System_2::copy_file("x", "txt", "x", "txt"),
                  "copy_file: dest exists fails");
-
-        kernel::sys::hang();
     }
 
     void resize_file_size() noexcept {

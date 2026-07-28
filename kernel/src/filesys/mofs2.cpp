@@ -308,12 +308,12 @@ namespace kernel::filesys
     }
 
     bool MoleculeOS_File_System_2::resize_file_size(I_Node* inode,
-                                                    uint32_t new_size) 
+                                                    const uint32_t new_size) 
                                                     noexcept {
         if (inode == nullptr) [[unlikely]]
             return false;
 
-        if (inode->file_data_ptr) [[unlikely]]
+        if (inode->file_data_ptr == nullptr) [[unlikely]]
             return false;
 
         void* new_ptr = heap::Block_Allocator::reallocate(inode->file_data_ptr,
