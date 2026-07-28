@@ -44,6 +44,8 @@ namespace shell::commands
             "\t\t| (create a file with custom default size) create [File] [ByteSize]\n"
             "\t- list (lists all files) | list\n"
             "\t- remove (deletes a file) | remove [File]\n"
+            "\t- rename (renames a file) | rename [OldFileName] [NewFileName]\n"
+            "\t- copy (copys file content to another file) | copy [SrcFile] [DestFile]\n"
             "\n"
         };
 
