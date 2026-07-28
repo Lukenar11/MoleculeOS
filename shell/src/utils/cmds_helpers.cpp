@@ -13,7 +13,7 @@ NOTES:
     header so that the compiler can inline them more easily.
 */
 
-#include "utils/commands_helpers.hpp"
+#include "utils/cmds_helpers.hpp"
 
 namespace shell::commands
 {

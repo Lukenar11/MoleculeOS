@@ -5,9 +5,9 @@
 #
 
 OBJS += $(BUILD)/shell.o \
-		$(BUILD)/commands.o \
+		$(BUILD)/cmds.o \
 		$(BUILD)/shell_helpers.o \
-		$(BUILD)/commands_helpers.o \
+		$(BUILD)/cmds_helpers.o \
 		$(BUILD)/utils.o \
 		$(BUILD)/help.o \
 		$(BUILD)/info.o \
@@ -25,5 +25,5 @@ $(BUILD)/%.o: shell/src/%.cpp
 $(BUILD)/%.o: shell/src/utils/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(BUILD)/%.o: shell/src/commands/%.cpp
+$(BUILD)/%.o: shell/src/cmds/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

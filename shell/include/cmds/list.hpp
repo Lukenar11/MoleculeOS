@@ -8,7 +8,7 @@ DESCRIPTION:
     This file contains the internal implementation of 
     one of the terminal commands available in MoleculeOS.
 
-    This command creates a file.
+    This command lists all the files.
 
     The commands can be called by the 
     shell interpreter from a table generated at compile time, 
@@ -20,17 +20,11 @@ NOTES:
 
 #pragma once
 
-#include "../utils/commands_helpers.hpp"
-#include "../utils/utils.hpp"
+#include "../utils/cmds_helpers.hpp"
 #include <kernel_api.hpp>
-#include <array.hpp>
-#include <string_manip.hpp>
-
-static void split_file_name_and_size(const runtime::Array<char, 64>& args,
-                                     runtime::Array<char, 64>& filename,
-                                     uint32_t& file_size) noexcept;
+#include <text_output.hpp>
 
 namespace shell::commands
 {
-    void create(const runtime::Array<char, 64>& args) noexcept;
+    void list() noexcept;
 } // namespace shell::commands

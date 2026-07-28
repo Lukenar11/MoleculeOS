@@ -6,7 +6,7 @@
 
 COMMON_FLAGS += -Ishell/include \
 				-Ishell/include/utils \
-				-Ishell/include/commands \
+				-Ishell/include/cmds \
 
 include shell/src/Makefile
 
