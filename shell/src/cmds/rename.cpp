@@ -5,6 +5,16 @@ namespace shell::commands
     void rename(const runtime::Array<char, 64>& args) noexcept {
         using namespace kernel::filesys;
 
+        static Parsed_File_Name old_parsed_filename;
+        old_parsed_filename.error.fill('\0');
+        old_parsed_filename.name.fill('\0');
+        old_parsed_filename.format.fill('\0');
+
+        static Parsed_File_Name new_parsed_filename;
+        new_parsed_filename.error.fill('\0');
+        new_parsed_filename.name.fill('\0');
+        new_parsed_filename.format.fill('\0');
+
         static const char* command_name = "rename: ";
 
         if (args[0] == '\0') {
@@ -46,7 +56,7 @@ namespace shell::commands
 
         runtime::Text_Output::put_char('\n');
 
-        Parsed_File_Name& old_parsed_filename = parse_filename(old_filename);
+        old_parsed_filename = parse_filename(old_filename);
         if (old_parsed_filename.error.data()[0] != '\0') {
             print_command_error(command_name);
             print_command_error(old_parsed_filename.error.data());
@@ -55,7 +65,7 @@ namespace shell::commands
             return;
         }
 
-        Parsed_File_Name& new_parsed_filename = parse_filename(new_filename);
+        new_parsed_filename = parse_filename(new_filename);
         if (new_parsed_filename.error.data()[0] != '\0') {
             print_command_error(command_name);
             print_command_error(new_parsed_filename.error.data());
