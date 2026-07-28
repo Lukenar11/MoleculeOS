@@ -20,6 +20,7 @@ OBJS += $(BUILD)/shell.o \
 		$(BUILD)/echo.o \
 		$(BUILD)/rename.o \
 		$(BUILD)/copy.o \
+		$(BUILD)/exists.o \
 
 $(BUILD)/%.o: shell/src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

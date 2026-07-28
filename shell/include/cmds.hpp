@@ -29,3 +29,4 @@ NOTES:
 #include "cmds/shutdown.hpp"
 #include "cmds/rename.hpp"
 #include "cmds/copy.hpp"
+#include "cmds/exists.hpp"
