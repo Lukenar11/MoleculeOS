@@ -18,7 +18,7 @@ DESCRIPTION:
 NOTES:
 */
 
-#include "remove.hpp"
+#include "cmds/remove.hpp"
 
 namespace shell::commands
 {

@@ -27,3 +27,4 @@ NOTES:
 #include "cmds/reboot.hpp"
 #include "cmds/remove.hpp"
 #include "cmds/shutdown.hpp"
+#include "cmds/rename.hpp"

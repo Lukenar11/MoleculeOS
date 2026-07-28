@@ -33,7 +33,7 @@
                 "${workspaceFolder}/drivers/include/vga",
                 "${workspaceFolder}/drivers/include/utils/",
                 "${workspaceFolder}/shell/include",
-                "${workspaceFolder}/shell/include/commands",
+                "${workspaceFolder}/shell/include/cmds",
                 "${workspaceFolder}/shell/include/utils"
             ],
             "defines": [

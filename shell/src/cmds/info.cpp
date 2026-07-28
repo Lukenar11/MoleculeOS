@@ -18,7 +18,7 @@ DESCRIPTION:
 NOTES:
 */
 
-#include "info.hpp"
+#include "cmds/info.hpp"
 
 namespace shell::commands
 {

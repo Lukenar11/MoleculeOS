@@ -20,4 +20,4 @@ NOTES:
     header so that the compiler can execute it inline.
 */
 
-#include "clear.hpp"
+#include "cmds/clear.hpp"

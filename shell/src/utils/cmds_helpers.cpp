@@ -68,7 +68,21 @@ namespace shell::commands
 
         parsed_filename.name[file_name_index]     = '\0';
         parsed_filename.format[file_format_index] = '\0';
-    
+
+        if (parsed_filename.name[0] == '\0') {
+            static const char* error_message = "no File Name entered";
+            runtime::String_Manipulation::copy_string(parsed_filename.error.data(),
+                                                      error_message);
+            return parsed_filename;
+        }
+
+        if (parsed_filename.format[0] == '\0') {
+            static const char* error_message = "no File Format entered";
+            runtime::String_Manipulation::copy_string(parsed_filename.error.data(),
+                                                      error_message);
+            return parsed_filename;
+        }
+
         for (uint32_t i = 0; parsed_filename.name[i] != '\0'; i++)
             if (!kernel::filesys::MoleculeOS_File_System_2::
                  is_valid_name_or_format_char(parsed_filename.name[i])) {

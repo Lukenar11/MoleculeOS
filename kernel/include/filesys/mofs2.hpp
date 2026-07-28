@@ -41,8 +41,19 @@ namespace
         const uint32_t name_length   = String_Manipulation::get_string_length(name);
         const uint32_t format_length = String_Manipulation::get_string_length(format);
 
-        if (name_length == 0 || 
-            name_length > MAX_FILE_NAME_LENGTH) [[unlikely]] 
+        if (name[0] == '\0') [[unlikely]]
+            return false;
+
+        if (name_length == 0) [[unlikely]]
+            return false;
+
+        if (name_length > MAX_FILE_NAME_LENGTH) [[unlikely]] 
+            return false;
+
+        if (format[0] == '\0') [[unlikely]]
+            return false;
+
+        if (format_length == 0) [[unlikely]]
             return false;
 
         if (format_length > MAX_FILE_FORMAT_LENGTH) [[unlikely]]

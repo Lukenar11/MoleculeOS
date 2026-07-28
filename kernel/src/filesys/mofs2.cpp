@@ -44,6 +44,9 @@ namespace kernel::filesys
                                                        noexcept {
         using namespace runtime;
 
+        if (!name_and_format_guard(name, format)) [[unlikely]]
+            return false;
+
         if ((inode.name_hash == name_hash) && (inode.format_hash == format_hash))
             if ((String_Manipulation::compare_strings(name, inode.file_name.data()) == 0) &&
                 (String_Manipulation::compare_strings(format, inode.file_format.data()) == 0))
@@ -222,7 +225,13 @@ namespace kernel::filesys
                                                const char* new_name,
                                                const char* new_format) noexcept {
         using namespace runtime;
-        
+
+        if (!name_and_format_guard(old_name, old_format)) [[unlikely]]
+            return false;
+
+        if (!name_and_format_guard(new_name, new_format)) [[unlikely]]
+            return false;
+
         I_Node* inode = find_file(old_name, old_format);
         if (inode == nullptr) [[unlikely]]
             return false;
@@ -244,6 +253,12 @@ namespace kernel::filesys
                                              const char* dest_name,
                                              const char* dest_format) noexcept {
         using namespace runtime;
+
+        if (!name_and_format_guard(src_name, src_format)) [[unlikely]]
+            return false;
+
+        if (!name_and_format_guard(dest_name, dest_format)) [[unlikely]]
+            return false;
 
         I_Node* src_inode = find_file(src_name, src_format);
         if (src_inode == nullptr) [[unlikely]]

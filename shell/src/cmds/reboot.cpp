@@ -20,4 +20,4 @@ NOTES:
     header so that the compiler can execute it inline.
 */
 
-#include "reboot.hpp"
+#include "cmds/reboot.hpp"

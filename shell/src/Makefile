@@ -18,6 +18,7 @@ OBJS += $(BUILD)/shell.o \
 		$(BUILD)/list.o \
 		$(BUILD)/remove.o \
 		$(BUILD)/echo.o \
+		$(BUILD)/rename.o \
 
 $(BUILD)/%.o: shell/src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

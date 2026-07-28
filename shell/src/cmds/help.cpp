@@ -19,7 +19,7 @@ DESCRIPTION:
 NOTES:
 */
 
-#include "help.hpp"
+#include "cmds/help.hpp"
 
 namespace shell::commands
 {
