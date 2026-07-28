@@ -30,3 +30,4 @@ NOTES:
 #include "cmds/rename.hpp"
 #include "cmds/copy.hpp"
 #include "cmds/exists.hpp"
+#include "cmds/allocinfo.hpp"

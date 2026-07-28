@@ -41,18 +41,19 @@ namespace
     }
 
     constexpr shell::Command_Entry shell_command_table[] = {
-        {make_hash("help"),     [](auto& _)    -> void {shell::commands::help();}},
-        {make_hash("info"),     [](auto& _)    -> void {shell::commands::info();}},
-        {make_hash("clear"),    [](auto& _)    -> void {shell::commands::clear();}},
-        {make_hash("reboot"),   [](auto& _)    -> void {shell::commands::reboot();}},
-        {make_hash("shutdown"), [](auto& _)    -> void {shell::commands::shutdown();}},
-        {make_hash("echo"),     [](auto& args) -> void {shell::commands::echo(args);}},
-        {make_hash("create"),   [](auto& args) -> void {shell::commands::create(args);}},
-        {make_hash("list"),     [](auto& _)    -> void {shell::commands::list();}},
-        {make_hash("remove"),   [](auto& args) -> void {shell::commands::remove(args);}},
-        {make_hash("rename"),   [](auto& args) -> void {shell::commands::rename(args);}},
-        {make_hash("copy"),     [](auto& args) -> void {shell::commands::copy(args);}},
-        {make_hash("exists"),   [](auto& args) -> void {shell::commands::exists(args);}}
+        {make_hash("help"),      [](auto& _)    -> void {shell::commands::help();}},
+        {make_hash("info"),      [](auto& _)    -> void {shell::commands::info();}},
+        {make_hash("clear"),     [](auto& _)    -> void {shell::commands::clear();}},
+        {make_hash("reboot"),    [](auto& _)    -> void {shell::commands::reboot();}},
+        {make_hash("shutdown"),  [](auto& _)    -> void {shell::commands::shutdown();}},
+        {make_hash("echo"),      [](auto& args) -> void {shell::commands::echo(args);}},
+        {make_hash("create"),    [](auto& args) -> void {shell::commands::create(args);}},
+        {make_hash("list"),      [](auto& _)    -> void {shell::commands::list();}},
+        {make_hash("remove"),    [](auto& args) -> void {shell::commands::remove(args);}},
+        {make_hash("rename"),    [](auto& args) -> void {shell::commands::rename(args);}},
+        {make_hash("copy"),      [](auto& args) -> void {shell::commands::copy(args);}},
+        {make_hash("exists"),    [](auto& args) -> void {shell::commands::exists(args);}},
+        {make_hash("allocinfo"), [](auto& args) -> void {shell::commands::allocinfo(args);}}
     };
 }
 
