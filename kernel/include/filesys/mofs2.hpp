@@ -25,7 +25,7 @@ NOTES:
 #include "filesys/helpers.hpp"
 #include "heap/block.hpp"
 #include <array.hpp>
-#include <stdint.h>
+#include <types.h>
 #include <string_manip.hpp>
 
 namespace

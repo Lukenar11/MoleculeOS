@@ -15,7 +15,7 @@ NOTES:
 #pragma once
 
 #include "utils/regs.hpp"
-#include <stdint.h>
+#include <types.h>
 
 namespace kernel::idt::irq
 {

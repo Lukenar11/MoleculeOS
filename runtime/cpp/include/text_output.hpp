@@ -25,7 +25,7 @@ NOTES:
 #pragma once
 
 #include <drivers_api.hpp>
-#include <stdint.h>
+#include <types.h>
 #include <array.hpp>
 
 namespace runtime 

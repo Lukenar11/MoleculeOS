@@ -16,7 +16,7 @@ NOTES:
 
 #include "idt/idt.hpp"
 #include "sys/interrupts.hpp"
-#include <stdint.h>
+#include <types.h>
 #include <io_api.hpp>
 
 namespace 

@@ -19,7 +19,7 @@ NOTES:
 
     The system does not rely on the host system's standard library, so
     this header replaces the functionality normally provided by the
-    system's '<stdint.h>'.
+    system's '<types.h>'.
 */
 
-#include <stdint.h>
+#include <types.h>

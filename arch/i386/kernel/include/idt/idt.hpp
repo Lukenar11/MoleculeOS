@@ -27,7 +27,7 @@ NOTES:
 #include "idt/irq.hpp"
 #include "load_idt.hpp"
 #include <kernel_api.hpp>
-#include <stdint.h>
+#include <types.h>
 #include <array.hpp>
 
 namespace

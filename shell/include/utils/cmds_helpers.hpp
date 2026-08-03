@@ -18,7 +18,7 @@ NOTES:
 #include "utils.hpp"
 #include <kernel_api.hpp>
 #include <text_output.hpp>
-#include <stdint.h>
+#include <types.h>
 #include <array.hpp>
 #include <string_manip.hpp>
 

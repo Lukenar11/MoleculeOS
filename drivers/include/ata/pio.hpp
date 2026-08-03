@@ -28,7 +28,7 @@ NOTES:
 #pragma once
 
 #include "../utils/ata_pio_helpers.hpp"
-#include <stdint.h>
+#include <types.h>
 #include <port_io.hpp>
 #include <kernel_api.hpp>
 #include <array.hpp>

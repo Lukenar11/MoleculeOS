@@ -15,7 +15,7 @@ NOTES:
 #pragma once
 
 #include "heap/helpers.hpp"
-#include <stdint.h>
+#include <types.h>
 #include <array.hpp>
 #include <kernel_api.hpp>
 #include <memory_manip.hpp>

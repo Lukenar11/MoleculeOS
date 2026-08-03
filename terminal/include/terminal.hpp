@@ -20,7 +20,7 @@ NOTES:
 
 #include <shell_api.hpp>
 #include <drivers_api.hpp>
-#include <stdint.h>
+#include <types.h>
 #include <text_output.hpp>
 
 namespace terminal

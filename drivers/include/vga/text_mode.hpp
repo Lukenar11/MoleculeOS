@@ -23,7 +23,7 @@ NOTES:
 #pragma once
 
 #include "../utils/vga_text_mode_helpers.hpp"
-#include <stdint.h>
+#include <types.h>
 
 namespace drivers::vga 
 {

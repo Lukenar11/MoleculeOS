@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdint.h>
+#include <types.h>
 #include <text_output.hpp>
 #include <array.hpp>
 #include <drivers_api.hpp>

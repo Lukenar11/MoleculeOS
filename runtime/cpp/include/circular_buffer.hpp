@@ -16,7 +16,7 @@ NOTES:
 #pragma once
 
 #include <array.hpp>
-#include <stdint.h>
+#include <types.h>
 
 namespace runtime
 {
