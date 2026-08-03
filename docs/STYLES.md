@@ -184,14 +184,14 @@ Examples (single-line):
 ```cpp
     switch (scancode) {
     case static_cast<char>(Spechial_keys::NEW_LINE): return '\n';
-    case static_cast<char>(Spechial_keys::SPACE): return ' ';
+    case static_cast<char>(Spechial_keys::SPACE):    return ' ';
     default: return 0;
     }
 ```
 
 ```cpp
     switch (scancode) {
-    case contidtion: do_something(); break;
+    case contidtion: do_something();      break;
     case contidtion: do_something_else(); break;
     default: hero_of_whatever(); break;
     }
@@ -332,7 +332,7 @@ Example (with long args):
 Example (with short args):
 
 ```cpp
-    runtime::text_output.put_string("Hello, World!\n");
+    runtime::Text_Output::put_string("Hello, World!\n");
 ```
 
 ---
@@ -902,23 +902,44 @@ Each driver is a **standalone block** that contains **various modules**:
 ```txt
     drivers/
     │
-    ├─ ps2/
-    │   │   # Classic module structure, as explained in '3.4 Module Structure'
-    │   ├── keyboardin/
-    │   |   │
-    │   |   └── ...
-    |   |   
-    |   └── ...
-    |
-    ├─ vga/
-    |   │   # Classic module structure, as explained in '3.4 Module Structure'
-    |   ├── textmode/
-    │   |   │
-    │   |   └── ...
+    |   # public API
+    ├── include/ 
+    │   |
+    |   ├── vga/
+    |   |   |
+    |   |   └── text_mode.hpp
+    |   |
+    |   ├── ps2
+    |   |   |
+    |   |   └── ...
+    |   |
+    |   |   # driver helpers
+    |   ├── utils/
+    |   |   |
+    |   |   ├── vga_helpers.hpp
+    |   |   |
+    |   |   └── ...
     |   |
     |   └── ...
     |
-    └── ...
+    |   # Implementation
+    └── src/
+        |
+        ├── vga/
+        |   |
+        |   └── text_mode.cpp
+        |
+        ├── ps2
+        |   |
+        |   └── ...
+        |
+        ├── utils/
+        |   |
+        |   ├── vga_helpers.cpp
+        |   |
+        |   └── ...
+        |
+        └── ...
 ```
 
 ### Rules
@@ -936,19 +957,15 @@ Each driver is a **standalone block** that contains **various modules**:
 
 ```txt
     runtime/
-    │   # Central APIs (e.g. "drivers_api.hpp", "drivers_api.hpp")
+    │
     ├─ apis/
-    │   │   # Standard APIs for architecture-specific components (e.g. "kernel_arch_api.hpp", "io_api.hpp")
-    │   ├── arch/
-    │   |   |   
-    │   |   └── ... *.hpp / *.h
     |   |
-    │   |   # Standard APIs (e.g. "drivers_api.hpp")
-    │   └── ... *.hpp / *.hpp
+    │   |   # APIs (e.g. 'drivers_api.hpp')
+    │   └── ... *.hpp
     |
-    |   # C++ Runtime (e.g. "array.hpp", "text_output.hpp")
-    |   # Classic module structure, as explained in '3.4 Module Structure'
+    |  # C++ Runtime (e.g. 'array.hpp', 'text_output.hpp')
     └─ cpp/
+        |
         │   # public API
         ├── include/
         |   |
@@ -972,18 +989,18 @@ Each driver is a **standalone block** that contains **various modules**:
 - The runtime must not access **any hardware** directly (only via `drivers/`)
 - The runtime is the **lowest layer**  
 - The runtime must be accessible **to all other modules**
-- The APIs for the runtime-specific components must include "arch" in their names and 
+- The APIs for the runtime-specific components must include 'arch' in their names and 
   use `#ifdef` preprocessor directives to compile only the code for the respective architecture.
 
 ---
 
 ## 3.8 Kernel Structure
 
-The kernel consists of clearly separated subsyss
+The kernel consists of clearly separated Subsystem
 
 ### Rules
 
-- Each subsys has **a clearly defined area of responsibility**  
+- Each Subsystem has **a clearly defined area of responsibility**  
 - No mixing of logic  
 - No global variables except for intentionally defined kernel singletons
 - As few dependencies as possible between its components
@@ -994,34 +1011,22 @@ The kernel consists of clearly separated subsyss
     |
     ├── include/
     |   |
-    |   ├── utils/
-    |   |
-    |   |   # Kernel Subsys/Komponente structure
+    |   |   # Kernel Subsystem/Components structure
     |   ├── heap/
-    |   |   |
-    |   |   ├── utils/
-    |   |   |   |
-    |   |   |   └── ...
     |   |   |
     |   |   └── ...
     |   |
-    |   |   # Kernel Subsyss/Komponentes
+    |   |   # Kernel Subsystem/Components
     |   └── ...
     |
     └── src/
         |
-        ├── utils/
-        |
-        |   # Kernel Subsys/Komponente structure
-        ├── idt/
-        |   |
-        |   ├── utils/
-        |   |   |
-        |   |   └── ...
+        |   # Kernel Subsystem/Components structure
+        ├── heap/
         |   |
         |   └── ...
         |
-        |   # Kernel Subsyss/Komponentes
+        |   # Kernel Subsystem/Components
         ├── ...
         |
         └── kernel_main.cpp
@@ -1048,45 +1053,38 @@ calling the respective command implementations via the **shell_command_table**, 
 The commands must have no connection to the interpreter, except for the argument array and the **shell_command_table**
 
 ``` txt
+    # Module as explained in '3.4 Module Structure'.
     shell/
     |
-    |   # shell command implementations (e.g. echo, list)
-    |   # Classic module structure, as explained in '3.4 Module Structure' 
-    ├── commands/
+    ├── include/
     |   |
-    |   ├── include/
+    |   |   # shell command implementations (e.g. echo, list).
+    |   ├── cmds/
     |   |   |
-    |   |   ├── utils/
-    |   |   |   |
-    |   |   |   └── ...
-    |   |   |
-    |   |   └── ...
+    │   |   └── ...
     |   |
-    |   └── src/
-    |       |
-    |       ├── utils/
-    |       |   |
-    |       |   └── ...
-    |       |
-    |       └── ...
+    |   |   # Helper files for the interpreter and the command implementations.
+    |   ├── utils/
+    |   |   |
+    │   |   └── ...
+    |   |
+    |   |   # Interpreter implementation & cmds/ API for the interpreter.
+    |   └── ...
     |
-    |   # interpreter for the shell commands
-    |   # Classic module structure, as explained in '3.4 Module Structure' 
-    └── interpreter/
+    └── src/
         |
-        ├── include/
-        |   |
-        |   ├── utils/
-        |   |   |
-        |   |   └── ...
+        |   # shell command implementations (e.g. echo, list).
+        ├── cmds/
         |   |
         |   └── ...
         |
-        └── src/
-            |
-            ├── utils/
-            |
-            └── ...
+        |   # Helper files for the interpreter and the command implementations.
+        ├── utils/
+        |   |
+        |   └── ...
+        |
+        |   # Interpreter implementation & cmds/ API for the interpreter.
+        └── ...
 ```
 
 ---
@@ -1103,22 +1101,14 @@ The terminal is a high-level UI that uses the keyboard driver and the shell inte
 - It only displays user input and forwards characters to the shell.
 
 ``` txt
-    # Classic module structure, as explained in '3.4 Module Structure' 
+    # Module as described in '3.4 Module Structure', but with a simplified structure.
     terminal/
     │
     ├── include/
     |   |
-    |   ├─ utils/
-    |   |  |
-    |   |  └── ...
-    |   |
     │   └── ...
     │
     └── src/
-        |
-        ├─ utils/
-        |  |
-        |  └── ...
         |
         └── ...
 ```
@@ -1139,19 +1129,19 @@ The `arch/` directory contains all architecture-specific code
     |
     ├── i386/
     |   |
-    |   |   # The structure is identical to that explained in "3.8 Kernel Structure".
+    |   |   # The structure is identical to that explained in '3.8 Kernel Structure'.
     |   ├── kernel/
     |   |   |
     |   |   └── ...
     |   |
-    |   |   # The structure is identical to that explained in "3.7 Runtime Structure".
+    |   |   # The structure is identical to that explained in '3.7 Runtime Structure'.
     |   ├── runtime/
     |   |   |
     |   |   └── ...
     |   |
     |   └── ...
     |
-    |   # Folders for other architectures, e.g., (x86_64, arm, misp)
+    |   # Folders for other architectures, e.g., (x86_64, arm, mips)
     └── ...
 ```
 
