@@ -134,3 +134,110 @@
 - Filesystem not yet journaled or crash‑safe  
 - Filesystem is volatile
 - Filesystem is flat
+
+---
+
+## *[0.3.0‑alpha] – August 4, 2026*
+
+**Added**
+- Added `<circular_buffer.hpp>`
+- ATA-PIO driver
+- New terminal commands for filesystem interaction  
+  - `allocinfo`
+  - `copy`
+  - `exists`
+  - `rename`
+- IRQ-handler for the keyboard driver `drivers::ps2::Keyboard_Input::keyboard_irq_handler();`
+- Keyboard input buffer scancode_buffer `drivers::ps2::Keyboard_Input::scancode_buffer();`
+
+### Changed
+- Rewrite the allocator from a stack to a block allocator
+- New Inode based flat custom file system with heap allocation and name hashing
+- Specifying the file size with the `create` command
+- Merging architecture-dependent and architecture-independent APIs
+  - `<kernel_arch_api.hpp>` merged with `<kernel_api.hpp>`
+  - `<io_arch_api.hpp>` merged with `<io_api.hpp>`
+- Renaming libraries
+  - `<string_manipulation.hpp>` renamed to `<string_manip.hpp>`
+  - `<memory_manipulation.hpp>` renamed to `<memory_manip.hpp>`
+- New Filesystem API
+  - `kernel::filesystem::mofs.is_valid_file_name_or_formant_char();` → `kernel::filesys::MoleculeOS_File_System_2::is_valid_name_or_format_char();`
+  - `kernel::filesystem::mofs.get_inode_by_name_and_format();` → `kernel::filesys::MoleculeOS_File_System_2::find_file();`
+  - `kernel::filesystem::mofs.create_file();` → `kernel::filesys::MoleculeOS_File_System_2::create_file();`
+  - `kernel::filesystem::mofs.delete_file();` → `kernel::filesys::MoleculeOS_File_System_2::delete_file();`
+  - `kernel::filesystem::mofs.get_file_content_binary();` → [Removed]
+  - `kernel::filesystem::mofs.get_file_content_as_string();` → [Removed]
+  - `kernel::filesystem::mofs.read_file_binary_at();` → [Removed]
+  - `kernel::filesystem::mofs.read_file_as_string_at();` → [Removed]
+  - `kernel::filesystem::mofs.set_file_content_binary(); ` → [Removed]
+  - `kernel::filesystem::mofs.set_file_content_as_string();` → [Removed]
+  - `kernel::filesystem::mofs.write_file_binary_at();` → [Removed]
+  - `kernel::filesystem::mofs.write_file_string_at();` → [Removed]
+  - `kernel::filesystem::mofs.get_inodes();` → `kernel::filesys::MoleculeOS_File_System_2::get_inode_table();`
+  - added `kernel::filesys::MoleculeOS_File_System_2::write_file();`
+  - added `kernel::filesys::MoleculeOS_File_System_2::append_file();`
+  - added `kernel::filesys::MoleculeOS_File_System_2::clear_file();`
+  - added `kernel::filesys::MoleculeOS_File_System_2::rename_file();`
+  - added `kernel::filesys::MoleculeOS_File_System_2::copy_file();`
+  - added `kernel::filesys::MoleculeOS_File_System_2::read_file();`
+  - added `kernel::filesys::MoleculeOS_File_System_2::resize_file_size();`
+- New heap allocator API
+  - `kernel::heap::stack.allocate();` → `kernel::heap::Block_Allocator::allocate();`
+  - `kernel::heap::stack.rewind();` → `kernel::heap::Block_Allocator::deallocate();`
+  - `kernel::heap::stack.mark();` → [Removed]
+  - `kernel::heap::stack.used();` → [Removed]
+  - `kernel::heap::stack.remaining();` → [Removed]
+  - added `kernel::heap::Block_Allocator::reallocate();`
+  - added `kernel::heap::Block_Allocator::get_allocation_info();`
+- New heap size (**64KB** → **2MB**)
+- Moved most of the stack initialization from the boot to the linker script.
+- New filename for `<stdint.h>` → `<types.h>`
+- Removed `intpure_t` & `uintptr_t`
+- Connecting the keyboard driver to the IRQ
+- Project folder structure
+- rename `system/` → `sys/`
+- rename `filesystem/` → `filesys/`
+- rename `commands/` → `cmds/`
+- rename `commands.hpp` → `cmds.hpp`
+- rename `mofs.hpp/cpp` → `mofs2.hpp/cpp`
+- rename `stack.hpp/cpp` → `block.hpp/cpp`
+- rename `trigger_interrupt.asm` → `interrupts.asm`
+- rename `cpu_flags.asm` → `eflags.asm`
+- rename `hang.asm` → `halt.asm`
+- rename `init_kernel.hpp/cpp` → `kernel_arch_init.hpp/cpp`
+- rename `filesystem::` → `filesys::`
+- rename `IDT` → `Interrupt_Descriptor_Table/`
+- rename `MoleculeOS_File_System` → `MoleculeOS_File_System_2`
+- rename `Stack_Allocator` → `Block_Allocator`
+- move `kernel_stack.asm` → `linker.ld` 
+- move `gdt.asm` → `_start.asm` 
+- Delete all global objects using static classes.
+- Updated STYLES.md for the new folder structure.
+- Makefile structure
+
+### Improved
+- New file system, with more flexibility and better usage
+- New heap allocator with more flexibility
+- More memory for the Heap
+- New simplified API structure
+- Moved most of the stack initialization from the boot script to the linker script.
+- Stack and heap initialization are in the same file.
+- No unnecessary type aliases
+- Better buffering
+- Interrupt based keyboard driver
+- Better Project folder structure
+- No global objects
+- Better Makefile structure
+
+### Fixed
+- Outdated references in STYLES.md 
+
+### Known Issues
+- No multitasking  
+- No scheduler  
+- No user mode  
+- No paging / memory manager  
+- No mouse support  
+- No user programs  
+- Filesystem is volatile
+- Filesystem is flat
