@@ -240,7 +240,7 @@
 - No multitasking  
 - No scheduler  
 - No user mode  
-- No paging / memory manager  
+- No memory manager  
 - No mouse support  
 - No user programs  
 - Filesystem is volatile
