@@ -44,7 +44,7 @@ The goal is to understand the *essence* of OS development without unnecessary co
 
 Below is the current state of MoleculeOS running in QEMU:
 
-![MoleculeOS boot screenshot](docs/images/std-srceen-v2.png)
+![MoleculeOS boot screenshot](docs/images/std-srceen-v3.png)
 
 Below is the current state of MoleculeOS running in QEMU (deliberately triggered panic with a division by 0):
 
@@ -52,7 +52,7 @@ Below is the current state of MoleculeOS running in QEMU (deliberately triggered
 
 ## Demo Preview
 
-![Demo Preview](docs/videos/molecule-os-using-v2.gif)
+![Demo Preview](docs/videos/molecule-os-using-v3.gif)
 
 ---
 

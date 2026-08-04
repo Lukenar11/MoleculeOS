@@ -228,6 +228,7 @@
 - Better Project folder structure
 - No global objects
 - Better Makefile structure
+- faster build time
 
 ### Fixed
 - Outdated references in STYLES.md 
