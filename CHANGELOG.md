@@ -152,6 +152,8 @@
 - New IO-functions
   - `word_input_stream`
   - `word_output_stream`
+- Error message when building for an unsupported architecture
+  - `#   error "Architecture is not supported!"`
 
 ### Changed
 - Rewrite the allocator from a stack to a block allocator
@@ -232,6 +234,7 @@
 - No global objects
 - Better Makefile structure
 - faster build time
+- Error message when building for an unsupported architecture
 
 ### Fixed
 - Outdated references in STYLES.md 
