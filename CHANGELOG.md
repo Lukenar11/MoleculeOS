@@ -139,7 +139,7 @@
 
 ## *[0.3.0‑alpha] – August 4, 2026*
 
-**Added**
+### Added
 - Added `<circular_buffer.hpp>`
 - ATA-PIO driver
 - New terminal commands for filesystem interaction  
@@ -248,3 +248,4 @@
 - No user programs  
 - Filesystem is volatile
 - Filesystem is flat
+- Hard Drive driver is not used
