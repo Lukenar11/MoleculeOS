@@ -149,6 +149,9 @@
   - `rename`
 - IRQ-handler for the keyboard driver `drivers::ps2::Keyboard_Input::keyboard_irq_handler();`
 - Keyboard input buffer scancode_buffer `drivers::ps2::Keyboard_Input::scancode_buffer();`
+- New IO-functions
+  - `word_input_stream`
+  - `word_output_stream`
 
 ### Changed
 - Rewrite the allocator from a stack to a block allocator
