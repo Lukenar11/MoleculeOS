@@ -134,8 +134,8 @@ namespace drivers::ata
                                                 const uint16_t control_reg) 
                                                 noexcept;
 
-        [[nodiscard]]
-        static bool poll_until_drq_or_error() noexcept;
+        [[nodiscard]] static bool poll_until_drq_or_error() noexcept;
+        [[nodiscard]] static bool poll_until_not_busy() noexcept;
 
         [[nodiscard]]
         static bool poll_and_read_or_write_disk(const Driver_Operations op,

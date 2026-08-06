@@ -43,8 +43,8 @@ namespace drivers::ata
 
         uint32_t timeout = 5'000'000;
         while (timeout--) {
-            const uint8_t status = runtime::byte_input(dcr_port);
-            if ((status & BSY) == DRDY)
+            const uint8_t status = runtime::byte_input(status_port());
+            if (!(status & ATA_BSY) && (status & ATA_DRDY))
                 break;
         }
     }
@@ -57,12 +57,10 @@ namespace drivers::ata
         device_control_reg = control_reg;
         reset_driver(control_reg);
 
-        io_port_base               = io_base;
-        const uint8_t drive_select = (is_master) 
-                                     ? MASTER_SELECT 
-                                     : SLAVE_SELECT;
+        io_port_base      = io_base;
+        master_save_flags = (is_master) ? MASTER_SELECT : SLAVE_SELECT;
 
-        runtime::byte_output(status_port() - 1, drive_select);
+        runtime::byte_output(status_port() - 1, master_save_flags);
         runtime::byte_output(status_port(), ATA_IDENTIFY);
 
         delay();
@@ -113,10 +111,25 @@ namespace drivers::ata
         while (timeout--) {
             const uint8_t status = runtime::byte_input(status_port());
 
-            if (status & ATA_ERR) [[unlikely]]
+            if (status & (ATA_ERR | ATA_DF)) [[unlikely]]
                 return false;
 
             if (!(status & ATA_BSY) && (status & ATA_DRQ))
+                return true;
+        }
+
+        return false;
+    }
+
+    bool Programmable_Input_Output::poll_until_not_busy() noexcept {
+        uint32_t timeout = 5'000'000;
+        while (timeout--) {
+            const uint8_t status = runtime::byte_input(status_port());
+
+            if (status & (ATA_ERR | ATA_DF)) [[unlikely]]
+                return false;
+
+            if (!(status & ATA_BSY))
                 return true;
         }
 
@@ -167,7 +180,7 @@ namespace drivers::ata
         runtime::byte_output(io_port_base + 6, shift_and_mask(absolute_lba, 
                                                               24, 
                                                               NIBBLE_MASK, 
-                                                              MASTER));
+                                                              master_save_flags));
 
         if (op == Driver_Operations::READ)
             runtime::byte_output(status_port(), READ_SECTORS);
@@ -178,6 +191,13 @@ namespace drivers::ata
                                          buffer, 
                                          sector_count))
             return false;
+
+        if (op == Driver_Operations::WRITE) {
+            runtime::byte_output(status_port(), FLUSH_CACHE);
+
+            if (!poll_until_not_busy()) [[unlikely]]
+                return false;
+        }
 
         const uint8_t final_status = runtime::byte_input(status_port());
         return !(final_status & ATA_ERR || final_status & ATA_DF);
@@ -223,12 +243,9 @@ namespace drivers::ata
             relative_lba > (max_sectors - sector_count + 1)) [[unlikely]]
             return false;
 
-        const uint8_t initial_status = runtime::byte_input(status_port());
-        if (initial_status & ATA_BSY) {
-            if (!poll_until_drq_or_error()) {
-                reset_driver(dcr_port());
-                return false;
-            }
+        if (!poll_until_not_busy()) [[unlikely]] {
+            reset_driver(dcr_port());
+            return false;
         }
 
         while (sector_count > 0) {
@@ -239,7 +256,7 @@ namespace drivers::ata
             if (!start_pio_disk_read_or_write(op,
                                               buffer,
                                               chunk,
-                                              relative_lba)) {
+                                              relative_lba)) [[unlikely]] {
                 reset_driver(dcr_port());
                 return false;
             }

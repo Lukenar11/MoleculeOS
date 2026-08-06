@@ -56,17 +56,15 @@ namespace kernel::storagmgr
     }
 
     void Storage_Manager::init() noexcept {
-        Filesys_Header header;
+        Filesys_Header header{};
         header.magic              = 0x4D4F4653;
         header.version            = 2;
         header.inode_count        = 256;
-        header.inode_table_offset = sizeof(Filesys_Header);
-        header.data_offset        = header.inode_table_offset +
-                                        header.inode_count * 
-                                        sizeof(Serialized_I_Node);
+        header.inode_table_offset = FS_INODE_TABLE_OFFSET;
+        header.data_offset        = FS_DATA_OFFSET;
 
         read_or_write_bytes(drivers::ata::Driver_Operations::WRITE,
-                            0,
+                            FS_HEADER_OFFSET,
                             sizeof(header),
                             &header);
     }
@@ -76,16 +74,14 @@ namespace kernel::storagmgr
         using namespace kernel::filesys;
 
         Filesys_Header header;
-        header.magic              = 0x4D4F4653; // "MOFS"
+        header.magic              = 0x4D4F4653;
         header.version            = 2;
         header.inode_count        = 256;
-        header.inode_table_offset = sizeof(Filesys_Header);
-        header.data_offset        = header.inode_table_offset +
-                                    header.inode_count * 
-                                    sizeof(Serialized_I_Node);
+        header.inode_table_offset = FS_INODE_TABLE_OFFSET;
+        header.data_offset        = FS_DATA_OFFSET;
         
         if (!read_or_write_bytes(drivers::ata::Driver_Operations::WRITE,
-                                 0,
+                                 FS_HEADER_OFFSET,
                                  sizeof(Filesys_Header),
                                  &header)) [[unlikely]]
             return false;
@@ -145,7 +141,7 @@ namespace kernel::storagmgr
 
         Filesys_Header header;
         if (!read_or_write_bytes(drivers::ata::Driver_Operations::READ,
-                                 0,
+                                 FS_HEADER_OFFSET,
                                  sizeof(Filesys_Header),
                                  &header)) [[unlikely]]
             return false;
