@@ -61,7 +61,6 @@ $(KERNEL): $(OBJS)
 
 $(OS_HDD):
 	dd if=/dev/zero of=$(OS_HDD) bs=512 count=2048
-	echo -n "Hello, HDD!" | dd of=$(OS_HDD) bs=1 seek=0 conv=notrunc
 
 iso: $(KERNEL)
 	mkdir -p $(ISO)/boot/grub

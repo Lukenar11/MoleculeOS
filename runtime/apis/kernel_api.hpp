@@ -21,6 +21,7 @@ NOTES:
 #include "kernel/include/filesys/mofs2.hpp"
 #include "kernel/include/filesys/helpers.hpp"
 #include "kernel/include/heap/block.hpp"
+#include "kernel/include/storagemgr/storage_mgr.hpp"
 
 #ifdef __I386__
 #   include "arch/i386/kernel/include/utils/regs.hpp"

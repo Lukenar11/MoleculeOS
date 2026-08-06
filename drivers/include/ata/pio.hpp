@@ -161,6 +161,11 @@ namespace drivers::ata
             return device_control_reg; 
         }
 
+        [[nodiscard]]
+        static inline uint16_t get_sector_word_size() noexcept {
+            return SECTOR_WORD_SIZE;
+        }
+
         static void init() noexcept;
 
         static bool run(const Driver_Operations op,

@@ -52,6 +52,8 @@
         "redict",
         "resb",
         "rodata",
-        "SRST"
+        "SRST",
+        "storagemgr",
+        "storagmgr"
     ]
 }

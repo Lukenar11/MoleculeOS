@@ -22,6 +22,9 @@ NOTES:
 namespace kernel::sys
 {
     void shutdown() noexcept {
+        if (!storagmgr::Storage_Manager::save_filesys())
+            sys::panic("save failed");
+        
         const uint32_t cpu_flags = save_eflags();
         for (const auto& entry : emulator_specific_shutdown_command_mappings) {
             if (entry.is_8bit_mode) [[unlikely]] {

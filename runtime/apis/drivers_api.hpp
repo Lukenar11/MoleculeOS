@@ -12,6 +12,13 @@ NOTES:
 
 #pragma once
 
+#include <types.h>
+
+namespace drivers::ata 
+{
+    enum class Driver_Operations : uint32_t;
+}
+
 #include "drivers/include/vga/text_mode.hpp"
 #include "drivers/include/utils/vga_text_mode_helpers.hpp"
 

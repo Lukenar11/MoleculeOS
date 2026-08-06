@@ -83,6 +83,15 @@ namespace kernel::filesys
             return inode_table;
         };
 
+        static inline constexpr I_Node& get_inode_entry(const uint32_t index) noexcept {
+            return inode_table[index];
+        }
+
+        static inline constexpr I_Node& set_inode_entry(const I_Node& inode, 
+                                              const uint32_t index) noexcept {
+            return inode_table[index] = inode;
+        }
+
         static I_Node* create_file(const char* name, 
                                    const char* format, 
                                    const uint32_t byte_size) noexcept;
