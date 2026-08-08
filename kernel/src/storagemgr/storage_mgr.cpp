@@ -113,10 +113,11 @@ namespace kernel::storagmgr
                                                    inode.file_format.data(),
                                                    MAX_FILE_FORMAT_LENGTH + 1);
 
-            serialized_inode.name_hash        = inode.name_hash;
-            serialized_inode.format_hash      = inode.format_hash;
-            serialized_inode.file_byte_size   = inode.file_byte_size;
-            serialized_inode.file_data_offset = current_data_offset;
+            serialized_inode.name_hash           = inode.name_hash;
+            serialized_inode.format_hash         = inode.format_hash;
+            serialized_inode.file_byte_size      = inode.file_byte_size;
+            serialized_inode.used_data_byte_size = inode.used_data_byte_size;
+            serialized_inode.file_data_offset    = current_data_offset;
 
             if (inode.file_data_ptr && inode.file_byte_size > 0) {
                 if (!read_or_write_bytes(drivers::ata::Driver_Operations::WRITE,
@@ -196,10 +197,11 @@ namespace kernel::storagmgr
                                                    serialized.file_format.data(),
                                                    MAX_FILE_FORMAT_LENGTH + 1);
 
-            inode.name_hash      = serialized.name_hash;
-            inode.format_hash    = serialized.format_hash;
-            inode.file_byte_size = serialized.file_byte_size;
-            inode.file_data_ptr  = data_ptr;
+            inode.name_hash           = serialized.name_hash;
+            inode.format_hash         = serialized.format_hash;
+            inode.file_byte_size      = serialized.file_byte_size;
+            inode.used_data_byte_size = serialized.used_data_byte_size;
+            inode.file_data_ptr       = data_ptr;
 
             MoleculeOS_File_System_2::set_inode_entry(inode, i);
         }
