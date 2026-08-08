@@ -10,7 +10,7 @@ namespace kernel::storagmgr
         using namespace runtime;
         using namespace heap;
 
-        const uint32_t n = Programmable_Input_Output::get_sector_word_size() << 1;
+        const uint32_t n = SECTOR_WORD_SIZE << 1;
 
         const uint32_t start_sector  = offset / n;
         const uint32_t sector_offset = offset % n;
@@ -38,6 +38,14 @@ namespace kernel::storagmgr
                                                    size);
         }
         else {
+            if (!Programmable_Input_Output::run(Driver_Operations::READ,
+                                                sector_count,
+                                                sector_buffer,
+                                                start_sector)) [[unlikely]] {   
+                Block_Allocator::deallocate(reinterpret_cast<void*>(sector_buffer));
+                return false;
+            }
+
             Memory_Manipulation::copy_memory_block(sector_bytes + sector_offset,
                                                    buffer,
                                                    size);
@@ -56,7 +64,7 @@ namespace kernel::storagmgr
     }
 
     void Storage_Manager::init() noexcept {
-        Filesys_Header header{};
+        Filesys_Header header;
         header.magic              = 0x4D4F4653;
         header.version            = 2;
         header.inode_count        = 256;
@@ -90,7 +98,6 @@ namespace kernel::storagmgr
         serialized_inodes.fill(Serialized_I_Node{});
 
         uint32_t current_data_offset = 0;
-
         for (uint32_t i = 0; i < header.inode_count; ++i) {
             I_Node& inode = MoleculeOS_File_System_2::get_inode_entry(i);
             if (!inode.file_data_ptr || inode.file_byte_size == 0)
@@ -120,6 +127,7 @@ namespace kernel::storagmgr
             }
 
             current_data_offset += inode.file_byte_size;
+            current_data_offset = (current_data_offset + 511) & ~511u;
         }
 
         const uint32_t inode_table_size = header.inode_count * 
@@ -152,8 +160,8 @@ namespace kernel::storagmgr
         static runtime::Array<Serialized_I_Node, 256> serialized_inodes;
         serialized_inodes.fill(Serialized_I_Node{});
 
-        const uint32_t inode_table_size =
-            header.inode_count * sizeof(Serialized_I_Node);
+        const uint32_t inode_table_size = header.inode_count *
+                                          sizeof(Serialized_I_Node);
 
         if (!read_or_write_bytes(drivers::ata::Driver_Operations::READ,
                                  header.inode_table_offset,

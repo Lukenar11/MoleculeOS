@@ -88,7 +88,7 @@ namespace kernel::filesys
         }
 
         static inline constexpr I_Node& set_inode_entry(const I_Node& inode, 
-                                              const uint32_t index) noexcept {
+                                                        const uint32_t index) noexcept {
             return inode_table[index] = inode;
         }
 

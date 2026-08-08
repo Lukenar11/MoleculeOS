@@ -96,8 +96,6 @@ namespace drivers::ata
         static constexpr uint8_t BYTE_MASK         = 0xFF;
         static constexpr uint32_t DOUBLE_WORD_MASK = 0x0FFFFFFF;
 
-        static constexpr uint32_t SECTOR_WORD_SIZE = 256;
-
         static constexpr uint32_t MAX_ALLOWED_SECTOR_COUNT = 128;
         static constexpr uint32_t CHUNK_SECTORS            = 8;
         static_assert(CHUNK_SECTORS <= MAX_ALLOWED_SECTOR_COUNT, 
@@ -159,11 +157,6 @@ namespace drivers::ata
         [[nodiscard]]
         static inline uint16_t dcr_port() noexcept { 
             return device_control_reg; 
-        }
-
-        [[nodiscard]]
-        static inline uint16_t get_sector_word_size() noexcept {
-            return SECTOR_WORD_SIZE;
         }
 
         static void init() noexcept;
