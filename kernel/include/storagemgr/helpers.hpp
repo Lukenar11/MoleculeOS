@@ -12,7 +12,8 @@ DESCRIPTION:
 
     A 'Serialized_I_Node'-table contains the inode infos which is fetched from the 
     inodes in the RAM.
-    The 'Serialized_I_Node' in the second hard-drive sector after the header.
+    The Serialized_I_Node table begins in the second sector of the hard drive,
+    immediately after the file-system header.
 
 NOTES:
 

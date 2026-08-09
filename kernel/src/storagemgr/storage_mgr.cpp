@@ -24,6 +24,12 @@ namespace kernel::storagmgr
         using namespace runtime;
         using namespace heap;
 
+        if (size == 0) [[unlikely]]
+            return false;
+
+        if (buffer == nullptr) [[unlikely]]
+            return false;
+
         const uint32_t start_sector  = offset / SECTOR_SIZE;
         const uint32_t sector_offset = offset % SECTOR_SIZE;
         const uint32_t end_offset    = sector_offset + size;
@@ -81,17 +87,27 @@ namespace kernel::storagmgr
         using namespace kernel::filesys;
 
         Filesys_Header header;
-        String_Manipulation::copy_string(header.magic.data(), 
-                                         FILESYS_HEADER_MAGIC);
-        header.version            = MOFS_VERSION;
-        header.inode_count        = INODE_TABLE_ENTRYS;
-        header.inode_table_offset = INODE_TABLE_OFFSET;
-        header.data_offset        = FILESYS_DATA_OFFSET;
 
-        read_or_write_bytes(drivers::ata::Driver_Operations::WRITE,
+        read_or_write_bytes(drivers::ata::Driver_Operations::READ,
                             FILESYS_HEADER_OFFSET,
                             sizeof(header),
                             &header);
+
+        if (String_Manipulation::compare_strings(header.magic.data(), 
+                                                 FILESYS_HEADER_MAGIC) != 0) {
+
+            String_Manipulation::copy_string(header.magic.data(), 
+                                             FILESYS_HEADER_MAGIC);
+            header.version            = MOFS_VERSION;
+            header.inode_count        = INODE_TABLE_ENTRYS;
+            header.inode_table_offset = INODE_TABLE_OFFSET;
+            header.data_offset        = FILESYS_DATA_OFFSET;
+
+            read_or_write_bytes(drivers::ata::Driver_Operations::WRITE,
+                                FILESYS_HEADER_OFFSET,
+                                sizeof(header),
+                                &header);
+        }
     }
 
     bool Storage_Manager::save_filesys() noexcept {
@@ -176,6 +192,9 @@ namespace kernel::storagmgr
                                  &header)) [[unlikely]]
             return false;
 
+        if (header.version != MOFS_VERSION) [[unlikely]]
+            return false;
+
         if (String_Manipulation::compare_strings(header.magic.data(), 
                                                  FILESYS_HEADER_MAGIC) != 0) [[unlikely]]
             return false;
@@ -192,17 +211,17 @@ namespace kernel::storagmgr
             return false;
 
         for (uint32_t i = 0; i < header.inode_count; ++i) {
-            Serialized_I_Node& serialized = serialized_inodes[i];
-            if (serialized.file_byte_size == 0)
+            Serialized_I_Node& serialized_inode = serialized_inodes[i];
+            if (serialized_inode.file_byte_size == 0)
                 continue;
 
-            void* data_ptr = Block_Allocator::allocate(serialized.file_byte_size);
+            void* data_ptr = Block_Allocator::allocate(serialized_inode.file_byte_size);
             if (!data_ptr) [[unlikely]]
                 return false;
 
             if (!read_or_write_bytes(drivers::ata::Driver_Operations::READ,
-                                     header.data_offset + serialized.file_data_offset,
-                                     serialized.file_byte_size,
+                                     header.data_offset + serialized_inode.file_data_offset,
+                                     serialized_inode.file_byte_size,
                                      data_ptr)) [[unlikely]] {
                 Block_Allocator::deallocate(reinterpret_cast<void*>(data_ptr));
                 return false;
@@ -211,17 +230,17 @@ namespace kernel::storagmgr
             static I_Node inode;
 
             Memory_Manipulation::copy_memory_block(inode.file_name.data(),
-                                                   serialized.file_name.data(),
+                                                   serialized_inode.file_name.data(),
                                                    MAX_FILE_NAME_LENGTH + 1);
 
             Memory_Manipulation::copy_memory_block(inode.file_format.data(),
-                                                   serialized.file_format.data(),
+                                                   serialized_inode.file_format.data(),
                                                    MAX_FILE_FORMAT_LENGTH + 1);
 
-            inode.name_hash           = serialized.name_hash;
-            inode.format_hash         = serialized.format_hash;
-            inode.file_byte_size      = serialized.file_byte_size;
-            inode.used_data_byte_size = serialized.used_data_byte_size;
+            inode.name_hash           = serialized_inode.name_hash;
+            inode.format_hash         = serialized_inode.format_hash;
+            inode.file_byte_size      = serialized_inode.file_byte_size;
+            inode.used_data_byte_size = serialized_inode.used_data_byte_size;
             inode.file_data_ptr       = data_ptr;
 
             MoleculeOS_File_System_2::set_inode_entry(inode, i);
