@@ -10,6 +10,8 @@ DESCRIPTION:
     to determine the valid heap area.
 
 NOTES:
+    Some methods are placed in the header 
+    because they are so small that the compiler can inline them.
 */
 
 #pragma once

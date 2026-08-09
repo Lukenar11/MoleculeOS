@@ -15,6 +15,9 @@ NOTES:
     Some methods are defined only in the header file so that the 
     compiler can inline them more easily.
 
+    Some functions are defined only in the header file so that the 
+    compiler can inline them more easily.
+
     The 'delay()' method causes a delay of approximately 500 ns, 
     since the ATA standard requires a delay of 400 ns in some cases.
     The 'delay()' method works by performing a read operation over the ATA bus multiple times
@@ -23,6 +26,10 @@ NOTES:
     this method introduces a delay of 500 ns as a safety measure.
 
     For the sake of simplicity, support for 48-bit 'LBA-addresses' has been omitted.
+
+    The forward-declaration for the 'kernel::sys::panic();' function is intends, 
+    because the inclusion of the '<kernel_api.hpp>' regarding conflicts with the 
+    '<drivers_api.hpp>'.
 */
 
 #pragma once

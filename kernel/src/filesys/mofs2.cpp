@@ -13,10 +13,10 @@ NOTES:
     all files—along with their contents—are deleted upon 
     shutting down or restarting the sys.
 
-    One method are placed in the header 
+    One function are placed in the header 
     because they are so small that the compiler can inline them.
 
-    Some functions are placed in the header 
+    Some methods are placed in the header 
     because they are so small that the compiler can inline them.
 */
 

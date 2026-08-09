@@ -1,3 +1,17 @@
+/**
+LICENSE:
+    Copyright (c) 2026 Lukenar11 (Luke Matthes)
+    MIT Licensed
+    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+
+DESCRIPTION:
+    This class implements a storage manager, 
+    this manager loads file-system at the boot or reboot phase from the hard-drive into the RAM and
+    saves the file-system from the RAM into the hard-drive at the shutdown or reboot phase.
+
+NOTES:
+*/
+
 #pragma once 
 
 #include "helpers.hpp"
