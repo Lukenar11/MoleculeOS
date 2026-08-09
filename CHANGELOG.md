@@ -156,6 +156,7 @@
   - `#   error "Architecture is not supported!"`
 
 ### Changed
+- A shutdown warning, instead of a panic, if the shutdown failed
 - Rewrite the allocator from a stack to a block allocator
 - New Inode based flat custom file system with heap allocation and name hashing
 - Specifying the file size with the `create` command
