@@ -30,8 +30,13 @@ NOTES:
 #include "../utils/ata_pio_helpers.hpp"
 #include <types.h>
 #include <port_io.hpp>
-#include <kernel_api.hpp>
 #include <array.hpp>
+
+namespace kernel::sys
+{
+    [[noreturn]]
+    void panic(const char* message) noexcept;
+}
 
 namespace
 {

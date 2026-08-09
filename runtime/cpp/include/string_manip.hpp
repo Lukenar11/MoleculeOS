@@ -23,8 +23,8 @@ namespace runtime
 {
     class String_Manipulation final {
     public:
-        static  inline void copy_string(char* dest_ptr, 
-                                        const char* src_ptr) noexcept {
+        static inline void copy_string(char* dest_ptr, 
+                                       const char* src_ptr) noexcept {
             while ((*dest_ptr++ = *src_ptr++));
         }
 

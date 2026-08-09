@@ -12,18 +12,11 @@ NOTES:
 
 #pragma once
 
-#include <types.h>
-
-namespace drivers::ata 
-{
-    enum class Driver_Operations : uint32_t;
-}
+#include "drivers/include/ata/pio.hpp"
+#include "drivers/include/utils/ata_pio_helpers.hpp"
 
 #include "drivers/include/vga/text_mode.hpp"
 #include "drivers/include/utils/vga_text_mode_helpers.hpp"
 
 #include "drivers/include/ps2/keyboard_in.hpp"
 #include "drivers/include/utils/ps2_keyboard_in_helpers.hpp"
-
-#include "drivers/include/ata/pio.hpp"
-#include "drivers/include/utils/ata_pio_helpers.hpp"

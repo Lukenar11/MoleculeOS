@@ -9,9 +9,15 @@ namespace kernel::storagmgr
 {
     class Storage_Manager final {
     private:
-        static constexpr uint32_t FS_HEADER_OFFSET      = 0;
-        static constexpr uint32_t FS_INODE_TABLE_OFFSET = 512;
-        static constexpr uint32_t FS_DATA_OFFSET        = FS_INODE_TABLE_OFFSET + 256 * sizeof(Serialized_I_Node);
+        static constexpr const char* FILESYS_HEADER_MAGIC = "MOFS";
+
+        static constexpr uint32_t MOFS_VERSION          = 2;
+        static constexpr uint32_t FILESYS_HEADER_OFFSET = 0;
+        static constexpr uint32_t SECTOR_SIZE           = drivers::ata::SECTOR_SIZE;
+        static constexpr uint32_t INODE_TABLE_OFFSET    = SECTOR_SIZE;
+        static constexpr uint32_t FILESYS_DATA_OFFSET   = INODE_TABLE_OFFSET + 
+                                                          filesys::INODE_TABLE_ENTRYS * 
+                                                          sizeof(Serialized_I_Node);
 
         static bool read_or_write_bytes(drivers::ata::Driver_Operations op,
                                         const uint32_t offset, 

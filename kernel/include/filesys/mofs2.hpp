@@ -67,7 +67,7 @@ namespace kernel::filesys
 {
     class MoleculeOS_File_System_2 final {
     private:
-        static inline runtime::Array<I_Node, 256> inode_table;
+        static inline runtime::Array<I_Node, INODE_TABLE_ENTRYS> inode_table;
 
         static uint32_t to_fnv1a_hash(const char* txt) noexcept;
 
@@ -79,7 +79,8 @@ namespace kernel::filesys
                                         noexcept;
 
     public:
-        static inline constexpr const runtime::Array<I_Node, 256>& get_inode_table() noexcept {
+        static inline constexpr const runtime::Array<I_Node, INODE_TABLE_ENTRYS>& get_inode_table() 
+        noexcept {
             return inode_table;
         };
 

@@ -7,7 +7,7 @@
 namespace kernel::storagmgr
 {
     struct Filesys_Header final {
-        uint32_t magic              = 0;
+        runtime::Array<char, 5> magic;
         uint32_t version            = 0;
         uint32_t inode_count        = 0;
         uint32_t inode_table_offset = 0;

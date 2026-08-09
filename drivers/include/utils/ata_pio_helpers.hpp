@@ -17,7 +17,8 @@ NOTES:
 
 namespace drivers::ata
 {
-    constexpr uint32_t SECTOR_WORD_SIZE = 256;
+    inline constexpr uint32_t SECTOR_SIZE = 512;
+    inline constexpr uint32_t SECTOR_WORD_SIZE = SECTOR_SIZE / sizeof(uint16_t);
 
     enum class Driver_Operations : uint32_t {
         READ  = 0,
