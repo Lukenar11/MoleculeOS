@@ -19,7 +19,7 @@ NOTES:
 */
 
 #include <kernel.hpp>
-#include <terminal_api.hpp>
+#include <terminal.hpp>
 #include <drivers.hpp>
 
 namespace kernel
