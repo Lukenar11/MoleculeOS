@@ -4,11 +4,10 @@
 # https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 # 
 
-COMMON_FLAGS += \
-	-Iruntime/stdlib/include \
-	-Iruntime/stdlib/include/utils \
-	-Iruntime/apis/arch \
-	-Iruntime/apis
+COMMON_FLAGS += -Iruntime/stdlib/include \
+				-Iruntime/stdlib/include/utils \
+				-Iruntime/apis \
+				-Iruntime/types \
 
 include runtime/stdlib/src/Makefile
 
