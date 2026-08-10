@@ -38,19 +38,19 @@ namespace drivers::ata
 {
     void Programmable_Input_Output::delay() noexcept {
         for (uint32_t i = 0; i < 5; ++i) 
-            runtime::byte_input(status_port());
+            stdlib::byte_input(status_port());
     }
 
     void Programmable_Input_Output::reset_driver(const uint16_t dcr_port) 
                                                  noexcept {
-        runtime::byte_output(dcr_port, SRST);
-        runtime::byte_output(dcr_port, DCR_DEFAULT);
+        stdlib::byte_output(dcr_port, SRST);
+        stdlib::byte_output(dcr_port, DCR_DEFAULT);
 
         delay();
 
         uint32_t timeout = 5'000'000;
         while (timeout--) {
-            const uint8_t status = runtime::byte_input(status_port());
+            const uint8_t status = stdlib::byte_input(status_port());
             if (!(status & ATA_BSY) && (status & ATA_DRDY))
                 break;
         }
@@ -67,15 +67,15 @@ namespace drivers::ata
         io_port_base      = io_base;
         master_save_flags = (is_master) ? MASTER_SELECT : SLAVE_SELECT;
 
-        runtime::byte_output(status_port() - 1, master_save_flags);
-        runtime::byte_output(status_port(), ATA_IDENTIFY);
+        stdlib::byte_output(status_port() - 1, master_save_flags);
+        stdlib::byte_output(status_port(), ATA_IDENTIFY);
 
         delay();
         
         if (!poll_until_drq_or_error()) [[unlikely]]
             return false;
 
-        runtime::word_input_stream(io_base, SECTOR_WORD_SIZE, identify_data);
+        stdlib::word_input_stream(io_base, SECTOR_WORD_SIZE, identify_data);
         return true;
     }
 
@@ -116,7 +116,7 @@ namespace drivers::ata
     bool Programmable_Input_Output::poll_until_drq_or_error() noexcept {
         uint32_t timeout = 5'000'000;
         while (timeout--) {
-            const uint8_t status = runtime::byte_input(status_port());
+            const uint8_t status = stdlib::byte_input(status_port());
 
             if (status & (ATA_ERR | ATA_DF)) [[unlikely]]
                 return false;
@@ -131,7 +131,7 @@ namespace drivers::ata
     bool Programmable_Input_Output::poll_until_not_busy() noexcept {
         uint32_t timeout = 5'000'000;
         while (timeout--) {
-            const uint8_t status = runtime::byte_input(status_port());
+            const uint8_t status = stdlib::byte_input(status_port());
 
             if (status & (ATA_ERR | ATA_DF)) [[unlikely]]
                 return false;
@@ -154,11 +154,11 @@ namespace drivers::ata
                 return false;
 
             if (op == Driver_Operations::READ)
-                runtime::word_input_stream(io_port_base,
+                stdlib::word_input_stream(io_port_base,
                                            SECTOR_WORD_SIZE,
                                            buffer);
             else
-                runtime::word_output_stream(io_port_base,
+                stdlib::word_output_stream(io_port_base,
                                             SECTOR_WORD_SIZE,
                                             buffer);
 
@@ -180,19 +180,19 @@ namespace drivers::ata
             return false;
 
         const uint32_t absolute_lba = relative_lba + lba_start_address;
-        runtime::byte_output(io_port_base + 2, static_cast<uint8_t>(sector_count));
-        runtime::byte_output(io_port_base + 3, shift_and_mask(absolute_lba, 0, BYTE_MASK));
-        runtime::byte_output(io_port_base + 4, shift_and_mask(absolute_lba, 8, BYTE_MASK));
-        runtime::byte_output(io_port_base + 5, shift_and_mask(absolute_lba, 16, BYTE_MASK));
-        runtime::byte_output(io_port_base + 6, shift_and_mask(absolute_lba, 
+        stdlib::byte_output(io_port_base + 2, static_cast<uint8_t>(sector_count));
+        stdlib::byte_output(io_port_base + 3, shift_and_mask(absolute_lba, 0, BYTE_MASK));
+        stdlib::byte_output(io_port_base + 4, shift_and_mask(absolute_lba, 8, BYTE_MASK));
+        stdlib::byte_output(io_port_base + 5, shift_and_mask(absolute_lba, 16, BYTE_MASK));
+        stdlib::byte_output(io_port_base + 6, shift_and_mask(absolute_lba, 
                                                               24, 
                                                               NIBBLE_MASK, 
                                                               master_save_flags));
 
         if (op == Driver_Operations::READ)
-            runtime::byte_output(status_port(), READ_SECTORS);
+            stdlib::byte_output(status_port(), READ_SECTORS);
         else
-            runtime::byte_output(status_port(), WRITE_SECTORS);
+            stdlib::byte_output(status_port(), WRITE_SECTORS);
 
         if (!poll_and_read_or_write_disk(op,
                                          buffer, 
@@ -200,13 +200,13 @@ namespace drivers::ata
             return false;
 
         if (op == Driver_Operations::WRITE) {
-            runtime::byte_output(status_port(), FLUSH_CACHE);
+            stdlib::byte_output(status_port(), FLUSH_CACHE);
 
             if (!poll_until_not_busy()) [[unlikely]]
                 return false;
         }
 
-        const uint8_t final_status = runtime::byte_input(status_port());
+        const uint8_t final_status = stdlib::byte_input(status_port());
         return !(final_status & ATA_ERR || final_status & ATA_DF);
     }
 

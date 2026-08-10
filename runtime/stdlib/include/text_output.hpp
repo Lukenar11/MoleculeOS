@@ -28,7 +28,7 @@ NOTES:
 #include <types.hpp>
 #include <array.hpp>
 
-namespace runtime 
+namespace stdlib 
 {
     class Text_Output final {
     private:
@@ -81,4 +81,4 @@ namespace runtime
         Text_Output() noexcept  = default;
         ~Text_Output() noexcept = default;
     };
-} // namespace runtime
+} // namespace stdlib

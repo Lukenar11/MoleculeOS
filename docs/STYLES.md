@@ -332,7 +332,7 @@ Example (with long args):
 Example (with short args):
 
 ```cpp
-    runtime::Text_Output::put_string("Hello, World!\n");
+    stdlib::Text_Output::put_string("Hello, World!\n");
 ```
 
 ---

@@ -27,5 +27,5 @@ NOTES:
 
 namespace shell::commands
 {
-    void exists(const runtime::Array<char, 64>& args) noexcept;
+    void exists(const stdlib::Array<char, 64>& args) noexcept;
 } // namespace shell::commands

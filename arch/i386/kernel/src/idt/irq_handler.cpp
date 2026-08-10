@@ -32,8 +32,8 @@ namespace kernel::idt::irq
     
         if ((interrupt_vector >= MIN_INTERRUPT_VEC) && 
             (interrupt_vector <= MAX_INTERRUPT_VEC))
-            runtime::byte_output(SLAVE_PIC_CMD_PORT, EOF);
+            stdlib::byte_output(SLAVE_PIC_CMD_PORT, EOF);
     
-        runtime::byte_output(MASTER_PIC_CMD_PORT, EOF);
+        stdlib::byte_output(MASTER_PIC_CMD_PORT, EOF);
     }
 } // namespace kernel::irq

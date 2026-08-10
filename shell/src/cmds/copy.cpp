@@ -22,7 +22,7 @@ NOTES:
 
 namespace shell::commands
 {
-    void copy(const runtime::Array<char, 64>& args) noexcept {
+    void copy(const stdlib::Array<char, 64>& args) noexcept {
         using namespace kernel::filesys;
 
         static const char* command_name = "copy: ";
@@ -45,13 +45,13 @@ namespace shell::commands
             return;
         }
 
-        static runtime::Array<char, 64> src_filename;
+        static stdlib::Array<char, 64> src_filename;
         src_filename.fill('\0');
 
         for (uint32_t i = 0; i < split_index; i++)
             src_filename[i] = args[i];
 
-        static runtime::Array<char, 64> dest_filename;
+        static stdlib::Array<char, 64> dest_filename;
         dest_filename.fill('\0');
 
         uint32_t dest_index = 0;
@@ -62,7 +62,7 @@ namespace shell::commands
             dest_filename[dest_index++] = args[i];
         }
 
-        runtime::Text_Output::put_char('\n');
+        stdlib::Text_Output::put_char('\n');
 
         Parsed_File_Name src_parsed = parse_filename(src_filename);
         if (src_parsed.error.data()[0] != '\0') {

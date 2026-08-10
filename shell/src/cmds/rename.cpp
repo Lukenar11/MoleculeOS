@@ -22,7 +22,7 @@ NOTES:
 
 namespace shell::commands
 {
-    void rename(const runtime::Array<char, 64>& args) noexcept {
+    void rename(const stdlib::Array<char, 64>& args) noexcept {
         using namespace kernel::filesys;
 
         static Parsed_File_Name old_parsed_filename;
@@ -57,13 +57,13 @@ namespace shell::commands
             return;
         }
 
-        static runtime::Array<char, 64> old_filename;
+        static stdlib::Array<char, 64> old_filename;
         old_filename.fill('\0');
 
         for (uint32_t i = 0; i < split_index; i++)
             old_filename[i] = args[i];
 
-        static runtime::Array<char, 64> new_filename;
+        static stdlib::Array<char, 64> new_filename;
         new_filename.fill('\0');
 
         uint32_t new_filename_index = 0;
@@ -74,7 +74,7 @@ namespace shell::commands
             new_filename[new_filename_index++] = args[i];
         }
 
-        runtime::Text_Output::put_char('\n');
+        stdlib::Text_Output::put_char('\n');
 
         old_parsed_filename = parse_filename(old_filename);
         if (old_parsed_filename.error.data()[0] != '\0') {

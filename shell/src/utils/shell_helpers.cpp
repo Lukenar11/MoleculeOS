@@ -14,7 +14,7 @@ DESCRIPTION:
      
 NOTES: 
     The function pointer signature is designed to accept a 
-    fixed-size 'runtime::Array<char, 64>' 
+    fixed-size 'stdlib::Array<char, 64>' 
     containing the parsed argument string, this avoids dynamic memory usage.
 */
 

@@ -29,16 +29,16 @@ namespace kernel::sys
         for (const auto& entry : emulator_specific_shutdown_command_mappings) {
             if (entry.is_8bit_mode) [[unlikely]] {
                 const uint8_t value = entry.value & 0xFF;
-                runtime::byte_output(entry.port, value);
+                stdlib::byte_output(entry.port, value);
             } 
             else [[likely]] {
-                runtime::word_output(entry.port, entry.value);
+                stdlib::word_output(entry.port, entry.value);
             }
 
             restore_eflags(cpu_flags);
         }
 
-        runtime::Text_Output::reset();
+        stdlib::Text_Output::reset();
 
         const uint32_t line_count = sizeof(message_if_hardware_shutdown_not_success) / 
                                     sizeof(message_if_hardware_shutdown_not_success[0]);
@@ -47,13 +47,13 @@ namespace kernel::sys
         uint32_t length = 0;
         uint32_t x_pos  = 0;
         for (uint32_t i = 0; i < line_count; ++i) {
-            length = runtime::String_Manipulation::get_string_length(
+            length = stdlib::String_Manipulation::get_string_length(
                          message_if_hardware_shutdown_not_success[i]
                      );
             x_pos = (drivers::vga::TEXT_MODE_SCREEN_WIDTH - length) / 2;
 
-            runtime::Text_Output::set_cursor(x_pos, start_y + i);
-            runtime::Text_Output::put_string(message_if_hardware_shutdown_not_success[i]);
+            stdlib::Text_Output::set_cursor(x_pos, start_y + i);
+            stdlib::Text_Output::put_string(message_if_hardware_shutdown_not_success[i]);
         }
 
         sys::hang();

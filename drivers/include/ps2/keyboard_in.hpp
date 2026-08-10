@@ -43,13 +43,13 @@ namespace drivers::ps2
         static inline bool caps_is_enabled  = false;
 
         static inline bool has_pending_scancode() noexcept {
-            return runtime::byte_input(KEYBOARD_STATUS_PORT) & LOWEST_BIT;
+            return stdlib::byte_input(KEYBOARD_STATUS_PORT) & LOWEST_BIT;
         }
 
         static char get_key() noexcept;
 
     public:
-        static inline runtime::Circular_Buffer<char, ALLOWED_SCANCODE_SIZE> scancode_buffer;
+        static inline stdlib::Circular_Buffer<char, ALLOWED_SCANCODE_SIZE> scancode_buffer;
         
         static void keyboard_irq_handler(kernel::Registers*) noexcept;
     

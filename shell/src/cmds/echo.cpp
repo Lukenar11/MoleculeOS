@@ -22,10 +22,10 @@ NOTES:
 
 namespace shell::commands
 {
-    runtime::Array<char,64>& extract_echo_text(const runtime::Array<char,64>& args,
-                                               const char* redirect_pos) 
-                                               noexcept {
-        static runtime::Array<char,64> text;
+    stdlib::Array<char,64>& extract_echo_text(const stdlib::Array<char,64>& args,
+                                              const char* redirect_pos) 
+                                              noexcept {
+        static stdlib::Array<char,64> text;
         text.fill('\0');
 
         uint32_t start = 0;
@@ -49,12 +49,12 @@ namespace shell::commands
     }
 
     auto& extract_filename_after_input_redirect(const char* redict_operator_pos,
-                                                const runtime::Array<char,64>& args)
+                                                const stdlib::Array<char,64>& args)
                                                 noexcept {
         const char null_char  = '\0';
         const char space_char = ' ';
 
-        static runtime::Array<char,64> filename;
+        static stdlib::Array<char,64> filename;
         filename.fill(null_char);
 
         if (!redict_operator_pos) [[unlikely]]
@@ -84,12 +84,12 @@ namespace shell::commands
     }
 
     auto& extract_text_after_redict_operator(const char* redict_operator_pos, 
-                                             const runtime::Array<char, 64>& args)
+                                             const stdlib::Array<char, 64>& args)
                                              noexcept {
         const char null_char  = '\0';
         const char space_char = ' ';
 
-        static runtime::Array<char, 64> filename;
+        static stdlib::Array<char, 64> filename;
         filename.fill(null_char);
 
         if (!redict_operator_pos) [[unlikely]]
@@ -119,11 +119,11 @@ namespace shell::commands
         return filename;
     }
 
-    void handle_file_instream(const runtime::Array<char, 64>& filename,
-                              const runtime::Array<char, 64>& file_instream) 
+    void handle_file_instream(const stdlib::Array<char, 64>& filename,
+                              const stdlib::Array<char, 64>& file_instream) 
                               noexcept {
         using namespace kernel::filesys;
-        using namespace runtime;
+        using namespace stdlib;
 
         static shell::commands::Parsed_File_Name parsed_filename;
         parsed_filename.name.fill('\0');
@@ -149,7 +149,7 @@ namespace shell::commands
         MoleculeOS_File_System_2::append_file(inode, instream, length);
     }
 
-    void handle_file_outstream(const runtime::Array<char,64>& filename) noexcept {
+    void handle_file_outstream(const stdlib::Array<char,64>& filename) noexcept {
         using namespace kernel::filesys;
         using namespace kernel::heap;
 
@@ -195,12 +195,12 @@ namespace shell::commands
         buffer[inode->used_data_byte_size] = '\0';
 
         for (uint32_t i = 0; buffer[i] != '\0'; i++)
-            runtime::Text_Output::put_char(buffer[i]);
+            stdlib::Text_Output::put_char(buffer[i]);
 
         Block_Allocator::deallocate(buffer);
     }
 
-    void echo(const runtime::Array<char, 64>& args) noexcept {
+    void echo(const stdlib::Array<char, 64>& args) noexcept {
         const char* command_name = "echo: ";
 
         if (args[0] == '\0') [[unlikely]] {
@@ -211,16 +211,16 @@ namespace shell::commands
             return;
         }
 
-        static runtime::Array<char, 64> file_stream;
-        static runtime::Array<char, 64> filename;
+        static stdlib::Array<char, 64> file_stream;
+        static stdlib::Array<char, 64> filename;
         const char null_char = '\0';
 
-        const char* file_outstrem_redict_operator_pos = runtime::String_Manipulation::
+        const char* file_outstrem_redict_operator_pos = stdlib::String_Manipulation::
                                                         find_char_in_string(args.begin(),
                                                                             '<');
 
         if (file_outstrem_redict_operator_pos != nullptr) {
-            const char* pos = runtime::String_Manipulation::
+            const char* pos = stdlib::String_Manipulation::
                               find_char_in_string(file_outstrem_redict_operator_pos + 1, '<');
 
             if (pos != nullptr) [[unlikely]] {
@@ -244,14 +244,13 @@ namespace shell::commands
         }
 
         const char* file_intstrem_redict_operator_pos = 
-            runtime::String_Manipulation::find_char_in_string(
+            stdlib::String_Manipulation::find_char_in_string(
                 args.begin(), 
                 '>'
             );
         if (file_intstrem_redict_operator_pos != nullptr) {
-            const char* pos = runtime::String_Manipulation::
-                              find_char_in_string(file_intstrem_redict_operator_pos + 1,
-                                                  '>');
+            const char* pos = stdlib::String_Manipulation::
+                              find_char_in_string(file_intstrem_redict_operator_pos + 1, '>');
             if (pos != nullptr) [[unlikely]] {
                 print_command_error(command_name);
                 print_command_error("multiple redirect operators\n");
@@ -273,7 +272,7 @@ namespace shell::commands
             return;
         }
 
-        runtime::Text_Output::put_string(args.data());
+        stdlib::Text_Output::put_string(args.data());
 
         command_end();
     }

@@ -6,12 +6,12 @@
 
 static void fs_print(bool ok, const char* message) noexcept {
     if (ok)
-        runtime::Text_Output::put_string("[ OK ] ");
+        stdlib::Text_Output::put_string("[ OK ] ");
     else
-        runtime::Text_Output::put_string("[FAIL] ");
+        stdlib::Text_Output::put_string("[FAIL] ");
 
-    runtime::Text_Output::put_string(message);
-    runtime::Text_Output::put_char('\n');
+    stdlib::Text_Output::put_string(message);
+    stdlib::Text_Output::put_char('\n');
 }
 
 namespace tests
@@ -19,7 +19,7 @@ namespace tests
     void create_file() noexcept {
         using namespace kernel::filesys;
 
-        runtime::Text_Output::reset();
+        stdlib::Text_Output::reset();
 
         I_Node* a = MoleculeOS_File_System_2::create_file("test", "txt", 32);
 
@@ -150,7 +150,7 @@ namespace tests
     void resize_file_size() noexcept {
         using namespace kernel::filesys;
 
-        runtime::Text_Output::reset();
+        stdlib::Text_Output::reset();
 
         I_Node* inode = MoleculeOS_File_System_2::create_file("resize", "bin", 16);
         fs_print(inode != nullptr, 

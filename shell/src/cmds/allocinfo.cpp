@@ -24,7 +24,7 @@ NOTES:
 
 namespace shell::commands
 {
-    void allocinfo(const runtime::Array<char, 64>& args) noexcept {
+    void allocinfo(const stdlib::Array<char, 64>& args) noexcept {
         using namespace kernel::filesys;
 
         static const char* command_name = "allocinfo: ";
@@ -64,13 +64,13 @@ namespace shell::commands
             return;
         }
 
-        runtime::Text_Output::put_string("Index: ");
-        runtime::Text_Output::put_uint(index);
-        runtime::Text_Output::put_char('\n');
+        stdlib::Text_Output::put_string("Index: ");
+        stdlib::Text_Output::put_uint(index);
+        stdlib::Text_Output::put_char('\n');
 
-        runtime::Text_Output::put_string("Blocks: ");
-        runtime::Text_Output::put_uint(blocks);
-        runtime::Text_Output::put_char('\n');
+        stdlib::Text_Output::put_string("Blocks: ");
+        stdlib::Text_Output::put_uint(blocks);
+        stdlib::Text_Output::put_char('\n');
 
         command_end();
     }

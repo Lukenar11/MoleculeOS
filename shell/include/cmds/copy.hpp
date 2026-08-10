@@ -26,5 +26,5 @@ NOTES:
 
 namespace shell::commands
 {
-    void copy(const runtime::Array<char, 64>& args) noexcept;
+    void copy(const stdlib::Array<char, 64>& args) noexcept;
 } // namespace shell::commands

@@ -22,7 +22,7 @@ NOTES:
 
 namespace shell::commands
 {
-    void exists(const runtime::Array<char, 64>& args) noexcept {
+    void exists(const stdlib::Array<char, 64>& args) noexcept {
         static const char* command_name = "exists: ";
 
         Parsed_File_Name& parsed_filename = parse_filename(args);

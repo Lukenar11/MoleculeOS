@@ -20,7 +20,7 @@ namespace kernel
         static idt::Interrupt_Descriptor_Table idt;
 
         for (const auto& entry : pic_mappings)
-            runtime::byte_output(entry.port, entry.value);
+            stdlib::byte_output(entry.port, entry.value);
 
         sys::enable_interrupts();
     }

@@ -50,7 +50,7 @@ namespace shell::commands
             "\t- allocinfo (prints the file allocation info) | allocinfo [File]\n"
         };
 
-        runtime::Text_Output::reset();
-        runtime::Text_Output::put_string(help_message);
+        stdlib::Text_Output::reset();
+        stdlib::Text_Output::put_string(help_message);
     }
 } // namespace shell::commands

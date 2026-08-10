@@ -24,7 +24,7 @@ NOTES:
 
 #include <text_output.hpp>
 
-namespace runtime
+namespace stdlib
 {
     void Text_Output::reset() noexcept {
         cursor_x = 0;
@@ -89,7 +89,7 @@ namespace runtime
         if (base < 2 || base > 16) [[unlikely]]
             return;
         
-        runtime::Array<char, 32> buffer;
+        stdlib::Array<char, 32> buffer;
         uint32_t i = 0;
         while (value) {
             const uint8_t number = value % base;
@@ -185,7 +185,7 @@ namespace runtime
             return;
         }
 
-        runtime::Array<char, 12> buffer;
+        stdlib::Array<char, 12> buffer;
         uint32_t i = 0;
         while (value) {
             buffer[i++] = null_char + (value % ten);
@@ -219,4 +219,4 @@ namespace runtime
         const uint32_t base = 16;
         put_base(value, base);
     }
-} // namespace runtime
+} // namespace stdlib

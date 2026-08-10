@@ -29,5 +29,5 @@ NOTES:
 
 namespace shell::commands
 {
-    void echo(const runtime::Array<char, 64>& args) noexcept;
+    void echo(const stdlib::Array<char, 64>& args) noexcept;
 } // namespace shell::commands

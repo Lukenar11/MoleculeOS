@@ -22,7 +22,7 @@ NOTES:
 
 #include <types.hpp>
 
-namespace runtime
+namespace stdlib
 {
     extern "C" {
         uint8_t byte_input(uint16_t port);
@@ -39,4 +39,4 @@ namespace runtime
                                 uint32_t word_count,
                                 uint16_t* buffer);
     }
-} // namespace runtime
+} // namespace stdlib

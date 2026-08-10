@@ -27,5 +27,5 @@ NOTES:
 
 namespace shell::commands
 {
-    void remove(const runtime::Array<char, 64>& args) noexcept;
+    void remove(const stdlib::Array<char, 64>& args) noexcept;
 } // namespace shell::commands

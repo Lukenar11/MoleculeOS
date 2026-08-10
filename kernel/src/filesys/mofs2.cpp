@@ -42,7 +42,7 @@ namespace kernel::filesys
                                                        const uint32_t name_hash,
                                                        const uint32_t format_hash) 
                                                        noexcept {
-        using namespace runtime;
+        using namespace stdlib;
 
         if (!name_and_format_guard(name, format)) [[unlikely]]
             return false;
@@ -59,7 +59,7 @@ namespace kernel::filesys
                                                   const char* format, 
                                                   const uint32_t byte_size) 
                                                   noexcept {
-        using namespace runtime;
+        using namespace stdlib;
 
         if (!name_and_format_guard(name, format)) [[unlikely]]
             return nullptr;
@@ -98,7 +98,7 @@ namespace kernel::filesys
 
     bool MoleculeOS_File_System_2::delete_file(const char* name, 
                                                const char* format) noexcept {
-        using namespace runtime;
+        using namespace stdlib;
 
         if (!name_and_format_guard(name, format)) [[unlikely]]
             return false;
@@ -153,7 +153,7 @@ namespace kernel::filesys
                                               const uint32_t length,
                                               const uint32_t data_size,
                                               const uint8_t* data) noexcept {
-        using namespace runtime;
+        using namespace stdlib;
         
         if (inode == nullptr) [[unlikely]]
             return false;
@@ -181,7 +181,7 @@ namespace kernel::filesys
     bool MoleculeOS_File_System_2::append_file(I_Node* inode,
                                                const uint8_t* data,
                                                const uint32_t data_size) noexcept {
-        using namespace runtime;
+        using namespace stdlib;
 
         if (inode == nullptr) [[unlikely]]
             return false;
@@ -202,7 +202,7 @@ namespace kernel::filesys
     }
 
     bool MoleculeOS_File_System_2::clear_file(I_Node* inode) noexcept {
-        using namespace runtime;
+        using namespace stdlib;
 
         if (inode == nullptr) [[unlikely]]
             return false;
@@ -224,7 +224,7 @@ namespace kernel::filesys
                                                const char* old_format,
                                                const char* new_name,
                                                const char* new_format) noexcept {
-        using namespace runtime;
+        using namespace stdlib;
 
         if (!name_and_format_guard(old_name, old_format)) [[unlikely]]
             return false;
@@ -252,7 +252,7 @@ namespace kernel::filesys
                                              const char* src_format,
                                              const char* dest_name,
                                              const char* dest_format) noexcept {
-        using namespace runtime;
+        using namespace stdlib;
 
         if (!name_and_format_guard(src_name, src_format)) [[unlikely]]
             return false;
@@ -291,7 +291,7 @@ namespace kernel::filesys
                                              const uint32_t buffer_size,
                                              const uint32_t offset,
                                              const uint32_t length) noexcept {
-        using namespace runtime;
+        using namespace stdlib;
 
         if (inode == nullptr) [[unlikely]]
             return false;

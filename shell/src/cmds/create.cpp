@@ -20,11 +20,11 @@ NOTES:
 
 #include "cmds/create.hpp"
 
-static void split_file_name_and_size(const runtime::Array<char, 64>& args,
-                                     runtime::Array<char, 64>& filename,
+static void split_file_name_and_size(const stdlib::Array<char, 64>& args,
+                                     stdlib::Array<char, 64>& filename,
                                      uint32_t& file_size) 
                                      noexcept {
-    using namespace runtime;
+    using namespace stdlib;
 
     file_size = 1024;
 
@@ -63,9 +63,9 @@ static void split_file_name_and_size(const runtime::Array<char, 64>& args,
 
 namespace shell::commands
 {
-    void create(const runtime::Array<char, 64>& args) noexcept {
+    void create(const stdlib::Array<char, 64>& args) noexcept {
         using namespace kernel::filesys;
-        using namespace runtime;
+        using namespace stdlib;
 
         static const char* command_name = "create: ";
 

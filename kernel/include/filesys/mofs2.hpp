@@ -32,7 +32,7 @@ namespace
 {
     inline bool name_and_format_guard(const char* name, 
                                       const char* format) noexcept {
-        using namespace runtime;
+        using namespace stdlib;
         using namespace kernel::filesys;
 
         if (!name || !format) [[unlikely]] 
@@ -67,7 +67,7 @@ namespace kernel::filesys
 {
     class MoleculeOS_File_System_2 final {
     private:
-        static inline runtime::Array<I_Node, INODE_TABLE_ENTRYS> inode_table;
+        static inline stdlib::Array<I_Node, INODE_TABLE_ENTRYS> inode_table;
 
         static uint32_t to_fnv1a_hash(const char* txt) noexcept;
 
@@ -79,7 +79,7 @@ namespace kernel::filesys
                                         noexcept;
 
     public:
-        static inline constexpr const runtime::Array<I_Node, INODE_TABLE_ENTRYS>& get_inode_table() 
+        static inline constexpr const stdlib::Array<I_Node, INODE_TABLE_ENTRYS>& get_inode_table() 
         noexcept {
             return inode_table;
         };

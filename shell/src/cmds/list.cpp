@@ -23,8 +23,8 @@ NOTES:
 namespace shell::commands
 {
     void list() noexcept {
-        runtime::Text_Output::reset();
-        runtime::Text_Output::put_string("Files:\n");
+        stdlib::Text_Output::reset();
+        stdlib::Text_Output::put_string("Files:\n");
 
         const auto& inodes = kernel::filesys::MoleculeOS_File_System_2::get_inode_table();
         for (const auto& inode : inodes) {
@@ -33,23 +33,23 @@ namespace shell::commands
 
             if (inode.file_name[0] == '\0') [[unlikely]] {
                 static const char* error_message = "\t- [INVALID FILE]\n";
-                runtime::Text_Output::put_string(error_message);
+                stdlib::Text_Output::put_string(error_message);
                 continue;
             }
 
-            runtime::Text_Output::put_string("\t- ");
-            runtime::Text_Output::put_string(inode.file_name.data());
+            stdlib::Text_Output::put_string("\t- ");
+            stdlib::Text_Output::put_string(inode.file_name.data());
 
             if (inode.file_format[0] != '\0') {
-                runtime::Text_Output::put_char('.');
-                runtime::Text_Output::put_string(inode.file_format.data());
+                stdlib::Text_Output::put_char('.');
+                stdlib::Text_Output::put_string(inode.file_format.data());
             }
 
-            runtime::Text_Output::put_string(" (");
-            runtime::Text_Output::put_uint(inode.file_byte_size);
-            runtime::Text_Output::put_string(" Bytes)\n");
+            stdlib::Text_Output::put_string(" (");
+            stdlib::Text_Output::put_uint(inode.file_byte_size);
+            stdlib::Text_Output::put_string(" Bytes)\n");
         }
 
-        runtime::Text_Output::put_char('\n');
+        stdlib::Text_Output::put_char('\n');
     }
 } // namespace shell::commands

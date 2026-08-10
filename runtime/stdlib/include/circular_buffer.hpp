@@ -18,12 +18,12 @@ NOTES:
 #include <array.hpp>
 #include <types.hpp>
 
-namespace runtime
+namespace stdlib
 {
     template<typename T, uint32_t S>
     class Circular_Buffer final {
     private:
-        runtime::Array<T, S> buffer;
+        stdlib::Array<T, S> buffer;
         uint32_t buffer_head;
         uint32_t buffer_tail;
         bool buffer_is_full;
@@ -86,4 +86,4 @@ namespace runtime
 
         ~Circular_Buffer() noexcept = default;
     };
-} // namespace runtime
+} // namespace stdlib

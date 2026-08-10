@@ -19,7 +19,7 @@ NOTES:
 
 #include <types.hpp>
 
-namespace runtime
+namespace stdlib
 {
     class Memory_Manipulation final {
     public:
@@ -84,4 +84,4 @@ namespace runtime
         Memory_Manipulation() noexcept  = default;
         ~Memory_Manipulation() noexcept = default;
     };
-} // namespace runtime
+} // namespace stdlib

@@ -14,7 +14,7 @@ DESCRIPTION:
      
 NOTES: 
     The function pointer signature is designed to accept a 
-    fixed-size 'runtime::Array<char, 64>' 
+    fixed-size 'stdlib::Array<char, 64>' 
     containing the parsed argument string, this avoids dynamic memory usage.
 */
 
@@ -27,6 +27,6 @@ namespace shell
 {
     struct Command_Entry final {
         uint32_t hash = 0;
-        void (*function)(const runtime::Array<char, 64>& args);
+        void (*function)(const stdlib::Array<char, 64>& args);
     };
 } // namespace shell

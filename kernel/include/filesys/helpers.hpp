@@ -20,8 +20,8 @@ namespace kernel::filesys
     constexpr uint32_t INODE_TABLE_ENTRYS     = 256;
 
     struct I_Node final {
-        runtime::Array<char, MAX_FILE_NAME_LENGTH + 1> file_name;
-        runtime::Array<char, MAX_FILE_FORMAT_LENGTH + 1> file_format;
+        stdlib::Array<char, MAX_FILE_NAME_LENGTH + 1> file_name;
+        stdlib::Array<char, MAX_FILE_FORMAT_LENGTH + 1> file_format;
         uint32_t name_hash           = 0;
         uint32_t format_hash         = 0;
         uint32_t used_data_byte_size = 0;

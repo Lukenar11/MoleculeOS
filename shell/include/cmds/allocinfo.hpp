@@ -28,5 +28,5 @@ NOTES:
 
 namespace shell::commands
 {
-    void allocinfo(const runtime::Array<char, 64>& args) noexcept;
+    void allocinfo(const stdlib::Array<char, 64>& args) noexcept;
 } // namespace shell::commands

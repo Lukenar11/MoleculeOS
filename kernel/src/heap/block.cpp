@@ -161,7 +161,7 @@ namespace kernel::heap
         const uint32_t n = (old_size < new_size) 
                             ? old_size 
                             : new_size;
-        runtime::Memory_Manipulation::copy_memory_block(new_ptr, ptr, n);
+        stdlib::Memory_Manipulation::copy_memory_block(new_ptr, ptr, n);
 
         deallocate(ptr);
         return new_ptr;

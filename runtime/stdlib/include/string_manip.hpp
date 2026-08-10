@@ -19,7 +19,7 @@ NOTES:
 
 #include <types.hpp>
 
-namespace runtime
+namespace stdlib
 {
     class String_Manipulation final {
     public:
@@ -95,4 +95,4 @@ namespace runtime
         String_Manipulation() noexcept  = default;
         ~String_Manipulation() noexcept = default;
     };
-} // namespace runtime
+} // namespace stdlib

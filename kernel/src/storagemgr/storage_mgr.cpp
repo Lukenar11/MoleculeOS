@@ -21,7 +21,7 @@ namespace kernel::storagmgr
                                               const uint32_t size,
                                               void* buffer) noexcept {
         using namespace drivers::ata;
-        using namespace runtime;
+        using namespace stdlib;
         using namespace heap;
 
         if (size == 0) [[unlikely]]
@@ -83,7 +83,7 @@ namespace kernel::storagmgr
     }
 
     void Storage_Manager::init() noexcept {
-        using namespace runtime;
+        using namespace stdlib;
         using namespace kernel::filesys;
 
         Filesys_Header header;
@@ -111,7 +111,7 @@ namespace kernel::storagmgr
     }
 
     bool Storage_Manager::save_filesys() noexcept {
-        using namespace runtime;
+        using namespace stdlib;
         using namespace kernel::filesys;
 
         Filesys_Header header;
@@ -128,8 +128,8 @@ namespace kernel::storagmgr
                                  &header)) [[unlikely]]
             return false;
 
-        static runtime::Array<Serialized_I_Node, 
-                              INODE_TABLE_ENTRYS> serialized_inodes;
+        static stdlib::Array<Serialized_I_Node, 
+                             INODE_TABLE_ENTRYS> serialized_inodes;
         serialized_inodes.fill(Serialized_I_Node{});
 
         uint32_t current_data_offset = 0;
@@ -181,7 +181,7 @@ namespace kernel::storagmgr
     }
 
     bool Storage_Manager::load_filesys() noexcept {
-        using namespace runtime;
+        using namespace stdlib;
         using namespace kernel::filesys;
         using namespace heap;
 
@@ -199,7 +199,7 @@ namespace kernel::storagmgr
                                                  FILESYS_HEADER_MAGIC) != 0) [[unlikely]]
             return false;
 
-        static runtime::Array<Serialized_I_Node, INODE_TABLE_ENTRYS> serialized_inodes;
+        static stdlib::Array<Serialized_I_Node, INODE_TABLE_ENTRYS> serialized_inodes;
         serialized_inodes.fill(Serialized_I_Node{});
 
         const uint32_t inode_table_size = header.inode_count *

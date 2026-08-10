@@ -23,10 +23,10 @@ namespace drivers::ps2
 {
     [[nodiscard]]
     char Keyboard_Input::get_key() noexcept {
-        if (!(runtime::byte_input(KEYBOARD_STATUS_PORT) & LOWEST_BIT))
+        if (!(stdlib::byte_input(KEYBOARD_STATUS_PORT) & LOWEST_BIT))
             return '\0';
     
-        const uint8_t scancode = runtime::byte_input(KEYBOARD_DATA_PORT);
+        const uint8_t scancode = stdlib::byte_input(KEYBOARD_DATA_PORT);
     
         switch (scancode) {
         case static_cast<uint8_t>(Special_Keyboard_Keys::LEFT_SHIFT):

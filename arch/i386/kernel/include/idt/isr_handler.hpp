@@ -29,9 +29,9 @@ namespace
 {
     inline constexpr void print_reg_dump(const char* label, 
                                          const uint32_t value) noexcept {
-        runtime::Text_Output::put_string(label, 
+        stdlib::Text_Output::put_string(label, 
                                          /*clear_screen_if_hight_limit_reached=*/false);
-        runtime::Text_Output::put_hex(value);
+        stdlib::Text_Output::put_hex(value);
     }
 }
 
