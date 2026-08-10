@@ -26,7 +26,7 @@ NOTES:
 #include <io.hpp>
 #include <string_manip.hpp>
 #include <text_output.hpp>
-#include <kernel_api.hpp>
+#include <kernel.hpp>
 
 namespace
 {

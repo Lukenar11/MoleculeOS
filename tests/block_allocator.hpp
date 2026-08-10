@@ -1,7 +1,7 @@
 #pragma once
 
 #include <types.h>
-#include <kernel_api.hpp>
+#include <kernel.hpp>
 
 namespace tests
 {

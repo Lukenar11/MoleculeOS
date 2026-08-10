@@ -19,7 +19,7 @@ NOTES:
 #include "heap/helpers.hpp"
 #include <types.h>
 #include <array.hpp>
-#include <kernel_api.hpp>
+#include <kernel.hpp>
 #include <memory_manip.hpp>
 
 namespace kernel::heap

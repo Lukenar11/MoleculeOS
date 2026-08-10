@@ -28,7 +28,7 @@ NOTES:
     For the sake of simplicity, support for 48-bit 'LBA-addresses' has been omitted.
 
     The forward-declaration for the 'kernel::sys::panic();' function is intends, 
-    because the inclusion of the '<kernel_api.hpp>' regarding conflicts with the 
+    because the inclusion of the '<kernel.hpp>' regarding conflicts with the 
     '<drivers.hpp>'.
 */
 

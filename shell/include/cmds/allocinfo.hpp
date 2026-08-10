@@ -23,7 +23,7 @@ NOTES:
 #pragma once
 
 #include "../utils/cmds_helpers.hpp"
-#include <kernel_api.hpp>
+#include <kernel.hpp>
 
 namespace shell::commands
 {

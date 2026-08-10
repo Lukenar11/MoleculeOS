@@ -23,7 +23,7 @@ NOTES:
 #include <types.h>
 #include <circular_buffer.hpp>
 #include <io.hpp>
-#include <kernel_api.hpp>
+#include <kernel.hpp>
 
 namespace kernel {
     struct Registers;

@@ -18,7 +18,7 @@ NOTES:
     a kernel panic is triggered to prevent undefined behavior.
 */
 
-#include <kernel_api.hpp>
+#include <kernel.hpp>
 #include <terminal_api.hpp>
 #include <drivers.hpp>
 

@@ -4,7 +4,7 @@
 #include <text_output.hpp>
 #include <array.hpp>
 #include <drivers.hpp>
-#include <kernel_api.hpp>
+#include <kernel.hpp>
 #include <memory_manip.hpp>
 #include <string_manip.hpp>
 
