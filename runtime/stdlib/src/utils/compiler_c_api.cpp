@@ -20,27 +20,53 @@ NOTES:
 extern "C"
 {
     void* memcpy(void* dest_ptr, const void* src_ptr, uint32_t size) {
-        return stdlib::Memory_Manipulation::copy_memory_block(dest_ptr, 
-                                                              src_ptr,
-                                                              size);
+        stdlib::Memory_Manipulation::copy_memory_block(dest_ptr, 
+                                                       src_ptr,
+                                                       size);
+                                                    
+        return dest_ptr;
     }
 
     void* memmove(void* dest_ptr, const void* src_ptr, uint32_t size) {
-        return stdlib::Memory_Manipulation::move_memory_block(dest_ptr, 
-                                                              src_ptr,
-                                                              size);
+        stdlib::Memory_Manipulation::move_memory_block(dest_ptr, 
+                                                       src_ptr,
+                                                       size);
+
+        return dest_ptr;
     }
 
     void* memset(void* dest_ptr, int32_t value, uint32_t size) {
-        return stdlib::Memory_Manipulation::set_memory_block(dest_ptr, 
-                                                              value,
-                                                              size);
+        stdlib::Memory_Manipulation::set_memory_block(dest_ptr, 
+                                                      value,
+                                                      size);
+
+        return dest_ptr;
     }
 
     int32_t memcmp(const void* a_ptr, const void* b_ptr, uint32_t size) {
-        return stdlib::Memory_Manipulation::compare_memory_block(a_ptr,
-                                                                 b_ptr, 
-                                                                 size);
+        int32_t status;
+
+        switch (stdlib::Memory_Manipulation::compare_memory_block(a_ptr,
+                                                                  b_ptr, 
+                                                                  size)) {
+        case status::LESS_THAN: 
+            status = -1;
+            break;
+
+        case status::EQUAL_TO: 
+            status = 0;
+            break;
+
+        case status::GREATER_THAN: 
+            status = 1;
+            break;
+
+        default: 
+            status = 0;
+            break;
+        }
+
+        return status;
     }
 
     void strncpy(char* dest_ptr, const char* src_ptr, uint32_t size) {
