@@ -20,7 +20,7 @@ NOTES:
 
 #include "idt/utils/irq_helpers.hpp"
 #include "utils/regs.hpp"
-#include <drivers_api.hpp>
+#include <drivers.hpp>
 #include <io_api.hpp>
 
 namespace

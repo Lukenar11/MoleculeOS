@@ -29,7 +29,7 @@ NOTES:
 
     The forward-declaration for the 'kernel::sys::panic();' function is intends, 
     because the inclusion of the '<kernel_api.hpp>' regarding conflicts with the 
-    '<drivers_api.hpp>'.
+    '<drivers.hpp>'.
 */
 
 #pragma once

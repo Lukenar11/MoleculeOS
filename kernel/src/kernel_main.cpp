@@ -20,7 +20,7 @@ NOTES:
 
 #include <kernel_api.hpp>
 #include <terminal_api.hpp>
-#include <drivers_api.hpp>
+#include <drivers.hpp>
 
 namespace kernel
 {

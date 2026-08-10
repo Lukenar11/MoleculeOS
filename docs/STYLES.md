@@ -948,7 +948,7 @@ Each driver is a **standalone block** that contains **various modules**:
 - Drivers must use **only runtime**  
 - Drivers must **not directly** call kernel subsyss  
 - Drivers should be as **simple** as possible and serve only as a **HAL (Hardware Abstraction Layer)**
-- Each new driver must be included in the file `runtime\apis\drivers_api.hpp`.
+- Each new driver must be included in the file `runtime\apis\drivers.hpp`.
 - Even internal runtime components, such as “text_output,” must use the central APIs.
 
 ---
@@ -960,7 +960,7 @@ Each driver is a **standalone block** that contains **various modules**:
     │
     ├─ apis/
     |   |
-    │   |   # APIs (e.g. 'drivers_api.hpp')
+    │   |   # APIs (e.g. 'drivers.hpp')
     │   └── ... *.hpp
     |
     |  # C++ Runtime (e.g. 'array.hpp', 'text_output.hpp')
