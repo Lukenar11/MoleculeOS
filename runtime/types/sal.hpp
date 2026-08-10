@@ -10,15 +10,15 @@ DESCRIPTION:
     because methods and functions returns 'void' or 'status_t'.
 
     SAL Explanation:
-        - IN    => Input
-        - OUT   => Output
-        - INOUT => Input & Output
+        - _IN_    => Input
+        - _OUT_   => Output
+        - _INOUT_ => Input & Output
 
 NOTES:
 */
 
 #pragma once
 
-#define IN
-#define OUT
-#define INOUT
+#define _IN_
+#define _OUT_
+#define _INOUT_
