@@ -17,6 +17,7 @@ NOTES:
 
 #include <memory_manip.hpp>
 #include <string_manip.hpp>
+#include <types.hpp>
 
 extern "C"
 {

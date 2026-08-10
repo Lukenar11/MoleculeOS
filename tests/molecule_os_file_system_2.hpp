@@ -1,6 +1,7 @@
 #pragma once
 
 #include <text_output.hpp>
+#include <types.hpp>
 #include <kernel.hpp>
 
 static void fs_print(bool ok, const char* message) noexcept {

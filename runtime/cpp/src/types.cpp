@@ -13,13 +13,9 @@ DESCRIPTION:
     platform-specific variations.
 
 NOTES:
-    This implementation is intentionally minimal and written in C to
-    ensure compatibility with both C and C++ components of the system,
-    especially those interacting with Assembly routines.
-
     The system does not rely on the host system's standard library, so
     this header replaces the functionality normally provided by the
-    system's '<types.h>'.
+    system's '<types.hpp>'.
 */
 
-#include <types.h>
+#include <types.hpp>

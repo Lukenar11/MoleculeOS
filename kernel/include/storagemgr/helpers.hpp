@@ -22,7 +22,7 @@ NOTES:
 #pragma once
 
 #include "filesys/mofs2.hpp"
-#include <types.h>
+#include <types.hpp>
 #include <array.hpp>
 
 namespace kernel::storagmgr

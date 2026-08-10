@@ -20,6 +20,7 @@ NOTES:
 
 #include "utils/isr_helpers.hpp"
 #include "sys/interrupts.hpp"
+#include <types.hpp>
 
 namespace
 {

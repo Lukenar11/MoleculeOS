@@ -26,7 +26,7 @@ NOTES:
 
 #pragma once
 
-#include <types.h>
+#include <types.hpp>
 
 namespace drivers::ps2
 {

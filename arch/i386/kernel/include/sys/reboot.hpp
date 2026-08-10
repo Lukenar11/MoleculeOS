@@ -15,7 +15,7 @@ NOTES:
 #pragma once
 
 #include "sys/panic.hpp"
-#include <types.h>
+#include <types.hpp>
 #include <drivers.hpp>
 #include <io.hpp>
 

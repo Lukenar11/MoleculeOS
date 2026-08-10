@@ -17,7 +17,7 @@ NOTES:
 
 #pragma once
 
-#include <types.h>
+#include <types.hpp>
 
 namespace kernel::sys
 {

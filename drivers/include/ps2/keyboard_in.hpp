@@ -20,7 +20,7 @@ NOTES:
 #pragma once
 
 #include "../utils/ps2_keyboard_in_helpers.hpp"
-#include <types.h>
+#include <types.hpp>
 #include <circular_buffer.hpp>
 #include <io.hpp>
 #include <kernel.hpp>

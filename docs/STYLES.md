@@ -213,12 +213,12 @@ Examples (single-line):
    (in the order they are needed in the code)
 
 2. Library headers
-   (e.g., `<types.h>`, `<stddef.h>`, `<array>` — also in the order of use)
+   (e.g., `<types.hpp>`, `<stddef.h>`, `<array>` — also in the order of use)
 
 ### Rule: “First use → first include”
 
 If an array is used first in the code → include `<array>` first  
-If a `uint32_t` appears afterward → include `<types.h>` afterward
+If a `uint32_t` appears afterward → include `<types.hpp>` afterward
 
 Example:
 
@@ -226,7 +226,7 @@ Example:
     #include "drivers/vga/textmode/include/textmode.hpp"   // needed first
     #include "kernel/include/sys/kernel_sys_sleep.h" // needed afterward
     #include <array>     // used first in the code
-    #include <types.h>  // used afterward
+    #include <types.hpp>  // used afterward
 ```
 
 ---
@@ -572,7 +572,7 @@ A practical example of all the rules:
     #pragma once
 
     #include "utils/helpers.hpp"
-    #include <types.h>
+    #include <types.hpp>
     #include <io.hpp>
 
     namespace drivers::ps2 
@@ -630,7 +630,7 @@ A practical example of all the rules:
 
     #pragma once
 
-    #include <types.h>
+    #include <types.hpp>
 
     namespace drivers::ps2
     {

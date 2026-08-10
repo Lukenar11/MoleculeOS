@@ -22,6 +22,7 @@ NOTES:
 
 #include "../utils/cmds_helpers.hpp"
 #include "../utils/utils.hpp"
+#include <types.hpp>
 #include <kernel.hpp>
 #include <array.hpp>
 #include <string_manip.hpp>
