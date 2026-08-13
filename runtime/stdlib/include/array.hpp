@@ -22,7 +22,7 @@ namespace stdlib
     template<class T, uint32_t S>
     class Array final {
     private:
-        static_assert(S > 0, "Array size must be greater than zero");
+        static_assert(S > 0, "'Array' size must be greater than zero");
 
         T buffer[S] = {};
 

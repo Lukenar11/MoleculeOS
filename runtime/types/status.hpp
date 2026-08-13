@@ -42,6 +42,8 @@ namespace status
     constexpr status_t GREATER_THAN = 0x01'0000'00;
     constexpr status_t LESS_THAN    = 0x01'0000'01;
     constexpr status_t EQUAL_TO     = 0x01'0000'02;
+    constexpr status_t FULL         = 0x01'0000'03;
+    constexpr status_t EMPTY        = 0x01'0000'04;
     
     constexpr status_t NULL_POINTER         = 0x02'0000'00;
     constexpr status_t INVALID_POINTER      = 0x02'0000'01;
