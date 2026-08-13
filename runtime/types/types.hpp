@@ -27,3 +27,13 @@ using int32_t = signed int;
 using uint8_t  = unsigned char;
 using uint16_t = unsigned short;
 using uint32_t = unsigned int;
+
+static_assert(sizeof(int8_t)  == 1, "Error 'int8_t' has the wrong byte size!");
+static_assert(sizeof(int16_t) == 2, "Error 'int16_t' has the wrong byte size!");
+static_assert(sizeof(int32_t) == 4, "Error 'int32_t' has the wrong byte size!");
+
+static_assert(sizeof(uint8_t)  == 1, "Error 'uint8_t' has the wrong byte size!");
+static_assert(sizeof(uint16_t) == 2, "Error 'uint16_t' has the wrong byte size!");
+static_assert(sizeof(uint32_t) == 4, "Error 'uint32_t' has the wrong byte size!");
+
+static_assert(sizeof(void*) == 4, "Error 'uint32_t' has the wrong byte size!");
