@@ -106,28 +106,23 @@ namespace stdlib
         }
 
         [[nodiscard]] inline 
-        status_t count(_OUT_ uint32_t& count) const noexcept {
-            status_t status;
+        uint32_t count() const noexcept {
+            uint32_t status;
 
             if (buffer_is_full) [[unlikely]] {
-                count  = S;
-                status = status::FULL;
-
+                status = S;
                 goto cleanup;
             }
 
             if (buffer_head >= buffer_tail) [[unlikely]] {
-                count  = buffer_head - buffer_tail;
-                status = status::SUCCESS;
-
+                status = buffer_head - buffer_tail;
                 goto cleanup;
             }
 
-            count  = S + buffer_head - buffer_tail;
-            status = status::SUCCESS;
+            status = S + buffer_head - buffer_tail;
 
         cleanup:
-            return count;
+            return status;
         }
 
         [[nodiscard]] inline constexpr
