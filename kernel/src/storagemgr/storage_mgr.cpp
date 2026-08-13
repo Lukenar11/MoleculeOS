@@ -94,7 +94,7 @@ namespace kernel::storagmgr
                             &header);
 
         if (String_Manipulation::compare_strings(header.magic.data(), 
-                                                 FILESYS_HEADER_MAGIC) != 0) {
+                                                 FILESYS_HEADER_MAGIC) != status::EQUAL_TO) {
 
             String_Manipulation::copy_string(header.magic.data(), 
                                              FILESYS_HEADER_MAGIC);
@@ -195,8 +195,8 @@ namespace kernel::storagmgr
         if (header.version != MOFS_VERSION) [[unlikely]]
             return false;
 
-        if (String_Manipulation::compare_strings(header.magic.data(), 
-                                                 FILESYS_HEADER_MAGIC) != 0) [[unlikely]]
+        if (String_Manipulation::copy_string(header.magic.data(), 
+                                             FILESYS_HEADER_MAGIC) != status::SUCCESS) [[unlikely]]
             return false;
 
         static stdlib::Array<Serialized_I_Node, INODE_TABLE_ENTRYS> serialized_inodes;

@@ -53,10 +53,6 @@ extern "C"
             status = -1;
             break;
 
-        case status::EQUAL_TO: 
-            status = 0;
-            break;
-
         case status::GREATER_THAN: 
             status = 1;
             break;
@@ -81,16 +77,43 @@ extern "C"
     }
 
     uint32_t strlen(const char *string) {
-        return stdlib::String_Manipulation::get_string_length(string);
+        uint32_t length;
+        stdlib::String_Manipulation::get_string_length(length, string);
+
+        return length;
     }
 
     int32_t strcmp(const char* a_ptr, const char* b_ptr) {
-        return stdlib::String_Manipulation::compare_strings(a_ptr, 
-                                                            b_ptr);
+        int32_t status;
+
+        status = stdlib::String_Manipulation::compare_strings(a_ptr, b_ptr);
+
+        switch (status) {
+        case status::LESS_THAN: 
+            status = -1;
+            break;
+
+        case status::GREATER_THAN: 
+            status = 1;
+            break;
+
+        default: 
+            status = 0;
+            break;
+        }
+
+        return status;
     }
 
     const char* strchr(const char* string, int32_t symbol) {
-        return stdlib::String_Manipulation::find_char_in_string(string, 
-                                                                symbol);
+        const char* result = nullptr; 
+        if (stdlib::String_Manipulation::find_char_in_string(result,
+                                                             string,
+                                                             symbol) != 
+            status::SUCCESS) [[unlikely]] {
+            return nullptr; 
+        }
+
+        return result;
     }
 }

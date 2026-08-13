@@ -38,8 +38,10 @@ namespace
         if (!name || !format) [[unlikely]] 
             return false;
 
-        const uint32_t name_length   = String_Manipulation::get_string_length(name);
-        const uint32_t format_length = String_Manipulation::get_string_length(format);
+        uint32_t name_length;
+        uint32_t format_length;
+        String_Manipulation::get_string_length(name_length, name);
+        String_Manipulation::get_string_length(format_length, format);
 
         if (name[0] == '\0') [[unlikely]]
             return false;

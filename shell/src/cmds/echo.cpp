@@ -144,7 +144,8 @@ namespace shell::commands
                                                           parsed_filename.format.data(),
                                                           file_instream.size());
             
-        const int32_t length = String_Manipulation::get_string_length(file_instream.data());
+        uint32_t length;
+        String_Manipulation::get_string_length(length, file_instream.data());
         const auto& instream = reinterpret_cast<const uint8_t*>(file_instream.data());
         MoleculeOS_File_System_2::append_file(inode, instream, length);
     }
@@ -215,13 +216,16 @@ namespace shell::commands
         static stdlib::Array<char, 64> filename;
         const char null_char = '\0';
 
-        const char* file_outstrem_redict_operator_pos = stdlib::String_Manipulation::
-                                                        find_char_in_string(args.begin(),
-                                                                            '<');
+        const char* file_outstrem_redict_operator_pos;
+        stdlib::String_Manipulation::find_char_in_string(file_outstrem_redict_operator_pos,
+                                                         args.begin(), 
+                                                         '<');
 
         if (file_outstrem_redict_operator_pos != nullptr) {
-            const char* pos = stdlib::String_Manipulation::
-                              find_char_in_string(file_outstrem_redict_operator_pos + 1, '<');
+            const char* pos;
+            stdlib::String_Manipulation::find_char_in_string(pos, 
+                                                             file_outstrem_redict_operator_pos + 1,
+                                                             '<');
 
             if (pos != nullptr) [[unlikely]] {
                 print_command_error(command_name);
@@ -243,14 +247,15 @@ namespace shell::commands
             return;
         }
 
-        const char* file_intstrem_redict_operator_pos = 
-            stdlib::String_Manipulation::find_char_in_string(
-                args.begin(), 
-                '>'
-            );
+        const char* file_intstrem_redict_operator_pos;
+        stdlib::String_Manipulation::find_char_in_string(file_intstrem_redict_operator_pos,
+                                                         args.begin(), 
+                                                         '>');
         if (file_intstrem_redict_operator_pos != nullptr) {
-            const char* pos = stdlib::String_Manipulation::
-                              find_char_in_string(file_intstrem_redict_operator_pos + 1, '>');
+            const char* pos;
+            stdlib::String_Manipulation::find_char_in_string(pos, 
+                                                             file_intstrem_redict_operator_pos + 1,
+                                                             '>');
             if (pos != nullptr) [[unlikely]] {
                 print_command_error(command_name);
                 print_command_error("multiple redirect operators\n");

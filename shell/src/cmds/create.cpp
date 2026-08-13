@@ -55,7 +55,10 @@ static void split_file_name_and_size(const stdlib::Array<char, 64>& args,
         if (!String_Manipulation::is_digit(*i_ptr))
             return;
 
-    file_size   = String_Manipulation::string_to_int(size_ptr);
+    int32_t temp;
+    String_Manipulation::string_to_int(temp, size_ptr);
+    file_size = static_cast<uint32_t>(temp);
+
     *last_space = '\0';
 
     return;

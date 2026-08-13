@@ -114,7 +114,8 @@ namespace tests
         stdlib::Array<uint16_t, 256> buffer;
 
         const char* message_to_write = "Dawn of Ashes!";
-        const uint32_t length = stdlib::String_Manipulation::get_string_length(message_to_write);
+        uint32_t length;
+        stdlib::String_Manipulation::get_string_length(length, message_to_write);
         
         buffer.fill(0);
         stdlib::Memory_Manipulation::copy_memory_block(buffer.begin(), 

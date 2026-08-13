@@ -1,7 +1,7 @@
 /**
 LICENSE:
     Copyright (c) 2026 Lukenar11 (Luke Matthes)
-    Under the MIT License
+    MIT Licensed
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:

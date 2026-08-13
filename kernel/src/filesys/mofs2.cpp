@@ -48,8 +48,12 @@ namespace kernel::filesys
             return false;
 
         if ((inode.name_hash == name_hash) && (inode.format_hash == format_hash))
-            if ((String_Manipulation::compare_strings(name, inode.file_name.data()) == 0) &&
-                (String_Manipulation::compare_strings(format, inode.file_format.data()) == 0))
+            if ((String_Manipulation::compare_strings(name, 
+                                                      inode.file_name.data()) == 
+                status::EQUAL_TO) &&
+                (String_Manipulation::compare_strings(format, 
+                                                      inode.file_format.data()) == 
+                status::EQUAL_TO))
                 return true;
         
         return false;

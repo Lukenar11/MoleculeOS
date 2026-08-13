@@ -1,7 +1,7 @@
 /**
 LICENSE:
     Copyright (c) 2026 Lukenar11 (Luke Matthes)
-    Under the MIT License
+    MIT Licensed
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
@@ -45,7 +45,7 @@ namespace stdlib
 
             dest = static_cast<uint8_t*>(dest_ptr);
             src  = static_cast<const uint8_t*>(src_ptr);
-            while (size--) {
+            while (size--) [[likely]] {
                 *dest++ = *src++;
             }
 
@@ -78,14 +78,14 @@ namespace stdlib
 
             if (reinterpret_cast<uint32_t>(dest) < 
                 reinterpret_cast<uint32_t>(src)) [[likely]] {
-                while (size--) {
+                while (size--) [[likely]] {
                     *dest++ = *src++;
                 }
             } 
             else {
                 dest += size;
                 src  += size;
-                while (size--) {
+                while (size--) [[likely]] {
                     *--dest = *--src;
                 }
             }
@@ -116,8 +116,9 @@ namespace stdlib
 
             dest = static_cast<uint8_t*>(dest_ptr);
             byte = static_cast<uint8_t>(value);
-            while (size--)
+            while (size--) [[likely]] {
                 *dest++ = byte;
+            }
 
             status = status::SUCCESS;
 
@@ -143,7 +144,7 @@ namespace stdlib
                 goto cleanup;
             }
 
-            while (size--) {
+            while (size--) [[likely]] {
                 if (*a < *b) {
                     status = status::LESS_THAN;
                     goto cleanup;  
