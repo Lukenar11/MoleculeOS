@@ -20,7 +20,7 @@ NOTES:
 
 #pragma once
 
-using int8_t  = signed char;  
+using int8_t  = signed char;
 using int16_t = signed short;
 using int32_t = signed int;
 
