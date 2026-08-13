@@ -27,41 +27,76 @@ namespace stdlib
         T buffer[S] = {};
 
     public:
-        // array index-access (arr[i])
-        inline constexpr T& operator[](uint32_t index) noexcept { 
+        inline constexpr 
+        T& operator[](uint32_t index) noexcept { 
             return buffer[index]; 
         }
 
-        inline constexpr const T& operator[](const uint32_t index) 
-        const noexcept {
+        inline constexpr 
+        const T& operator[](const uint32_t index) const noexcept {
             return buffer[index]; 
         }
 
-        // get array-size
-        inline constexpr uint32_t size() const noexcept { return S; }
+        inline constexpr 
+        uint32_t size() const noexcept { 
+            return S; 
+        }
 
-        // iterators
-        inline constexpr T* begin() noexcept { return buffer; }
-        inline constexpr T* end() noexcept { return buffer + S; }
+        inline constexpr 
+        T* begin() noexcept { 
+            return buffer; 
+        }
 
-        inline constexpr const T* begin() const noexcept { return buffer; }
-        inline constexpr const T* end() const noexcept { return buffer + S; }
+        inline constexpr 
+        const T* begin() const noexcept { 
+            return buffer; 
+        }
 
-        // get first/last array-element
-        inline constexpr T& front() noexcept { return buffer[0]; }
-        inline constexpr T& back() noexcept { return buffer[S - 1]; }
+        inline constexpr 
+        T* end() noexcept { 
+            return buffer + S; 
+        }
 
-        inline constexpr const T& front() const noexcept { return buffer[0]; }
-        inline constexpr const T& back() const noexcept { return buffer[S - 1]; }
+        inline constexpr 
+        const T* end() const noexcept { 
+            return buffer + S; 
+        }
 
-        // get array-content
-        inline constexpr T* data() noexcept { return buffer; }
-        inline constexpr const T* data() const noexcept { return buffer; }
+        inline constexpr 
+        T& front() noexcept { 
+            return buffer[0]; 
+        }
 
-        // Replace array-data with "value"
-        inline constexpr void fill(const T& value) noexcept {
-            for (uint32_t i = 0; i < S; i++)
+        inline constexpr 
+        const T& front() const noexcept { 
+            return buffer[0];
+        }
+
+        inline constexpr 
+        T& back() noexcept { 
+            return buffer[S - 1]; 
+        }
+
+        inline constexpr 
+        const T& back() const noexcept { 
+            return buffer[S - 1]; 
+        }
+
+        inline constexpr 
+        T* data() noexcept { 
+            return buffer; 
+        }
+
+        inline constexpr 
+        const T* data() const noexcept { 
+            return buffer; 
+        }
+
+        inline constexpr 
+        void fill(const T& value) noexcept {
+            for (uint32_t i = 0; i < S; i++) [[likely]] {
                 buffer[i] = value; 
+            }
         }
 
         Array() noexcept  = default;

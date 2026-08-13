@@ -26,6 +26,7 @@ NOTES:
 
 #include <drivers.hpp>
 #include <types.hpp>
+#include <sal.hpp>
 #include <array.hpp>
 
 namespace stdlib 
@@ -36,44 +37,74 @@ namespace stdlib
         static inline uint32_t cursor_y = 0;
         
         static inline const bool does_blink = false;
-        static inline uint8_t cursor_color = 
+        static inline uint8_t cursor_color  = 
             drivers::vga::Text_Mode::make_color(drivers::vga::Text_Mode_Colors::LIGHT_GREY,
                                                 drivers::vga::Text_Mode_Colors::BLACK,
                                                 does_blink);
 
         static void new_line() noexcept;
-        static void put_base(uint32_t value, const uint32_t base) noexcept;
+        static void put_base(_IN_ uint32_t value, 
+                             _IN_ const uint32_t base) noexcept;
 
-        static uint32_t calculate_needed_lines(const char* text) noexcept;
+        static 
+        uint32_t calculate_needed_lines(_IN_ const char* text) noexcept;
             
     public:
-        static void reset() noexcept;
-        static void set_text_color(const drivers::vga::Text_Mode_Colors& color,
-                                   const drivers::vga::Text_Mode_Colors& background,
-                                   const bool does_blink=false) 
-                                   noexcept;
+        static inline
+        void reset() noexcept {
+            using namespace drivers;
+
+            cursor_x = 0;
+            cursor_y = 0;
+
+            vga::Text_Mode::clear_screen(vga::Text_Mode_Colors::BLACK);
+        }
+
+        static inline 
+        void set_text_color(_IN_ const drivers::vga::Text_Mode_Colors& color,
+                            _IN_ const drivers::vga::Text_Mode_Colors& background,
+                            _IN_ const bool does_blink=false) 
+                            noexcept {
+            using namespace drivers;
+
+            cursor_color = vga::Text_Mode::make_color(color, 
+                                                      background, 
+                                                      does_blink);
+        }
         
-        static void put_char(const char symbol) noexcept;
-        static void put_string(const char* message, 
-                              const bool clear_screen_if_hight_limit_reached=true)
-                              noexcept;
-            
-        static void put_int(int32_t value) noexcept;
-        static void put_uint(uint32_t value) noexcept;
-            
-        static void put_hex(const uint32_t value) noexcept;
-        static void put_bin(const uint32_t value) noexcept;
-            
-        static void put_ptr(const uint32_t value) noexcept;
+        static 
+        void put_char(_IN_ const char symbol) noexcept;
 
-        [[nodiscard]] static inline uint32_t get_cursor_x() noexcept {return cursor_x;}
-        [[nodiscard]] static inline uint32_t get_cursor_y() noexcept {return cursor_y;}
+        static 
+        void put_string(_IN_ const char* message, 
+                        _IN_ const bool premature_screen_clearing=true) noexcept;
+            
+        static void put_int(_IN_  int32_t value) noexcept;
+        static void put_uint(_IN_ uint32_t value) noexcept;
+            
+        static void put_hex(_IN_ const uint32_t value) noexcept;
+        static void put_bin(_IN_ const uint32_t value) noexcept;
+        static void put_ptr(_IN_ const uint32_t value) noexcept;
 
-        [[nodiscard]]
-        static inline uint8_t get_text_color() noexcept {return cursor_color;}
+        [[nodiscard]] static inline 
+        uint32_t get_cursor_x() noexcept {
+            return cursor_x;
+        }
 
-        static inline constexpr void set_cursor(const uint32_t x, 
-                                                const uint32_t y) noexcept {
+        [[nodiscard]] static inline 
+        uint32_t get_cursor_y() noexcept {
+            return cursor_y;
+        }
+
+
+        [[nodiscard]] static inline 
+        uint8_t get_text_color() noexcept {
+            return cursor_color;
+        }
+
+        static inline constexpr 
+        void set_cursor(_IN_ const uint32_t x, 
+                        _IN_ const uint32_t y) noexcept {
             cursor_x = x;
             cursor_y = y;
         }
