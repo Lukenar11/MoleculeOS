@@ -176,8 +176,6 @@ namespace shell::commands
         if (!buffer) {
             print_command_error(command_name);
             print_command_error("heap allocation failed\n");
-
-            Block_Allocator::deallocate(buffer);
             return;
         }
 

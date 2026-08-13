@@ -199,7 +199,8 @@ namespace kernel::storagmgr
                                              FILESYS_HEADER_MAGIC) != status::SUCCESS) [[unlikely]]
             return false;
 
-        static stdlib::Array<Serialized_I_Node, INODE_TABLE_ENTRYS> serialized_inodes;
+        static stdlib::Array<Serialized_I_Node, 
+                             INODE_TABLE_ENTRYS> serialized_inodes;
         serialized_inodes.fill(Serialized_I_Node{});
 
         const uint32_t inode_table_size = header.inode_count *
@@ -227,7 +228,7 @@ namespace kernel::storagmgr
                 return false;
             }
 
-            static I_Node inode;
+            I_Node inode;
 
             Memory_Manipulation::copy_memory_block(inode.file_name.data(),
                                                    serialized_inode.file_name.data(),
