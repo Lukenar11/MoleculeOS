@@ -172,7 +172,9 @@ namespace shell::commands
         }
 
         const uint32_t size = inode->used_data_byte_size + 1;
-        uint8_t* buffer = static_cast<uint8_t*>(Block_Allocator::allocate(size));
+        void* ptr;
+        Block_Allocator::allocate(ptr, size);
+        uint8_t* buffer = static_cast<uint8_t*>(ptr);
         if (!buffer) {
             print_command_error(command_name);
             print_command_error("heap allocation failed\n");

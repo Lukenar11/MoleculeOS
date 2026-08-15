@@ -21,6 +21,7 @@ NOTES:
 #include <sal.hpp>
 #include <kernel.hpp>
 #include <memory_manip.hpp>
+#include <status.hpp>
 
 namespace kernel::heap
 {
@@ -66,23 +67,24 @@ namespace kernel::heap
                   _IN_ const uint8_t* end) noexcept;
 
         static 
-        bool get_allocation_info(_IN_  void* ptr, 
-                                 _OUT_ uint32_t& index, 
-                                 _OUT_ uint32_t& blocks) noexcept;
-
-        
-        [[nodiscard]] static 
-        void* allocate(_IN_ const uint32_t size) noexcept;
-
-        [[nodiscard]] static 
-        void* clear_allocate(_IN_ const uint32_t size) noexcept;
-
-        [[nodiscard]] static 
-        void* reallocate(_IN_ void* ptr,
-                         _IN_ const uint32_t new_size) noexcept;
+        status_t get_allocation_info(_OUT_ uint32_t& index, 
+                                     _OUT_ uint32_t& blocks,
+                                     _IN_  void* ptr) noexcept;
 
         static 
-        void deallocate(_IN_ void* ptr) noexcept;
+        status_t allocate(_OUT_ void*& ptr, 
+                          _IN_  const uint32_t size) noexcept;
+
+        static
+        status_t clear_allocate(_OUT_ void*& ptr,
+                                _IN_  const uint32_t size) noexcept;
+
+        static 
+        status_t reallocate(_INOUT_ void*& ptr, 
+                            _IN_    const uint32_t new_size) noexcept;
+
+        static 
+        status_t deallocate(_IN_ void* ptr) noexcept;
 
         Block_Allocator() noexcept  = default;
         ~Block_Allocator() noexcept = default;

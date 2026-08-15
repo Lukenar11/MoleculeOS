@@ -54,9 +54,9 @@ namespace shell::commands
 
         uint32_t index = 0;
         uint32_t blocks = 0;
-        if (!kernel::heap::Block_Allocator::get_allocation_info(inode->file_data_ptr,
-                                                                index,
-                                                                blocks)) {
+        if (!kernel::heap::Block_Allocator::get_allocation_info(index,
+                                                                blocks,
+                                                                inode->file_data_ptr)) {
             print_command_error(command_name);
             print_command_error("allocation info not available");
 

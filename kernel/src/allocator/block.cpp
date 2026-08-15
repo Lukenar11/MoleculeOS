@@ -75,9 +75,9 @@ namespace kernel::heap
         return &memory_pool_ptr[i * MEMORY_BLOCK_SIZE];
     }
 
-    bool Block_Allocator::find_enough_free_memory_blocks(_INOUT_    uint32_t& j,
-                                                         _IN_ const uint32_t i, 
-                                                         _IN_ const uint32_t blocks_needed) 
+    bool Block_Allocator::find_enough_free_memory_blocks(_INOUT_ uint32_t& j,
+                                                         _IN_    const uint32_t i, 
+                                                         _IN_    const uint32_t blocks_needed) 
                                                          noexcept {
         j = 0;
         while (j < blocks_needed) [[likely]] {
@@ -91,120 +91,185 @@ namespace kernel::heap
         return true;
     }
 
-    bool Block_Allocator::get_allocation_info(_IN_  void* ptr, 
-                                              _OUT_ uint32_t& index, 
-                                              _OUT_ uint32_t& blocks) 
-                                              noexcept {
-        if (ptr == nullptr || memory_pool_ptr == nullptr) [[unlikely]] {
-            return false;
+    status_t Block_Allocator::get_allocation_info(_OUT_ uint32_t& index, 
+                                                  _OUT_ uint32_t& blocks,
+                                                  _IN_  void* ptr) noexcept {
+        status_t status;
+        uint8_t* block_ptr;
+        uint32_t offset;
+
+        if (!ptr || !memory_pool_ptr) [[unlikely]] {
+            status = status::NULL_POINTER;
+            goto cleanup;
         }
 
-        const uint8_t* block_ptr = reinterpret_cast<uint8_t*>(ptr);
+        block_ptr = reinterpret_cast<uint8_t*>(ptr);
         if (block_ptr < memory_pool_ptr ||
             block_ptr >= memory_pool_ptr + 
             needed_pool_space) [[unlikely]] {
-            return false;
+            status = status::POINTER_OUT_OF_RANGE;
+            goto cleanup;
         }
 
-        const uint32_t offset = static_cast<uint32_t>(block_ptr - 
-                                                      memory_pool_ptr);
+        offset = static_cast<uint32_t>(block_ptr - memory_pool_ptr);
         if (offset % MEMORY_BLOCK_SIZE != 0) [[unlikely]] {
-            return false;
+            status = status::HEAP_CORRUPTED;
+            goto cleanup;
         }
 
         index  = offset / MEMORY_BLOCK_SIZE;
         blocks = allocation_sizes[index];
         if (blocks == 0) [[unlikely]] {
-            return false;
+            status = status::FAIL;
+            goto cleanup;
         }
 
-        return true;
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
     }
 
-    [[nodiscard]]
-    void* Block_Allocator::allocate(_IN_ const uint32_t size) noexcept {
-        if (memory_pool_ptr == nullptr) [[unlikely]] {
-            sys::panic("Block allocator not initialized");
+    status_t Block_Allocator::allocate(_OUT_ void*& ptr, 
+                                       _IN_  const uint32_t size) noexcept {
+        status_t status;
+        uint32_t blocks_needed;
+        uint32_t i = 0;
+        uint32_t j = 0;
+
+        if (!memory_pool_ptr) [[unlikely]] {
+            sys::panic("'Block_allocator' not initialized");
         }
 
         if (size == 0) [[unlikely]] {
-            return nullptr;
+            status = status::INVALID_PARAMETER;
+            goto cleanup;
         }
 
-        const uint32_t blocks_needed = (size + MEMORY_BLOCK_SIZE - 1) /
-                                        MEMORY_BLOCK_SIZE;
+        blocks_needed = (size + MEMORY_BLOCK_SIZE - 1) / MEMORY_BLOCK_SIZE;
         if (blocks_needed > all_memory_blocks) [[unlikely]] {
-            return nullptr;
+            status = status::HEAP_EXHAUSTED;
+            goto cleanup;
         }
 
-        uint32_t i = 0;
-        uint32_t j = 0;
         while (i <= all_memory_blocks - blocks_needed) [[likely]] {
             if (find_enough_free_memory_blocks(j, 
                                                i, 
                                                blocks_needed)) [[likely]] {
-                return set_allocation_sizes_entry(blocks_needed, i);
+                ptr = set_allocation_sizes_entry(blocks_needed, i);
+                break;
             }
             else [[unlikely]] {
                 i += j + 1;
             }
         }
 
-        return nullptr;
+        if (!ptr) [[unlikely]] {
+            status = status::HEAP_EXHAUSTED;
+            goto cleanup;
+        }
+
+        status = status::SUCCESS;
+        goto success;
+
+    cleanup:
+        ptr = nullptr;
+
+    success:
+        return status;
+
     }
 
-    void* Block_Allocator::clear_allocate(_IN_ const uint32_t size) noexcept {
+    status_t Block_Allocator::clear_allocate(_OUT_ void*& ptr,
+                                             _IN_  const uint32_t size) 
+                                             noexcept {
+        status_t status;
+
         if (size == 0) [[unlikely]] {
-            return nullptr;
+            status = status::INVALID_PARAMETER;
+            goto cleanup;
         }
-    
-        void* ptr = allocate(size);
-        if (ptr == nullptr) [[unlikely]] {
-            return nullptr;
+
+        status = allocate(ptr, size);
+        if (status != status::SUCCESS || !ptr) [[unlikely]] {
+            goto cleanup;
         }
-    
+
         stdlib::Memory_Manipulation::set_memory_block(ptr, 0, size);
-        return ptr;
+        status = status::SUCCESS;
+
+        goto success;
+
+    cleanup: 
+        ptr = nullptr;
+
+    success: 
+        return status;
     }
 
-    [[nodiscard]]
-    void* Block_Allocator::reallocate(_IN_ void* ptr, 
-                                      _IN_ const uint32_t new_size) noexcept {
-        if (ptr == nullptr) [[unlikely]] {
-            return allocate(new_size);
+    status_t Block_Allocator::reallocate(_INOUT_ void*& ptr, 
+                                         _IN_    const uint32_t new_size) 
+                                         noexcept {
+        status_t status;
+        uint32_t index      = 0;
+        uint32_t old_blocks = 0;
+        void* new_ptr;
+        uint32_t old_size;
+        uint32_t n;
+
+        if (!ptr) [[unlikely]] {
+            status = allocate(ptr, new_size);
+            goto cleanup;
         }
 
         if (new_size == 0) [[unlikely]] {
-            deallocate(ptr);
-            return nullptr;
+            status = status::INVALID_PARAMETER;
+            goto cleanup;
         }
 
-        uint32_t index      = 0;
-        uint32_t old_blocks = 0;
-        if (!get_allocation_info(ptr, index, old_blocks)) [[unlikely]] {
-            sys::panic("Invalid realloc");
+        if (get_allocation_info(index,
+                                old_blocks,
+                                ptr) != status::SUCCESS) [[unlikely]] {
+            sys::panic("Invalid reallocate!");
         }
 
-        void* new_ptr = allocate(new_size);
-        if (!new_ptr) [[unlikely]] {
-            return nullptr;
+        status = allocate(new_ptr, new_size);
+        if (status != status::SUCCESS || !new_ptr) [[unlikely]] {
+            goto cleanup;
         }
 
-        const uint32_t old_size = old_blocks * MEMORY_BLOCK_SIZE;
-        const uint32_t n        = (old_size < new_size) 
-                                  ? old_size 
-                                  : new_size;
+        old_size = old_blocks * MEMORY_BLOCK_SIZE;
+        if (old_size < new_size) {
+            n = old_size;
+        } 
+        else {
+            n = new_size;
+        }
+
         stdlib::Memory_Manipulation::copy_memory_block(new_ptr, ptr, n);
-
         deallocate(ptr);
-        return new_ptr;
+
+        ptr    = new_ptr;
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
     }
 
-    void Block_Allocator::deallocate(_IN_ void* ptr) noexcept {
+    status_t Block_Allocator::deallocate(_IN_ void* ptr) noexcept {
+        status_t status;
+
         uint32_t block_index = 0;
         uint32_t block_count = 0;
 
-        if (!get_allocation_info(ptr, block_index, block_count)) [[unlikely]] {
+        if (!ptr) [[unlikely]] {
+            status = status::NULL_POINTER;
+            goto cleanup;
+        }
+
+        if (get_allocation_info(block_index,
+                                block_count,
+                                ptr) != status::SUCCESS) [[unlikely]] {
             sys::panic("Invalid free");
         }
 
@@ -213,5 +278,10 @@ namespace kernel::heap
         }
 
         allocation_sizes[block_index] = 0;
+
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
     }
 } // namespace kernel::heap

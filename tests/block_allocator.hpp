@@ -21,13 +21,13 @@ namespace tests
             b[i] = i;
 
         // 3) reallocate to 64 bytes
-        void* p2 = kernel::heap::Block_Allocator::reallocate(p, 64);
+        kernel::heap::Block_Allocator::reallocate(p, 64);
         stdlib::Text_Output::put_string("Reallocated to 64 bytes at: ");
-        stdlib::Text_Output::put_ptr(reinterpret_cast<uint32_t>(p2));
+        stdlib::Text_Output::put_ptr(reinterpret_cast<uint32_t>(p));
         stdlib::Text_Output::put_char('\n');
 
         // 4) verify copy
-        uint8_t* b2 = reinterpret_cast<uint8_t*>(p2);
+        uint8_t* b2 = reinterpret_cast<uint8_t*>(p);
         bool ok = true;
         for (uint32_t i = 0; i < 16; ++i)
             if (b2[i] != i)
@@ -36,13 +36,13 @@ namespace tests
         stdlib::Text_Output::put_string(ok ? "Copy OK\n" : "Copy FAILED\n");
 
         // 5) shrink to 8 bytes
-        void* p3 = kernel::heap::Block_Allocator::reallocate(p2, 8);
+        kernel::heap::Block_Allocator::reallocate(p, 8);
         stdlib::Text_Output::put_string("Shrink to 8 bytes at: ");
-        stdlib::Text_Output::put_ptr(reinterpret_cast<uint32_t>(p3));
+        stdlib::Text_Output::put_ptr(reinterpret_cast<uint32_t>(p));
         stdlib::Text_Output::put_char('\n');
 
         // 6) free
-        kernel::heap::Block_Allocator::deallocate(p3);
+        kernel::heap::Block_Allocator::deallocate(p);
         stdlib::Text_Output::put_string("Freed final block\n");
 
         kernel::sys::hang();
@@ -53,15 +53,16 @@ namespace tests
         stdlib::Text_Output::put_string("=== reallocate special cases ===\n");
 
         // realloc(nullptr, size) → allocate(size)
-        void* p = kernel::heap::Block_Allocator::reallocate(nullptr, 32);
+        void* p = nullptr;
+        kernel::heap::Block_Allocator::reallocate(p, 32);
         stdlib::Text_Output::put_string("realloc(nullptr, 32) → ");
         stdlib::Text_Output::put_ptr(reinterpret_cast<uint32_t>(p));
         stdlib::Text_Output::put_char('\n');
 
         // realloc(ptr, 0) → free(ptr)
-        void* p2 = kernel::heap::Block_Allocator::reallocate(p, 0);
+        kernel::heap::Block_Allocator::reallocate(p, 0);
         stdlib::Text_Output::put_string("realloc(ptr, 0) → ");
-        stdlib::Text_Output::put_ptr(reinterpret_cast<uint32_t>(p2));
+        stdlib::Text_Output::put_ptr(reinterpret_cast<uint32_t>(p));
         stdlib::Text_Output::put_char('\n');
 
         kernel::sys::hang();

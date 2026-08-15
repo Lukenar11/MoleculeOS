@@ -36,9 +36,9 @@ namespace kernel::storagmgr
         const uint32_t sector_count  = (end_offset + SECTOR_SIZE - 1) / 
                                         SECTOR_SIZE;
 
-        uint16_t* sector_buffer = reinterpret_cast<uint16_t*>(
-            Block_Allocator::allocate(sector_count * SECTOR_SIZE)
-        );
+        void* ptr;
+        Block_Allocator::allocate(ptr, sector_count * SECTOR_SIZE);
+        uint16_t* sector_buffer = reinterpret_cast<uint16_t*>(ptr);
         if (!sector_buffer) [[unlikely]]
             return false;
 
@@ -216,7 +216,8 @@ namespace kernel::storagmgr
             if (serialized_inode.file_byte_size == 0)
                 continue;
 
-            void* data_ptr = Block_Allocator::allocate(serialized_inode.file_byte_size);
+            void* data_ptr;
+            Block_Allocator::allocate(data_ptr, serialized_inode.file_byte_size);
             if (!data_ptr) [[unlikely]]
                 return false;
 

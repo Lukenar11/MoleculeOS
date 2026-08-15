@@ -80,7 +80,8 @@ namespace kernel::filesys
                 return nullptr;
 
             if (inode_table[i].file_data_ptr == nullptr) {
-                void* ptr = heap::Block_Allocator::allocate(byte_size);
+                void* ptr; 
+                heap::Block_Allocator::allocate(ptr, byte_size);
                 if (ptr == nullptr) [[unlikely]]
                     return nullptr;
 
@@ -335,12 +336,11 @@ namespace kernel::filesys
         if (inode->file_data_ptr == nullptr) [[unlikely]]
             return false;
 
-        void* new_ptr = heap::Block_Allocator::reallocate(inode->file_data_ptr,
-                                                          new_size);
-        if (new_ptr == nullptr) [[unlikely]]
+        if (heap::Block_Allocator::reallocate(inode->file_data_ptr, new_size)
+            != status::SUCCESS) [[unlikely]] {
             return false;
+        }
 
-        inode->file_data_ptr  = new_ptr;
         inode->file_byte_size = new_size;
 
         if (inode->used_data_byte_size > new_size)

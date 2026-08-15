@@ -51,9 +51,9 @@ namespace tests
 
         uint32_t lba = 0;
         int32_t sectors = 1;
-        uint16_t* ptr = static_cast<uint16_t*>(
-            kernel::heap::Block_Allocator::allocate(reserved_words * 2)
-        );
+        void* temp_ptr;
+        kernel::heap::Block_Allocator::allocate(temp_ptr, reserved_words * 2)
+        uint16_t* ptr = static_cast<uint16_t*>(temp_ptr);
 
         for (uint32_t i = 0; i < reserved_words; i++)
             ptr[i] = 0;
