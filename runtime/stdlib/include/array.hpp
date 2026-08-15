@@ -16,6 +16,7 @@ NOTES:
 #pragma once
 
 #include <types.hpp>
+#include <sal.hpp>
 
 namespace stdlib 
 {
@@ -28,12 +29,12 @@ namespace stdlib
 
     public:
         inline constexpr 
-        T& operator[](uint32_t index) noexcept { 
+        T& operator[](_IN_ uint32_t index) noexcept { 
             return buffer[index]; 
         }
 
         inline constexpr 
-        const T& operator[](const uint32_t index) const noexcept {
+        const T& operator[](_IN_ const uint32_t index) const noexcept {
             return buffer[index]; 
         }
 
@@ -93,7 +94,7 @@ namespace stdlib
         }
 
         inline constexpr 
-        void fill(const T& value) noexcept {
+        void fill(_IN_ const T& value) noexcept {
             for (uint32_t i = 0; i < S; i++) [[likely]] {
                 buffer[i] = value; 
             }
