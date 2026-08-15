@@ -13,7 +13,7 @@ DESCRIPTION:
 
 NOTES:
     The internal definitions of 'heap_start' and 'heap_end' are located
-    in the linker script (linker.ld).
+    in the linker script ('linker.ld').
 */
 
 #pragma once
