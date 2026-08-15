@@ -12,7 +12,7 @@ OBJS += $(BUILD)/mofs2.o \
 $(BUILD)/%.o: kernel/src/filesys/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(BUILD)/%.o: kernel/src/heap/%.cpp
+$(BUILD)/%.o: kernel/src/allocator/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD)/%.o: kernel/src/storagemgr/%.cpp

@@ -14,7 +14,7 @@ NOTES:
     because they are so small that the compiler can inline them.
 */
 
-#include "heap/block.hpp"
+#include "allocator/block.hpp"
 
 namespace kernel::heap
 {
