@@ -55,12 +55,12 @@ namespace kernel::heap
         memory_pool_ptr = reinterpret_cast<uint8_t*>(data_pool_start);
 
         stdlib::Memory_Manipulation::set_memory_block(free_memory_bitmap, 
-                                                      0xFFFF'FFFF, 
+                                                      ALL_BLOCKS_FREE, 
                                                       bitmap_word_count * 
                                                       sizeof(uint32_t));
         
         stdlib::Memory_Manipulation::set_memory_block(allocation_sizes, 
-                                                      0, 
+                                                      MEMORY_CLEAR, 
                                                       all_memory_blocks * 
                                                       sizeof(uint16_t));
     }
@@ -195,7 +195,7 @@ namespace kernel::heap
             goto cleanup;
         }
 
-        stdlib::Memory_Manipulation::set_memory_block(ptr, 0, size);
+        stdlib::Memory_Manipulation::set_memory_block(ptr, MEMORY_CLEAR, size);
         status = status::SUCCESS;
 
         goto success;
