@@ -26,9 +26,9 @@ namespace stdlib
     class Memory_Manipulation final {
     public:
         static inline
-        status_t copy_memory_block(_INOUT_ void* dest_ptr, 
-                                   _IN_    const void* src_ptr, 
-                                   _IN_    uint32_t size) noexcept {
+        status_t copy_memory_block(_IN_ void* dest_ptr, 
+                                   _IN_ const void* src_ptr, 
+                                   _IN_ uint32_t size) noexcept {
             status_t status;
             uint8_t* dest;
             const uint8_t* src;
@@ -56,9 +56,9 @@ namespace stdlib
         }
 
         static inline
-        status_t move_memory_block(_INOUT_ void* dest_ptr, 
-                                   _IN_    const void* src_ptr, 
-                                   _IN_    uint32_t size) noexcept {
+        status_t move_memory_block(_IN_ void* dest_ptr, 
+                                   _IN_ const void* src_ptr, 
+                                   _IN_ uint32_t size) noexcept {
             status_t status;
             uint8_t* dest;
             const uint8_t* src;
@@ -97,9 +97,9 @@ namespace stdlib
         }
 
         static inline
-        status_t set_memory_block(_INOUT_ void* dest_ptr, 
-                                  _IN_    const int32_t value, 
-                                  _IN_    uint32_t size) noexcept {
+        status_t set_memory_block(_IN_ void* dest_ptr, 
+                                  _IN_ const int32_t value, 
+                                  _IN_ uint32_t size) noexcept {
             status_t status;
             uint8_t* dest;
             uint8_t byte;
