@@ -5,9 +5,9 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This file defines a tiny 'Source Annotation Language' ('SAL'), 
-    to mark in function/method paramater which is used as in or output
-    because methods and functions returns 'void' or 'status_t'.
+    This file defines a small 'Source Annotation Language' ('SAL')
+    to mark function/method parameters as input or output, 
+    since methods and functions return 'void' or 'status_t'.
 
     SAL Explanation:
         - _IN_    => Input

@@ -6,8 +6,8 @@ LICENSE:
 
 DESCRIPTION:
     This file implements status-codes for handling general events and
-    as alternative for exceptions, 
-    because in bare mattel environments exceptions doesn't exists.
+    as an alternative for exceptions, 
+    because in bare metal environments exceptions don't exists.
 
     The status-codes are grouped in a specific hex layout
     (0x[Grub]'[Flags][Flags]'[Number])(Each [...] represents one byte.).
