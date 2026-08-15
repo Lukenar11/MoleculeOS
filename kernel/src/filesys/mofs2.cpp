@@ -36,7 +36,7 @@ namespace kernel::filesys
         return hash;
     }
     
-    bool MoleculeOS_File_System_2::file_already_exists(const I_Node& inode, 
+    bool MoleculeOS_File_System_2::file_already_exists(const File_Header& file_header, 
                                                        const char* name, 
                                                        const char* format,
                                                        const uint32_t name_hash,
@@ -47,19 +47,19 @@ namespace kernel::filesys
         if (!name_and_format_guard(name, format)) [[unlikely]]
             return false;
 
-        if ((inode.name_hash == name_hash) && (inode.format_hash == format_hash))
+        if ((file_header.name_hash == name_hash) && (file_header.format_hash == format_hash))
             if ((String_Manipulation::compare_strings(name, 
-                                                      inode.file_name.data()) == 
+                                                      file_header.file_name.data()) == 
                 status::EQUAL_TO) &&
                 (String_Manipulation::compare_strings(format, 
-                                                      inode.file_format.data()) == 
+                                                      file_header.file_format.data()) == 
                 status::EQUAL_TO))
                 return true;
         
         return false;
     }
 
-    I_Node* MoleculeOS_File_System_2::create_file(const char* name, 
+    File_Header* MoleculeOS_File_System_2::create_file(const char* name, 
                                                   const char* format, 
                                                   const uint32_t byte_size) 
                                                   noexcept {
@@ -71,30 +71,30 @@ namespace kernel::filesys
         const uint32_t name_hash   = to_fnv1a_hash(name);
         const uint32_t format_hash = to_fnv1a_hash(format);
 
-        for (uint32_t i = 0; i < inode_table.size(); i++) {
-            if (file_already_exists(inode_table[i], 
+        for (uint32_t i = 0; i < file_header_table.size(); i++) {
+            if (file_already_exists(file_header_table[i], 
                                     name, 
                                     format,
                                     name_hash,
                                     format_hash)) [[unlikely]]
                 return nullptr;
 
-            if (inode_table[i].file_data_ptr == nullptr) {
+            if (file_header_table[i].file_data_ptr == nullptr) {
                 void* ptr; 
                 heap::Block_Allocator::allocate(ptr, byte_size);
                 if (ptr == nullptr) [[unlikely]]
                     return nullptr;
 
-                inode_table[i].used_data_byte_size = 0;
-                inode_table[i].file_byte_size      = byte_size;
-                inode_table[i].file_data_ptr       = ptr;
-                inode_table[i].format_hash         = format_hash;
-                inode_table[i].name_hash           = name_hash;
+                file_header_table[i].used_data_byte_size = 0;
+                file_header_table[i].file_byte_size      = byte_size;
+                file_header_table[i].file_data_ptr       = ptr;
+                file_header_table[i].format_hash         = format_hash;
+                file_header_table[i].name_hash           = name_hash;
 
-                String_Manipulation::copy_string(inode_table[i].file_format.data(), format);               
-                String_Manipulation::copy_string(inode_table[i].file_name.data(), name);
+                String_Manipulation::copy_string(file_header_table[i].file_format.data(), format);               
+                String_Manipulation::copy_string(file_header_table[i].file_name.data(), name);
 
-                return &inode_table[i];
+                return &file_header_table[i];
             }
         }
 
@@ -111,21 +111,21 @@ namespace kernel::filesys
         const uint32_t name_hash   = to_fnv1a_hash(name);
         const uint32_t format_hash = to_fnv1a_hash(format);
 
-        for (uint32_t i = 0; i < inode_table.size(); i++) {
-            if (file_already_exists(inode_table[i], 
+        for (uint32_t i = 0; i < file_header_table.size(); i++) {
+            if (file_already_exists(file_header_table[i], 
                                     name, 
                                     format,
                                     name_hash,
                                     format_hash)) [[likely]] {
-                if (inode_table[i].file_data_ptr != nullptr) [[unlikely]]
-                    heap::Block_Allocator::deallocate(inode_table[i].file_data_ptr);
+                if (file_header_table[i].file_data_ptr != nullptr) [[unlikely]]
+                    heap::Block_Allocator::deallocate(file_header_table[i].file_data_ptr);
 
-                inode_table[i].file_name.fill('\0');
-                inode_table[i].file_format.fill('\0');
-                inode_table[i].name_hash      = 0;
-                inode_table[i].format_hash    = 0;
-                inode_table[i].file_byte_size = 0;
-                inode_table[i].file_data_ptr  = nullptr;
+                file_header_table[i].file_name.fill('\0');
+                file_header_table[i].file_format.fill('\0');
+                file_header_table[i].name_hash      = 0;
+                file_header_table[i].format_hash    = 0;
+                file_header_table[i].file_byte_size = 0;
+                file_header_table[i].file_data_ptr  = nullptr;
 
                 return true;
             }
@@ -134,7 +134,7 @@ namespace kernel::filesys
         return false;
     }
 
-    I_Node* MoleculeOS_File_System_2::find_file(const char* name,
+    File_Header* MoleculeOS_File_System_2::find_file(const char* name,
                                                 const char* format) noexcept {
         if (!name_and_format_guard(name, format)) [[unlikely]]
             return nullptr;
@@ -142,40 +142,40 @@ namespace kernel::filesys
         const uint32_t name_hash   = to_fnv1a_hash(name);
         const uint32_t format_hash = to_fnv1a_hash(format);
 
-        for (uint32_t i = 0; i < inode_table.size(); i++)
-            if (file_already_exists(inode_table[i],
+        for (uint32_t i = 0; i < file_header_table.size(); i++)
+            if (file_already_exists(file_header_table[i],
                                     name,
                                     format,
                                     name_hash,
                                     format_hash)) [[likely]]
-                return &inode_table[i];
+                return &file_header_table[i];
 
         return nullptr;
     }
 
-    bool MoleculeOS_File_System_2::write_file(I_Node* inode,
+    bool MoleculeOS_File_System_2::write_file(File_Header* file_header,
                                               const uint32_t offset,
                                               const uint32_t length,
                                               const uint32_t data_size,
                                               const uint8_t* data) noexcept {
         using namespace stdlib;
         
-        if (inode == nullptr) [[unlikely]]
+        if (file_header == nullptr) [[unlikely]]
             return false;
 
-        if (inode->file_data_ptr == nullptr) [[unlikely]]
+        if (file_header->file_data_ptr == nullptr) [[unlikely]]
             return false;
 
-        if (offset >= inode->file_byte_size) [[unlikely]]
+        if (offset >= file_header->file_byte_size) [[unlikely]]
             return false;
 
-        if (offset + length > inode->file_byte_size) [[unlikely]]
+        if (offset + length > file_header->file_byte_size) [[unlikely]]
             return false;
 
         if (data_size < length) [[unlikely]]
             return false;
 
-        uint8_t* dest_ptr = static_cast<uint8_t*>(inode->file_data_ptr);
+        uint8_t* dest_ptr = static_cast<uint8_t*>(file_header->file_data_ptr);
         Memory_Manipulation::copy_memory_block(dest_ptr + offset, 
                                                data, 
                                                length);
@@ -183,45 +183,45 @@ namespace kernel::filesys
         return true;
     }
 
-    bool MoleculeOS_File_System_2::append_file(I_Node* inode,
+    bool MoleculeOS_File_System_2::append_file(File_Header* file_header,
                                                const uint8_t* data,
                                                const uint32_t data_size) noexcept {
         using namespace stdlib;
 
-        if (inode == nullptr) [[unlikely]]
+        if (file_header == nullptr) [[unlikely]]
             return false;
 
-        if (inode->file_data_ptr == nullptr) [[unlikely]]
+        if (file_header->file_data_ptr == nullptr) [[unlikely]]
            return false;
 
-        if (inode->used_data_byte_size + data_size > inode->file_byte_size) [[unlikely]]
+        if (file_header->used_data_byte_size + data_size > file_header->file_byte_size) [[unlikely]]
             return false;
 
-        uint8_t* data_ptr = static_cast<uint8_t*>(inode->file_data_ptr);
-        Memory_Manipulation::copy_memory_block(data_ptr + inode->used_data_byte_size,
+        uint8_t* data_ptr = static_cast<uint8_t*>(file_header->file_data_ptr);
+        Memory_Manipulation::copy_memory_block(data_ptr + file_header->used_data_byte_size,
                                                data,
                                                data_size);
 
-        inode->used_data_byte_size += data_size;
+        file_header->used_data_byte_size += data_size;
         return true;
     }
 
-    bool MoleculeOS_File_System_2::clear_file(I_Node* inode) noexcept {
+    bool MoleculeOS_File_System_2::clear_file(File_Header* file_header) noexcept {
         using namespace stdlib;
 
-        if (inode == nullptr) [[unlikely]]
+        if (file_header == nullptr) [[unlikely]]
             return false;
 
-        if (inode->file_data_ptr == nullptr) [[unlikely]]
+        if (file_header->file_data_ptr == nullptr) [[unlikely]]
             return false;
 
-        uint8_t* data_ptr = static_cast<uint8_t*>(inode->file_data_ptr);
+        uint8_t* data_ptr = static_cast<uint8_t*>(file_header->file_data_ptr);
         if (data_ptr == nullptr) [[unlikely]]
             return false;
 
-        Memory_Manipulation::set_memory_block(data_ptr, 0, inode->file_byte_size);
+        Memory_Manipulation::set_memory_block(data_ptr, 0, file_header->file_byte_size);
 
-        inode->used_data_byte_size = 0;
+        file_header->used_data_byte_size = 0;
         return true;
     }
 
@@ -237,18 +237,18 @@ namespace kernel::filesys
         if (!name_and_format_guard(new_name, new_format)) [[unlikely]]
             return false;
 
-        I_Node* inode = find_file(old_name, old_format);
-        if (inode == nullptr) [[unlikely]]
+        File_Header* file_header = find_file(old_name, old_format);
+        if (file_header == nullptr) [[unlikely]]
             return false;
 
         if (find_file(new_name, new_format) != nullptr) [[unlikely]]
             return false;
 
-        String_Manipulation::copy_string(inode->file_name.data(), new_name);
-        String_Manipulation::copy_string(inode->file_format.data(), new_format);
+        String_Manipulation::copy_string(file_header->file_name.data(), new_name);
+        String_Manipulation::copy_string(file_header->file_format.data(), new_format);
 
-        inode->name_hash   = to_fnv1a_hash(new_name);
-        inode->format_hash = to_fnv1a_hash(new_format);
+        file_header->name_hash   = to_fnv1a_hash(new_name);
+        file_header->format_hash = to_fnv1a_hash(new_format);
 
         return true;
     }
@@ -265,58 +265,58 @@ namespace kernel::filesys
         if (!name_and_format_guard(dest_name, dest_format)) [[unlikely]]
             return false;
 
-        I_Node* src_inode = find_file(src_name, src_format);
-        if (src_inode == nullptr) [[unlikely]]
+        File_Header* src_file_header = find_file(src_name, src_format);
+        if (src_file_header == nullptr) [[unlikely]]
             return false;
 
         if (find_file(dest_name, dest_format) != nullptr) [[unlikely]]
             return false;
 
-        I_Node* dest_inode = create_file(dest_name, 
+        File_Header* dest_file_header = create_file(dest_name, 
                                          dest_format, 
-                                         src_inode->file_byte_size);
-        if (dest_inode == nullptr) [[unlikely]]
+                                         src_file_header->file_byte_size);
+        if (dest_file_header == nullptr) [[unlikely]]
             return false;
 
-        uint8_t* src_ptr  = static_cast<uint8_t*>(src_inode->file_data_ptr);
-        uint8_t* dest_ptr = static_cast<uint8_t*>(dest_inode->file_data_ptr);
+        uint8_t* src_ptr  = static_cast<uint8_t*>(src_file_header->file_data_ptr);
+        uint8_t* dest_ptr = static_cast<uint8_t*>(dest_file_header->file_data_ptr);
         if (src_ptr == nullptr || dest_ptr == nullptr) [[unlikely]]
             return false;
 
         Memory_Manipulation::copy_memory_block(dest_ptr,
                                                src_ptr,
-                                               src_inode->file_byte_size);
+                                               src_file_header->file_byte_size);
 
-        dest_inode->used_data_byte_size = src_inode->used_data_byte_size;
+        dest_file_header->used_data_byte_size = src_file_header->used_data_byte_size;
         return true;
     }
 
-    bool MoleculeOS_File_System_2::read_file(I_Node* inode,
+    bool MoleculeOS_File_System_2::read_file(File_Header* file_header,
                                              uint8_t* buffer,
                                              const uint32_t buffer_size,
                                              const uint32_t offset,
                                              const uint32_t length) noexcept {
         using namespace stdlib;
 
-        if (inode == nullptr) [[unlikely]]
+        if (file_header == nullptr) [[unlikely]]
             return false;
 
-        if (inode->file_data_ptr == nullptr) [[unlikely]]
+        if (file_header->file_data_ptr == nullptr) [[unlikely]]
            return false;
 
         if (buffer == nullptr) [[unlikely]]
             return false;
 
-        if (offset >= inode->file_byte_size) [[unlikely]]
+        if (offset >= file_header->file_byte_size) [[unlikely]]
             return false;
 
-        if (offset + length > inode->file_byte_size) [[unlikely]]
+        if (offset + length > file_header->file_byte_size) [[unlikely]]
             return false;
 
         if (buffer_size < length) [[unlikely]]
             return false;
 
-        uint8_t* src_ptr = static_cast<uint8_t*>(inode->file_data_ptr);
+        uint8_t* src_ptr = static_cast<uint8_t*>(file_header->file_data_ptr);
         if (src_ptr == nullptr) [[unlikely]]
            return false;
 
@@ -327,24 +327,24 @@ namespace kernel::filesys
         return true;
     }
 
-    bool MoleculeOS_File_System_2::resize_file_size(I_Node* inode,
+    bool MoleculeOS_File_System_2::resize_file_size(File_Header* file_header,
                                                     const uint32_t new_size) 
                                                     noexcept {
-        if (inode == nullptr) [[unlikely]]
+        if (file_header == nullptr) [[unlikely]]
             return false;
 
-        if (inode->file_data_ptr == nullptr) [[unlikely]]
+        if (file_header->file_data_ptr == nullptr) [[unlikely]]
             return false;
 
-        if (heap::Block_Allocator::reallocate(inode->file_data_ptr, new_size)
+        if (heap::Block_Allocator::reallocate(file_header->file_data_ptr, new_size)
             != status::SUCCESS) [[unlikely]] {
             return false;
         }
 
-        inode->file_byte_size = new_size;
+        file_header->file_byte_size = new_size;
 
-        if (inode->used_data_byte_size > new_size)
-            inode->used_data_byte_size = new_size;
+        if (file_header->used_data_byte_size > new_size)
+            file_header->used_data_byte_size = new_size;
 
         return true;
     }

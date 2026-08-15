@@ -134,7 +134,7 @@ namespace stdlib
 
         static 
         void put_string(_IN_ const char* message, 
-                        _IN_ const bool premature_screen_clearing=true) 
+                        _IN_ const bool premature_screen_clear=true) 
                         noexcept;
     
         Text_Output() noexcept  = default;

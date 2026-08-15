@@ -15,11 +15,11 @@ NOTES:
 
 namespace kernel::filesys
 {
-    constexpr uint32_t MAX_FILE_NAME_LENGTH   = 8;
-    constexpr uint32_t MAX_FILE_FORMAT_LENGTH = 4;
-    constexpr uint32_t INODE_TABLE_ENTRYS     = 256;
+    constexpr uint32_t MAX_FILE_NAME_LENGTH     = 8;
+    constexpr uint32_t MAX_FILE_FORMAT_LENGTH   = 4;
+    constexpr uint32_t FILE_HEADER_TABLE_ENTRYS = 256;
 
-    struct I_Node final {
+    struct File_Header final {
         stdlib::Array<char, MAX_FILE_NAME_LENGTH + 1> file_name;
         stdlib::Array<char, MAX_FILE_FORMAT_LENGTH + 1> file_format;
         uint32_t name_hash           = 0;

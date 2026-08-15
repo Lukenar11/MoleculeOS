@@ -21,9 +21,9 @@ namespace tests
 
         stdlib::Text_Output::reset();
 
-        I_Node* a = MoleculeOS_File_System_2::create_file("test", "txt", 32);
+        File_Header* a = MoleculeOS_File_System_2::create_file("test", "txt", 32);
 
-        fs_print(a != nullptr, "create_file: inode created");
+        fs_print(a != nullptr, "create_file: file_header created");
         fs_print(a->file_byte_size == 32, "create_file: correct size");
         fs_print(a->used_data_byte_size == 0, "create_file: used size = 0");
     }
@@ -31,7 +31,7 @@ namespace tests
     void write_file() noexcept {
         using namespace kernel::filesys;
         
-        I_Node* a = MoleculeOS_File_System_2::find_file("test", "txt");
+        File_Header* a = MoleculeOS_File_System_2::find_file("test", "txt");
 
         uint8_t data1[5] = {1, 2, 3, 4, 5};
         fs_print(MoleculeOS_File_System_2::write_file(a, 0, 5, 5, data1),
@@ -42,7 +42,7 @@ namespace tests
     void read_file() noexcept {
         using namespace kernel::filesys;
 
-        I_Node* a = MoleculeOS_File_System_2::find_file("test", "txt");
+        File_Header* a = MoleculeOS_File_System_2::find_file("test", "txt");
 
         uint8_t buffer[5];
         fs_print(MoleculeOS_File_System_2::read_file(a, buffer, 5, 0, 5),
@@ -56,7 +56,7 @@ namespace tests
     void append_file() noexcept {
         using namespace kernel::filesys;
         
-        I_Node* a = MoleculeOS_File_System_2::find_file("test", "txt");
+        File_Header* a = MoleculeOS_File_System_2::find_file("test", "txt");
 
         uint8_t data2[3] = {9, 9, 9};
         fs_print(MoleculeOS_File_System_2::append_file(a, data2, 3),
@@ -69,7 +69,7 @@ namespace tests
     void clear_file() noexcept {
         using namespace kernel::filesys;
         
-        I_Node* a = MoleculeOS_File_System_2::find_file("test", "txt");
+        File_Header* a = MoleculeOS_File_System_2::find_file("test", "txt");
 
         fs_print(MoleculeOS_File_System_2::clear_file(a),
                  "clear_file: cleared");
@@ -105,8 +105,8 @@ namespace tests
                                                      "backup", "bin"),
                  "copy_file: copied");
 
-        I_Node* src = MoleculeOS_File_System_2::find_file("log", "bin");
-        I_Node* dst = MoleculeOS_File_System_2::find_file("backup", "bin");
+        File_Header* src = MoleculeOS_File_System_2::find_file("log", "bin");
+        File_Header* dst = MoleculeOS_File_System_2::find_file("backup", "bin");
 
         fs_print(dst != nullptr, "copy_file: backup exists");
         fs_print(dst->file_byte_size == src->file_byte_size,
@@ -128,7 +128,7 @@ namespace tests
     void error_cases() noexcept {
         using namespace kernel::filesys;
         
-        I_Node* a = MoleculeOS_File_System_2::find_file("backup", "bin");
+        File_Header* a = MoleculeOS_File_System_2::find_file("backup", "bin");
 
         uint8_t data1[5] = {1, 2, 3, 4, 5};
 
@@ -152,43 +152,43 @@ namespace tests
 
         stdlib::Text_Output::reset();
 
-        I_Node* inode = MoleculeOS_File_System_2::create_file("resize", "bin", 16);
-        fs_print(inode != nullptr, 
+        File_Header* file_header = MoleculeOS_File_System_2::create_file("resize", "bin", 16);
+        fs_print(file_header != nullptr, 
                  "resize_file_size: create test file");
 
         uint8_t initial[16];
         for (uint32_t i = 0; i < 16; i++)
             initial[i] = i;
 
-        MoleculeOS_File_System_2::write_file(inode, 0, 16, 16, initial);
+        MoleculeOS_File_System_2::write_file(file_header, 0, 16, 16, initial);
 
-        fs_print(MoleculeOS_File_System_2::resize_file_size(inode, 32),
+        fs_print(MoleculeOS_File_System_2::resize_file_size(file_header, 32),
                  "resize_file_size: grow file to 32 bytes");
 
-        fs_print(inode->file_byte_size == 32,
+        fs_print(file_header->file_byte_size == 32,
                  "resize_file_size: new size is correct");
 
         uint8_t buffer1[16];
-        MoleculeOS_File_System_2::read_file(inode, buffer1, 16, 0, 16);
+        MoleculeOS_File_System_2::read_file(file_header, buffer1, 16, 0, 16);
 
         for (uint32_t i = 0; i < 16; i++)
             fs_print(buffer1[i] == initial[i],
                      "resize_file_size: old data preserved after grow");
 
-        fs_print(MoleculeOS_File_System_2::resize_file_size(inode, 8),
+        fs_print(MoleculeOS_File_System_2::resize_file_size(file_header, 8),
                  "resize_file_size: shrink file to 8 bytes");
 
-        fs_print(inode->file_byte_size == 8,
+        fs_print(file_header->file_byte_size == 8,
                  "resize_file_size: shrink size correct");
 
         uint8_t buffer2[8];
-        MoleculeOS_File_System_2::read_file(inode, buffer2, 8, 0, 8);
+        MoleculeOS_File_System_2::read_file(file_header, buffer2, 8, 0, 8);
 
         for (uint32_t i = 0; i < 8; i++)
             fs_print(buffer2[i] == initial[i],
                      "resize_file_size: first bytes preserved after shrink");
 
-        fs_print(inode->used_data_byte_size <= 8,
+        fs_print(file_header->used_data_byte_size <= 8,
                  "resize_file_size: used size adjusted after shrink");
 
         kernel::sys::hang();

@@ -26,27 +26,27 @@ namespace shell::commands
         stdlib::Text_Output::reset();
         stdlib::Text_Output::put_string("Files:\n");
 
-        const auto& inodes = kernel::filesys::MoleculeOS_File_System_2::get_inode_table();
-        for (const auto& inode : inodes) {
-            if (inode.file_data_ptr == nullptr)
+        const auto& file_headers = kernel::filesys::MoleculeOS_File_System_2::get_file_header_table();
+        for (const auto& file_header : file_headers) {
+            if (file_header.file_data_ptr == nullptr)
                 continue;
 
-            if (inode.file_name[0] == '\0') [[unlikely]] {
+            if (file_header.file_name[0] == '\0') [[unlikely]] {
                 static const char* error_message = "\t- [INVALID FILE]\n";
                 stdlib::Text_Output::put_string(error_message);
                 continue;
             }
 
             stdlib::Text_Output::put_string("\t- ");
-            stdlib::Text_Output::put_string(inode.file_name.data());
+            stdlib::Text_Output::put_string(file_header.file_name.data());
 
-            if (inode.file_format[0] != '\0') {
+            if (file_header.file_format[0] != '\0') {
                 stdlib::Text_Output::put_char('.');
-                stdlib::Text_Output::put_string(inode.file_format.data());
+                stdlib::Text_Output::put_string(file_header.file_format.data());
             }
 
             stdlib::Text_Output::put_string(" (");
-            stdlib::Text_Output::put_uint(inode.file_byte_size);
+            stdlib::Text_Output::put_uint(file_header.file_byte_size);
             stdlib::Text_Output::put_string(" Bytes)\n");
         }
 

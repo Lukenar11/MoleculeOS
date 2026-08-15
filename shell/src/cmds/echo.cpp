@@ -137,17 +137,17 @@ namespace shell::commands
             return;
         }
 
-        I_Node* inode = MoleculeOS_File_System_2::find_file(parsed_filename.name.data(),
-                                                            parsed_filename.format.data());
-        if (!inode)
-            inode = MoleculeOS_File_System_2::create_file(parsed_filename.name.data(),
+        File_Header* file_header = MoleculeOS_File_System_2::find_file(parsed_filename.name.data(),
+                                                                 parsed_filename.format.data());
+        if (!file_header)
+            file_header = MoleculeOS_File_System_2::create_file(parsed_filename.name.data(),
                                                           parsed_filename.format.data(),
                                                           file_instream.size());
             
         uint32_t length;
         String_Manipulation::get_string_length(length, file_instream.data());
         const auto& instream = reinterpret_cast<const uint8_t*>(file_instream.data());
-        MoleculeOS_File_System_2::append_file(inode, instream, length);
+        MoleculeOS_File_System_2::append_file(file_header, instream, length);
     }
 
     void handle_file_outstream(const stdlib::Array<char,64>& filename) noexcept {
@@ -163,15 +163,15 @@ namespace shell::commands
             return;
         }
 
-        I_Node* inode = MoleculeOS_File_System_2::find_file(parsed_filename.name.data(),
-                                                            parsed_filename.format.data());
-        if (!inode) {
+        File_Header* file_header = MoleculeOS_File_System_2::find_file(parsed_filename.name.data(),
+                                                                 parsed_filename.format.data());
+        if (!file_header) {
             print_command_error(command_name);
             print_command_error("file not found\n");
             return;
         }
 
-        const uint32_t size = inode->used_data_byte_size + 1;
+        const uint32_t size = file_header->used_data_byte_size + 1;
         void* ptr;
         Block_Allocator::allocate(ptr, size);
         uint8_t* buffer = static_cast<uint8_t*>(ptr);
@@ -181,11 +181,11 @@ namespace shell::commands
             return;
         }
 
-        if (!MoleculeOS_File_System_2::read_file(inode,
+        if (!MoleculeOS_File_System_2::read_file(file_header,
                                                  buffer,
                                                  size,
                                                  0,
-                                                 inode->used_data_byte_size)) {
+                                                 file_header->used_data_byte_size)) {
             print_command_error(command_name);
             print_command_error("could not read file\n");
 
@@ -193,7 +193,7 @@ namespace shell::commands
             return;
         }
 
-        buffer[inode->used_data_byte_size] = '\0';
+        buffer[file_header->used_data_byte_size] = '\0';
 
         for (uint32_t i = 0; buffer[i] != '\0'; i++)
             stdlib::Text_Output::put_char(buffer[i]);

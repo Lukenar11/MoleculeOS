@@ -69,11 +69,11 @@ namespace kernel::filesys
 {
     class MoleculeOS_File_System_2 final {
     private:
-        static inline stdlib::Array<I_Node, INODE_TABLE_ENTRYS> inode_table;
+        static inline stdlib::Array<File_Header, FILE_HEADER_TABLE_ENTRYS> file_header_table;
 
         static uint32_t to_fnv1a_hash(const char* txt) noexcept;
 
-        static bool file_already_exists(const I_Node& inode, 
+        static bool file_already_exists(const File_Header& file_header, 
                                         const char* name, 
                                         const char* format,
                                         const uint32_t name_hash,
@@ -81,41 +81,41 @@ namespace kernel::filesys
                                         noexcept;
 
     public:
-        static inline constexpr const stdlib::Array<I_Node, INODE_TABLE_ENTRYS>& get_inode_table() 
+        static inline constexpr const stdlib::Array<File_Header, FILE_HEADER_TABLE_ENTRYS>& get_file_header_table() 
         noexcept {
-            return inode_table;
+            return file_header_table;
         };
 
-        static inline constexpr I_Node& get_inode_entry(const uint32_t index) noexcept {
-            return inode_table[index];
+        static inline constexpr File_Header& get_file_header_entry(const uint32_t index) noexcept {
+            return file_header_table[index];
         }
 
-        static inline constexpr I_Node& set_inode_entry(const I_Node& inode, 
+        static inline constexpr File_Header& set_file_header_entry(const File_Header& file_header, 
                                                         const uint32_t index) noexcept {
-            return inode_table[index] = inode;
+            return file_header_table[index] = file_header;
         }
 
-        static I_Node* create_file(const char* name, 
+        static File_Header* create_file(const char* name, 
                                    const char* format, 
                                    const uint32_t byte_size) noexcept;
 
         static bool delete_file(const char* file_name, 
                                 const char* file_format) noexcept;
 
-        static I_Node* find_file(const char* name,
+        static File_Header* find_file(const char* name,
                                  const char* format) noexcept;
 
-        static bool write_file(I_Node* inode,
+        static bool write_file(File_Header* file_header,
                                const uint32_t offset,
                                const uint32_t length,
                                const uint32_t data_size,
                                const uint8_t* data) noexcept;
 
-        static bool append_file(I_Node* inode,
+        static bool append_file(File_Header* file_header,
                                 const uint8_t* data,
                                 const uint32_t data_size) noexcept;
 
-        static bool clear_file(I_Node* inode) noexcept;
+        static bool clear_file(File_Header* file_header) noexcept;
 
         static bool rename_file(const char* old_name,
                                 const char* old_format,
@@ -127,13 +127,13 @@ namespace kernel::filesys
                               const char* dest_name,
                               const char* dest_format) noexcept;
 
-        static bool read_file(I_Node* inode,
+        static bool read_file(File_Header* file_header,
                               uint8_t* buffer,
                               const uint32_t buffer_size,
                               const uint32_t offset,
                               const uint32_t length) noexcept;
 
-        static bool resize_file_size(I_Node* inode,
+        static bool resize_file_size(File_Header* file_header,
                                      const uint32_t new_size) noexcept;
 
         static bool is_valid_name_or_format_char(const char symbol) noexcept;

@@ -42,9 +42,9 @@ namespace shell::commands
             return;
         }
 
-        I_Node* inode = MoleculeOS_File_System_2::find_file(parsed_filename.name.data(),
-                                                            parsed_filename.format.data());
-        if (!inode) {
+        File_Header* file_header = MoleculeOS_File_System_2::find_file(parsed_filename.name.data(),
+                                                                 parsed_filename.format.data());
+        if (!file_header) {
             print_command_error(command_name);
             print_command_error("file not found");
 
@@ -56,7 +56,7 @@ namespace shell::commands
         uint32_t blocks = 0;
         if (!kernel::heap::Block_Allocator::get_allocation_info(index,
                                                                 blocks,
-                                                                inode->file_data_ptr)) {
+                                                                file_header->file_data_ptr)) {
             print_command_error(command_name);
             print_command_error("allocation info not available");
 

@@ -98,10 +98,10 @@ namespace kernel::storagmgr
 
             String_Manipulation::copy_string(header.magic.data(), 
                                              FILESYS_HEADER_MAGIC);
-            header.version            = MOFS_VERSION;
-            header.inode_count        = INODE_TABLE_ENTRYS;
-            header.inode_table_offset = INODE_TABLE_OFFSET;
-            header.data_offset        = FILESYS_DATA_OFFSET;
+            header.version                  = MOFS_VERSION;
+            header.file_header_count        = FILE_HEADER_TABLE_ENTRYS;
+            header.FILE_HEADER_TABLE_OFFSET = FILE_HEADER_TABLE_OFFSET;
+            header.data_offset              = FILESYS_DATA_OFFSET;
 
             read_or_write_bytes(drivers::ata::Driver_Operations::WRITE,
                                 FILESYS_HEADER_OFFSET,
@@ -117,10 +117,10 @@ namespace kernel::storagmgr
         Filesys_Header header;
         String_Manipulation::copy_string(header.magic.data(),
                                          FILESYS_HEADER_MAGIC);
-        header.version            = MOFS_VERSION;
-        header.inode_count        = INODE_TABLE_ENTRYS;
-        header.inode_table_offset = INODE_TABLE_OFFSET;
-        header.data_offset        = FILESYS_DATA_OFFSET;
+        header.version                  = MOFS_VERSION;
+        header.file_header_count        = FILE_HEADER_TABLE_ENTRYS;
+        header.FILE_HEADER_TABLE_OFFSET = FILE_HEADER_TABLE_OFFSET;
+        header.data_offset              = FILESYS_DATA_OFFSET;
         
         if (!read_or_write_bytes(drivers::ata::Driver_Operations::WRITE,
                                  FILESYS_HEADER_OFFSET,
@@ -128,53 +128,53 @@ namespace kernel::storagmgr
                                  &header)) [[unlikely]]
             return false;
 
-        static stdlib::Array<Serialized_I_Node, 
-                             INODE_TABLE_ENTRYS> serialized_inodes;
-        serialized_inodes.fill(Serialized_I_Node{});
+        static stdlib::Array<Serialized_File_Header, 
+                             FILE_HEADER_TABLE_ENTRYS> serialized_file_headers;
+        serialized_file_headers.fill(Serialized_File_Header{});
 
         uint32_t current_data_offset = 0;
-        for (uint32_t i = 0; i < header.inode_count; ++i) {
-            I_Node& inode = MoleculeOS_File_System_2::get_inode_entry(i);
-            if (!inode.file_data_ptr || inode.file_byte_size == 0)
+        for (uint32_t i = 0; i < header.file_header_count; ++i) {
+            File_Header& file_header = MoleculeOS_File_System_2::get_file_header_entry(i);
+            if (!file_header.file_data_ptr || file_header.file_byte_size == 0)
                 continue;
 
-            Serialized_I_Node& serialized_inode = serialized_inodes[i];
+            Serialized_File_Header& serialized_file_header = serialized_file_headers[i];
 
-            Memory_Manipulation::copy_memory_block(serialized_inode.file_name.data(),
-                                                   inode.file_name.data(),
+            Memory_Manipulation::copy_memory_block(serialized_file_header.file_name.data(),
+                                                   file_header.file_name.data(),
                                                    MAX_FILE_NAME_LENGTH + 1);
 
-            Memory_Manipulation::copy_memory_block(serialized_inode.file_format.data(),
-                                                   inode.file_format.data(),
+            Memory_Manipulation::copy_memory_block(serialized_file_header.file_format.data(),
+                                                   file_header.file_format.data(),
                                                    MAX_FILE_FORMAT_LENGTH + 1);
 
-            serialized_inode.name_hash           = inode.name_hash;
-            serialized_inode.format_hash         = inode.format_hash;
-            serialized_inode.file_byte_size      = inode.file_byte_size;
-            serialized_inode.used_data_byte_size = inode.used_data_byte_size;
-            serialized_inode.file_data_offset    = current_data_offset;
+            serialized_file_header.name_hash           = file_header.name_hash;
+            serialized_file_header.format_hash         = file_header.format_hash;
+            serialized_file_header.file_byte_size      = file_header.file_byte_size;
+            serialized_file_header.used_data_byte_size = file_header.used_data_byte_size;
+            serialized_file_header.file_data_offset    = current_data_offset;
 
-            if (inode.file_data_ptr && inode.file_byte_size > 0) {
+            if (file_header.file_data_ptr && file_header.file_byte_size > 0) {
                 if (!read_or_write_bytes(drivers::ata::Driver_Operations::WRITE,
                                          header.data_offset + current_data_offset,
-                                         inode.file_byte_size,
-                                         inode.file_data_ptr)) [[unlikely]]
+                                         file_header.file_byte_size,
+                                         file_header.file_data_ptr)) [[unlikely]]
                     return false;
             }
 
-            const uint32_t ALIGN_MASK = inode.used_data_byte_size - 1;
+            const uint32_t ALIGN_MASK = file_header.used_data_byte_size - 1;
 
-            current_data_offset += inode.used_data_byte_size;
+            current_data_offset += file_header.used_data_byte_size;
             current_data_offset = (current_data_offset + ALIGN_MASK) & 
                                    ~ALIGN_MASK;
         }
 
-        const uint32_t inode_table_size = header.inode_count * 
-                                          sizeof(Serialized_I_Node);
+        const uint32_t file_header_table_size = header.file_header_count * 
+                                          sizeof(Serialized_File_Header);
         if (!read_or_write_bytes(drivers::ata::Driver_Operations::WRITE,
-                                 header.inode_table_offset,
-                                 inode_table_size,
-                                 serialized_inodes.data())) [[unlikely]]
+                                 header.FILE_HEADER_TABLE_OFFSET,
+                                 file_header_table_size,
+                                 serialized_file_headers.data())) [[unlikely]]
             return false;
 
         return true;
@@ -199,53 +199,53 @@ namespace kernel::storagmgr
                                              FILESYS_HEADER_MAGIC) != status::SUCCESS) [[unlikely]]
             return false;
 
-        static stdlib::Array<Serialized_I_Node, 
-                             INODE_TABLE_ENTRYS> serialized_inodes;
-        serialized_inodes.fill(Serialized_I_Node{});
+        static stdlib::Array<Serialized_File_Header, 
+                             FILE_HEADER_TABLE_ENTRYS> serialized_file_headers;
+        serialized_file_headers.fill(Serialized_File_Header{});
 
-        const uint32_t inode_table_size = header.inode_count *
-                                          sizeof(Serialized_I_Node);
+        const uint32_t file_header_table_size = header.file_header_count *
+                                          sizeof(Serialized_File_Header);
         if (!read_or_write_bytes(drivers::ata::Driver_Operations::READ,
-                                 header.inode_table_offset,
-                                 inode_table_size,
-                                 serialized_inodes.data())) [[unlikely]]
+                                 header.FILE_HEADER_TABLE_OFFSET,
+                                 file_header_table_size,
+                                 serialized_file_headers.data())) [[unlikely]]
             return false;
 
-        for (uint32_t i = 0; i < header.inode_count; ++i) {
-            Serialized_I_Node& serialized_inode = serialized_inodes[i];
-            if (serialized_inode.file_byte_size == 0)
+        for (uint32_t i = 0; i < header.file_header_count; ++i) {
+            Serialized_File_Header& serialized_file_header = serialized_file_headers[i];
+            if (serialized_file_header.file_byte_size == 0)
                 continue;
 
             void* data_ptr;
-            Block_Allocator::allocate(data_ptr, serialized_inode.file_byte_size);
+            Block_Allocator::allocate(data_ptr, serialized_file_header.file_byte_size);
             if (!data_ptr) [[unlikely]]
                 return false;
 
             if (!read_or_write_bytes(drivers::ata::Driver_Operations::READ,
-                                     header.data_offset + serialized_inode.file_data_offset,
-                                     serialized_inode.file_byte_size,
+                                     header.data_offset + serialized_file_header.file_data_offset,
+                                     serialized_file_header.file_byte_size,
                                      data_ptr)) [[unlikely]] {
                 Block_Allocator::deallocate(reinterpret_cast<void*>(data_ptr));
                 return false;
             }
 
-            I_Node inode;
+            File_Header file_header;
 
-            Memory_Manipulation::copy_memory_block(inode.file_name.data(),
-                                                   serialized_inode.file_name.data(),
+            Memory_Manipulation::copy_memory_block(file_header.file_name.data(),
+                                                   serialized_file_header.file_name.data(),
                                                    MAX_FILE_NAME_LENGTH + 1);
 
-            Memory_Manipulation::copy_memory_block(inode.file_format.data(),
-                                                   serialized_inode.file_format.data(),
+            Memory_Manipulation::copy_memory_block(file_header.file_format.data(),
+                                                   serialized_file_header.file_format.data(),
                                                    MAX_FILE_FORMAT_LENGTH + 1);
 
-            inode.name_hash           = serialized_inode.name_hash;
-            inode.format_hash         = serialized_inode.format_hash;
-            inode.file_byte_size      = serialized_inode.file_byte_size;
-            inode.used_data_byte_size = serialized_inode.used_data_byte_size;
-            inode.file_data_ptr       = data_ptr;
+            file_header.name_hash           = serialized_file_header.name_hash;
+            file_header.format_hash         = serialized_file_header.format_hash;
+            file_header.file_byte_size      = serialized_file_header.file_byte_size;
+            file_header.used_data_byte_size = serialized_file_header.used_data_byte_size;
+            file_header.file_data_ptr       = data_ptr;
 
-            MoleculeOS_File_System_2::set_inode_entry(inode, i);
+            MoleculeOS_File_System_2::set_file_header_entry(file_header, i);
         }
 
         return true;

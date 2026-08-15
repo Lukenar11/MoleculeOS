@@ -55,7 +55,7 @@ namespace status
     constexpr status_t ALIGNMENT_ERROR = 0x03'0000'02;
     
     constexpr status_t FS_CORRUPTED      = 0x04'0000'00;
-    constexpr status_t FS_INVALID_INODE  = 0x04'0000'01;
+    constexpr status_t FS_INVALID_file_header  = 0x04'0000'01;
     constexpr status_t FS_INVALID_BLOCK  = 0x04'0000'02;
     constexpr status_t FS_OUT_OF_SPACE   = 0x04'0000'03;
     
