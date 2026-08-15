@@ -100,7 +100,7 @@ namespace kernel::storagmgr
                                              FILESYS_HEADER_MAGIC);
             header.version                  = MOFS_VERSION;
             header.file_header_count        = FILE_HEADER_TABLE_ENTRYS;
-            header.FILE_HEADER_TABLE_OFFSET = FILE_HEADER_TABLE_OFFSET;
+            header.file_header_table_offset = FILE_HEADER_TABLE_OFFSET;
             header.data_offset              = FILESYS_DATA_OFFSET;
 
             read_or_write_bytes(drivers::ata::Driver_Operations::WRITE,
@@ -119,7 +119,7 @@ namespace kernel::storagmgr
                                          FILESYS_HEADER_MAGIC);
         header.version                  = MOFS_VERSION;
         header.file_header_count        = FILE_HEADER_TABLE_ENTRYS;
-        header.FILE_HEADER_TABLE_OFFSET = FILE_HEADER_TABLE_OFFSET;
+        header.file_header_table_offset = FILE_HEADER_TABLE_OFFSET;
         header.data_offset              = FILESYS_DATA_OFFSET;
         
         if (!read_or_write_bytes(drivers::ata::Driver_Operations::WRITE,
@@ -172,7 +172,7 @@ namespace kernel::storagmgr
         const uint32_t file_header_table_size = header.file_header_count * 
                                           sizeof(Serialized_File_Header);
         if (!read_or_write_bytes(drivers::ata::Driver_Operations::WRITE,
-                                 header.FILE_HEADER_TABLE_OFFSET,
+                                 header.file_header_table_offset,
                                  file_header_table_size,
                                  serialized_file_headers.data())) [[unlikely]]
             return false;
@@ -206,7 +206,7 @@ namespace kernel::storagmgr
         const uint32_t file_header_table_size = header.file_header_count *
                                           sizeof(Serialized_File_Header);
         if (!read_or_write_bytes(drivers::ata::Driver_Operations::READ,
-                                 header.FILE_HEADER_TABLE_OFFSET,
+                                 header.file_header_table_offset,
                                  file_header_table_size,
                                  serialized_file_headers.data())) [[unlikely]]
             return false;
