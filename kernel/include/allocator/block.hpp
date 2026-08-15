@@ -34,24 +34,39 @@ namespace kernel::heap
         static inline uint32_t all_memory_blocks = 0;
         static inline uint32_t needed_pool_space = 0;
 
-        static inline uint8_t* memory_pool_ptr     = nullptr;
-        static inline uint16_t* allocation_sizes   = nullptr;
-        static inline uint32_t* free_memory_bitmap = nullptr;
+        static inline uint8_t* memory_pool_ptr   = nullptr;
+        static inline uint16_t* allocation_sizes = nullptr;
+        static inline uint32_t* memory_bitmap    = nullptr;
 
         static inline
         void set_block_used(_IN_ const uint32_t i) noexcept {
-            free_memory_bitmap[i >> 5] &= ~(1u << (i & 31));
+            memory_bitmap[i >> 5] &= ~(1u << (i & 31));
         }
 
         static inline
         void set_block_free(_IN_ const uint32_t i) noexcept {
-            free_memory_bitmap[i >> 5] |= (1u << (i & 31));
+            memory_bitmap[i >> 5] |= (1u << (i & 31));
         }
 
         static inline
         bool is_block_free(_IN_ const uint32_t i) noexcept {
-            return free_memory_bitmap[i >> 5] & (1u << (i & 31));
+            return memory_bitmap[i >> 5] & (1u << (i & 31));
         }
+
+        static
+        void compute_block_count(_IN_ const uint32_t start_addr,
+                                 _IN_ const uint32_t end_addr) noexcept;
+
+        static
+        void setup_metadata_pointers(_IN_ const uint32_t start_addr) noexcept;
+
+        static
+        void setup_memory_pool(_IN_ const uint32_t start_addr,
+                               _IN_ const uint32_t end_addr,
+                               _IN_ const uint32_t word_count) noexcept;
+
+        static
+        void clear_metadata(_IN_ const uint32_t word_count) noexcept;
 
         static 
         void* set_allocation_sizes_entry(_IN_ const uint32_t blocks_needed, 
@@ -62,7 +77,22 @@ namespace kernel::heap
                                             _IN_    const uint32_t i, 
                                             _IN_    const uint32_t blocks_needed)
                                             noexcept;
-    
+
+        static
+        status_t validate_allocate_size(_IN_ const uint32_t size,
+                                        _OUT_ uint32_t& blocks_needed) 
+                                        noexcept;
+
+        static
+        status_t find_free_memory_region(_OUT_ uint32_t& index,
+                                         _IN_  const uint32_t blocks_needed) 
+                                         noexcept;
+
+        static
+        status_t perform_reallocate(_INOUT_ void*& ptr,
+                                    _IN_    const uint32_t new_size) 
+                                    noexcept;
+
     public:
         static 
         void init(_IN_ const uint8_t* begin, 
