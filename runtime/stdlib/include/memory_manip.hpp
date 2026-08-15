@@ -17,8 +17,8 @@ NOTES:
 
 #pragma once
 
-#include <sal.hpp>
 #include <status.hpp>
+#include <sal.hpp>
 #include <types.hpp>
 
 namespace stdlib

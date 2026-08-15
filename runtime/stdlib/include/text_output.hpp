@@ -24,8 +24,8 @@ NOTES:
 
 #pragma once
 
-#include <drivers.hpp>
 #include <types.hpp>
+#include <drivers.hpp>
 #include <sal.hpp>
 #include <array.hpp>
 

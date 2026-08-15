@@ -15,8 +15,8 @@ NOTES:
 
 #pragma once
 
-#include <array.hpp>
 #include <types.hpp>
+#include <array.hpp>
 #include <sal.hpp>
 #include <status.hpp>
 
