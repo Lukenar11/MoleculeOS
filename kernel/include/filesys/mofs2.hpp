@@ -26,116 +26,99 @@ NOTES:
 #include "allocator/block.hpp"
 #include <array.hpp>
 #include <types.hpp>
+#include <sal.hpp>
+#include <status.hpp>
 #include <string_manip.hpp>
-
-namespace
-{
-    inline bool name_and_format_guard(const char* name, 
-                                      const char* format) noexcept {
-        using namespace stdlib;
-        using namespace kernel::filesys;
-
-        if (!name || !format) [[unlikely]] 
-            return false;
-
-        uint32_t name_length;
-        uint32_t format_length;
-        String_Manipulation::get_string_length(name_length, name);
-        String_Manipulation::get_string_length(format_length, format);
-
-        if (name[0] == '\0') [[unlikely]]
-            return false;
-
-        if (name_length == 0) [[unlikely]]
-            return false;
-
-        if (name_length > MAX_FILE_NAME_LENGTH) [[unlikely]] 
-            return false;
-
-        if (format[0] == '\0') [[unlikely]]
-            return false;
-
-        if (format_length == 0) [[unlikely]]
-            return false;
-
-        if (format_length > MAX_FILE_FORMAT_LENGTH) [[unlikely]]
-            return false;
-
-        return true;
-    }
-}
 
 namespace kernel::filesys
 {
     class MoleculeOS_File_System_2 final {
     private:
-        static inline stdlib::Array<File_Header, FILE_HEADER_TABLE_ENTRYS> file_header_table;
+        static 
+        inline stdlib::Array<File_Header, 
+                             FILE_HEADER_TABLE_ENTRYS> file_header_table;
 
-        static uint32_t to_fnv1a_hash(const char* txt) noexcept;
+        static 
+        uint32_t to_fnv1a_hash(_IN_ const char* txt) noexcept;
 
-        static bool file_already_exists(const File_Header& file_header, 
-                                        const char* name, 
-                                        const char* format,
-                                        const uint32_t name_hash,
-                                        const uint32_t format_hash) 
-                                        noexcept;
+
+        static
+        status_t validate_name_and_format(_IN_ const char* name, 
+                                          _IN_ const char* format) noexcept;
+
+        static 
+        status_t file_already_exists(_IN_ const File_Header& file_header, 
+                                     _IN_ const char* name, 
+                                     _IN_ const char* format,
+                                     _IN_ const uint32_t name_hash,
+                                     _IN_ const uint32_t format_hash) noexcept;
 
     public:
-        static inline constexpr const stdlib::Array<File_Header, FILE_HEADER_TABLE_ENTRYS>& get_file_header_table() 
-        noexcept {
-            return file_header_table;
-        };
-
-        static inline constexpr File_Header& get_file_header_entry(const uint32_t index) noexcept {
-            return file_header_table[index];
+        static inline constexpr 
+        File_Header& get_file_header_entry(_IN_ const uint32_t i) noexcept {
+            return file_header_table[i];
         }
 
-        static inline constexpr File_Header& set_file_header_entry(const File_Header& file_header, 
-                                                        const uint32_t index) noexcept {
-            return file_header_table[index] = file_header;
+        static inline constexpr 
+        File_Header& set_file_header_entry(_IN_ const File_Header& file_header, 
+                                           _IN_ const uint32_t i) noexcept {
+            return file_header_table[i] = file_header;
         }
 
-        static File_Header* create_file(const char* name, 
-                                   const char* format, 
-                                   const uint32_t byte_size) noexcept;
+        static 
+        status_t create_file(_OUT_ File_Header*& file_header,
+                             _IN_  const char* name, 
+                             _IN_  const char* format, 
+                             _IN_  const uint32_t byte_size) noexcept;
 
-        static bool delete_file(const char* file_name, 
-                                const char* file_format) noexcept;
+        static 
+        status_t delete_file(_IN_ const char* file_name, 
+                             _IN_ const char* file_format) noexcept;
 
-        static File_Header* find_file(const char* name,
-                                 const char* format) noexcept;
+        static 
+        status_t find_file(_OUT_ File_Header*& file_header,
+                           _IN_  const char* name,
+                           _IN_  const char* format) noexcept;
 
-        static bool write_file(File_Header* file_header,
-                               const uint32_t offset,
-                               const uint32_t length,
-                               const uint32_t data_size,
-                               const uint8_t* data) noexcept;
+        static 
+        status_t write_file(_IN_ File_Header* file_header,
+                            _IN_ const uint32_t offset,
+                            _IN_ const uint32_t length,
+                            _IN_ const uint32_t data_size,
+                            _IN_ const uint8_t* data) noexcept;
 
-        static bool append_file(File_Header* file_header,
-                                const uint8_t* data,
-                                const uint32_t data_size) noexcept;
+        static 
+        status_t append_file(_IN_ File_Header* file_header,
+                             _IN_ const uint8_t* data,
+                             _IN_ const uint32_t data_size) noexcept;
 
-        static bool clear_file(File_Header* file_header) noexcept;
+        static 
+        status_t clear_file(_IN_ File_Header* file_header) noexcept;
 
-        static bool rename_file(const char* old_name,
-                                const char* old_format,
-                                const char* new_name,
-                                const char* new_format) noexcept;
+        static 
+        status_t rename_file(_IN_ const char* old_name,
+                             _IN_ const char* old_format,
+                             _IN_ const char* new_name,
+                             _IN_ const char* new_format) noexcept;
 
-        static bool copy_file(const char* src_name,
-                              const char* src_format,
-                              const char* dest_name,
-                              const char* dest_format) noexcept;
+        static 
+        status_t copy_file(_IN_ const char* src_name,
+                           _IN_ const char* src_format,
+                           _IN_ const char* dest_name,
+                           _IN_ const char* dest_format) noexcept;
 
-        static bool read_file(File_Header* file_header,
-                              uint8_t* buffer,
-                              const uint32_t buffer_size,
-                              const uint32_t offset,
-                              const uint32_t length) noexcept;
+        static 
+        status_t read_file(_IN_ File_Header* file_header,
+                          _IN_ uint8_t* buffer,
+                          _IN_ const uint32_t buffer_size,
+                          _IN_ const uint32_t offset,
+                          _IN_ const uint32_t length) noexcept;
 
-        static bool resize_file_size(File_Header* file_header,
-                                     const uint32_t new_size) noexcept;
+        static 
+        status_t resize_file_size(_IN_ File_Header* file_header,
+                                  _IN_ const uint32_t new_size) noexcept;
 
-        static bool is_valid_name_or_format_char(const char symbol) noexcept;
+        static 
+        bool is_valid_name_or_format_char(_IN_ const char symbol) noexcept;
     };
 } // namespace kernel::filesys

@@ -34,14 +34,18 @@ namespace shell::commands
             return;
         }
 
-        if (kernel::filesys::MoleculeOS_File_System_2::find_file(parsed_filename.name.data(), 
-                                                                 parsed_filename.format.data())) {
+        kernel::filesys::File_Header* file_header;
+        kernel::filesys::MoleculeOS_File_System_2::find_file(file_header,
+                                                             parsed_filename.name.data(), 
+                                                             parsed_filename.format.data());
+        if (!file_header) {
             print_command_error(command_name);
-            print_command_error("File exists!");
+            print_command_error("File does not exist!");
+
         }
         else {
             print_command_error(command_name);
-            print_command_error("File does not exist!");
+            print_command_error("File exists!");
         }
 
         command_end();

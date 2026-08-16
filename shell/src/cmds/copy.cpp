@@ -80,10 +80,10 @@ namespace shell::commands
             return;
         }
 
-        if (!MoleculeOS_File_System_2::copy_file(src_parsed.name.data(),
-                                                 src_parsed.format.data(),
-                                                 dest_parsed.name.data(),
-                                                 dest_parsed.format.data())) {
+        if (MoleculeOS_File_System_2::copy_file(src_parsed.name.data(),
+                                                src_parsed.format.data(),
+                                                dest_parsed.name.data(),
+                                                dest_parsed.format.data()) != status::SUCCESS) {
             print_command_error(command_name);
             print_command_error("copy failed");
             command_end();

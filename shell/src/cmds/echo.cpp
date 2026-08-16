@@ -137,12 +137,15 @@ namespace shell::commands
             return;
         }
 
-        File_Header* file_header = MoleculeOS_File_System_2::find_file(parsed_filename.name.data(),
-                                                                 parsed_filename.format.data());
+        File_Header* file_header;
+        MoleculeOS_File_System_2::find_file(file_header,
+                                            parsed_filename.name.data(),
+                                            parsed_filename.format.data());
         if (!file_header)
-            file_header = MoleculeOS_File_System_2::create_file(parsed_filename.name.data(),
-                                                          parsed_filename.format.data(),
-                                                          file_instream.size());
+            MoleculeOS_File_System_2::create_file(file_header,
+                                                  parsed_filename.name.data(),
+                                                  parsed_filename.format.data(),
+                                                  file_instream.size());
             
         uint32_t length;
         String_Manipulation::get_string_length(length, file_instream.data());
@@ -163,8 +166,10 @@ namespace shell::commands
             return;
         }
 
-        File_Header* file_header = MoleculeOS_File_System_2::find_file(parsed_filename.name.data(),
-                                                                 parsed_filename.format.data());
+        File_Header* file_header;
+        MoleculeOS_File_System_2::find_file(file_header,
+                                            parsed_filename.name.data(),
+                                            parsed_filename.format.data());
         if (!file_header) {
             print_command_error(command_name);
             print_command_error("file not found\n");
@@ -181,11 +186,12 @@ namespace shell::commands
             return;
         }
 
-        if (!MoleculeOS_File_System_2::read_file(file_header,
-                                                 buffer,
-                                                 size,
-                                                 0,
-                                                 file_header->used_data_byte_size)) {
+        if (MoleculeOS_File_System_2::read_file(file_header,
+                                                buffer,
+                                                size,
+                                                0,
+                                                file_header->used_data_byte_size) 
+            != status::SUCCESS) {
             print_command_error(command_name);
             print_command_error("could not read file\n");
 

@@ -36,8 +36,9 @@ namespace shell::commands
             return;
         }
 
-        if (!MoleculeOS_File_System_2::delete_file(parsed_filename.name.data(),
-                                                   parsed_filename.format.data())) [[unlikely]] {
+        if (MoleculeOS_File_System_2::delete_file(parsed_filename.name.data(),
+                                                  parsed_filename.format.data()) 
+            != status::SUCCESS) [[unlikely]] {
             static const char* error_message = "file does not exist";
             print_command_error(command_name);
             print_command_error(error_message);

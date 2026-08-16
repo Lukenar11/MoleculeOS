@@ -86,9 +86,11 @@ namespace shell::commands
             return;
         }
 
-        File_Header* file_header = MoleculeOS_File_System_2::create_file(parsed_filename.name.data(),
-                                                                   parsed_filename.format.data(),
-                                                                   file_size);
+        File_Header* file_header; 
+        MoleculeOS_File_System_2::create_file(file_header, 
+                                              parsed_filename.name.data(),
+                                              parsed_filename.format.data(),
+                                              file_size);
         if (!file_header) [[unlikely]] {
             static const char* error_message = "file could not be created";
 

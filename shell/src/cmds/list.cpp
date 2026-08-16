@@ -23,13 +23,18 @@ NOTES:
 namespace shell::commands
 {
     void list() noexcept {
+        using namespace kernel::filesys;
+
         stdlib::Text_Output::reset();
         stdlib::Text_Output::put_string("Files:\n");
 
-        const auto& file_headers = kernel::filesys::MoleculeOS_File_System_2::get_file_header_table();
-        for (const auto& file_header : file_headers) {
-            if (file_header.file_data_ptr == nullptr)
+        File_Header file_header;
+        for (uint32_t i = 0; i < FILE_HEADER_TABLE_ENTRYS; i++) [[likely]] {
+            file_header = MoleculeOS_File_System_2::get_file_header_entry(i);
+
+            if (!file_header.file_data_ptr) {
                 continue;
+            }
 
             if (file_header.file_name[0] == '\0') [[unlikely]] {
                 static const char* error_message = "\t- [INVALID FILE]\n";

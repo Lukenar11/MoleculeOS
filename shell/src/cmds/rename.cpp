@@ -94,10 +94,11 @@ namespace shell::commands
             return;
         }
 
-        if (!MoleculeOS_File_System_2::rename_file(old_parsed_filename.name.data(),
-                                                   old_parsed_filename.format.data(),
-                                                   new_parsed_filename.name.data(),
-                                                   new_parsed_filename.format.data())) {
+        if (MoleculeOS_File_System_2::rename_file(old_parsed_filename.name.data(),
+                                                  old_parsed_filename.format.data(),
+                                                  new_parsed_filename.name.data(),
+                                                  new_parsed_filename.format.data()) 
+                                                  != status::SUCCESS) {
             print_command_error(command_name);
             print_command_error("file renaming failed");
 

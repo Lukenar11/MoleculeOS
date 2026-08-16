@@ -24,66 +24,131 @@ NOTES:
 
 namespace kernel::filesys
 {
-    uint32_t MoleculeOS_File_System_2::to_fnv1a_hash(const char* txt) noexcept {
+    uint32_t MoleculeOS_File_System_2::to_fnv1a_hash(_IN_ const char* txt) noexcept {
         const uint32_t prime_offset = 0x01000193;
-        uint32_t hash = 0x811C9DC5;
+        uint32_t hash               = 0x811C9DC5;
         
-        while (*txt) {
+        while (*txt) [[likely]] {
             hash ^= static_cast<uint8_t>(*txt++);
             hash *= prime_offset;
         }
 
         return hash;
     }
+
+    status_t MoleculeOS_File_System_2::validate_name_and_format(_IN_ const char* name, 
+                                                                _IN_ const char* format) 
+                                                                noexcept {
+        using namespace stdlib;
+        using namespace kernel::filesys;
+
+        status_t status;
+        uint32_t name_length;
+        uint32_t format_length;
+
+        if (!name || !format) [[unlikely]] {
+            status = status::NULL_POINTER;
+            goto cleanup;
+        }
+
+        String_Manipulation::get_string_length(name_length, name);
+        String_Manipulation::get_string_length(format_length, format);
+
+        if (name[0] == '\0' || format[0] == '\0') [[unlikely]] {
+            status = status::INVALID_PARAMETER;
+            goto cleanup;
+        }
+
+        if (name_length == 0 ||
+            format_length == 0) [[unlikely]] {
+            status = status::INVALID_PARAMETER;
+            goto cleanup;
+        }
+
+        if (name_length > MAX_FILE_NAME_LENGTH ||
+            format_length > MAX_FILE_FORMAT_LENGTH) [[unlikely]] {
+            status = status::FS_OUT_OF_SPACE;
+            goto cleanup;
+        }
+
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
+    }
     
-    bool MoleculeOS_File_System_2::file_already_exists(const File_Header& file_header, 
-                                                       const char* name, 
-                                                       const char* format,
-                                                       const uint32_t name_hash,
-                                                       const uint32_t format_hash) 
-                                                       noexcept {
+    status_t MoleculeOS_File_System_2::file_already_exists(_IN_ const File_Header& file_header, 
+                                                           _IN_ const char* name, 
+                                                           _IN_ const char* format,
+                                                           _IN_ const uint32_t name_hash,
+                                                           _IN_ const uint32_t format_hash) 
+                                                           noexcept {
         using namespace stdlib;
 
-        if (!name_and_format_guard(name, format)) [[unlikely]]
-            return false;
+        status_t status;
+        status_t name_status;
+        status_t format_status;
 
-        if ((file_header.name_hash == name_hash) && (file_header.format_hash == format_hash))
-            if ((String_Manipulation::compare_strings(name, 
-                                                      file_header.file_name.data()) == 
-                status::EQUAL_TO) &&
-                (String_Manipulation::compare_strings(format, 
-                                                      file_header.file_format.data()) == 
-                status::EQUAL_TO))
-                return true;
+        status = validate_name_and_format(name, format);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        if (file_header.name_hash == name_hash && 
+            file_header.format_hash == format_hash) {
+            name_status = String_Manipulation::compare_strings(name, 
+                                                               file_header.file_name.data());
+            format_status = String_Manipulation::compare_strings(format, 
+                                                                 file_header.file_format.data());
+            if (name_status == status::EQUAL_TO && 
+                format_status == status::EQUAL_TO) {
+                status = status::ALREADY_EXISTS;
+                goto cleanup;
+            }
+        }
+
+        status = status::NOT_FOUND;
         
-        return false;
+    cleanup:
+        return status;
     }
 
-    File_Header* MoleculeOS_File_System_2::create_file(const char* name, 
-                                                  const char* format, 
-                                                  const uint32_t byte_size) 
-                                                  noexcept {
+    status_t MoleculeOS_File_System_2::create_file(_OUT_ File_Header*& file_header,
+                                                   _IN_  const char* name, 
+                                                   _IN_  const char* format, 
+                                                   _IN_  const uint32_t byte_size) 
+                                                   noexcept {
         using namespace stdlib;
 
-        if (!name_and_format_guard(name, format)) [[unlikely]]
-            return nullptr;
+        status_t status;
+        uint32_t name_hash;
+        uint32_t format_hash;
 
-        const uint32_t name_hash   = to_fnv1a_hash(name);
-        const uint32_t format_hash = to_fnv1a_hash(format);
+        status = validate_name_and_format(name, format);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
 
-        for (uint32_t i = 0; i < file_header_table.size(); i++) {
+        name_hash   = to_fnv1a_hash(name);
+        format_hash = to_fnv1a_hash(format);
+
+        for (uint32_t i = 0; i < file_header_table.size(); i++) [[likely]] {
             if (file_already_exists(file_header_table[i], 
                                     name, 
                                     format,
                                     name_hash,
-                                    format_hash)) [[unlikely]]
-                return nullptr;
+                                    format_hash) == status::ALREADY_EXISTS) [[unlikely]] {
+                status = status::ALREADY_EXISTS;
+                goto cleanup;
+            }
 
-            if (file_header_table[i].file_data_ptr == nullptr) {
+            if (!file_header_table[i].file_data_ptr) {
                 void* ptr; 
                 heap::Block_Allocator::allocate(ptr, byte_size);
-                if (ptr == nullptr) [[unlikely]]
-                    return nullptr;
+                if (!ptr) [[unlikely]] {
+                    status = status::FAIL;
+                    goto cleanup;
+                }
 
                 file_header_table[i].used_data_byte_size = 0;
                 file_header_table[i].file_byte_size      = byte_size;
@@ -91,34 +156,48 @@ namespace kernel::filesys
                 file_header_table[i].format_hash         = format_hash;
                 file_header_table[i].name_hash           = name_hash;
 
-                String_Manipulation::copy_string(file_header_table[i].file_format.data(), format);               
+                String_Manipulation::copy_string(file_header_table[i].file_format.data(), format);
                 String_Manipulation::copy_string(file_header_table[i].file_name.data(), name);
 
-                return &file_header_table[i];
+                file_header = &file_header_table[i];
+                status      = status::SUCCESS;
+                goto done;
             }
         }
 
-        return nullptr;
+    cleanup:
+        file_header = nullptr;
+
+    done:
+        return status;
     }
 
-    bool MoleculeOS_File_System_2::delete_file(const char* name, 
-                                               const char* format) noexcept {
+    status_t MoleculeOS_File_System_2::delete_file(_IN_ const char* name, 
+                                                   _IN_ const char* format) 
+                                                   noexcept {
         using namespace stdlib;
 
-        if (!name_and_format_guard(name, format)) [[unlikely]]
-            return false;
-            
-        const uint32_t name_hash   = to_fnv1a_hash(name);
-        const uint32_t format_hash = to_fnv1a_hash(format);
+        status_t status;
+        uint32_t name_hash;
+        uint32_t format_hash;
 
-        for (uint32_t i = 0; i < file_header_table.size(); i++) {
+        status = validate_name_and_format(name, format);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+            
+        name_hash   = to_fnv1a_hash(name);
+        format_hash = to_fnv1a_hash(format);
+
+        for (uint32_t i = 0; i < file_header_table.size(); i++) [[likely]] {
             if (file_already_exists(file_header_table[i], 
                                     name, 
                                     format,
                                     name_hash,
-                                    format_hash)) [[likely]] {
-                if (file_header_table[i].file_data_ptr != nullptr) [[unlikely]]
+                                    format_hash) == status::ALREADY_EXISTS) [[likely]] {
+                if (!file_header_table[i].file_data_ptr) [[unlikely]] {
                     heap::Block_Allocator::deallocate(file_header_table[i].file_data_ptr);
+                }
 
                 file_header_table[i].file_name.fill('\0');
                 file_header_table[i].file_format.fill('\0');
@@ -127,122 +206,196 @@ namespace kernel::filesys
                 file_header_table[i].file_byte_size = 0;
                 file_header_table[i].file_data_ptr  = nullptr;
 
-                return true;
+                status = status::SUCCESS;
+                goto cleanup;
             }
         }
 
-        return false;
+        status = status::FAIL;
+
+    cleanup:
+        return status;
     }
 
-    File_Header* MoleculeOS_File_System_2::find_file(const char* name,
-                                                const char* format) noexcept {
-        if (!name_and_format_guard(name, format)) [[unlikely]]
-            return nullptr;
+    status_t MoleculeOS_File_System_2::find_file(_OUT_ File_Header*& file_header,
+                                                 _IN_  const char* name,
+                                                 _IN_  const char* format) 
+                                                 noexcept {
+        status_t status;
+        uint32_t name_hash;  
+        uint32_t format_hash;
 
-        const uint32_t name_hash   = to_fnv1a_hash(name);
-        const uint32_t format_hash = to_fnv1a_hash(format);
+        status = validate_name_and_format(name, format);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
 
-        for (uint32_t i = 0; i < file_header_table.size(); i++)
+        name_hash   = to_fnv1a_hash(name);
+        format_hash = to_fnv1a_hash(format);
+
+        for (uint32_t i = 0; i < file_header_table.size(); i++) [[likely]] {
             if (file_already_exists(file_header_table[i],
                                     name,
                                     format,
                                     name_hash,
-                                    format_hash)) [[likely]]
-                return &file_header_table[i];
+                                    format_hash) == status::ALREADY_EXISTS) [[likely]] {
+                file_header = &file_header_table[i];
+                status      = status::SUCCESS;
+                goto done;
+            }
+        }
 
-        return nullptr;
+    cleanup:
+        file_header = nullptr;
+        status      = status::NOT_FOUND;
+
+    done:
+        return status;
     }
 
-    bool MoleculeOS_File_System_2::write_file(File_Header* file_header,
-                                              const uint32_t offset,
-                                              const uint32_t length,
-                                              const uint32_t data_size,
-                                              const uint8_t* data) noexcept {
+    status_t MoleculeOS_File_System_2::write_file(_IN_ File_Header* file_header,
+                                                  _IN_ const uint32_t offset,
+                                                  _IN_ const uint32_t length,
+                                                  _IN_ const uint32_t data_size,
+                                                  _IN_ const uint8_t* data) 
+                                                  noexcept {
         using namespace stdlib;
+
+        status_t status;
+        uint8_t* dest_ptr;
         
-        if (file_header == nullptr) [[unlikely]]
-            return false;
+        if (!file_header) [[unlikely]] {
+            status = status::NOT_FOUND;
+            goto cleanup;
+        }
 
-        if (file_header->file_data_ptr == nullptr) [[unlikely]]
-            return false;
+        if (!file_header->file_data_ptr) [[unlikely]] {
+            status = status::EMPTY;
+            goto cleanup;
+        }
 
-        if (offset >= file_header->file_byte_size) [[unlikely]]
-            return false;
+        if (offset >= file_header->file_byte_size ||
+            offset + length > file_header->file_byte_size) [[unlikely]] {
+            status = status::FS_OUT_OF_SPACE;
+            goto cleanup;
+        }
 
-        if (offset + length > file_header->file_byte_size) [[unlikely]]
-            return false;
+        if (data_size < length) [[unlikely]] {
+            status = status::INVALID_PARAMETER;
+            goto cleanup;
+        }
 
-        if (data_size < length) [[unlikely]]
-            return false;
-
-        uint8_t* dest_ptr = static_cast<uint8_t*>(file_header->file_data_ptr);
+        dest_ptr = static_cast<uint8_t*>(file_header->file_data_ptr);
         Memory_Manipulation::copy_memory_block(dest_ptr + offset, 
                                                data, 
                                                length);
 
-        return true;
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
     }
 
-    bool MoleculeOS_File_System_2::append_file(File_Header* file_header,
-                                               const uint8_t* data,
-                                               const uint32_t data_size) noexcept {
+    status_t MoleculeOS_File_System_2::append_file(_IN_ File_Header* file_header,
+                                                   _IN_ const uint8_t* data,
+                                                   _IN_ const uint32_t data_size) 
+                                                   noexcept {
         using namespace stdlib;
 
-        if (file_header == nullptr) [[unlikely]]
-            return false;
+        status_t status;
+        uint8_t* data_ptr;
+        uint8_t* dest_ptr;
 
-        if (file_header->file_data_ptr == nullptr) [[unlikely]]
-           return false;
+        if (!file_header) [[unlikely]] {
+            status = status::NOT_FOUND;
+            goto cleanup;
+        }
 
-        if (file_header->used_data_byte_size + data_size > file_header->file_byte_size) [[unlikely]]
-            return false;
+        if (!file_header->file_data_ptr) [[unlikely]] {
+            status = status::EMPTY;
+            goto cleanup;
+        }
 
-        uint8_t* data_ptr = static_cast<uint8_t*>(file_header->file_data_ptr);
-        Memory_Manipulation::copy_memory_block(data_ptr + file_header->used_data_byte_size,
-                                               data,
-                                               data_size);
+        if (file_header->used_data_byte_size + data_size > 
+            file_header->file_byte_size) [[unlikely]] {
+            status = status::FS_OUT_OF_SPACE;
+            goto cleanup;
+        }
+
+        data_ptr = static_cast<uint8_t*>(file_header->file_data_ptr);
+        dest_ptr = data_ptr + file_header->used_data_byte_size;
+        Memory_Manipulation::copy_memory_block(dest_ptr, data, data_size);
 
         file_header->used_data_byte_size += data_size;
-        return true;
+
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
     }
 
-    bool MoleculeOS_File_System_2::clear_file(File_Header* file_header) noexcept {
+    status_t MoleculeOS_File_System_2::clear_file(_IN_ File_Header* file_header) 
+                                                  noexcept {
         using namespace stdlib;
 
-        if (file_header == nullptr) [[unlikely]]
+        status_t status;
+        uint8_t* data_ptr;
+
+        if (!file_header) [[unlikely]] {
+            status = status::NOT_FOUND;
+            goto cleanup;
+        }
+
+        if (!file_header->file_data_ptr) [[unlikely]] {
+            status = status::EMPTY;
+            goto cleanup;
+        }
+
+        data_ptr = static_cast<uint8_t*>(file_header->file_data_ptr);
+        if (!data_ptr) [[unlikely]] {
             return false;
+        }
 
-        if (file_header->file_data_ptr == nullptr) [[unlikely]]
-            return false;
-
-        uint8_t* data_ptr = static_cast<uint8_t*>(file_header->file_data_ptr);
-        if (data_ptr == nullptr) [[unlikely]]
-            return false;
-
-        Memory_Manipulation::set_memory_block(data_ptr, 0, file_header->file_byte_size);
-
+        Memory_Manipulation::set_memory_block(data_ptr, 
+                                              0, 
+                                              file_header->file_byte_size);
         file_header->used_data_byte_size = 0;
-        return true;
+
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
     }
 
-    bool MoleculeOS_File_System_2::rename_file(const char* old_name,
-                                               const char* old_format,
-                                               const char* new_name,
-                                               const char* new_format) noexcept {
+    status_t MoleculeOS_File_System_2::rename_file(_IN_ const char* old_name,
+                                                   _IN_ const char* old_format,
+                                                   _IN_ const char* new_name,
+                                                   _IN_ const char* new_format)
+                                                   noexcept {
         using namespace stdlib;
 
-        if (!name_and_format_guard(old_name, old_format)) [[unlikely]]
-            return false;
+        status_t status;
+        File_Header* file_header;
 
-        if (!name_and_format_guard(new_name, new_format)) [[unlikely]]
-            return false;
+        status = validate_name_and_format(old_name, old_format);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
 
-        File_Header* file_header = find_file(old_name, old_format);
-        if (file_header == nullptr) [[unlikely]]
-            return false;
+        status = validate_name_and_format(new_name, new_format);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
 
-        if (find_file(new_name, new_format) != nullptr) [[unlikely]]
-            return false;
+        status = find_file(file_header, old_name, old_format);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        status = find_file(file_header, new_name, new_format);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
 
         String_Manipulation::copy_string(file_header->file_name.data(), new_name);
         String_Manipulation::copy_string(file_header->file_format.data(), new_format);
@@ -250,106 +403,159 @@ namespace kernel::filesys
         file_header->name_hash   = to_fnv1a_hash(new_name);
         file_header->format_hash = to_fnv1a_hash(new_format);
 
-        return true;
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
     }
 
-    bool MoleculeOS_File_System_2::copy_file(const char* src_name,
-                                             const char* src_format,
-                                             const char* dest_name,
-                                             const char* dest_format) noexcept {
+    status_t MoleculeOS_File_System_2::copy_file(_IN_ const char* src_name,
+                                                 _IN_ const char* src_format,
+                                                 _IN_ const char* dest_name,
+                                                 _IN_ const char* dest_format) 
+                                                 noexcept {
         using namespace stdlib;
 
-        if (!name_and_format_guard(src_name, src_format)) [[unlikely]]
-            return false;
+        status_t status;
+        File_Header* src_file_header;
+        File_Header* dest_file_header;
+        uint8_t* src_ptr; 
+        uint8_t* dest_ptr;
 
-        if (!name_and_format_guard(dest_name, dest_format)) [[unlikely]]
-            return false;
+        status = validate_name_and_format(src_name, src_format);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
 
-        File_Header* src_file_header = find_file(src_name, src_format);
-        if (src_file_header == nullptr) [[unlikely]]
-            return false;
+        status = validate_name_and_format(dest_name, dest_format);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
 
-        if (find_file(dest_name, dest_format) != nullptr) [[unlikely]]
-            return false;
+        status = find_file(src_file_header, src_name, src_format);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
 
-        File_Header* dest_file_header = create_file(dest_name, 
-                                         dest_format, 
-                                         src_file_header->file_byte_size);
-        if (dest_file_header == nullptr) [[unlikely]]
-            return false;
+        status = find_file(dest_file_header, dest_name, dest_format);
+        if (status != status::SUCCESS) [[unlikely]] {
+            status = status::NOT_FOUND;
+            goto cleanup;
+        }
 
-        uint8_t* src_ptr  = static_cast<uint8_t*>(src_file_header->file_data_ptr);
-        uint8_t* dest_ptr = static_cast<uint8_t*>(dest_file_header->file_data_ptr);
-        if (src_ptr == nullptr || dest_ptr == nullptr) [[unlikely]]
-            return false;
+        create_file(dest_file_header, 
+                    dest_name, 
+                    dest_format, 
+                    src_file_header->file_byte_size);
+        if (!dest_file_header) [[unlikely]] {
+            status = status::FAIL;
+            goto cleanup;
+        }
+
+        src_ptr  = static_cast<uint8_t*>(src_file_header->file_data_ptr);
+        dest_ptr = static_cast<uint8_t*>(dest_file_header->file_data_ptr);
+        if (!src_ptr || !dest_ptr) [[unlikely]] {
+            status = status::EMPTY;
+            goto cleanup;
+        }
 
         Memory_Manipulation::copy_memory_block(dest_ptr,
                                                src_ptr,
                                                src_file_header->file_byte_size);
 
         dest_file_header->used_data_byte_size = src_file_header->used_data_byte_size;
-        return true;
+
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
     }
 
-    bool MoleculeOS_File_System_2::read_file(File_Header* file_header,
-                                             uint8_t* buffer,
-                                             const uint32_t buffer_size,
-                                             const uint32_t offset,
-                                             const uint32_t length) noexcept {
+    status_t MoleculeOS_File_System_2::read_file(_IN_ File_Header* file_header,
+                                                 _IN_ uint8_t* buffer,
+                                                 _IN_ const uint32_t buffer_size,
+                                                 _IN_ const uint32_t offset,
+                                                 _IN_ const uint32_t length) 
+                                                 noexcept {
         using namespace stdlib;
 
-        if (file_header == nullptr) [[unlikely]]
-            return false;
+        status_t status;
+        uint8_t* src_ptr;
 
-        if (file_header->file_data_ptr == nullptr) [[unlikely]]
-           return false;
+        if (!file_header || !buffer) [[unlikely]] {
+            status = status::NULL_POINTER;
+            goto cleanup;
+        }
 
-        if (buffer == nullptr) [[unlikely]]
-            return false;
+        if (!file_header->file_data_ptr) [[unlikely]] {
+            status = status::EMPTY;
+            goto cleanup;
+        }
 
-        if (offset >= file_header->file_byte_size) [[unlikely]]
-            return false;
+        if (offset >= file_header->file_byte_size ||
+            offset + length > file_header->file_byte_size) [[unlikely]] {
+            status = status::FS_OUT_OF_SPACE;
+            goto cleanup;
+        }
 
-        if (offset + length > file_header->file_byte_size) [[unlikely]]
-            return false;
+        if (buffer_size < length) [[unlikely]]{
+            status = status::INVALID_PARAMETER;
+            goto cleanup;
+        }
 
-        if (buffer_size < length) [[unlikely]]
-            return false;
-
-        uint8_t* src_ptr = static_cast<uint8_t*>(file_header->file_data_ptr);
-        if (src_ptr == nullptr) [[unlikely]]
-           return false;
+        src_ptr = static_cast<uint8_t*>(file_header->file_data_ptr);
+        if (!src_ptr) [[unlikely]] {
+            status = status::FAIL;
+            goto cleanup;
+        }
 
         Memory_Manipulation::copy_memory_block(buffer, 
                                                src_ptr + offset, 
                                                length);
+        status = status::SUCCESS;
 
-        return true;
+    cleanup:
+        return status;
     }
 
-    bool MoleculeOS_File_System_2::resize_file_size(File_Header* file_header,
-                                                    const uint32_t new_size) 
-                                                    noexcept {
-        if (file_header == nullptr) [[unlikely]]
-            return false;
+    status_t MoleculeOS_File_System_2::resize_file_size(_IN_ File_Header* file_header,
+                                                        _IN_ const uint32_t new_size) 
+                                                        noexcept {
+        status_t status;
 
-        if (file_header->file_data_ptr == nullptr) [[unlikely]]
-            return false;
+        if (!file_header) [[unlikely]] {
+            status = status::NULL_POINTER;
+            goto cleanup;
+        }
 
-        if (heap::Block_Allocator::reallocate(file_header->file_data_ptr, new_size)
-            != status::SUCCESS) [[unlikely]] {
-            return false;
+        if (file_header->file_data_ptr) [[unlikely]] {
+            status = status::EMPTY;
+            goto cleanup;
+        }
+
+        if (new_size == 0) [[unlikely]] {
+            status = status::INVALID_PARAMETER;
+            goto cleanup;
+        }
+
+        status = heap::Block_Allocator::reallocate(file_header->file_data_ptr, 
+                                                   new_size);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
         }
 
         file_header->file_byte_size = new_size;
-
-        if (file_header->used_data_byte_size > new_size)
+        if (file_header->used_data_byte_size > new_size) [[likely]] {
             file_header->used_data_byte_size = new_size;
+        }
 
-        return true;
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
     }
 
-    bool MoleculeOS_File_System_2::is_valid_name_or_format_char(const char symbol)
+    bool MoleculeOS_File_System_2::is_valid_name_or_format_char(_IN_ const char symbol)
                                                                 noexcept {
         if (((symbol >= 'A') && (symbol <= 'Z')) ||
             ((symbol >= 'a') && (symbol <= 'z')) ||
