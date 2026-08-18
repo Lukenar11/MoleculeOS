@@ -65,3 +65,4 @@ namespace status
     constexpr status_t ATA_DEVICE_FAULT = 0x05'0000'01;
     constexpr status_t ATA_BAD_SECTOR   = 0x05'0000'02;
 } // namespace status
+
