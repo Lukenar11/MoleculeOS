@@ -113,13 +113,88 @@ namespace kernel::filesys
         return status;
     }
 
-    status_t MoleculeOS_File_System_2::create_file(_OUT_ File_Header*& file_header,
-                                                   _IN_  const char* name, 
-                                                   _IN_  const char* format, 
-                                                   _IN_  const uint32_t byte_size) 
-                                                   noexcept {
+    status_t MoleculeOS_File_System_2::check_file_not_exists(_IN_ const char* name,
+                                                             _IN_ const char* format,
+                                                             _IN_ uint32_t name_hash,
+                                                             _IN_ uint32_t format_hash) 
+                                                             noexcept {
+        status_t status;
+
+        for (uint32_t i = 0; i < file_header_table.size(); i++) [[likely]] {
+            if (file_already_exists(file_header_table[i],
+                                    name,
+                                    format,
+                                    name_hash,
+                                    format_hash) == status::ALREADY_EXISTS) {
+                status = status::ALREADY_EXISTS;
+                goto cleanup;
+            }
+        }
+
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
+    }
+
+    status_t MoleculeOS_File_System_2::find_free_file_header(_OUT_ uint32_t& index) 
+                                                             noexcept {
+        status_t status;
+
+        for (uint32_t i = 0; i < file_header_table.size(); i++) [[likely]] {
+            if (!file_header_table[i].file_data_ptr) {
+                index  = i;
+                status = status::SUCCESS;
+                goto cleanup;
+            }
+        }
+
+        status = status::FS_OUT_OF_SPACE;
+    
+    cleanup:
+        return status;
+    }
+
+    status_t MoleculeOS_File_System_2::init_file_header(_OUT_ File_Header*& header,
+                                                        _IN_  uint32_t index,
+                                                        _IN_  const char* name,
+                                                        _IN_  const char* format,
+                                                        _IN_  uint32_t name_hash,
+                                                        _IN_  uint32_t format_hash,
+                                                        _IN_  uint32_t byte_size) 
+                                                        noexcept {
         using namespace stdlib;
 
+        status_t status;
+        void* ptr;
+        File_Header& file_header = file_header_table[index];
+
+        status = heap::Block_Allocator::allocate(ptr, byte_size);
+        if (status != status::SUCCESS) [[unlikely]] {
+            header = nullptr;
+            goto cleanup;
+        }
+
+        file_header.used_data_byte_size = 0;
+        file_header.file_byte_size      = byte_size;
+        file_header.file_data_ptr       = ptr;
+        file_header.name_hash           = name_hash;
+        file_header.format_hash         = format_hash;
+
+        String_Manipulation::copy_string(file_header.file_name.data(), name);
+        String_Manipulation::copy_string(file_header.file_format.data(), format);
+
+        header = &file_header;
+
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
+    }
+
+    status_t MoleculeOS_File_System_2::find_file_for_deletion(_IN_ const char* name,
+                                                              _IN_ const char* format,
+                                                              _OUT_ uint32_t& index) noexcept {
         status_t status;
         uint32_t name_hash;
         uint32_t format_hash;
@@ -133,42 +208,94 @@ namespace kernel::filesys
         format_hash = to_fnv1a_hash(format);
 
         for (uint32_t i = 0; i < file_header_table.size(); i++) [[likely]] {
-            if (file_already_exists(file_header_table[i], 
-                                    name, 
+            if (file_already_exists(file_header_table[i],
+                                    name,
                                     format,
                                     name_hash,
-                                    format_hash) == status::ALREADY_EXISTS) [[unlikely]] {
-                status = status::ALREADY_EXISTS;
+                                    format_hash) == status::ALREADY_EXISTS) {
+                index  = i;
+                status = status::SUCCESS;
                 goto cleanup;
-            }
-
-            if (!file_header_table[i].file_data_ptr) {
-                void* ptr; 
-                heap::Block_Allocator::allocate(ptr, byte_size);
-                if (!ptr) [[unlikely]] {
-                    status = status::FAIL;
-                    goto cleanup;
-                }
-
-                file_header_table[i].used_data_byte_size = 0;
-                file_header_table[i].file_byte_size      = byte_size;
-                file_header_table[i].file_data_ptr       = ptr;
-                file_header_table[i].format_hash         = format_hash;
-                file_header_table[i].name_hash           = name_hash;
-
-                String_Manipulation::copy_string(file_header_table[i].file_format.data(), format);
-                String_Manipulation::copy_string(file_header_table[i].file_name.data(), name);
-
-                file_header = &file_header_table[i];
-                status      = status::SUCCESS;
-                goto done;
             }
         }
 
-    cleanup:
-        file_header = nullptr;
+        status = status::NOT_FOUND;
 
-    done:
+    cleanup:
+        return status;
+    }
+
+    status_t MoleculeOS_File_System_2::clear_file_data(_IN_ const uint32_t i) 
+                                                       noexcept {
+        using namespace heap;
+
+        status_t status;
+
+        if (!file_header_table[i].file_data_ptr) [[unlikely]] {
+            status = status::EMPTY;
+            goto cleanup;
+        }
+
+        status = Block_Allocator::deallocate(file_header_table[i].file_data_ptr);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        file_header_table[i].file_name.fill('\0');
+        file_header_table[i].file_format.fill('\0');
+        file_header_table[i].name_hash      = 0;
+        file_header_table[i].format_hash    = 0;
+        file_header_table[i].file_byte_size = 0;
+        file_header_table[i].file_data_ptr  = nullptr;
+
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
+    }
+
+    status_t MoleculeOS_File_System_2::create_file(_OUT_ File_Header*& file_header,
+                                                   _IN_  const char* name,
+                                                   _IN_  const char* format,
+                                                   _IN_  uint32_t byte_size) 
+                                                   noexcept {
+        status_t status;
+        uint32_t index;
+        uint32_t name_hash;
+        uint32_t format_hash;
+
+        if (byte_size == 0) [[unlikely]] {
+            status = status::INVALID_PARAMETER;
+            goto cleanup;
+        }
+
+        name_hash   = to_fnv1a_hash(name);
+        format_hash = to_fnv1a_hash(format);
+
+        status = check_file_not_exists(name, format, name_hash, format_hash);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        status = find_free_file_header(index);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        status = init_file_header(file_header,
+                                  index,
+                                  name,
+                                  format,
+                                  name_hash,
+                                  format_hash,
+                                  byte_size);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        status = status::SUCCESS;
+
+    cleanup:
         return status;
     }
 
@@ -178,40 +305,24 @@ namespace kernel::filesys
         using namespace stdlib;
 
         status_t status;
-        uint32_t name_hash;
-        uint32_t format_hash;
+        uint32_t index;
 
         status = validate_name_and_format(name, format);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
             
-        name_hash   = to_fnv1a_hash(name);
-        format_hash = to_fnv1a_hash(format);
-
-        for (uint32_t i = 0; i < file_header_table.size(); i++) [[likely]] {
-            if (file_already_exists(file_header_table[i], 
-                                    name, 
-                                    format,
-                                    name_hash,
-                                    format_hash) == status::ALREADY_EXISTS) [[likely]] {
-                if (!file_header_table[i].file_data_ptr) [[unlikely]] {
-                    heap::Block_Allocator::deallocate(file_header_table[i].file_data_ptr);
-                }
-
-                file_header_table[i].file_name.fill('\0');
-                file_header_table[i].file_format.fill('\0');
-                file_header_table[i].name_hash      = 0;
-                file_header_table[i].format_hash    = 0;
-                file_header_table[i].file_byte_size = 0;
-                file_header_table[i].file_data_ptr  = nullptr;
-
-                status = status::SUCCESS;
-                goto cleanup;
-            }
+        status = find_file_for_deletion(name, format, index);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
         }
 
-        status = status::FAIL;
+        status = clear_file_data(index);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        status = status::SUCCESS;
 
     cleanup:
         return status;
@@ -439,7 +550,6 @@ namespace kernel::filesys
 
         status = find_file(dest_file_header, dest_name, dest_format);
         if (status != status::SUCCESS) [[unlikely]] {
-            status = status::NOT_FOUND;
             goto cleanup;
         }
 

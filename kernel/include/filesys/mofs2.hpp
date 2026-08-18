@@ -53,6 +53,32 @@ namespace kernel::filesys
                                      _IN_ const uint32_t name_hash,
                                      _IN_ const uint32_t format_hash) noexcept;
 
+        static
+        status_t check_file_not_exists(_IN_ const char* name,
+                                       _IN_ const char* format,
+                                       _IN_ uint32_t name_hash,
+                                       _IN_ uint32_t format_hash) noexcept;
+
+        static
+        status_t find_free_file_header(_OUT_ uint32_t& index) noexcept;
+
+        static
+        status_t init_file_header(_OUT_ File_Header*& header,
+                                  _IN_  uint32_t index,
+                                  _IN_  const char* name,
+                                  _IN_  const char* format,
+                                  _IN_  uint32_t name_hash,
+                                  _IN_  uint32_t format_hash,
+                                  _IN_  uint32_t byte_size) noexcept;
+
+        static 
+        status_t find_file_for_deletion(_IN_ const char* name,
+                                        _IN_ const char* format,
+                                        _OUT_ uint32_t& index) noexcept;
+
+        static
+        status_t clear_file_data(_IN_ const uint32_t i) noexcept;
+
     public:
         static inline constexpr 
         File_Header& get_file_header_entry(_IN_ const uint32_t i) noexcept {
