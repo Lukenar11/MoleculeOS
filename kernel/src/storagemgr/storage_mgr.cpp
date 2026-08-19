@@ -14,7 +14,7 @@ NOTES:
 
 #include "storagemgr/storage_mgr.hpp"
 
-namespace kernel::storagmgr
+namespace kernel::storagemgr
 {
     bool Storage_Manager::read_or_write_bytes(drivers::ata::Driver_Operations op,
                                               const uint32_t offset,
@@ -250,4 +250,4 @@ namespace kernel::storagmgr
 
         return true;
     }
-} // kernel::storagmgr
+} // kernel::storagemgr

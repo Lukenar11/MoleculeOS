@@ -11,9 +11,9 @@
 {
     "files.eol": "\n",
 
-    "editor.tabSize": 4,
-    "editor.insertSpaces": true,
-    "editor.formatOnSave": false,
+    "editor.tabSize":           4,
+    "editor.insertSpaces":      true,
+    "editor.formatOnSave":      false,
     "editor.detectIndentation": false,
         "files.associations": {
         "*.asm": "nasm"
@@ -54,6 +54,5 @@
         "rodata",
         "SRST",
         "storagemgr",
-        "storagmgr"
     ]
 }

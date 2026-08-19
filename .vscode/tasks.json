@@ -12,8 +12,8 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build MoleculeOS",
-            "type": "shell",
+            "label":   "Build MoleculeOS",
+            "type":    "shell",
             "command": "./tools/build.sh",
             "options": {
                 "cwd": "${workspaceFolder}",
@@ -25,8 +25,8 @@
             "problemMatcher": ["$gcc"]
         },
         {
-            "label": "Run MoleculeOS",
-            "type": "shell",
+            "label":   "Run MoleculeOS",
+            "type":    "shell",
             "command": "./tools/run.sh",
             "options": {
                 "cwd": "${workspaceFolder}",

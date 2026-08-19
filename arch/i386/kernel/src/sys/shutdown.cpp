@@ -22,7 +22,7 @@ NOTES:
 namespace kernel::sys
 {
     void shutdown() noexcept {
-        if (!storagmgr::Storage_Manager::save_filesys())
+        if (!storagemgr::Storage_Manager::save_filesys())
             sys::panic("save failed");
         
         const uint32_t cpu_flags = save_eflags();

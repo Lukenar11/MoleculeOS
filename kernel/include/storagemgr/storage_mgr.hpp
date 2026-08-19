@@ -17,9 +17,11 @@ NOTES:
 #include "helpers.hpp"
 #include <types.hpp>
 #include <drivers.hpp>
+#include <sal.hpp>
+#include <status.hpp>
 #include <memory_manip.hpp>
 
-namespace kernel::storagmgr
+namespace kernel::storagemgr
 {
     class Storage_Manager final {
     private:
@@ -33,10 +35,11 @@ namespace kernel::storagmgr
                                                              filesys::FILE_HEADER_TABLE_ENTRYS * 
                                                              sizeof(Serialized_File_Header);
 
-        static bool read_or_write_bytes(drivers::ata::Driver_Operations op,
-                                        const uint32_t offset, 
-                                        const uint32_t size, 
-                                        void* buffer) noexcept;
+        static 
+        status_t read_or_write_bytes(_OUT_ void* buffer,
+                                     _IN_  drivers::ata::Driver_Operations op,
+                                     _IN_  const uint32_t offset, 
+                                     _IN_  const uint32_t size) noexcept;
 
     public:
         static void init() noexcept;
@@ -47,4 +50,4 @@ namespace kernel::storagmgr
         Storage_Manager() noexcept  = default;
         ~Storage_Manager() noexcept = default;
     };
-} // namespace kernel::storagmgr
+} // namespace kernel::storagemgr

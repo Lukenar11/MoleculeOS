@@ -12,15 +12,15 @@
     "version": 4,
     "configurations": [
         {
-            "name": "MoleculeOS",
-            "compilerPath": "clang++",
+            "name":             "MoleculeOS",
+            "compilerPath":     "clang++",
             "intelliSenseMode": "clang-x86",
-            "cStandard": "c17",
-            "cppStandard": "c++20",
+            "cStandard":        "c17",
+            "cppStandard":      "c++20",
             "includePath": [
                 "${workspaceFolder}",
                 "${workspaceFolder}/kernel/include",
-                "${workspaceFolder}/kernel/include/heap",
+                "${workspaceFolder}/kernel/include/allocator",
                 "${workspaceFolder}/kernel/include/filesys",
                 "${workspaceFolder}/runtime/stdlib/include",
                 "${workspaceFolder}/runtime/apis",

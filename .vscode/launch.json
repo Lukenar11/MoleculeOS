@@ -12,21 +12,21 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Run MoleculeOS in QEMU",
-            "type": "cppdbg",
+            "name":    "Run MoleculeOS in QEMU",
+            "type":    "cppdbg",
             "request": "launch",
             "program": "/usr/bin/qemu-sys-i386",
             "args": [
                 "-cdrom",
                 "${workspaceFolder}/build/MoleculeOS.iso"
             ],
-            "cwd": "${workspaceFolder}",
+            "cwd":             "${workspaceFolder}",
             "externalConsole": true,
-            "MIMode": "gdb",
-            "miDebuggerPath": "/usr/bin/gdb",
+            "MIMode":          "gdb",
+            "miDebuggerPath":  "/usr/bin/gdb",
             "pipeTransport": {
-                "pipeProgram": "wsl.exe",
-                "pipeArgs": [],
+                "pipeProgram":  "wsl.exe",
+                "pipeArgs":     [],
                 "debuggerPath": "/usr/bin/gdb"
             }
         }
