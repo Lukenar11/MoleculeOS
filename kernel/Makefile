@@ -6,8 +6,8 @@
 
 COMMON_FLAGS += -Ikernel/include \
 				-Ikernel/include/filesys \
-				-Ikernel/include/allocator \
-				-Ikernel/include/storagemgr \
+				-Ikernel/include/heap \
+				-Ikernel/include/storemgr \
 
 include kernel/src/Makefile
 

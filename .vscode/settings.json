@@ -53,6 +53,6 @@
         "resb",
         "rodata",
         "SRST",
-        "storagemgr",
+        "storemgr",
     ]
 }

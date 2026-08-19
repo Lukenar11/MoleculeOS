@@ -24,7 +24,7 @@ namespace kernel::sys
         const uint8_t input_buffer_full = 0x02;
         const uint8_t zero              = 0;
 
-        if (!storagemgr::Storage_Manager::save_filesys())
+        if (!storemgr::Storage_Manager::save_filesys())
             panic("save failed");
 
         uint32_t timeout = 100'000;

@@ -30,9 +30,9 @@ namespace kernel
 
         heap::Block_Allocator::init(&heap::heap_start, &heap::heap_end);
         drivers::ata::Programmable_Input_Output::init();
-        storagemgr::Storage_Manager::init();
+        storemgr::Storage_Manager::init();
 
-        if (!storagemgr::Storage_Manager::load_filesys())
+        if (!storemgr::Storage_Manager::load_filesys())
             sys::panic("load failed");
 
         // schedule MoleculeOS
@@ -40,10 +40,10 @@ namespace kernel
         while (true) {
             sys::sleep();
             terminal.step();
-            storagemgr::Storage_Manager::load_filesys();
+            storemgr::Storage_Manager::load_filesys();
         }
 
-        if (!storagemgr::Storage_Manager::save_filesys())
+        if (!storemgr::Storage_Manager::save_filesys())
             sys::panic("save failed");
 
         sys::panic("Unexpected return from the \"kernel_main\" scheduler main loop");

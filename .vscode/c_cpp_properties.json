@@ -20,8 +20,9 @@
             "includePath": [
                 "${workspaceFolder}",
                 "${workspaceFolder}/kernel/include",
-                "${workspaceFolder}/kernel/include/allocator",
+                "${workspaceFolder}/kernel/include/heap",
                 "${workspaceFolder}/kernel/include/filesys",
+                "${workspaceFolder}/kernel/include/storemgr",
                 "${workspaceFolder}/runtime/stdlib/include",
                 "${workspaceFolder}/runtime/apis",
                 "${workspaceFolder}/runtime/types",

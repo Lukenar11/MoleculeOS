@@ -16,7 +16,7 @@ NOTES:
 
 #pragma once
 
-#include "allocator/helpers.hpp"
+#include "heap/helpers.hpp"
 #include <types.hpp>
 #include <sal.hpp>
 #include <kernel.hpp>

@@ -25,7 +25,7 @@ NOTES:
 #include <types.hpp>
 #include <array.hpp>
 
-namespace kernel::storagemgr
+namespace kernel::storemgr
 {
     struct Filesys_Header final {
         stdlib::Array<char, 5> magic;
@@ -44,4 +44,4 @@ namespace kernel::storagemgr
         uint32_t used_data_byte_size = 0;
         uint32_t file_data_offset    = 0;
     };
-} // namespace kernel::storagemgr
+} // namespace kernel::storemgr
