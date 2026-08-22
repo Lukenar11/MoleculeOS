@@ -110,7 +110,7 @@ namespace kernel::storemgr
         }
     }
 
-    bool Storage_Manager::save_filesys() noexcept {
+    bool Storage_Manager::save_filesystem() noexcept {
         using namespace stdlib;
         using namespace kernel::filesys;
 
@@ -180,7 +180,7 @@ namespace kernel::storemgr
         return true;
     }
 
-    bool Storage_Manager::load_filesys() noexcept {
+    bool Storage_Manager::load_filesystem() noexcept {
         using namespace stdlib;
         using namespace kernel::filesys;
         using namespace heap;

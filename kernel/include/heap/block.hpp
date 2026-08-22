@@ -79,9 +79,8 @@ namespace kernel::heap
                                             noexcept;
 
         static
-        status_t validate_allocate_size(_IN_ const uint32_t size,
-                                        _OUT_ uint32_t& blocks_needed) 
-                                        noexcept;
+        status_t validate_allocate_size(_OUT_ uint32_t& blocks_needed,
+                                        _IN_  const uint32_t size) noexcept;
 
         static
         status_t find_free_memory_region(_OUT_ uint32_t& index,

@@ -12,7 +12,7 @@ DESCRIPTION:
     SAL Explanation:
         - _IN_    => Input
         - _OUT_   => Output
-        - _INOUT_ => Input & Output
+        - _INOUT_ => input => 2. output
 
 NOTES:
 */

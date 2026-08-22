@@ -42,8 +42,8 @@ namespace kernel::storemgr
     public:
         static void init() noexcept;
 
-        static bool save_filesys() noexcept;
-        static bool load_filesys() noexcept;
+        static bool save_filesystem() noexcept;
+        static bool load_filesystem() noexcept;
 
         Storage_Manager() noexcept  = default;
         ~Storage_Manager() noexcept = default;

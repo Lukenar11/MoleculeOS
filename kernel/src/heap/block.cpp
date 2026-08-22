@@ -98,8 +98,8 @@ namespace kernel::heap
         return true;
     }
 
-    status_t Block_Allocator::validate_allocate_size(_IN_ const uint32_t size,
-                                                     _OUT_ uint32_t& blocks_needed) 
+    status_t Block_Allocator::validate_allocate_size(_OUT_ uint32_t& blocks_needed,
+                                                     _IN_  const uint32_t size) 
                                                      noexcept {
         status_t status;
         
@@ -252,7 +252,7 @@ namespace kernel::heap
         uint32_t blocks_needed;
         uint32_t index;
     
-        status = validate_allocate_size(size, blocks_needed);
+        status = validate_allocate_size(blocks_needed, size);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -262,7 +262,12 @@ namespace kernel::heap
             goto cleanup;
         }
     
-        ptr    = set_allocation_sizes_entry(blocks_needed, index);
+        ptr = set_allocation_sizes_entry(blocks_needed, index);
+        // if (!ptr) [[unlikely]] {
+        //     status = status::FAIL;
+        //     goto cleanup;
+        // }
+
         status = status::SUCCESS;
     
         goto done;

@@ -19,6 +19,7 @@ NOTES:
 */
 
 #include <kernel.hpp>
+#include <status.hpp>
 #include <terminal.hpp>
 #include <drivers.hpp>
 
@@ -32,19 +33,24 @@ namespace kernel
         drivers::ata::Programmable_Input_Output::init();
         storemgr::Storage_Manager::init();
 
-        if (!storemgr::Storage_Manager::load_filesys())
+        if (!storemgr::Storage_Manager::load_filesystem()) [[unlikely]] {
             sys::panic("load failed");
+        }
 
         // schedule MoleculeOS
         static terminal::Terminal terminal;
         while (true) {
             sys::sleep();
             terminal.step();
-            storemgr::Storage_Manager::load_filesys();
+
+            if (!storemgr::Storage_Manager::save_filesystem()) [[unlikely]] {
+                sys::panic("save failed");
+            }
         }
 
-        if (!storemgr::Storage_Manager::save_filesys())
+        if (!storemgr::Storage_Manager::save_filesystem()) [[unlikely]] {
             sys::panic("save failed");
+        }
 
         sys::panic("Unexpected return from the \"kernel_main\" scheduler main loop");
     }
