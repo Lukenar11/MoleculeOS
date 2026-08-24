@@ -35,8 +35,7 @@ namespace kernel::filesys
     class MoleculeOS_File_System_2 final {
     private:
         static 
-        inline stdlib::Array<File_Header, 
-                             FILE_HEADER_TABLE_ENTRYS> file_header_table;
+        inline stdlib::Array<File_Entry, FILE_TABLE_ENTRYS> file_entry_table;
 
         static 
         uint32_t to_fnv1a_hash(_IN_ const char* txt) noexcept;
@@ -47,7 +46,7 @@ namespace kernel::filesys
                                           _IN_ const char* format) noexcept;
 
         static 
-        status_t file_already_exists(_IN_ const File_Header& file_header, 
+        status_t file_already_exists(_IN_ const File_Entry& file_entry, 
                                      _IN_ const char* name, 
                                      _IN_ const char* format,
                                      _IN_ const uint32_t name_hash,
@@ -60,10 +59,10 @@ namespace kernel::filesys
                                        _IN_ uint32_t format_hash) noexcept;
 
         static
-        status_t find_free_file_header(_OUT_ uint32_t& index) noexcept;
+        status_t find_free_file_entry(_OUT_ uint32_t& index) noexcept;
 
         static
-        status_t init_file_header(_OUT_ File_Header*& header,
+        status_t init_file_entry(_OUT_ File_Entry*& header,
                                   _IN_  uint32_t index,
                                   _IN_  const char* name,
                                   _IN_  const char* format,
@@ -81,18 +80,18 @@ namespace kernel::filesys
 
     public:
         static inline constexpr 
-        File_Header& get_file_header_entry(_IN_ const uint32_t i) noexcept {
-            return file_header_table[i];
+        File_Entry& get_file_entry(_IN_ const uint32_t i) noexcept {
+            return file_entry_table[i];
         }
 
         static inline constexpr 
-        void set_file_header_entry(_IN_ const File_Header& file_header, 
-                                   _IN_ const uint32_t i) noexcept {
-            file_header_table[i] = file_header;
+        void set_file_entry(_IN_ const File_Entry& file_entry, 
+                            _IN_ const uint32_t i) noexcept {
+            file_entry_table[i] = file_entry;
         }
 
         static 
-        status_t create_file(_OUT_ File_Header*& file_header,
+        status_t create_file(_OUT_ File_Entry*& file_entry,
                              _IN_  const char* name, 
                              _IN_  const char* format, 
                              _IN_  const uint32_t byte_size) noexcept;
@@ -102,24 +101,24 @@ namespace kernel::filesys
                              _IN_ const char* file_format) noexcept;
 
         static 
-        status_t find_file(_OUT_ File_Header*& file_header,
+        status_t find_file(_OUT_ File_Entry*& file_entry,
                            _IN_  const char* name,
                            _IN_  const char* format) noexcept;
 
         static 
-        status_t write_file(_IN_ File_Header* file_header,
+        status_t write_file(_IN_ File_Entry* file_entry,
                             _IN_ const uint32_t offset,
                             _IN_ const uint32_t length,
                             _IN_ const uint32_t data_size,
                             _IN_ const uint8_t* data) noexcept;
 
         static 
-        status_t append_file(_IN_ File_Header* file_header,
+        status_t append_file(_IN_ File_Entry* file_entry,
                              _IN_ const uint8_t* data,
                              _IN_ const uint32_t data_size) noexcept;
 
         static 
-        status_t clear_file(_IN_ File_Header* file_header) noexcept;
+        status_t clear_file(_IN_ File_Entry* file_entry) noexcept;
 
         static 
         status_t rename_file(_IN_ const char* old_name,
@@ -134,14 +133,14 @@ namespace kernel::filesys
                            _IN_ const char* dest_format) noexcept;
 
         static 
-        status_t read_file(_IN_ File_Header* file_header,
+        status_t read_file(_IN_ File_Entry* file_entry,
                           _IN_ uint8_t* buffer,
                           _IN_ const uint32_t buffer_size,
                           _IN_ const uint32_t offset,
                           _IN_ const uint32_t length) noexcept;
 
         static 
-        status_t resize_file_size(_IN_ File_Header* file_header,
+        status_t resize_file_size(_IN_ File_Entry* file_entry,
                                   _IN_ const uint32_t new_size) noexcept;
 
         static 

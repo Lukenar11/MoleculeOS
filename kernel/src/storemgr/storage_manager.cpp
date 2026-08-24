@@ -175,15 +175,15 @@ namespace kernel::storemgr
         return status;
     }
 
-    status_t Storage_Manager::read_filesystem_header(_OUT_ Filesys_Header& header) 
+    status_t Storage_Manager::read_filesystem_header(_OUT_ MOFS_Header& header) 
                                                      noexcept {
         using namespace drivers;
 
         status_t status;
 
         status = read_or_write_bytes(ata::Operations::READ,
-                                     FILESYS_HEADER_OFFSET,
-                                     sizeof(Filesys_Header),
+                                     MOFS_HEADER_OFFSET,
+                                     sizeof(MOFS_Header),
                                      &header);
         if (status != status::SUCCESS) [[unlikely]] {
             status = status::FAIL;
@@ -196,9 +196,9 @@ namespace kernel::storemgr
         }
 
         if (stdlib::String_Manipulation::compare_strings(header.magic.data(),
-                                                         FILESYS_HEADER_MAGIC)
+                                                         MOFS_HEADER_MAGIC)
             != status::EQUAL_TO) [[unlikely]] {
-            status = status::FS_INVALID_FILE_HEADER;
+            status = status::FS_INVALID_FILE_ENTRY;
             goto cleanup;
         }
 
@@ -208,7 +208,7 @@ namespace kernel::storemgr
         return status;
     }
 
-    status_t Storage_Manager::write_filesystem_header(_IN_ Filesys_Header& header) 
+    status_t Storage_Manager::write_filesystem_header(_IN_ MOFS_Header& header) 
                                                       noexcept {
         using namespace filesys;
         using namespace drivers;
@@ -216,19 +216,19 @@ namespace kernel::storemgr
         status_t status;
 
         status = stdlib::String_Manipulation::copy_string(header.magic.data(),
-                                                          FILESYS_HEADER_MAGIC);
+                                                          MOFS_HEADER_MAGIC);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        header.version                  = MOFS_VERSION;
-        header.file_header_count        = FILE_HEADER_TABLE_ENTRYS;
-        header.file_header_table_offset = FILE_HEADER_TABLE_OFFSET;
-        header.data_offset              = FILESYS_DATA_OFFSET;
+        header.version                 = MOFS_VERSION;
+        header.file_entry_count        = FILE_TABLE_ENTRYS;
+        header.file_entry_table_offset = FILE_ENTRY_TABLE_OFFSET;
+        header.data_offset             = FILESYS_DATA_OFFSET;
 
         status = read_or_write_bytes(ata::Operations::WRITE,
-                                     FILESYS_HEADER_OFFSET,
-                                     sizeof(Filesys_Header),
+                                     MOFS_HEADER_OFFSET,
+                                     sizeof(MOFS_Header),
                                      &header);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
@@ -240,8 +240,8 @@ namespace kernel::storemgr
         return status;
     }
 
-    status_t Storage_Manager::load_single_file(_IN_ const Filesys_Header& header,
-                                               _IN_ const Serialized_File_Header& serialized,
+    status_t Storage_Manager::load_single_file(_IN_ const MOFS_Header& header,
+                                               _IN_ const Stored_File_Entry& stored,
                                                _IN_ const uint32_t index) noexcept {
         using namespace filesys;
         using namespace drivers;
@@ -249,55 +249,54 @@ namespace kernel::storemgr
         status_t status;
         void* data_ptr;
         uint32_t file_offset;
-        File_Header file_header;
+        File_Entry file_entry;
 
         const uint32_t name_length   = filesys::MAX_FILE_NAME_LENGTH + 1;
         const uint32_t format_length = filesys::MAX_FILE_FORMAT_LENGTH + 1;
 
-        if (serialized.file_byte_size == 0) [[unlikely]] {
+        if (stored.file_byte_size == 0) [[unlikely]] {
             status = status::SUCCESS;
             goto cleanup;
         }
 
         status = heap::Block_Allocator::allocate(data_ptr, 
-                                                 serialized.file_byte_size);
+                                                 stored.file_byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        file_offset = header.data_offset + serialized.file_data_offset;
+        file_offset = header.data_offset + stored.file_data_offset;
 
         status = read_or_write_bytes(ata::Operations::READ,
                                      file_offset,
-                                     serialized.file_byte_size,
+                                     stored.file_byte_size,
                                      data_ptr);
         if (status != status::SUCCESS) [[unlikely]] {
             heap::Block_Allocator::deallocate(data_ptr);
             goto cleanup;
         }
 
-        status = stdlib::Memory_Manipulation::copy_memory_block(file_header.file_name.data(),
-                                                                serialized.file_name.data(),
+        status = stdlib::Memory_Manipulation::copy_memory_block(file_entry.file_name.data(),
+                                                                stored.file_name.data(),
                                                                 name_length);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        status = stdlib::Memory_Manipulation::copy_memory_block(file_header.file_format.data(),
-                                                                serialized.file_format.data(),
+        status = stdlib::Memory_Manipulation::copy_memory_block(file_entry.file_format.data(),
+                                                                stored.file_format.data(),
                                                                 format_length);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        file_header.name_hash           = serialized.name_hash;
-        file_header.format_hash         = serialized.format_hash;
-        file_header.file_byte_size      = serialized.file_byte_size;
-        file_header.used_data_byte_size = serialized.used_data_byte_size;
-        file_header.file_data_ptr       = data_ptr;
+        file_entry.name_hash           = stored.name_hash;
+        file_entry.format_hash         = stored.format_hash;
+        file_entry.file_byte_size      = stored.file_byte_size;
+        file_entry.used_data_byte_size = stored.used_data_byte_size;
+        file_entry.file_data_ptr       = data_ptr;
 
-        filesys::MoleculeOS_File_System_2::set_file_header_entry(file_header, 
-                                                                 index);
+        filesys::MoleculeOS_File_System_2::set_file_entry(file_entry, index);
 
         status = status::SUCCESS;
 
@@ -305,54 +304,54 @@ namespace kernel::storemgr
         return status;
     }
 
-    status_t Storage_Manager::serialize_single_file(_INOUT_ uint32_t& current_data_offset,
-                                                    _OUT_   Serialized_File_Header& serialized,
-                                                    _IN_    filesys::File_Header& file_header,
-                                                    _IN_    const Filesys_Header& header) noexcept {
+    status_t Storage_Manager::store_single_file(_INOUT_ uint32_t& current_data_offset,
+                                                _OUT_   Stored_File_Entry& stored,
+                                                _IN_    filesys::File_Entry& file_entry,
+                                                _IN_    const MOFS_Header& header) noexcept {
         using namespace filesys;
         using namespace drivers;
 
         status_t status;
 
-        if (!file_header.file_data_ptr) [[unlikely]] {
+        if (!file_entry.file_data_ptr) [[unlikely]] {
             status = status::EMPTY;
             goto cleanup;
         }
 
-        if (file_header.file_byte_size == 0) [[unlikely]] {
+        if (file_entry.file_byte_size == 0) [[unlikely]] {
             status = status::EMPTY;
             goto cleanup;
         }
 
-        status = stdlib::Memory_Manipulation::copy_memory_block(serialized.file_name.data(),
-                                                                file_header.file_name.data(),
+        status = stdlib::Memory_Manipulation::copy_memory_block(stored.file_name.data(),
+                                                                file_entry.file_name.data(),
                                                                 MAX_FILE_NAME_LENGTH + 1);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        status = stdlib::Memory_Manipulation::copy_memory_block(serialized.file_format.data(),
-                                                                file_header.file_format.data(),
+        status = stdlib::Memory_Manipulation::copy_memory_block(stored.file_format.data(),
+                                                                file_entry.file_format.data(),
                                                                 MAX_FILE_FORMAT_LENGTH + 1);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        serialized.name_hash           = file_header.name_hash;
-        serialized.format_hash         = file_header.format_hash;
-        serialized.file_byte_size      = file_header.file_byte_size;
-        serialized.used_data_byte_size = file_header.used_data_byte_size;
-        serialized.file_data_offset    = current_data_offset;
+        stored.name_hash           = file_entry.name_hash;
+        stored.format_hash         = file_entry.format_hash;
+        stored.file_byte_size      = file_entry.file_byte_size;
+        stored.used_data_byte_size = file_entry.used_data_byte_size;
+        stored.file_data_offset    = current_data_offset;
 
         status = read_or_write_bytes(ata::Operations::WRITE,
                                      header.data_offset + current_data_offset,
-                                     file_header.file_byte_size,
-                                     file_header.file_data_ptr);
+                                     file_entry.file_byte_size,
+                                     file_entry.file_data_ptr);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        current_data_offset += file_header.file_byte_size;
+        current_data_offset += file_entry.file_byte_size;
 
         status = status::SUCCESS;
 
@@ -360,19 +359,19 @@ namespace kernel::storemgr
         return status;
     }
 
-    status_t Storage_Manager::write_file_header_table(_OUT_ Serialized_File_Header* table,
-                                                      _IN_  const Filesys_Header& header)
+    status_t Storage_Manager::write_file_entry_table(_OUT_ Stored_File_Entry* table,
+                                                      _IN_  const MOFS_Header& header)
                                                       noexcept {
         using namespace drivers;
         using namespace filesys;
 
         status_t status;
-        const uint32_t file_header_table_size = header.file_header_count * 
-                                                sizeof(Serialized_File_Header);
+        const uint32_t file_entry_table_size = header.file_entry_count * 
+                                                sizeof(Stored_File_Entry);
 
         status = read_or_write_bytes(ata::Operations::WRITE,
-                                     header.file_header_table_offset,
-                                     file_header_table_size,
+                                     header.file_entry_table_offset,
+                                     file_entry_table_size,
                                      table);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
@@ -388,25 +387,25 @@ namespace kernel::storemgr
         using namespace drivers;
         using namespace filesys;
 
-        Filesys_Header header;
+        MOFS_Header header;
 
         read_or_write_bytes(ata::Operations::READ,
-                            FILESYS_HEADER_OFFSET,
+                            MOFS_HEADER_OFFSET,
                             sizeof(header),
                             &header);
 
         if (stdlib::String_Manipulation::compare_strings(header.magic.data(), 
-                                                         FILESYS_HEADER_MAGIC)
-            != status::EQUAL_TO) {
+                                                         MOFS_HEADER_MAGIC)
+            != status::EQUAL_TO) [[unlikely]] {
             stdlib::String_Manipulation::copy_string(header.magic.data(), 
-                                                     FILESYS_HEADER_MAGIC);
-            header.version                  = MOFS_VERSION;
-            header.file_header_count        = FILE_HEADER_TABLE_ENTRYS;
-            header.file_header_table_offset = FILE_HEADER_TABLE_OFFSET;
-            header.data_offset              = FILESYS_DATA_OFFSET;
+                                                     MOFS_HEADER_MAGIC);
+            header.version                 = MOFS_VERSION;
+            header.file_entry_count        = FILE_TABLE_ENTRYS;
+            header.file_entry_table_offset = FILE_ENTRY_TABLE_OFFSET;
+            header.data_offset             = FILESYS_DATA_OFFSET;
 
             read_or_write_bytes(ata::Operations::WRITE,
-                                FILESYS_HEADER_OFFSET,
+                                MOFS_HEADER_OFFSET,
                                 sizeof(header),
                                 &header);
         }
@@ -417,36 +416,36 @@ namespace kernel::storemgr
         using namespace filesys;
 
         status_t status;
-        Filesys_Header header;
-        static stdlib::Array<Serialized_File_Header,
-                             FILE_HEADER_TABLE_ENTRYS> serialized_file_headers;
+        MOFS_Header header;
+        static stdlib::Array<Stored_File_Entry, 
+                             FILE_TABLE_ENTRYS> stored_file_entrys;
 
         uint32_t current_data_offset = 0;
 
-        serialized_file_headers.fill(Serialized_File_Header{});
+        stored_file_entrys.fill(Stored_File_Entry{});
 
         status = write_filesystem_header(header);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        for (uint32_t i = 0; i < header.file_header_count; ++i) [[likely]] {
-            File_Header& file_header = MoleculeOS_File_System_2::get_file_header_entry(i);
+        for (uint32_t i = 0; i < header.file_entry_count; ++i) [[likely]] {
+            File_Entry& file_entry = MoleculeOS_File_System_2::get_file_entry(i);
 
-            if (file_header.used_data_byte_size == 0) [[unlikely]] {
+            if (file_entry.used_data_byte_size == 0) [[unlikely]] {
                 continue;
             }
 
-            status = serialize_single_file(current_data_offset,
-                                           serialized_file_headers[i],
-                                           file_header,
-                                           header);
+            status = store_single_file(current_data_offset,
+                                       stored_file_entrys[i],
+                                       file_entry,
+                                       header);
             if (status != status::SUCCESS) [[unlikely]]{
                 goto cleanup;
             }
         }
 
-        status = write_file_header_table(serialized_file_headers.data(), 
+        status = write_file_entry_table(stored_file_entrys.data(), 
                                          header);
         if (status != status::SUCCESS) [[unlikely]]{
             goto cleanup;
@@ -462,9 +461,9 @@ namespace kernel::storemgr
         using namespace drivers;
         
         status_t status;
-        Filesys_Header header;
-        stdlib::Array<Serialized_File_Header, 
-                      filesys::FILE_HEADER_TABLE_ENTRYS> serialized_file_headers;
+        MOFS_Header header;
+        stdlib::Array<Stored_File_Entry, 
+                      filesys::FILE_TABLE_ENTRYS> stored_file_entrys;
         uint32_t table_size;
 
         status = read_filesystem_header(header);
@@ -472,18 +471,18 @@ namespace kernel::storemgr
             goto cleanup;
         }
 
-        table_size = header.file_header_count * sizeof(Serialized_File_Header);
+        table_size = header.file_entry_count * sizeof(Stored_File_Entry);
 
         status = read_or_write_bytes(ata::Operations::READ,
-                                     header.file_header_table_offset,
+                                     header.file_entry_table_offset,
                                      table_size,
-                                     serialized_file_headers.data());
+                                     stored_file_entrys.data());
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        for (uint32_t i = 0; i < header.file_header_count; ++i) [[likely]] {
-            status = load_single_file(header, serialized_file_headers[i], i);
+        for (uint32_t i = 0; i < header.file_entry_count; ++i) [[likely]] {
+            status = load_single_file(header, stored_file_entrys[i], i);
             if (status != status::SUCCESS) [[unlikely]] {
                 goto cleanup;
             }

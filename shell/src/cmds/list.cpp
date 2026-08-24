@@ -28,30 +28,30 @@ namespace shell::commands
         stdlib::Text_Output::reset();
         stdlib::Text_Output::put_string("Files:\n");
 
-        File_Header file_header;
-        for (uint32_t i = 0; i < FILE_HEADER_TABLE_ENTRYS; i++) [[likely]] {
-            file_header = MoleculeOS_File_System_2::get_file_header_entry(i);
+        File_Entry file_entry;
+        for (uint32_t i = 0; i < FILE_TABLE_ENTRYS; i++) [[likely]] {
+            file_entry = MoleculeOS_File_System_2::get_file_entry(i);
 
-            if (!file_header.file_data_ptr) {
+            if (!file_entry.file_data_ptr) {
                 continue;
             }
 
-            if (file_header.file_name[0] == '\0') [[unlikely]] {
+            if (file_entry.file_name[0] == '\0') [[unlikely]] {
                 static const char* error_message = "\t- [INVALID FILE]\n";
                 stdlib::Text_Output::put_string(error_message);
                 continue;
             }
 
             stdlib::Text_Output::put_string("\t- ");
-            stdlib::Text_Output::put_string(file_header.file_name.data());
+            stdlib::Text_Output::put_string(file_entry.file_name.data());
 
-            if (file_header.file_format[0] != '\0') {
+            if (file_entry.file_format[0] != '\0') {
                 stdlib::Text_Output::put_char('.');
-                stdlib::Text_Output::put_string(file_header.file_format.data());
+                stdlib::Text_Output::put_string(file_entry.file_format.data());
             }
 
             stdlib::Text_Output::put_string(" (");
-            stdlib::Text_Output::put_uint(file_header.file_byte_size);
+            stdlib::Text_Output::put_uint(file_entry.file_byte_size);
             stdlib::Text_Output::put_string(" Bytes)\n");
         }
 

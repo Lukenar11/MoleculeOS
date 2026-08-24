@@ -42,11 +42,11 @@ namespace shell::commands
             return;
         }
 
-        File_Header* file_header;
-        MoleculeOS_File_System_2::find_file(file_header, 
+        File_Entry* file_entry;
+        MoleculeOS_File_System_2::find_file(file_entry, 
                                             parsed_filename.name.data(), 
                                             parsed_filename.format.data());
-        if (!file_header) {
+        if (!file_entry) {
             print_command_error(command_name);
             print_command_error("file not found");
 
@@ -58,7 +58,7 @@ namespace shell::commands
         uint32_t blocks = 0;
         if (!kernel::heap::Block_Allocator::get_allocation_info(index,
                                                                 blocks,
-                                                                file_header->file_data_ptr)) {
+                                                                file_entry->file_data_ptr)) {
             print_command_error(command_name);
             print_command_error("allocation info not available");
 

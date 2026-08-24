@@ -25,15 +25,15 @@ namespace kernel::storemgr
 {
     class Storage_Manager final {
     private:
-        static constexpr const char* FILESYS_HEADER_MAGIC = "MOFS";
+        static constexpr const char* MOFS_HEADER_MAGIC = "MOFS";
 
-        static constexpr uint32_t MOFS_VERSION          = 2;
-        static constexpr uint32_t FILESYS_HEADER_OFFSET = 0;
-        static constexpr uint32_t SECTOR_SIZE           = drivers::ata::SECTOR_SIZE;
-        static constexpr uint32_t FILE_HEADER_TABLE_OFFSET = SECTOR_SIZE;
-        static constexpr uint32_t FILESYS_DATA_OFFSET      = FILE_HEADER_TABLE_OFFSET + 
-                                                             filesys::FILE_HEADER_TABLE_ENTRYS * 
-                                                             sizeof(Serialized_File_Header);
+        static constexpr uint32_t MOFS_VERSION            = 2;
+        static constexpr uint32_t MOFS_HEADER_OFFSET      = 0;
+        static constexpr uint32_t SECTOR_SIZE             = drivers::ata::SECTOR_SIZE;
+        static constexpr uint32_t FILE_ENTRY_TABLE_OFFSET = SECTOR_SIZE;
+        static constexpr uint32_t FILESYS_DATA_OFFSET     = FILE_ENTRY_TABLE_OFFSET + 
+                                                            filesys::FILE_TABLE_ENTRYS * 
+                                                            sizeof(Stored_File_Entry);
         
         static
         status_t read_bytes(_IN_  const uint32_t start_sector,
@@ -58,27 +58,26 @@ namespace kernel::storemgr
                                      _INOUT_ void* buffer) noexcept;
 
         static
-        status_t read_filesystem_header(_OUT_ Filesys_Header& header) noexcept;
+        status_t read_filesystem_header(_OUT_ MOFS_Header& header) noexcept;
 
         static
-        status_t write_filesystem_header(_IN_ Filesys_Header& header) noexcept;
+        status_t write_filesystem_header(_IN_ MOFS_Header& header) noexcept;
         
         static
-        status_t load_single_file(_IN_ const Filesys_Header& header,
-                                  _IN_ const Serialized_File_Header& serialized,
+        status_t load_single_file(_IN_ const MOFS_Header& header,
+                                  _IN_ const Stored_File_Entry& stored,
                                   _IN_ const uint32_t index) noexcept;
 
         static
-        status_t serialize_single_file(_INOUT_ uint32_t& current_data_offset,
-                                       _OUT_   Serialized_File_Header& serialized,
-                                       _IN_    filesys::File_Header& file_header,
-                                       _IN_    const Filesys_Header& header) 
-                                       noexcept;
+        status_t store_single_file(_INOUT_ uint32_t& current_data_offset,
+                                   _OUT_   Stored_File_Entry& stored,
+                                   _IN_    filesys::File_Entry& file_entry,
+                                   _IN_    const MOFS_Header& header) noexcept;
 
         static
-        status_t write_file_header_table(_OUT_ Serialized_File_Header* table,
-                                         _IN_  const Filesys_Header& header) 
-                                         noexcept;
+        status_t write_file_entry_table(_OUT_ Stored_File_Entry* table,
+                                        _IN_  const MOFS_Header& header) 
+                                        noexcept;
     
     public:
         static 

@@ -77,7 +77,7 @@ namespace kernel::filesys
         return status;
     }
     
-    status_t MoleculeOS_File_System_2::file_already_exists(_IN_ const File_Header& file_header, 
+    status_t MoleculeOS_File_System_2::file_already_exists(_IN_ const File_Entry& file_entry, 
                                                            _IN_ const char* name, 
                                                            _IN_ const char* format,
                                                            _IN_ const uint32_t name_hash,
@@ -94,12 +94,12 @@ namespace kernel::filesys
             goto cleanup;
         }
 
-        if (file_header.name_hash == name_hash && 
-            file_header.format_hash == format_hash) {
+        if (file_entry.name_hash == name_hash && 
+            file_entry.format_hash == format_hash) {
             name_status = String_Manipulation::compare_strings(name, 
-                                                               file_header.file_name.data());
+                                                               file_entry.file_name.data());
             format_status = String_Manipulation::compare_strings(format, 
-                                                                 file_header.file_format.data());
+                                                                 file_entry.file_format.data());
             if (name_status == status::EQUAL_TO && 
                 format_status == status::EQUAL_TO) {
                 status = status::ALREADY_EXISTS;
@@ -120,8 +120,8 @@ namespace kernel::filesys
                                                              noexcept {
         status_t status;
 
-        for (uint32_t i = 0; i < file_header_table.size(); i++) [[likely]] {
-            if (file_already_exists(file_header_table[i],
+        for (uint32_t i = 0; i < file_entry_table.size(); i++) [[likely]] {
+            if (file_already_exists(file_entry_table[i],
                                     name,
                                     format,
                                     name_hash,
@@ -137,12 +137,12 @@ namespace kernel::filesys
         return status;
     }
 
-    status_t MoleculeOS_File_System_2::find_free_file_header(_OUT_ uint32_t& index) 
+    status_t MoleculeOS_File_System_2::find_free_file_entry(_OUT_ uint32_t& index) 
                                                              noexcept {
         status_t status;
 
-        for (uint32_t i = 0; i < file_header_table.size(); i++) [[likely]] {
-            if (!file_header_table[i].file_data_ptr) {
+        for (uint32_t i = 0; i < file_entry_table.size(); i++) [[likely]] {
+            if (!file_entry_table[i].file_data_ptr) {
                 index  = i;
                 status = status::SUCCESS;
                 goto cleanup;
@@ -155,7 +155,7 @@ namespace kernel::filesys
         return status;
     }
 
-    status_t MoleculeOS_File_System_2::init_file_header(_OUT_ File_Header*& header,
+    status_t MoleculeOS_File_System_2::init_file_entry(_OUT_ File_Entry*& header,
                                                         _IN_  uint32_t index,
                                                         _IN_  const char* name,
                                                         _IN_  const char* format,
@@ -167,7 +167,7 @@ namespace kernel::filesys
 
         status_t status;
         void* ptr;
-        File_Header& file_header = file_header_table[index];
+        File_Entry& file_entry = file_entry_table[index];
 
         status = heap::Block_Allocator::allocate(ptr, byte_size);
         if (status != status::SUCCESS || !ptr) [[unlikely]] {
@@ -175,16 +175,16 @@ namespace kernel::filesys
             goto cleanup;
         }
 
-        file_header.used_data_byte_size = 0;
-        file_header.file_byte_size      = byte_size;
-        file_header.file_data_ptr       = ptr;
-        file_header.name_hash           = name_hash;
-        file_header.format_hash         = format_hash;
+        file_entry.used_data_byte_size = 0;
+        file_entry.file_byte_size      = byte_size;
+        file_entry.file_data_ptr       = ptr;
+        file_entry.name_hash           = name_hash;
+        file_entry.format_hash         = format_hash;
 
-        String_Manipulation::copy_string(file_header.file_name.data(), name);
-        String_Manipulation::copy_string(file_header.file_format.data(), format);
+        String_Manipulation::copy_string(file_entry.file_name.data(), name);
+        String_Manipulation::copy_string(file_entry.file_format.data(), format);
 
-        header = &file_header;
+        header = &file_entry;
 
         status = status::SUCCESS;
 
@@ -207,8 +207,8 @@ namespace kernel::filesys
         name_hash   = to_fnv1a_hash(name);
         format_hash = to_fnv1a_hash(format);
 
-        for (uint32_t i = 0; i < file_header_table.size(); i++) [[likely]] {
-            if (file_already_exists(file_header_table[i],
+        for (uint32_t i = 0; i < file_entry_table.size(); i++) [[likely]] {
+            if (file_already_exists(file_entry_table[i],
                                     name,
                                     format,
                                     name_hash,
@@ -231,22 +231,22 @@ namespace kernel::filesys
 
         status_t status;
 
-        if (!file_header_table[i].file_data_ptr) [[unlikely]] {
+        if (!file_entry_table[i].file_data_ptr) [[unlikely]] {
             status = status::EMPTY;
             goto cleanup;
         }
 
-        status = Block_Allocator::deallocate(file_header_table[i].file_data_ptr);
+        status = Block_Allocator::deallocate(file_entry_table[i].file_data_ptr);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        file_header_table[i].file_name.fill('\0');
-        file_header_table[i].file_format.fill('\0');
-        file_header_table[i].name_hash      = 0;
-        file_header_table[i].format_hash    = 0;
-        file_header_table[i].file_byte_size = 0;
-        file_header_table[i].file_data_ptr  = nullptr;
+        file_entry_table[i].file_name.fill('\0');
+        file_entry_table[i].file_format.fill('\0');
+        file_entry_table[i].name_hash      = 0;
+        file_entry_table[i].format_hash    = 0;
+        file_entry_table[i].file_byte_size = 0;
+        file_entry_table[i].file_data_ptr  = nullptr;
 
         status = status::SUCCESS;
 
@@ -254,7 +254,7 @@ namespace kernel::filesys
         return status;
     }
 
-    status_t MoleculeOS_File_System_2::create_file(_OUT_ File_Header*& file_header,
+    status_t MoleculeOS_File_System_2::create_file(_OUT_ File_Entry*& file_entry,
                                                    _IN_  const char* name,
                                                    _IN_  const char* format,
                                                    _IN_  uint32_t byte_size) 
@@ -277,12 +277,12 @@ namespace kernel::filesys
             goto cleanup;
         }
 
-        status = find_free_file_header(index);
+        status = find_free_file_entry(index);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        status = init_file_header(file_header,
+        status = init_file_entry(file_entry,
                                   index,
                                   name,
                                   format,
@@ -328,7 +328,7 @@ namespace kernel::filesys
         return status;
     }
 
-    status_t MoleculeOS_File_System_2::find_file(_OUT_ File_Header*& file_header,
+    status_t MoleculeOS_File_System_2::find_file(_OUT_ File_Entry*& file_entry,
                                                  _IN_  const char* name,
                                                  _IN_  const char* format) 
                                                  noexcept {
@@ -344,27 +344,27 @@ namespace kernel::filesys
         name_hash   = to_fnv1a_hash(name);
         format_hash = to_fnv1a_hash(format);
 
-        for (uint32_t i = 0; i < file_header_table.size(); i++) [[likely]] {
-            if (file_already_exists(file_header_table[i],
+        for (uint32_t i = 0; i < file_entry_table.size(); i++) [[likely]] {
+            if (file_already_exists(file_entry_table[i],
                                     name,
                                     format,
                                     name_hash,
                                     format_hash) == status::ALREADY_EXISTS) [[likely]] {
-                file_header = &file_header_table[i];
+                file_entry = &file_entry_table[i];
                 status      = status::SUCCESS;
                 goto done;
             }
         }
 
     cleanup:
-        file_header = nullptr;
+        file_entry = nullptr;
         status      = status::NOT_FOUND;
 
     done:
         return status;
     }
 
-    status_t MoleculeOS_File_System_2::write_file(_IN_ File_Header* file_header,
+    status_t MoleculeOS_File_System_2::write_file(_IN_ File_Entry* file_entry,
                                                   _IN_ const uint32_t offset,
                                                   _IN_ const uint32_t length,
                                                   _IN_ const uint32_t data_size,
@@ -375,18 +375,18 @@ namespace kernel::filesys
         status_t status;
         uint8_t* dest_ptr;
         
-        if (!file_header) [[unlikely]] {
+        if (!file_entry) [[unlikely]] {
             status = status::NOT_FOUND;
             goto cleanup;
         }
 
-        if (!file_header->file_data_ptr) [[unlikely]] {
+        if (!file_entry->file_data_ptr) [[unlikely]] {
             status = status::EMPTY;
             goto cleanup;
         }
 
-        if (offset >= file_header->file_byte_size ||
-            offset + length > file_header->file_byte_size) [[unlikely]] {
+        if (offset >= file_entry->file_byte_size ||
+            offset + length > file_entry->file_byte_size) [[unlikely]] {
             status = status::FS_OUT_OF_SPACE;
             goto cleanup;
         }
@@ -396,7 +396,7 @@ namespace kernel::filesys
             goto cleanup;
         }
 
-        dest_ptr = static_cast<uint8_t*>(file_header->file_data_ptr);
+        dest_ptr = static_cast<uint8_t*>(file_entry->file_data_ptr);
         Memory_Manipulation::copy_memory_block(dest_ptr + offset, 
                                                data, 
                                                length);
@@ -407,7 +407,7 @@ namespace kernel::filesys
         return status;
     }
 
-    status_t MoleculeOS_File_System_2::append_file(_IN_ File_Header* file_header,
+    status_t MoleculeOS_File_System_2::append_file(_IN_ File_Entry* file_entry,
                                                    _IN_ const uint8_t* data,
                                                    _IN_ const uint32_t data_size) 
                                                    noexcept {
@@ -417,27 +417,27 @@ namespace kernel::filesys
         uint8_t* data_ptr;
         uint8_t* dest_ptr;
 
-        if (!file_header) [[unlikely]] {
+        if (!file_entry) [[unlikely]] {
             status = status::NOT_FOUND;
             goto cleanup;
         }
 
-        if (!file_header->file_data_ptr) [[unlikely]] {
+        if (!file_entry->file_data_ptr) [[unlikely]] {
             status = status::EMPTY;
             goto cleanup;
         }
 
-        if (file_header->used_data_byte_size + data_size > 
-            file_header->file_byte_size) [[unlikely]] {
+        if (file_entry->used_data_byte_size + data_size > 
+            file_entry->file_byte_size) [[unlikely]] {
             status = status::FS_OUT_OF_SPACE;
             goto cleanup;
         }
 
-        data_ptr = static_cast<uint8_t*>(file_header->file_data_ptr);
-        dest_ptr = data_ptr + file_header->used_data_byte_size;
+        data_ptr = static_cast<uint8_t*>(file_entry->file_data_ptr);
+        dest_ptr = data_ptr + file_entry->used_data_byte_size;
         Memory_Manipulation::copy_memory_block(dest_ptr, data, data_size);
 
-        file_header->used_data_byte_size += data_size;
+        file_entry->used_data_byte_size += data_size;
 
         status = status::SUCCESS;
 
@@ -445,32 +445,32 @@ namespace kernel::filesys
         return status;
     }
 
-    status_t MoleculeOS_File_System_2::clear_file(_IN_ File_Header* file_header) 
+    status_t MoleculeOS_File_System_2::clear_file(_IN_ File_Entry* file_entry) 
                                                   noexcept {
         using namespace stdlib;
 
         status_t status;
         uint8_t* data_ptr;
 
-        if (!file_header) [[unlikely]] {
+        if (!file_entry) [[unlikely]] {
             status = status::NOT_FOUND;
             goto cleanup;
         }
 
-        if (!file_header->file_data_ptr) [[unlikely]] {
+        if (!file_entry->file_data_ptr) [[unlikely]] {
             status = status::EMPTY;
             goto cleanup;
         }
 
-        data_ptr = static_cast<uint8_t*>(file_header->file_data_ptr);
+        data_ptr = static_cast<uint8_t*>(file_entry->file_data_ptr);
         if (!data_ptr) [[unlikely]] {
             return false;
         }
 
         Memory_Manipulation::set_memory_block(data_ptr, 
                                               0, 
-                                              file_header->file_byte_size);
-        file_header->used_data_byte_size = 0;
+                                              file_entry->file_byte_size);
+        file_entry->used_data_byte_size = 0;
 
         status = status::SUCCESS;
 
@@ -486,7 +486,7 @@ namespace kernel::filesys
         using namespace stdlib;
 
         status_t status;
-        File_Header* file_header;
+        File_Entry* file_entry;
 
         status = validate_name_and_format(old_name, old_format);
         if (status != status::SUCCESS) [[unlikely]] {
@@ -498,21 +498,21 @@ namespace kernel::filesys
             goto cleanup;
         }
 
-        status = find_file(file_header, old_name, old_format);
+        status = find_file(file_entry, old_name, old_format);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        status = find_file(file_header, new_name, new_format);
+        status = find_file(file_entry, new_name, new_format);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        String_Manipulation::copy_string(file_header->file_name.data(), new_name);
-        String_Manipulation::copy_string(file_header->file_format.data(), new_format);
+        String_Manipulation::copy_string(file_entry->file_name.data(), new_name);
+        String_Manipulation::copy_string(file_entry->file_format.data(), new_format);
 
-        file_header->name_hash   = to_fnv1a_hash(new_name);
-        file_header->format_hash = to_fnv1a_hash(new_format);
+        file_entry->name_hash   = to_fnv1a_hash(new_name);
+        file_entry->format_hash = to_fnv1a_hash(new_format);
 
         status = status::SUCCESS;
 
@@ -528,8 +528,8 @@ namespace kernel::filesys
         using namespace stdlib;
 
         status_t status;
-        File_Header* src_file_header;
-        File_Header* dest_file_header;
+        File_Entry* src_file_entry;
+        File_Entry* dest_file_entry;
         uint8_t* src_ptr; 
         uint8_t* dest_ptr;
 
@@ -543,27 +543,27 @@ namespace kernel::filesys
             goto cleanup;
         }
 
-        status = find_file(src_file_header, src_name, src_format);
+        status = find_file(src_file_entry, src_name, src_format);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        status = find_file(dest_file_header, dest_name, dest_format);
+        status = find_file(dest_file_entry, dest_name, dest_format);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        create_file(dest_file_header, 
+        create_file(dest_file_entry, 
                     dest_name, 
                     dest_format, 
-                    src_file_header->file_byte_size);
-        if (!dest_file_header) [[unlikely]] {
+                    src_file_entry->file_byte_size);
+        if (!dest_file_entry) [[unlikely]] {
             status = status::FAIL;
             goto cleanup;
         }
 
-        src_ptr  = static_cast<uint8_t*>(src_file_header->file_data_ptr);
-        dest_ptr = static_cast<uint8_t*>(dest_file_header->file_data_ptr);
+        src_ptr  = static_cast<uint8_t*>(src_file_entry->file_data_ptr);
+        dest_ptr = static_cast<uint8_t*>(dest_file_entry->file_data_ptr);
         if (!src_ptr || !dest_ptr) [[unlikely]] {
             status = status::EMPTY;
             goto cleanup;
@@ -571,9 +571,9 @@ namespace kernel::filesys
 
         Memory_Manipulation::copy_memory_block(dest_ptr,
                                                src_ptr,
-                                               src_file_header->file_byte_size);
+                                               src_file_entry->file_byte_size);
 
-        dest_file_header->used_data_byte_size = src_file_header->used_data_byte_size;
+        dest_file_entry->used_data_byte_size = src_file_entry->used_data_byte_size;
 
         status = status::SUCCESS;
 
@@ -581,7 +581,7 @@ namespace kernel::filesys
         return status;
     }
 
-    status_t MoleculeOS_File_System_2::read_file(_IN_ File_Header* file_header,
+    status_t MoleculeOS_File_System_2::read_file(_IN_ File_Entry* file_entry,
                                                  _IN_ uint8_t* buffer,
                                                  _IN_ const uint32_t buffer_size,
                                                  _IN_ const uint32_t offset,
@@ -592,18 +592,18 @@ namespace kernel::filesys
         status_t status;
         uint8_t* src_ptr;
 
-        if (!file_header || !buffer) [[unlikely]] {
+        if (!file_entry || !buffer) [[unlikely]] {
             status = status::NULL_POINTER;
             goto cleanup;
         }
 
-        if (!file_header->file_data_ptr) [[unlikely]] {
+        if (!file_entry->file_data_ptr) [[unlikely]] {
             status = status::EMPTY;
             goto cleanup;
         }
 
-        if (offset >= file_header->file_byte_size ||
-            offset + length > file_header->file_byte_size) [[unlikely]] {
+        if (offset >= file_entry->file_byte_size ||
+            offset + length > file_entry->file_byte_size) [[unlikely]] {
             status = status::FS_OUT_OF_SPACE;
             goto cleanup;
         }
@@ -613,7 +613,7 @@ namespace kernel::filesys
             goto cleanup;
         }
 
-        src_ptr = static_cast<uint8_t*>(file_header->file_data_ptr);
+        src_ptr = static_cast<uint8_t*>(file_entry->file_data_ptr);
         if (!src_ptr) [[unlikely]] {
             status = status::FAIL;
             goto cleanup;
@@ -628,17 +628,17 @@ namespace kernel::filesys
         return status;
     }
 
-    status_t MoleculeOS_File_System_2::resize_file_size(_IN_ File_Header* file_header,
+    status_t MoleculeOS_File_System_2::resize_file_size(_IN_ File_Entry* file_entry,
                                                         _IN_ const uint32_t new_size) 
                                                         noexcept {
         status_t status;
 
-        if (!file_header) [[unlikely]] {
+        if (!file_entry) [[unlikely]] {
             status = status::NULL_POINTER;
             goto cleanup;
         }
 
-        if (file_header->file_data_ptr) [[unlikely]] {
+        if (file_entry->file_data_ptr) [[unlikely]] {
             status = status::EMPTY;
             goto cleanup;
         }
@@ -648,15 +648,15 @@ namespace kernel::filesys
             goto cleanup;
         }
 
-        status = heap::Block_Allocator::reallocate(file_header->file_data_ptr, 
+        status = heap::Block_Allocator::reallocate(file_entry->file_data_ptr, 
                                                    new_size);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        file_header->file_byte_size = new_size;
-        if (file_header->used_data_byte_size > new_size) [[likely]] {
-            file_header->used_data_byte_size = new_size;
+        file_entry->file_byte_size = new_size;
+        if (file_entry->used_data_byte_size > new_size) [[likely]] {
+            file_entry->used_data_byte_size = new_size;
         }
 
         status = status::SUCCESS;
