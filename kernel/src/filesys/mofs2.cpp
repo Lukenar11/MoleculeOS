@@ -170,7 +170,7 @@ namespace kernel::filesys
         File_Header& file_header = file_header_table[index];
 
         status = heap::Block_Allocator::allocate(ptr, byte_size);
-        if (status != status::SUCCESS) [[unlikely]] {
+        if (status != status::SUCCESS || !ptr) [[unlikely]] {
             header = nullptr;
             goto cleanup;
         }

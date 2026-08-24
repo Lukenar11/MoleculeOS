@@ -33,7 +33,7 @@ namespace kernel
         drivers::ata::Programmable_Input_Output::init();
         storemgr::Storage_Manager::init();
 
-        if (!storemgr::Storage_Manager::load_filesystem()) [[unlikely]] {
+        if (storemgr::Storage_Manager::load_filesystem() != status::SUCCESS) [[unlikely]] {
             sys::panic("load failed");
         }
 

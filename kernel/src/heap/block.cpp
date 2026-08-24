@@ -263,10 +263,10 @@ namespace kernel::heap
         }
     
         ptr = set_allocation_sizes_entry(blocks_needed, index);
-        // if (!ptr) [[unlikely]] {
-        //     status = status::FAIL;
-        //     goto cleanup;
-        // }
+        if (!ptr) [[unlikely]] {
+            status = status::OUT_OF_MEMORY;
+            goto cleanup;
+        }
 
         status = status::SUCCESS;
     

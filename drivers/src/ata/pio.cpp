@@ -143,7 +143,7 @@ namespace drivers::ata
         return false;
     }
 
-    bool Programmable_Input_Output::poll_and_read_or_write_disk(const Driver_Operations op,
+    bool Programmable_Input_Output::poll_and_read_or_write_disk(const Operations op,
                                                                 uint16_t* buffer,
                                                                 const uint32_t sector_count) 
                                                                 noexcept {
@@ -153,7 +153,7 @@ namespace drivers::ata
             if (!poll_until_drq_or_error()) [[unlikely]]
                 return false;
 
-            if (op == Driver_Operations::READ)
+            if (op == Operations::READ)
                 stdlib::word_input_stream(io_port_base,
                                            SECTOR_WORD_SIZE,
                                            buffer);
@@ -169,7 +169,7 @@ namespace drivers::ata
         return true;
     }
 
-    bool Programmable_Input_Output::start_pio_disk_read_or_write(const Driver_Operations op,
+    bool Programmable_Input_Output::start_pio_disk_read_or_write(const Operations op,
                                                                  uint16_t* buffer, 
                                                                  const uint32_t sector_count,
                                                                  const uint32_t relative_lba) 
@@ -189,7 +189,7 @@ namespace drivers::ata
                                                               NIBBLE_MASK, 
                                                               master_save_flags));
 
-        if (op == Driver_Operations::READ)
+        if (op == Operations::READ)
             stdlib::byte_output(status_port(), READ_SECTORS);
         else
             stdlib::byte_output(status_port(), WRITE_SECTORS);
@@ -199,7 +199,7 @@ namespace drivers::ata
                                          sector_count))
             return false;
 
-        if (op == Driver_Operations::WRITE) {
+        if (op == Operations::WRITE) {
             stdlib::byte_output(status_port(), FLUSH_CACHE);
 
             if (!poll_until_not_busy()) [[unlikely]]
@@ -230,7 +230,7 @@ namespace drivers::ata
         kernel::sys::panic("ATA init from IDENTIFY failed, no device detected");
     }
 
-    bool Programmable_Input_Output::run(const Driver_Operations op,
+    bool Programmable_Input_Output::run(const Operations op,
                                         uint32_t sector_count,
                                         uint16_t* buffer,
                                         uint32_t relative_lba) noexcept {

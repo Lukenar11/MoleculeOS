@@ -148,13 +148,13 @@ namespace drivers::ata
         [[nodiscard]] static bool poll_until_not_busy() noexcept;
 
         [[nodiscard]]
-        static bool poll_and_read_or_write_disk(const Driver_Operations op,
+        static bool poll_and_read_or_write_disk(const Operations op,
                                                 uint16_t* buffer,
                                                 uint32_t sector_count) 
                                                 noexcept;
 
         [[nodiscard]]
-        static bool start_pio_disk_read_or_write(const Driver_Operations op,
+        static bool start_pio_disk_read_or_write(const Operations op,
                                                  uint16_t* buffer, 
                                                  const uint32_t sector_count,
                                                  const uint32_t relative_lba) 
@@ -173,7 +173,7 @@ namespace drivers::ata
 
         static void init() noexcept;
 
-        static bool run(const Driver_Operations op,
+        static bool run(const Operations op,
                         uint32_t sector_count,
                         uint16_t* buffer,
                         uint32_t relative_lba) noexcept;

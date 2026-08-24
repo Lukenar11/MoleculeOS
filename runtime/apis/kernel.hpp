@@ -22,7 +22,7 @@ NOTES:
 #include "kernel/include/filesys/helpers.hpp"
 
 #include "kernel/include/heap/block.hpp"
-#include "kernel/include/storemgr/storage_mgr.hpp"
+#include "kernel/include/storemgr/storage_manager.hpp"
 
 #ifdef __I386__
 #   include "arch/i386/kernel/include/kernel_arch_init.hpp"

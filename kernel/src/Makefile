@@ -6,7 +6,7 @@
 
 OBJS += $(BUILD)/mofs2.o \
 		$(BUILD)/block.o \
-		$(BUILD)/storage_mgr.o \
+		$(BUILD)/storage_manager.o \
 		$(BUILD)/kernel_main.o \
 
 $(BUILD)/%.o: kernel/src/filesys/%.cpp

@@ -86,9 +86,9 @@ namespace kernel::filesys
         }
 
         static inline constexpr 
-        File_Header& set_file_header_entry(_IN_ const File_Header& file_header, 
-                                           _IN_ const uint32_t i) noexcept {
-            return file_header_table[i] = file_header;
+        void set_file_header_entry(_IN_ const File_Header& file_header, 
+                                   _IN_ const uint32_t i) noexcept {
+            file_header_table[i] = file_header;
         }
 
         static 

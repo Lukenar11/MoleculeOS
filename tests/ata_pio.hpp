@@ -23,7 +23,7 @@ namespace tests
         stdlib::Text_Output::put_string("Status before read: ");
         stdlib::Text_Output::put_hex(stdlib::byte_input(Programmable_Input_Output::status_port()));
 
-        if (Programmable_Input_Output::run(drivers::ata::Driver_Operations::READ,
+        if (Programmable_Input_Output::run(drivers::ata::Operations::READ,
                                            sectors, 
                                            buffer_ptr, 
                                            lba))
@@ -61,7 +61,7 @@ namespace tests
         stdlib::Text_Output::put_string("Status before read: ");
         stdlib::Text_Output::put_hex(stdlib::byte_input(Programmable_Input_Output::status_port()));
 
-        if (Programmable_Input_Output::run(drivers::ata::Driver_Operations::READ,
+        if (Programmable_Input_Output::run(drivers::ata::Operations::READ,
                                            sectors, 
                                            ptr, 
                                            lba))
@@ -94,7 +94,7 @@ namespace tests
         stdlib::Text_Output::put_hex(stdlib::byte_input(Programmable_Input_Output::status_port()));
 
         for (uint32_t lba = 0; lba < 16; ++lba)
-            if (Programmable_Input_Output::run(drivers::ata::Driver_Operations::READ,
+            if (Programmable_Input_Output::run(drivers::ata::Operations::READ,
                                                sectors, 
                                                buffer_ptr, 
                                                lba))
@@ -125,7 +125,7 @@ namespace tests
         uint16_t* buffer_ptr = buffer.begin();
         int32_t sectors = 1;
         uint32_t lba = 0;
-        Programmable_Input_Output::run(drivers::ata::Driver_Operations::WRITE, 
+        Programmable_Input_Output::run(drivers::ata::Operations::WRITE, 
                                        sectors, 
                                        buffer_ptr, 
                                        lba);
