@@ -59,18 +59,33 @@ namespace kernel::storemgr
 
         static
         status_t read_filesystem_header(_OUT_ Filesys_Header& header) noexcept;
+
+        static
+        status_t write_filesystem_header(_IN_ Filesys_Header& header) noexcept;
         
         static
         status_t load_single_file(_IN_ const Filesys_Header& header,
                                   _IN_ const Serialized_File_Header& serialized,
                                   _IN_ const uint32_t index) noexcept;
 
+        static
+        status_t serialize_single_file(_INOUT_ uint32_t& current_data_offset,
+                                       _OUT_   Serialized_File_Header& serialized,
+                                       _IN_    filesys::File_Header& file_header,
+                                       _IN_    const Filesys_Header& header) 
+                                       noexcept;
+
+        static
+        status_t write_file_header_table(_OUT_ Serialized_File_Header* table,
+                                         _IN_  const Filesys_Header& header) 
+                                         noexcept;
+    
     public:
         static 
         void init() noexcept;
 
         static 
-        bool save_filesystem() noexcept;
+        status_t save_filesystem() noexcept;
 
         static 
         status_t load_filesystem() noexcept;

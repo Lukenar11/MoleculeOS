@@ -22,40 +22,34 @@ NOTES:
 namespace kernel::idt::isr
 {
     extern "C"
-    void isr_handler(Registers* reg_dump) {
-        const bool clear_screen_if_hight_limit_reached = false;
+    void isr_handler(const Registers* reg_dump) {
 
         stdlib::Text_Output::reset();
         stdlib::Text_Output::set_text_color(drivers::vga::Text_Mode_Colors::RED,
-                                             drivers::vga::Text_Mode_Colors::BLACK);
+                                            drivers::vga::Text_Mode_Colors::BLACK);
 
         const uint32_t all_available_expectations = 0x6A;
         const char* exception = (reg_dump->interrupt_number < all_available_expectations)
                                 ? exception_names[reg_dump->interrupt_number]
                                 : "Unknown Exception";
     
-        stdlib::Text_Output::put_string(">>>>>>>>>> !KERNEL PANIC! <<<<<<<<<<", 
-                                         clear_screen_if_hight_limit_reached);
+        stdlib::Text_Output::put_string(">>>>>>>>>> !KERNEL PANIC! <<<<<<<<<<");
         print_reg_dump("\n\nError Code: ", reg_dump->error_code);
     
-        stdlib::Text_Output::put_string("\nException: ", 
-                                         clear_screen_if_hight_limit_reached);
+        stdlib::Text_Output::put_string("\nException: ");
         stdlib::Text_Output::put_string(exception);
         stdlib::Text_Output::put_char(' ');
         stdlib::Text_Output::put_char('(');
         stdlib::Text_Output::put_hex(reg_dump->interrupt_number);
         stdlib::Text_Output::put_char(')');
     
-        stdlib::Text_Output::put_string("\n\nCPU State:",
-                                         clear_screen_if_hight_limit_reached);
-        print_reg_dump("\n\tEIP: ", reg_dump->eip);
-        print_reg_dump("\n\tCS: ", reg_dump->cs);
-        stdlib::Text_Output::put_string("\n\tEFLAGS: ", 
-                                         clear_screen_if_hight_limit_reached);
+        stdlib::Text_Output::put_string("\n\nCPU State:");
+        print_reg_dump("\n\tEIP:   ", reg_dump->eip);
+        print_reg_dump("\n\tCS:    ", reg_dump->cs);
+        stdlib::Text_Output::put_string("\n\tEFLAGS: ");
         stdlib::Text_Output::put_bin(reg_dump->eflags);
     
-        stdlib::Text_Output::put_string("\n\nGeneral Registers:", 
-                                         clear_screen_if_hight_limit_reached);
+        stdlib::Text_Output::put_string("\n\nGeneral Registers:");               
         print_reg_dump("\n\tEAX: ", reg_dump->eax);
         print_reg_dump("\n\tEBX: ", reg_dump->ebx);
         print_reg_dump("\n\tECX: ", reg_dump->ecx);
@@ -64,8 +58,7 @@ namespace kernel::idt::isr
         print_reg_dump("\n\tEDI: ", reg_dump->edi);
         print_reg_dump("\n\tEBP: ", reg_dump->ebp);
 
-        stdlib::Text_Output::put_string("\n\nSegment Registers:", 
-                                         clear_screen_if_hight_limit_reached);
+        stdlib::Text_Output::put_string("\n\nSegment Registers:");
         print_reg_dump("\n\tDS: ", reg_dump->ds);
         print_reg_dump("\n\tES: ", reg_dump->es);
         print_reg_dump("\n\tFS: ", reg_dump->fs);

@@ -42,13 +42,9 @@ namespace kernel
         while (true) {
             sys::sleep();
             terminal.step();
-
-            if (!storemgr::Storage_Manager::save_filesystem()) [[unlikely]] {
-                sys::panic("save failed");
-            }
         }
 
-        if (!storemgr::Storage_Manager::save_filesystem()) [[unlikely]] {
+        if (storemgr::Storage_Manager::save_filesystem() != status::SUCCESS) [[unlikely]] {
             sys::panic("save failed");
         }
 

@@ -223,17 +223,13 @@ namespace stdlib
         }
     }
 
-    void Text_Output::put_string(_IN_ const char* message, 
-                                 _IN_ const bool premature_screen_clear) 
-                                 noexcept {
+    void Text_Output::put_string(_IN_ const char* message) noexcept {
         const uint32_t needed_lines = calculate_needed_lines(message);
         const uint32_t remaining    = drivers::vga::TEXT_MODE_SCREEN_HEIGHT - 
                                       cursor_y;
         
-        if (premature_screen_clear) {
-            if (needed_lines >= (remaining - 1)) [[unlikely]] {
-                reset();
-            }
+        if (needed_lines > remaining) [[unlikely]] {
+            reset();
         }
 
         while (*message) [[likely]] {

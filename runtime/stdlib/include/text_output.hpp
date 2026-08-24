@@ -133,9 +133,7 @@ namespace stdlib
         void put_char(_IN_ const char symbol) noexcept;
 
         static 
-        void put_string(_IN_ const char* message, 
-                        _IN_ const bool premature_screen_clear=true) 
-                        noexcept;
+        void put_string(_IN_ const char* message) noexcept;
     
         Text_Output() noexcept  = default;
         ~Text_Output() noexcept = default;

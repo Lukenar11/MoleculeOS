@@ -29,7 +29,7 @@ namespace
 {
     inline constexpr void print_reg_dump(const char* label, 
                                          const uint32_t value) noexcept {
-        stdlib::Text_Output::put_string(label, false);
+        stdlib::Text_Output::put_string(label);
         stdlib::Text_Output::put_hex(value);
     }
 }
@@ -37,5 +37,5 @@ namespace
 namespace kernel::idt::isr
 {
     extern "C"
-    void isr_handler(Registers* reg_dump);
+    void isr_handler(const Registers* reg_dump);
 } // namespace kernel::isr

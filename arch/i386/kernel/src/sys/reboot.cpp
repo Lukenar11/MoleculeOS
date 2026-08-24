@@ -24,7 +24,7 @@ namespace kernel::sys
         const uint8_t input_buffer_full = 0x02;
         const uint8_t zero              = 0;
 
-        if (!storemgr::Storage_Manager::save_filesystem()) [[unlikely]] {
+        if (storemgr::Storage_Manager::save_filesystem() != status::SUCCESS) [[unlikely]] {
             sys::panic("save failed");
         }
 
