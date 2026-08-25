@@ -24,26 +24,37 @@ NOTES:
 
 namespace drivers::vga 
 {
-    void Text_Mode::put_char_at(const char symbol, 
-                                const uint8_t color, 
-                                const uint32_t x, 
-                                const uint32_t y) noexcept {
-        // VGA-Area Over/Underflow gard
-        if (x >= TEXT_MODE_SCREEN_WIDTH || 
-            y >= TEXT_MODE_SCREEN_HEIGHT) [[unlikely]]
-            return;
+    status_t Text_Mode::put_char_at(_IN_ const char symbol, 
+                                    _IN_ const uint8_t color, 
+                                    _IN_ const uint32_t x, 
+                                    _IN_ const uint32_t y) noexcept {
+        status_t status;
+        uint32_t index;
 
-        const uint32_t index = static_cast<uint32_t>(y) * TEXT_MODE_SCREEN_WIDTH +
-                               static_cast<uint32_t>(x);
-        VGA_TEXT_MODE_SCREEN_FRAME_BUFFER[index] = make_symbol_entry(symbol, color);
+        if (x >= TEXT_MODE_SCREEN_WIDTH || 
+            y >= TEXT_MODE_SCREEN_HEIGHT) [[unlikely]] {
+            status = status::INVALID_PARAMETER;
+            goto cleanup;
+        }
+
+        index = static_cast<uint32_t>(y) * TEXT_MODE_SCREEN_WIDTH + 
+                static_cast<uint32_t>(x);
+        SCREEN_BUFFER[index] = make_symbol_entry(symbol, color);
+
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
     }
 
-    void Text_Mode::clear_screen(const Text_Mode_Colors& background) noexcept {
+    void Text_Mode::clear_screen(_IN_ const Text_Mode_Colors& background) 
+                                 noexcept {
         const uint8_t color  = make_color(Text_Mode_Colors::BLACK, background);
         const uint16_t entry = make_symbol_entry(' ', color);
+        const uint32_t n     = TEXT_MODE_SCREEN_WIDTH * TEXT_MODE_SCREEN_HEIGHT;
 
-        const uint32_t n = TEXT_MODE_SCREEN_WIDTH * TEXT_MODE_SCREEN_HEIGHT;
-        for (uint32_t i = 0; i < n; i++)
-            VGA_TEXT_MODE_SCREEN_FRAME_BUFFER[i] = entry;
+        for (uint32_t i = 0; i < n; i++) [[likely]] {
+            SCREEN_BUFFER[i] = entry;
+        }
     }
 } // namespace drivers::vga

@@ -24,43 +24,45 @@ NOTES:
 
 #include "../utils/vga_text_mode_helpers.hpp"
 #include <types.hpp>
+#include <sal.hpp>
+#include <status.hpp>
 
 namespace drivers::vga 
 {
     class Text_Mode final {
     private:
         static inline constexpr uint8_t BLINK_MODE_BIT = 0x80;
-        static inline volatile uint16_t* 
-        const VGA_TEXT_MODE_SCREEN_FRAME_BUFFER = reinterpret_cast<volatile uint16_t*>(0xB8000);
+        static inline volatile uint16_t* const SCREEN_BUFFER = 
+            reinterpret_cast<volatile uint16_t*>(0xB8000);
 
     public:
         [[nodiscard]]
-        static inline constexpr uint8_t make_color(const Text_Mode_Colors& foreground,
-                                                   const Text_Mode_Colors& background,
-                                                   const bool does_blink=false) 
-                                                   noexcept {
+        static inline constexpr 
+        uint8_t make_color(_IN_ const Text_Mode_Colors& foreground,
+                           _IN_ const Text_Mode_Colors& background,
+                           _IN_ const bool does_blink=false) noexcept {
             const uint8_t color = (static_cast<uint8_t>(background) << 4) | 
                                    static_cast<uint8_t>(foreground);
-            if (!does_blink) [[likely]]
-                return color;
-            else [[unlikely]]
-                return color | BLINK_MODE_BIT;
+
+            return (does_blink) ? (color | BLINK_MODE_BIT) : color;
         }
 
         [[nodiscard]]
-        static inline constexpr uint16_t make_symbol_entry(const char symbol, 
-                                                           const uint8_t color)
-                                                           noexcept {
+        static inline constexpr 
+        uint16_t make_symbol_entry(_IN_ const char symbol, 
+                                   _IN_ const uint8_t color) noexcept {
             return (static_cast<uint16_t>(color) << 8) | 
                     static_cast<uint16_t>(symbol);
         }
 
-        static void put_char_at(const char symbol, 
-                                const uint8_t color, 
-                                const uint32_t x, 
-                                const uint32_t y) noexcept;
+        static 
+        status_t put_char_at(_IN_ const char symbol, 
+                             _IN_ const uint8_t color, 
+                             _IN_ const uint32_t x, 
+                             _IN_ const uint32_t y) noexcept;
 
-        static void clear_screen(const Text_Mode_Colors& color) noexcept;
+        static 
+        void clear_screen(_IN_ const Text_Mode_Colors& color) noexcept;
 
         Text_Mode() noexcept  = default;
         ~Text_Mode() noexcept = default;

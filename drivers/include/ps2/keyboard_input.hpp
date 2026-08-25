@@ -23,6 +23,8 @@ NOTES:
 #include <types.hpp>
 #include <circular_buffer.hpp>
 #include <io.hpp>
+#include <status.hpp>
+#include <sal.hpp>
 #include <kernel.hpp>
 
 namespace kernel {
@@ -42,16 +44,20 @@ namespace drivers::ps2
         static inline bool shift_is_pressed = false;
         static inline bool caps_is_enabled  = false;
 
-        static inline bool has_pending_scancode() noexcept {
+        static inline 
+        bool has_pending_scancode() noexcept {
             return stdlib::byte_input(KEYBOARD_STATUS_PORT) & LOWEST_BIT;
         }
 
-        static char get_key() noexcept;
+        [[nodiscard]] static 
+        status_t get_key(_IN_ char& key) noexcept;
 
     public:
-        static inline stdlib::Circular_Buffer<char, ALLOWED_SCANCODE_SIZE> scancode_buffer;
+        static inline stdlib::Circular_Buffer<char, 
+                                              ALLOWED_SCANCODE_SIZE> scancode_buffer;
         
-        static void keyboard_irq_handler(kernel::Registers*) noexcept;
+        static 
+        void keyboard_irq_handler(_OUT_ kernel::Registers*) noexcept;
     
         Keyboard_Input() noexcept  = default;
         ~Keyboard_Input() noexcept = default;
