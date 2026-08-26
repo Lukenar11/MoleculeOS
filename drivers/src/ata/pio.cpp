@@ -256,7 +256,7 @@ namespace drivers::ata
             }
         }
 
-        status = status::SUCCESS;
+        status = status::ATA_TIMEOUT;
 
     cleanup:
         return status;
