@@ -62,7 +62,11 @@ namespace status
     constexpr status_t ALREADY_EXISTS         = 0x04'0000'05;
     constexpr status_t FS_VERSION_MISMATCH    = 0x04'0000'06;
     
-    constexpr status_t ATA_TIMEOUT      = 0x05'0000'00;
-    constexpr status_t ATA_DEVICE_FAULT = 0x05'0000'01;
-    constexpr status_t ATA_BAD_SECTOR   = 0x05'0000'02;
+    constexpr status_t ATA_TIMEOUT              = 0x05'0000'00;
+    constexpr status_t ATA_DEVICE_FAULT         = 0x05'0000'01;
+    constexpr status_t ATA_BAD_SECTOR           = 0x05'0000'02;
+    constexpr status_t ATA_NO_DEVICE            = 0x05'0000'03;
+    constexpr status_t ATA_INVALID_SECTOR_COUNT = 0x05'0000'04;
+    constexpr status_t ATA_INVALID_LBA          = 0x05'0000'05;
+    constexpr status_t ATA_ERROR                = 0x05'0000'06;
 } // namespace status

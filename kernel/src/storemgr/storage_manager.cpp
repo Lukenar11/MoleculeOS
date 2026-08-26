@@ -39,11 +39,11 @@ namespace kernel::storemgr
             goto cleanup;
         }
 
-        if (!ata::Programmable_Input_Output::run(ata::Operations::READ,
-                                                 sector_count,
-                                                 sector_words,
-                                                 start_sector)) [[unlikely]] {
-            status = status::FAIL;
+        status = ata::Programmable_Input_Output::run(sector_words,
+                                                     sector_count,
+                                                     start_sector,
+                                                     ata::Operations::READ);
+        if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
@@ -82,11 +82,11 @@ namespace kernel::storemgr
             goto cleanup;
         }
                              
-        if (!ata::Programmable_Input_Output::run(ata::Operations::READ,
-                                                 sector_count,
-                                                 sector_words,
-                                                 start_sector)) [[unlikely]] {
-            status = status::FAIL;
+        status = ata::Programmable_Input_Output::run(sector_words,
+                                                     sector_count,
+                                                     start_sector, 
+                                                     ata::Operations::READ);
+        if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
     
@@ -97,11 +97,11 @@ namespace kernel::storemgr
             goto cleanup;
         }
     
-        if (!ata::Programmable_Input_Output::run(ata::Operations::WRITE,
-                                                 sector_count,
-                                                 sector_words,
-                                                 start_sector)) [[unlikely]] {
-            status = status::FAIL;
+        status = ata::Programmable_Input_Output::run(sector_words,
+                                                     sector_count,
+                                                     start_sector, 
+                                                     ata::Operations::WRITE);
+        if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
     

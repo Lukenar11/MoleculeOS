@@ -36,6 +36,8 @@ NOTES:
 
 #include "../utils/ata_pio_helpers.hpp"
 #include <types.hpp>
+#include <sal.hpp>
+#include <status.hpp>
 #include <port_io.hpp>
 #include <array.hpp>
 
@@ -43,30 +45,7 @@ namespace kernel::sys
 {
     [[noreturn]]
     void panic(const char* message) noexcept;
-}
-
-namespace
-{
-    [[nodiscard]]
-    inline bool ata_pio_read_and_write_guard(const uint32_t partition_length, 
-                                              const uint32_t relative_lba, 
-                                              const uint32_t to_transfer) 
-                                              noexcept {
-        if (partition_length == 0) [[unlikely]]
-            return false;
-
-        if (relative_lba > partition_length) [[unlikely]]
-            return false;
-
-        if (to_transfer > partition_length) [[unlikely]]
-            return false;
-
-        if (relative_lba > partition_length - to_transfer) [[unlikely]]
-            return false;
-
-        return true;
-    }
-} // namespace
+} // namespace kernel::sys
 
 namespace drivers::ata
 {
@@ -119,64 +98,73 @@ namespace drivers::ata
         static inline uint16_t io_port_base       = 0;
         static inline uint8_t master_save_flags   = 0;
 
-        [[nodiscard]]
-        static inline constexpr uint8_t shift_and_mask(const uint32_t val,
-                                                      const uint32_t shift,
-                                                      const uint8_t mask,
-                                                      const uint8_t add_mask=0x00) 
-                                                      noexcept {
-            if (add_mask == 0x00) [[likely]]
-                return static_cast<uint8_t>(((val >> shift) & mask));
-            else [[unlikely]]
-                return static_cast<uint8_t>(((val >> shift) & mask) | add_mask);
-        }
+        [[nodiscard]] static
+        uint8_t shift_and_mask(_IN_ const uint32_t val,
+                               _IN_ const uint32_t shift,
+                               _IN_ const uint8_t mask,
+                               _IN_ const uint8_t add_mask=0x00) noexcept;
 
-        static void delay() noexcept;
-        static void reset_driver(const uint16_t dcr_port) noexcept;
+        [[nodiscard]] static
+        status_t validate_storage_access(_IN_ const uint32_t partition_length, 
+                                         _IN_ const uint32_t relative_lba, 
+                                         _IN_ const uint32_t to_transfer) 
+                                         noexcept;
 
-        static bool identify_drive(const uint16_t io_base,
-                                   const uint16_t control_reg,
-                                   const bool is_master,
-                                   uint16_t identify_data[SECTOR_WORD_SIZE])
-                                   noexcept;
+        static 
+        void delay() noexcept;
 
-        static bool probe_and_configure_channel(const uint16_t io_port,
-                                                const uint16_t control_reg) 
-                                                noexcept;
+        static 
+        void reset_driver(const uint16_t dcr_port) noexcept;
 
-        [[nodiscard]] static bool poll_until_drq_or_error() noexcept;
-        [[nodiscard]] static bool poll_until_not_busy() noexcept;
+        static
+        status_t identify_drive(_OUT_ uint16_t identify_data[SECTOR_WORD_SIZE],
+                                _IN_  const uint16_t io_base,
+                                _IN_  const uint16_t control_reg,
+                                _IN_  const bool is_master) noexcept;
 
-        [[nodiscard]]
-        static bool poll_and_read_or_write_disk(const Operations op,
-                                                uint16_t* buffer,
-                                                uint32_t sector_count) 
-                                                noexcept;
+        static 
+        status_t probe_and_configure_channel(_IN_ const uint16_t io_port,
+                                             _IN_ const uint16_t control_reg) 
+                                             noexcept;
 
-        [[nodiscard]]
-        static bool start_pio_disk_read_or_write(const Operations op,
-                                                 uint16_t* buffer, 
-                                                 const uint32_t sector_count,
-                                                 const uint32_t relative_lba) 
-                                                 noexcept;
+        [[nodiscard]] static 
+        status_t poll_until_drq_or_error() noexcept;
+
+        [[nodiscard]] static 
+        status_t poll_until_not_busy() noexcept;
+
+        [[nodiscard]] static 
+        status_t poll_and_read_or_write_disk(_INOUT_ uint16_t* buffer,
+                                             _IN_    const Operations op,
+                                             _IN_    const uint32_t sector_count) 
+                                             noexcept;
+
+        [[nodiscard]] static
+        status_t start_pio_disk_read_or_write(_INOUT_ uint16_t* buffer,
+                                              _IN_    const Operations op, 
+                                              _IN_    const uint32_t sector_count,
+                                              _IN_    const uint32_t relative_lba) 
+                                              noexcept;
 
     public:
-        [[nodiscard]]
-        static inline uint16_t status_port() noexcept { 
+        [[nodiscard]] static inline 
+        uint16_t status_port() noexcept { 
             return static_cast<uint16_t>(io_port_base + 7); 
         }
 
-        [[nodiscard]]
-        static inline uint16_t dcr_port() noexcept { 
+        [[nodiscard]] static inline 
+        uint16_t dcr_port() noexcept { 
             return device_control_reg; 
         }
 
-        static void init() noexcept;
+        static 
+        void init() noexcept;
 
-        static bool run(const Operations op,
-                        uint32_t sector_count,
-                        uint16_t* buffer,
-                        uint32_t relative_lba) noexcept;
+        static 
+        status_t run(_INOUT_ uint16_t* buffer,
+                     _IN_    uint32_t sector_count,
+                     _IN_    uint32_t relative_lba,
+                     _IN_    const Operations op) noexcept;
 
         Programmable_Input_Output() noexcept  = default;
         ~Programmable_Input_Output() noexcept = default;

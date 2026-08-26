@@ -35,179 +35,336 @@ NOTES:
 #include "../ata/pio.hpp"
 
 namespace drivers::ata
-{
+{ 
+    uint8_t Programmable_Input_Output::shift_and_mask(_IN_ const uint32_t val,
+                                                      _IN_ const uint32_t shift,
+                                                      _IN_ const uint8_t mask,
+                                                      _IN_ const uint8_t add_mask) 
+                                                      noexcept {
+        if (add_mask == 0x00) [[likely]] {
+            return static_cast<uint8_t>(((val >> shift) & mask));
+        }
+        else [[unlikely]] {
+            return static_cast<uint8_t>(((val >> shift) & mask) | add_mask);
+        }
+    }
+
+    status_t 
+    Programmable_Input_Output::validate_storage_access(_IN_ const uint32_t partition_length,
+                                                       _IN_ const uint32_t relative_lba, 
+                                                       _IN_ const uint32_t to_transfer) 
+                                                       noexcept {
+        status_t status;
+
+        if (partition_length == 0) [[unlikely]] {
+            status = status::ATA_NO_DEVICE;
+            goto cleanup;
+        }
+
+        if (to_transfer == 0) [[unlikely]] {
+            status = status::ATA_INVALID_SECTOR_COUNT;
+            goto cleanup;
+        }
+
+        if (to_transfer > partition_length) [[unlikely]] {
+            status = status::ATA_INVALID_SECTOR_COUNT;
+            goto cleanup;
+        }
+
+        if (relative_lba > partition_length) [[unlikely]] {
+            status = status::ATA_INVALID_LBA;
+            goto cleanup;
+        }
+
+        if (relative_lba > partition_length - to_transfer) [[unlikely]] {
+            status = status::ATA_INVALID_LBA;
+            goto cleanup;
+        }
+
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
+    }
+
     void Programmable_Input_Output::delay() noexcept {
-        for (uint32_t i = 0; i < 5; ++i) 
+        for (uint32_t i = 0; i < 5; ++i) [[likely]] {
             stdlib::byte_input(status_port());
+        }
     }
 
     void Programmable_Input_Output::reset_driver(const uint16_t dcr_port) 
                                                  noexcept {
+        uint32_t timeout = 5'000'000;
+        uint8_t status;
+
         stdlib::byte_output(dcr_port, SRST);
         stdlib::byte_output(dcr_port, DCR_DEFAULT);
 
         delay();
 
-        uint32_t timeout = 5'000'000;
-        while (timeout--) {
-            const uint8_t status = stdlib::byte_input(status_port());
-            if (!(status & ATA_BSY) && (status & ATA_DRDY))
+        while (timeout--) [[likely]] {
+            status = stdlib::byte_input(status_port());
+
+            if (!(status & ATA_BSY) && (status & ATA_DRDY)) {
                 break;
+            }
         }
     }
 
-    bool Programmable_Input_Output::identify_drive(const uint16_t io_base,
-                                                   const uint16_t control_reg,
-                                                   const bool is_master,
-                                                   uint16_t identify_data[SECTOR_WORD_SIZE])
-                                                   noexcept {
+    status_t
+    Programmable_Input_Output::identify_drive(_OUT_ uint16_t identify_data[SECTOR_WORD_SIZE],
+                                              _IN_  const uint16_t io_base,
+                                              _IN_  const uint16_t control_reg,
+                                              _IN_  const bool is_master)
+                                              noexcept {
+        status_t status;
+
         device_control_reg = control_reg;
         reset_driver(control_reg);
 
-        io_port_base      = io_base;
-        master_save_flags = (is_master) ? MASTER_SELECT : SLAVE_SELECT;
+        io_port_base = io_base;
+
+        if (is_master) {
+            master_save_flags = MASTER_SELECT;
+        }
+        else {
+            master_save_flags = SLAVE_SELECT;
+        }
 
         stdlib::byte_output(status_port() - 1, master_save_flags);
         stdlib::byte_output(status_port(), ATA_IDENTIFY);
 
         delay();
-        
-        if (!poll_until_drq_or_error()) [[unlikely]]
-            return false;
+
+        status = poll_until_drq_or_error();
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
 
         stdlib::word_input_stream(io_base, SECTOR_WORD_SIZE, identify_data);
-        return true;
+
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
     }
 
-    bool Programmable_Input_Output::probe_and_configure_channel(const uint16_t io_port,
-                                                                const uint16_t control_reg) 
-                                                                noexcept {
-        uint16_t identify_data[SECTOR_WORD_SIZE] = {0};
-        for (int i = 0; i < 2; ++i) {
-            const bool is_master = (i == 0);
+    status_t 
+    Programmable_Input_Output::probe_and_configure_channel(_IN_ const uint16_t io_port,
+                                                           _IN_ const uint16_t control_reg) 
+                                                           noexcept {
+        status_t status;
+        stdlib::Array<uint16_t, SECTOR_WORD_SIZE> identify_data;
+        uint32_t storage_size;
+        bool is_master;
 
-            if (!identify_drive(io_port, 
-                                control_reg, 
-                                is_master, 
-                                identify_data)) {
+        for (uint32_t i = 0; i < 2; ++i) [[likely]] {
+            is_master = (i == 0);
+
+            status = identify_drive(identify_data.data(),
+                                    io_port,
+                                    control_reg,
+                                    is_master);
+            if (status != status::SUCCESS) [[unlikely]] {
                 reset_driver(control_reg);
                 continue;
             }
 
-            const uint32_t storage_size = (static_cast<uint32_t>(identify_data[61]) << 16) |
-                                           static_cast<uint32_t>(identify_data[60]);
+            storage_size = (static_cast<uint32_t>(identify_data[61]) << 16) |
+                            static_cast<uint32_t>(identify_data[60]);
 
             io_port_base       = io_port;
             device_control_reg = control_reg;
-            master_save_flags  = (is_master) ? MASTER : SLAVE;
             lba_start_address  = 0;
 
-            if (storage_size == ATA_LBA28_OVERFLOW_MARKER)
+            if (is_master) {
+                master_save_flags = MASTER;
+            }
+            else {
+                master_save_flags = SLAVE;
+            }
+
+            if (storage_size == ATA_LBA28_OVERFLOW_MARKER) [[unlikely]] {
                 partition_length = ATA_LBA28_MAX_ADDRESS;
-            else
+            }
+            else [[likely]] {
                 partition_length = storage_size;
+            }
 
-            return true;
+            status = status::SUCCESS;
+            goto cleanup;
         }
 
-        return false;
+        status = status::ATA_NO_DEVICE;
+
+    cleanup:
+        return status;
     }
 
-    bool Programmable_Input_Output::poll_until_drq_or_error() noexcept {
+    status_t Programmable_Input_Output::poll_until_drq_or_error() noexcept {
+        status_t status;
+        uint8_t input;
         uint32_t timeout = 5'000'000;
-        while (timeout--) {
-            const uint8_t status = stdlib::byte_input(status_port());
 
-            if (status & (ATA_ERR | ATA_DF)) [[unlikely]]
-                return false;
+        while (timeout--) [[likely]] {
+            input = stdlib::byte_input(status_port());
 
-            if (!(status & ATA_BSY) && (status & ATA_DRQ))
-                return true;
+            if (input & ATA_ERR) [[unlikely]] {
+                status = status::ATA_ERROR;
+                goto cleanup;
+            }
+
+            if (input & ATA_DF) [[unlikely]] {
+                status = status::ATA_DEVICE_FAULT;
+                goto cleanup;
+            }
+
+            if (!(input & ATA_BSY) && (input & ATA_DRQ)) {
+                status = status::SUCCESS;
+                goto cleanup;
+            }
         }
 
-        return false;
+        status = status::ATA_TIMEOUT;
+
+    cleanup:
+        return status;
     }
 
-    bool Programmable_Input_Output::poll_until_not_busy() noexcept {
+    status_t Programmable_Input_Output::poll_until_not_busy() noexcept {
+        status_t status;
+        uint8_t input;
         uint32_t timeout = 5'000'000;
-        while (timeout--) {
-            const uint8_t status = stdlib::byte_input(status_port());
 
-            if (status & (ATA_ERR | ATA_DF)) [[unlikely]]
-                return false;
+        while (timeout--) [[likely]] {
+            input = stdlib::byte_input(status_port());
 
-            if (!(status & ATA_BSY))
-                return true;
+            if (input & ATA_ERR) [[unlikely]] {
+                status = status::ATA_ERROR;
+                goto cleanup;
+            }
+
+            if (input & ATA_DF) [[unlikely]] {
+                status = status::ATA_DEVICE_FAULT;
+                goto cleanup;
+            }
+
+            if (!(input & ATA_BSY)) {
+                status = status::SUCCESS;
+                goto cleanup;
+            }
         }
 
-        return false;
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
     }
 
-    bool Programmable_Input_Output::poll_and_read_or_write_disk(const Operations op,
-                                                                uint16_t* buffer,
-                                                                const uint32_t sector_count) 
-                                                                noexcept {
-        for (uint32_t i = 0; i < sector_count; ++i) {
+    status_t 
+    Programmable_Input_Output::poll_and_read_or_write_disk(_INOUT_ uint16_t* buffer,
+                                                           _IN_    const Operations op,
+                                                           _IN_    const uint32_t sector_count) 
+                                                           noexcept {
+        status_t status;
+
+        for (uint32_t i = 0; i < sector_count; ++i) [[likely]] {
             delay();
 
-            if (!poll_until_drq_or_error()) [[unlikely]]
-                return false;
+            status = poll_until_drq_or_error();
+            if (status != status::SUCCESS) [[unlikely]] {
+                goto cleanup;
+            }
 
-            if (op == Operations::READ)
+            if (op == Operations::READ) {
                 stdlib::word_input_stream(io_port_base,
+                                          SECTOR_WORD_SIZE,
+                                          buffer);
+
+            } 
+            else {
+                stdlib::word_output_stream(io_port_base,
                                            SECTOR_WORD_SIZE,
                                            buffer);
-            else
-                stdlib::word_output_stream(io_port_base,
-                                            SECTOR_WORD_SIZE,
-                                            buffer);
+            }
 
             buffer += SECTOR_WORD_SIZE;
+
             delay();
         }
 
-        return true;
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
     }
 
-    bool Programmable_Input_Output::start_pio_disk_read_or_write(const Operations op,
-                                                                 uint16_t* buffer, 
-                                                                 const uint32_t sector_count,
-                                                                 const uint32_t relative_lba) 
-                                                                 noexcept {
-        if (!ata_pio_read_and_write_guard(partition_length, 
-                                          relative_lba, 
-                                          sector_count)) [[unlikely]]
-            return false;
+    status_t 
+    Programmable_Input_Output::start_pio_disk_read_or_write(_INOUT_ uint16_t* buffer,
+                                                            _IN_    const Operations op,
+                                                            _IN_    const uint32_t sector_count,
+                                                            _IN_    const uint32_t relative_lba) 
+                                                            noexcept {
+        status_t status;
+        uint32_t absolute_lba;
+        uint8_t final_status;
 
-        const uint32_t absolute_lba = relative_lba + lba_start_address;
+        status = validate_storage_access(partition_length,
+                                          relative_lba,
+                                          sector_count);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        absolute_lba = relative_lba + lba_start_address;
+
         stdlib::byte_output(io_port_base + 2, static_cast<uint8_t>(sector_count));
         stdlib::byte_output(io_port_base + 3, shift_and_mask(absolute_lba, 0, BYTE_MASK));
         stdlib::byte_output(io_port_base + 4, shift_and_mask(absolute_lba, 8, BYTE_MASK));
         stdlib::byte_output(io_port_base + 5, shift_and_mask(absolute_lba, 16, BYTE_MASK));
-        stdlib::byte_output(io_port_base + 6, shift_and_mask(absolute_lba, 
-                                                              24, 
-                                                              NIBBLE_MASK, 
-                                                              master_save_flags));
+        stdlib::byte_output(io_port_base + 6, shift_and_mask(absolute_lba,
+                                                             24,
+                                                             NIBBLE_MASK,
+                                                             master_save_flags));
 
-        if (op == Operations::READ)
+        if (op == Operations::READ) {
             stdlib::byte_output(status_port(), READ_SECTORS);
-        else
+        }
+        else {
             stdlib::byte_output(status_port(), WRITE_SECTORS);
+        }
 
-        if (!poll_and_read_or_write_disk(op,
-                                         buffer, 
-                                         sector_count))
-            return false;
+        status = poll_and_read_or_write_disk(buffer, op, sector_count);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
 
         if (op == Operations::WRITE) {
             stdlib::byte_output(status_port(), FLUSH_CACHE);
 
-            if (!poll_until_not_busy()) [[unlikely]]
-                return false;
+            status = poll_until_not_busy();
+            if (status != status::SUCCESS) [[unlikely]] {
+                goto cleanup;
+            }
         }
 
-        const uint8_t final_status = stdlib::byte_input(status_port());
-        return !(final_status & ATA_ERR || final_status & ATA_DF);
+        final_status = stdlib::byte_input(status_port());
+
+        if (final_status & ATA_ERR) [[unlikely]] {
+            status = status::ATA_ERROR;
+            goto cleanup;
+        }
+
+        if (final_status & ATA_DF) [[unlikely]] {
+            status = status::ATA_DEVICE_FAULT;
+            goto cleanup;
+        }
+
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
     }
 
     void Programmable_Input_Output::init() noexcept {
@@ -221,58 +378,80 @@ namespace drivers::ata
             {IDE_SECONDARY_IO_BASE, IDE_SECONDARY_DCR_BASE} 
         };
 
-        for (const auto& channel : channels) {
-            if (probe_and_configure_channel(channel.io_port, 
-                                            channel.control_reg)) [[unlikely]]
-                return;
+        status_t status;
+        for (const auto& channel : channels) [[likely]] {
+            status = probe_and_configure_channel(channel.io_port, 
+                                                 channel.control_reg);
+            if (status == status::SUCCESS) {
+                goto cleanup;
+            }
         }
 
-        kernel::sys::panic("ATA init from IDENTIFY failed, no device detected");
+        kernel::sys::panic("ATA init from 'IDENTIFY' failed, no device detected");
+
+    cleanup:
+        return;
     }
 
-    bool Programmable_Input_Output::run(const Operations op,
-                                        uint32_t sector_count,
-                                        uint16_t* buffer,
-                                        uint32_t relative_lba) noexcept {
+    status_t Programmable_Input_Output::run(_INOUT_ uint16_t* buffer,
+                                            _IN_    uint32_t sector_count,
+                                            _IN_    uint32_t relative_lba,
+                                            _IN_    const Operations op) 
+                                            noexcept {
+        status_t status;
+        uint32_t chunk;
+        uint32_t max_sectors;
+
         if (sector_count == 0) [[unlikely]] {
-            reset_driver(dcr_port());
-            sector_count = 0;
-
-            return true;
+            status = status::SUCCESS;
+            goto cleanup;
         }
 
-        if (sector_count > MAX_ALLOWED_SECTOR_COUNT) [[unlikely]]
-            return false;
-
-        const uint32_t max_sectors = partition_length - 1;
-        if (relative_lba > max_sectors || 
-            sector_count > max_sectors || 
-            relative_lba > (max_sectors - sector_count + 1)) [[unlikely]]
-            return false;
-
-        if (!poll_until_not_busy()) [[unlikely]] {
-            reset_driver(dcr_port());
-            return false;
+        if (sector_count > MAX_ALLOWED_SECTOR_COUNT) [[unlikely]] {
+            status = status::ATA_INVALID_SECTOR_COUNT;
+            goto cleanup;
         }
 
-        while (sector_count > 0) {
-            const uint32_t chunk = (sector_count > CHUNK_SECTORS)
-                                   ? CHUNK_SECTORS
-                                   : sector_count;
-        
-            if (!start_pio_disk_read_or_write(op,
-                                              buffer,
-                                              chunk,
-                                              relative_lba)) [[unlikely]] {
-                reset_driver(dcr_port());
-                return false;
+        max_sectors = partition_length - 1;
+
+        if (relative_lba > max_sectors ||
+            sector_count > max_sectors ||
+            relative_lba > (max_sectors - sector_count + 1)) [[unlikely]] {
+            status = status::ATA_INVALID_LBA;
+            goto cleanup;
+        }
+
+        status = poll_until_not_busy();
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        while (sector_count > 0) [[likely]] {
+            if (sector_count > CHUNK_SECTORS) {
+                chunk = CHUNK_SECTORS;
             }
-        
+            else {
+                chunk = sector_count;
+            }
+
+            status = start_pio_disk_read_or_write(buffer,
+                                                  op,
+                                                  chunk,
+                                                  relative_lba);
+            if (status != status::SUCCESS) [[unlikely]] {
+                goto cleanup;
+            }
+
             buffer       += chunk * SECTOR_WORD_SIZE;
             relative_lba += chunk;
             sector_count -= chunk;
         }
 
-        return true;
+        status = status::SUCCESS;
+
+    cleanup:
+        reset_driver(dcr_port());
+
+        return status;
     }
 } // namespace drivers::ata

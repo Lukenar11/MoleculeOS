@@ -36,7 +36,7 @@ namespace kernel::idt::isr
         stdlib::Text_Output::put_string(">>>>>>>>>> !KERNEL PANIC! <<<<<<<<<<");
         print_reg_dump("\n\nError Code: ", reg_dump->error_code);
     
-        stdlib::Text_Output::put_string("\nException: ");
+        stdlib::Text_Output::put_string("\nException:  ");
         stdlib::Text_Output::put_string(exception);
         stdlib::Text_Output::put_char(' ');
         stdlib::Text_Output::put_char('(');
@@ -44,8 +44,8 @@ namespace kernel::idt::isr
         stdlib::Text_Output::put_char(')');
     
         stdlib::Text_Output::put_string("\n\nCPU State:");
-        print_reg_dump("\n\tEIP:   ", reg_dump->eip);
-        print_reg_dump("\n\tCS:    ", reg_dump->cs);
+        print_reg_dump("\n\tEIP:    ", reg_dump->eip);
+        print_reg_dump("\n\tCS:     ", reg_dump->cs);
         stdlib::Text_Output::put_string("\n\tEFLAGS: ");
         stdlib::Text_Output::put_bin(reg_dump->eflags);
     
