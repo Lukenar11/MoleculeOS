@@ -4,7 +4,9 @@
 # https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 # 
 
-OBJS += $(BUILD)/port_io.o \
+COMMON_FLAGS += -Iarch/i386/stdlib/include \
 
-$(BUILD)/%.o: arch/i386/runtime/src/%.asm
-	nasm $(ASM_FLAGS) $< -o $@
+include arch/i386/stdlib/src/Makefile
+
+$(BUILD_DIR):
+	mkdir -p $(BUILD_DIR)
