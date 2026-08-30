@@ -44,25 +44,27 @@ extern "C"
     }
 
     int32_t memcmp(const void* a_ptr, const void* b_ptr, uint32_t size) {
-        int32_t status;
+        int32_t iso_std_status;
+        status_t status;
 
-        switch (stdlib::Memory_Manipulation::compare_memory_block(a_ptr,
-                                                                  b_ptr, 
-                                                                  size)) {
+        status = stdlib::Memory_Manipulation::compare_memory_block(a_ptr,
+                                                                   b_ptr, 
+                                                                   size);
+        switch (status & status::flags::SIZE_ZERO) {
         case status::LESS_THAN: 
-            status = -1;
+            iso_std_status = -1;
             break;
 
         case status::GREATER_THAN: 
-            status = 1;
+            iso_std_status = 1;
             break;
 
         default: 
-            status = 0;
+            iso_std_status = 0;
             break;
         }
 
-        return status;
+        return iso_std_status;
     }
 
     void strncpy(char* dest_ptr, const char* src_ptr, uint32_t size) {

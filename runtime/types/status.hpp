@@ -31,13 +31,20 @@ using status_t = uint32_t;
 
 namespace status
 {
-    constexpr status_t SUCCESS           = 0x00'0000'00;
-    constexpr status_t FAIL              = 0x00'0000'01;
-    constexpr status_t INVALID_PARAMETER = 0x00'0000'02;
-    constexpr status_t NOT_FOUND         = 0x00'0000'03;
-    constexpr status_t OUT_OF_MEMORY     = 0x00'0000'04;
-    constexpr status_t IO_ERROR          = 0x00'0000'05;
-    constexpr status_t END_OF_FILE       = 0x00'0000'06;
+    constexpr status_t SUCCESS               = 0x00'0000'00;
+    constexpr status_t FAIL                  = 0x00'0000'01;
+    constexpr status_t INVALID_PARAMETER     = 0x00'0000'02;
+    constexpr status_t NOT_FOUND             = 0x00'0000'03;
+    constexpr status_t OUT_OF_MEMORY         = 0x00'0000'04;
+    constexpr status_t IO_ERROR              = 0x00'0000'05;
+    constexpr status_t END_OF_FILE           = 0x00'0000'06;
+    constexpr status_t MISSING_PARAMETER     = 0x00'0000'07;
+    constexpr status_t INVALID_STATE         = 0x00'0000'08;
+    constexpr status_t BUFFER_TOO_SMALL      = 0x00'0000'09;
+    constexpr status_t BUFFER_OVERFLOW       = 0x00'0000'0A;
+    constexpr status_t BUFFER_UNDERFLOW      = 0x00'0000'0B;
+    constexpr status_t UNSUPPORTED_OPERATION = 0x00'0000'0C;
+    constexpr status_t NOT_IMPLEMENTED       = 0x00'0000'0D;
 
     constexpr status_t GREATER_THAN = 0x01'0000'00;
     constexpr status_t LESS_THAN    = 0x01'0000'01;
@@ -70,3 +77,20 @@ namespace status
     constexpr status_t ATA_INVALID_LBA          = 0x05'0000'05;
     constexpr status_t ATA_ERROR                = 0x05'0000'06;
 } // namespace status
+
+namespace status::flags 
+{
+    constexpr status_t PARAM_A = 0x00'0001'00;
+    constexpr status_t PARAM_B = 0x00'0002'00;
+    constexpr status_t PARAM_C = 0x00'0004'00;
+    constexpr status_t PARAM_D = 0x00'0004'00;
+    
+    constexpr status_t READ_ONLY    = 0x00'0010'00;
+    constexpr status_t WRITE_ONLY   = 0x00'0020'00;
+    constexpr status_t EXECUTE_ONLY = 0x00'0040'00;
+    constexpr status_t UNALIGNED    = 0x00'0080'00;
+
+    constexpr status_t OUT_OF_RANGE = 0x00'0100'00;
+    constexpr status_t SIZE_ZERO    = 0x00'0200'00;
+    constexpr status_t TOO_LARGE    = 0x00'0400'00;
+} // namespace status::flags
