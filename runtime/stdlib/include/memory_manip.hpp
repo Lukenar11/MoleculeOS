@@ -94,7 +94,7 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        static inline status_t 
+        _API_ static inline status_t 
         copy_memory_block(_IN_ void* dest_ptr, 
                           _IN_ const void* src_ptr, 
                           _IN_ uint32_t size) noexcept {
@@ -141,7 +141,7 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        static inline status_t 
+        _API_ static inline status_t 
         move_memory_block(_IN_ void* dest_ptr, 
                           _IN_ const void* src_ptr, 
                           _IN_ uint32_t size) noexcept {
@@ -195,7 +195,7 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        static inline status_t 
+        _API_ static inline status_t 
         set_memory_block(_IN_ void* dest_ptr, 
                          _IN_ const int32_t value, 
                          _IN_ uint32_t size) noexcept {
@@ -257,7 +257,7 @@ namespace stdlib
          * @retval `status::EQUAL_TO`
          *          If the contents of both memory-blocks are identical.
          */
-        static inline status_t 
+        _API_ static inline status_t 
         compare_memory_block(_IN_ const void* a_ptr, 
                              _IN_ const void* b_ptr,
                              _IN_ uint32_t size) noexcept {

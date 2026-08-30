@@ -85,7 +85,7 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        static status_t 
+        _API_ static status_t 
         copy_string_part(_INOUT_ char* dest_ptr,
                          _IN_    const char* src_ptr,
                          _IN_    const uint32_t size) noexcept {
@@ -135,7 +135,7 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        static inline status_t 
+        _API_ static inline status_t 
         copy_string(_INOUT_ char* dest_ptr, 
                     _IN_    const char* src_ptr) noexcept {
             status_t status;
@@ -171,7 +171,7 @@ namespace stdlib
          * @retval `status::SUCCESS` 
          *          Default case.
          */
-        static inline status_t 
+        _API_ static inline status_t 
         find_char_in_string(_OUT_ const char*& founded_char,
                             _IN_  const char* string, 
                             _IN_  const int32_t symbol) noexcept {
@@ -213,7 +213,7 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        static inline status_t 
+        _API_ static inline status_t 
         get_string_length(_OUT_ uint32_t& length,
                           _IN_  const char *string) noexcept {
             status_t status;
@@ -257,7 +257,7 @@ namespace stdlib
          * @retval `status::EQUAL_TO`
          *          If string-a and string-b are identical.
          */
-        static inline status_t 
+        _API_ static inline status_t 
         compare_strings(_IN_ const char* a_ptr, 
                         _IN_ const char* b_ptr) noexcept {
             status_t status;
@@ -303,7 +303,7 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        static inline status_t 
+        _API_ static inline status_t 
         string_to_int(_OUT_ int32_t& value,
                       _IN_  const char* string) noexcept {
             status_t status;
@@ -352,7 +352,7 @@ namespace stdlib
          * @retval `true` if `symbol` is a digit.
          * @retval `false` if `symbol` is not a digit.
          */
-        static inline bool 
+        _API_ static inline bool 
         is_digit(_IN_ const int32_t symbol) noexcept {
             return (symbol >= '0') && (symbol <= '9');
         }
