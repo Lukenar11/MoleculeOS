@@ -106,7 +106,7 @@ namespace stdlib
          *
          * @param item The removed element.
          * 
-         * @retval `status::BUFFER_UNDERFLOW | status::EMPTY`
+         * @retval `status::BUFFER_UNDERFLOW | status::IS_EMPTY`
          *          If the buffer is empty.
          *
          * @retval `status::SUCCESS`
@@ -117,7 +117,7 @@ namespace stdlib
             status_t status;
 
             if (empty()) [[unlikely]] {
-                status = status::BUFFER_UNDERFLOW | status::flags::EMPTY;
+                status = status::BUFFER_UNDERFLOW | status::flags::IS_EMPTY;
                 goto cleanup;
             }
 
@@ -137,7 +137,7 @@ namespace stdlib
          *
          * @param item The element at the buffer tail.
          *
-         * @retval `status::BUFFER_UNDERFLOW | status::EMPTY`
+         * @retval `status::BUFFER_UNDERFLOW | status::IS_EMPTY`
          *          If the buffer is empty.
          *
          * @retval `status::SUCCESS`
@@ -148,7 +148,7 @@ namespace stdlib
             status_t status;
 
             if (empty()) [[unlikely]] {
-                status = status::BUFFER_UNDERFLOW | status::flags::EMPTY;
+                status = status::BUFFER_UNDERFLOW | status::flags::IS_EMPTY;
                 goto cleanup;
             }
 
