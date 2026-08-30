@@ -18,7 +18,9 @@ NOTES:
     system's '<types.hpp>'.
 */
 
+
 #pragma once
+
 
 using int8_t  = signed char;
 using int16_t = signed short;
@@ -28,12 +30,13 @@ using uint8_t  = unsigned char;
 using uint16_t = unsigned short;
 using uint32_t = unsigned int;
 
-static_assert(sizeof(int8_t)  == 1, "'int8_t' has the wrong byte size!");
-static_assert(sizeof(int16_t) == 2, "'int16_t' has the wrong byte size!");
-static_assert(sizeof(int32_t) == 4, "'int32_t' has the wrong byte size!");
 
-static_assert(sizeof(uint8_t)  == 1, "'uint8_t' has the wrong byte size!");
-static_assert(sizeof(uint16_t) == 2, "'uint16_t' has the wrong byte size!");
-static_assert(sizeof(uint32_t) == 4, "'uint32_t' has the wrong byte size!");
+static_assert(sizeof(int8_t)  == 1, "sizeof(int8_t) != 1");
+static_assert(sizeof(int16_t) == 2, "sizeof(int16_t) != 2");
+static_assert(sizeof(int32_t) == 4, "sizeof(int32_t) != 4");
 
-static_assert(sizeof(void*) == 4, "'uint32_t' has the wrong byte size!");
+static_assert(sizeof(uint8_t)  == 1, "sizeof(int8_t) != 1");
+static_assert(sizeof(uint16_t) == 2, "sizeof(int16_t) != 2");
+static_assert(sizeof(uint32_t) == 4, "sizeof(int32_t) != 4");
+
+static_assert(sizeof(void*) == 4, "sizeof(void*) != 4");

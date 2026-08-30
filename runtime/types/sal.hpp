@@ -13,12 +13,15 @@ DESCRIPTION:
         - _IN_    => Input
         - _OUT_   => Output
         - _INOUT_ => input => 2. output
+        - _API_   => public method
 
 NOTES:
 */
+
 
 #pragma once
 
 #define _IN_
 #define _OUT_
 #define _INOUT_
+#define _API_

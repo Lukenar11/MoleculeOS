@@ -23,11 +23,14 @@ DESCRIPTION:
 NOTES:
 */
 
+
 #pragma once
 
 #include <types.hpp>
 
+
 using status_t = uint32_t;
+
 
 namespace status
 {
@@ -77,6 +80,7 @@ namespace status
     constexpr status_t ATA_INVALID_LBA          = 0x05'0000'05;
     constexpr status_t ATA_ERROR                = 0x05'0000'06;
 } // namespace status
+
 
 namespace status::flags 
 {
