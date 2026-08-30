@@ -13,10 +13,12 @@ DESCRIPTION:
 NOTES:
 */
 
+
 #pragma once
 
 #include <types.hpp>
 #include <sal.hpp>
+
 
 namespace stdlib 
 {
@@ -28,73 +30,117 @@ namespace stdlib
         T buffer[S] = {};
 
     public:
-        inline constexpr 
-        T& operator[](_IN_ uint32_t index) noexcept { 
+        /**
+         * @brief Returns the element at the given index.
+         * 
+         * @warning No bounds checking is performed.
+         * 
+         * @param index index of the element
+         * 
+         * @return reference to the element at the given index
+         */
+        inline constexpr T& 
+        operator[](_IN_ uint32_t index) noexcept { 
             return buffer[index]; 
         }
 
-        inline constexpr 
-        const T& operator[](_IN_ const uint32_t index) const noexcept {
+        inline constexpr const T&
+        operator[](_IN_ const uint32_t index) const noexcept {
             return buffer[index]; 
         }
 
-        inline constexpr 
-        uint32_t size() const noexcept { 
+
+        /**
+         * @brief Returns the count of all array elements.
+         */
+        inline constexpr uint32_t 
+        size() const noexcept { 
             return S; 
         }
 
-        inline constexpr 
-        T* begin() noexcept { 
+
+        /**
+         * @brief Returns a pointer to the first element.
+         */
+        inline constexpr T* 
+        begin() noexcept { 
             return buffer; 
         }
 
-        inline constexpr 
-        const T* begin() const noexcept { 
+        inline constexpr const T* 
+        begin() const noexcept { 
             return buffer; 
         }
 
-        inline constexpr 
-        T* end() noexcept { 
+
+        /**
+         * @brief Returns a pointer to the last element.
+         */
+        inline constexpr T* 
+        end() noexcept { 
             return buffer + S; 
         }
 
-        inline constexpr 
-        const T* end() const noexcept { 
+        inline constexpr const T* 
+        end() const noexcept { 
             return buffer + S; 
         }
 
-        inline constexpr 
-        T& front() noexcept { 
+
+        /**
+         * @brief Returns the first element.
+         *
+         * @warning No bounds checking is performed.
+         */
+        inline constexpr T& 
+        front() noexcept { 
             return buffer[0]; 
         }
 
-        inline constexpr 
-        const T& front() const noexcept { 
+        inline constexpr const T& 
+        front() const noexcept { 
             return buffer[0];
         }
 
-        inline constexpr 
-        T& back() noexcept { 
+
+        /**
+         * @brief Returns the last element.
+         *
+         * @warning No bounds checking is performed.
+         */
+        inline constexpr T& 
+        back() noexcept { 
             return buffer[S - 1]; 
         }
 
-        inline constexpr 
-        const T& back() const noexcept { 
+        inline constexpr const T& 
+        back() const noexcept { 
             return buffer[S - 1]; 
         }
 
-        inline constexpr 
-        T* data() noexcept { 
+
+        /**
+         * @brief Returns a pointer to the data buffer.
+         */
+        inline constexpr T* 
+        data() noexcept { 
             return buffer; 
         }
 
-        inline constexpr 
-        const T* data() const noexcept { 
+        inline constexpr const T* 
+        data() const noexcept { 
             return buffer; 
         }
 
-        inline constexpr 
-        void fill(_IN_ const T& value) noexcept {
+
+        /**
+         * @brief Fills all array elements with a specific value.
+         * 
+         * @param value Value with which the array should be filled.
+         * 
+         */
+        inline constexpr void 
+        fill(_IN_ const T& value) noexcept {
             for (uint32_t i = 0; i < S; i++) [[likely]] {
                 buffer[i] = value; 
             }

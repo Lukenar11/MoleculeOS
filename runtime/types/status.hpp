@@ -93,4 +93,5 @@ namespace status::flags
     constexpr status_t OUT_OF_RANGE = 0x00'0100'00;
     constexpr status_t SIZE_ZERO    = 0x00'0200'00;
     constexpr status_t TOO_LARGE    = 0x00'0400'00;
+    constexpr status_t OVERWRITTEN  = 0x00'0800'00;
 } // namespace status::flags
