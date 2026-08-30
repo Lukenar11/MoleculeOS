@@ -13,5 +13,5 @@ OBJS += $(BUILD)/text_output.o \
 $(BUILD)/%.o: runtime/stdlib/src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(BUILD)/%.o: runtime/stdlib/src/utils/%.cpp
+$(BUILD)/%.o: runtime/stdlib/src/utils/%.c
 	$(CXX) $(CXXFLAGS) -c $< -o $@

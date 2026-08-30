@@ -215,6 +215,7 @@ namespace stdlib
 
             dest = static_cast<uint8_t*>(dest_ptr);
             byte = static_cast<uint8_t>(value);
+            
             while (size--) [[likely]] {
                 *dest++ = byte;
             }
