@@ -46,34 +46,12 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          All parameters are valid.
          */
-        [[nodiscard]] static inline status_t
+        [[nodiscard]] static status_t
         validate_parameters(_IN_ void* dest_ptr, 
                             _IN_ const void* src_ptr, 
-                            _IN_ uint32_t size) noexcept {
-            status_t status;
+                            _IN_ uint32_t size) noexcept;
 
-            if (!dest_ptr) [[unlikely]] {
-                status = status::NULL_POINTER | status::flags::PARAM_A;
-                goto cleanup;
-            }
-
-            if (!src_ptr) [[unlikely]] {
-                status = status::NULL_POINTER | status::flags::PARAM_B;
-                goto cleanup;
-            }
-
-            if (size == 0) [[unlikely]] {
-                status = status::SUCCESS | status::flags::SIZE_ZERO;
-                goto cleanup;
-            }
-
-            status = status::SUCCESS;
-
-        cleanup:
-            return status;
-        }
-
-
+                            
     public:
         /**
          * @brief Copys a memory-block with a specific size.
@@ -94,31 +72,10 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        _API_ static inline status_t 
+        _API_ static status_t 
         copy_memory_block(_IN_ void* dest_ptr, 
                           _IN_ const void* src_ptr, 
-                          _IN_ uint32_t size) noexcept {
-            status_t status;
-            uint8_t* dest;
-            const uint8_t* src;
-
-            status = validate_parameters(dest_ptr, src_ptr, size);
-            if (status != status::SUCCESS) [[unlikely]] {
-                goto cleanup;
-            }
-
-            dest = static_cast<uint8_t*>(dest_ptr);
-            src  = static_cast<const uint8_t*>(src_ptr);
-
-            while (size--) [[likely]] {
-                *dest++ = *src++;
-            }
-
-            status = status::SUCCESS;
-
-        cleanup:
-            return status;
-        }
+                          _IN_ uint32_t size) noexcept;
 
 
         /**
@@ -141,42 +98,10 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        _API_ static inline status_t 
+        _API_ static status_t 
         move_memory_block(_IN_ void* dest_ptr, 
                           _IN_ const void* src_ptr, 
-                          _IN_ uint32_t size) noexcept {
-            status_t status;
-            uint8_t* dest;
-            const uint8_t* src;
-
-            status = validate_parameters(dest_ptr, src_ptr, size);
-            if (status != status::SUCCESS) [[unlikely]] {
-                goto cleanup;
-            }
-            
-            dest = static_cast<uint8_t*>(dest_ptr);
-            src  = static_cast<const uint8_t*>(src_ptr);
-
-            if (reinterpret_cast<uint32_t>(dest) < 
-                reinterpret_cast<uint32_t>(src)) [[likely]] {
-                while (size--) [[likely]] {
-                    *dest++ = *src++;
-                }
-            } 
-            else {
-                dest += size;
-                src  += size;
-
-                while (size--) [[likely]] {
-                    *--dest = *--src;
-                }
-            }
-
-            status = status::SUCCESS;
-
-        cleanup:
-            return status;
-        }
+                          _IN_ uint32_t size) noexcept;
 
 
         /**
@@ -195,36 +120,10 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        _API_ static inline status_t 
+        _API_ static status_t 
         set_memory_block(_IN_ void* dest_ptr, 
                          _IN_ const int32_t value, 
-                         _IN_ uint32_t size) noexcept {
-            status_t status;
-            uint8_t* dest;
-            uint8_t byte;
-
-            if (!dest_ptr) [[unlikely]] {
-                status = status::NULL_POINTER | status::flags::PARAM_A;
-                goto cleanup;
-            }
-
-            if (size == 0) [[unlikely]] {
-                status = status::SUCCESS | status::flags::SIZE_ZERO;
-                goto cleanup;
-            }
-
-            dest = static_cast<uint8_t*>(dest_ptr);
-            byte = static_cast<uint8_t>(value);
-            
-            while (size--) [[likely]] {
-                *dest++ = byte;
-            }
-
-            status = status::SUCCESS;
-
-        cleanup:
-            return status;
-        };
+                         _IN_ uint32_t size) noexcept;
 
 
         /**
@@ -258,41 +157,10 @@ namespace stdlib
          * @retval `status::EQUAL_TO`
          *          If the contents of both memory-blocks are identical.
          */
-        _API_ static inline status_t 
+        _API_ static status_t 
         compare_memory_block(_IN_ const void* a_ptr, 
                              _IN_ const void* b_ptr,
-                             _IN_ uint32_t size) noexcept {
-            status_t status;
-            const uint8_t* a = static_cast<const uint8_t*>(a_ptr);
-            const uint8_t* b = static_cast<const uint8_t*>(b_ptr);
-
-            status = validate_parameters(const_cast<void*>(a_ptr), 
-                                         b_ptr,
-                                         size);
-            if (status != status::SUCCESS) [[unlikely]] {
-                goto cleanup;
-            }
-
-            while (size--) [[likely]] {
-                if (*a < *b) {
-                    status = status::LESS_THAN;
-                    goto cleanup;  
-                }
-
-                if (*a > *b) {
-                    status = status::GREATER_THAN;
-                    goto cleanup;  
-                }
-
-                a++;
-                b++;
-            }
-
-            status = status::EQUAL_TO;
-
-        cleanup:
-            return status;
-        }
+                             _IN_ uint32_t size) noexcept;
 
 
         Memory_Manipulation() noexcept  = default;

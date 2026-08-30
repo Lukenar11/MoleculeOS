@@ -11,8 +11,8 @@ DESCRIPTION:
     The routines include copying, shifting, comparing, and filling strings
 
 NOTES:
-    Because of the C API for the compiler, the methods are defined in the
-    header so that the compiler can inline them.
+    Some methods are defined in the header so that the 
+    compiler can better inline them.
 */
 
 
@@ -42,27 +42,9 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          If all pointer are valid.
          */
-        [[nodiscard]] static inline status_t
+        [[nodiscard]] static status_t
         validate_dest_ptr_and_src_ptr(_INOUT_ char* dest_ptr,
-                                      _IN_    const char* src_ptr) noexcept {
-            status_t status;
-
-            if (!dest_ptr) [[unlikely]] {
-                status = status::NULL_POINTER | status::flags::PARAM_A;
-                goto cleanup;
-            }
-
-            if (!src_ptr) [[unlikely]] {
-                status = status::NULL_POINTER | status::flags::PARAM_B;
-                goto cleanup;
-            }
-
-            status = status::SUCCESS;
-
-        cleanup:
-            return status;
-        }
-
+                                      _IN_    const char* src_ptr) noexcept;
 
     public:
         /**
@@ -88,36 +70,7 @@ namespace stdlib
         _API_ static status_t 
         copy_string_part(_INOUT_ char* dest_ptr,
                          _IN_    const char* src_ptr,
-                         _IN_    const uint32_t size) noexcept {
-            status_t status;
-            const char null_char = '\0';
-
-            status = validate_dest_ptr_and_src_ptr(dest_ptr, src_ptr);
-            if (status != status::SUCCESS) [[unlikely]] {
-                goto cleanup;
-            }
-
-            if (size == 0) [[unlikely]] {
-                status = status::SUCCESS | status::flags::SIZE_ZERO;
-                goto cleanup;
-            }
-
-            for (uint32_t i = 0; i < size; i++) [[likely]] {
-                if (src_ptr[i] == null_char) {
-                    dest_ptr[i] = null_char;
-                    status = status::SUCCESS;
-                    goto cleanup;
-                }
-
-                dest_ptr[i] = src_ptr[i];
-            }
-
-            dest_ptr[size - 1] = null_char;
-            status = status::SUCCESS;
-
-        cleanup:
-            return status;
-        }
+                         _IN_    const uint32_t size) noexcept;
 
 
         /**
@@ -135,24 +88,9 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        _API_ static inline status_t 
+        _API_ static status_t 
         copy_string(_INOUT_ char* dest_ptr, 
-                    _IN_    const char* src_ptr) noexcept {
-            status_t status;
-
-            status = validate_dest_ptr_and_src_ptr(dest_ptr, src_ptr);
-            if (status != status::SUCCESS) [[unlikely]] {
-                goto cleanup;
-            }
-
-            while ((*dest_ptr++ = *src_ptr++)) [[likely]] {
-            }
-
-            status = status::SUCCESS;
-
-        cleanup:
-            return status;
-        }
+                    _IN_    const char* src_ptr) noexcept;
 
 
         /**
@@ -171,34 +109,10 @@ namespace stdlib
          * @retval `status::SUCCESS` 
          *          Default case.
          */
-        _API_ static inline status_t 
+        _API_ static status_t 
         find_char_in_string(_OUT_ const char*& founded_char,
                             _IN_  const char* string, 
-                            _IN_  const int32_t symbol) noexcept {
-            status_t status;
-
-            if (!string) [[unlikely]] {
-                founded_char = nullptr;
-                status       = status::NULL_POINTER | status::flags::PARAM_B;
-
-                goto cleanup;
-            }
-
-            while (*string != static_cast<char>(symbol)) [[likely]] {
-                if (!(*string++)) [[unlikely]] {
-                    founded_char = nullptr;
-                    status       = status::NOT_FOUND;
-
-                    goto cleanup;
-                }
-            }
-
-            founded_char = const_cast<char*>(string);
-            status       = status::SUCCESS;
-
-        cleanup:
-            return status;
-        }
+                            _IN_  const int32_t symbol) noexcept;
 
 
         /**
@@ -213,27 +127,9 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        _API_ static inline status_t 
+        _API_ static status_t 
         get_string_length(_OUT_ uint32_t& length,
-                          _IN_  const char *string) noexcept {
-            status_t status;
-            length = 0;
-
-            if (!string) [[unlikely]] {
-                status = status::NULL_POINTER | status::flags::PARAM_B;
-                goto cleanup;
-            }
-
-            while (*string != '\0') [[likely]] {
-                ++string;
-                ++length;
-            }
-
-            status = status::SUCCESS;
-
-        cleanup:
-            return status;
-        }
+                          _IN_  const char *string) noexcept;
 
 
         /**
@@ -257,35 +153,9 @@ namespace stdlib
          * @retval `status::EQUAL_TO`
          *          If string-a and string-b are identical.
          */
-        _API_ static inline status_t 
+        _API_ static status_t 
         compare_strings(_IN_ const char* a_ptr, 
-                        _IN_ const char* b_ptr) noexcept {
-            status_t status;
-
-            status = validate_dest_ptr_and_src_ptr(const_cast<char*>(a_ptr), 
-                                                   b_ptr);
-            if (status != status::SUCCESS) [[unlikely]] {
-                goto cleanup;
-            }
-
-            while (*a_ptr && (*a_ptr == *b_ptr)) [[likely]] {
-                ++a_ptr;
-                ++b_ptr;
-            }
-
-            if (*a_ptr < *b_ptr) {
-                status = status::LESS_THAN;
-            } 
-            else if (*a_ptr > *b_ptr) {
-                status = status::GREATER_THAN;
-            }
-            else {
-                status = status::EQUAL_TO;
-            }
-
-        cleanup:
-            return status;
-        }
+                        _IN_ const char* b_ptr) noexcept;
 
 
         /**
@@ -303,45 +173,9 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        _API_ static inline status_t 
+        _API_ static status_t 
         string_to_int(_OUT_ int32_t& value,
-                      _IN_  const char* string) noexcept {
-            status_t status;
-            bool is_negative;
-            value = 0;
-
-           if (!string) [[unlikely]] {
-                status = status::NULL_POINTER | status::flags::PARAM_B;
-                goto cleanup;
-            }
-
-            if (string[0] == '-') {
-                is_negative = true;
-                string++;
-            }
-            else {
-                is_negative = false;
-            }
-
-            while (*string) [[likely]] {
-                if (!is_digit(*string)) [[unlikely]] {
-                    status = status::INVALID_PARAMETER;
-                    goto cleanup;
-                }
-
-                value = value * 10 + (*string - '0');
-                ++string;
-            }
-
-            if (is_negative) {
-                value = ~value + 1;
-            }
-
-            status = status::SUCCESS;
-
-        cleanup:
-            return status;
-        }
+                      _IN_  const char* string) noexcept;
 
 
         /**
@@ -352,10 +186,11 @@ namespace stdlib
          * @retval `true` if `symbol` is a digit.
          * @retval `false` if `symbol` is not a digit.
          */
-        _API_ static inline bool 
+        _API_ static bool 
         is_digit(_IN_ const int32_t symbol) noexcept {
             return (symbol >= '0') && (symbol <= '9');
         }
+
 
         String_Manipulation() noexcept  = default;
         ~String_Manipulation() noexcept = default;
