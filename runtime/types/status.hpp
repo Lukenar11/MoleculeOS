@@ -79,6 +79,11 @@ namespace status
     constexpr status_t ATA_INVALID_SECTOR_COUNT = 0x05'0000'04;
     constexpr status_t ATA_INVALID_LBA          = 0x05'0000'05;
     constexpr status_t ATA_ERROR                = 0x05'0000'06;
+
+    constexpr status_t PS2_SCANCODE_TO_BIG  = 0x06'0000'00;
+    constexpr status_t PS2_KEYBOARD_RELEASE = 0x06'0000'01;
+    constexpr status_t PS2_CAPS_LOCK        = 0x06'0000'02;
+    constexpr status_t PS2_SHIFT            = 0x06'0000'03;
 } // namespace status
 
 
@@ -99,5 +104,7 @@ namespace status::flags
     constexpr status_t TOO_LARGE    = 0x00'0400'00;
     constexpr status_t OVERWRITTEN  = 0x00'0800'00;
 
-    constexpr status_t IS_EMPTY = 0x00'1000'00;
+    constexpr status_t IS_EMPTY    = 0x00'1000'00;
+    constexpr status_t KEY_PRESS   = 0x00'2000'00;
+    constexpr status_t KEY_RELEASE = 0x00'4000'00;
 } // namespace status::flags

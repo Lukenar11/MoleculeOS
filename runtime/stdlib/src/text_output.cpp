@@ -153,10 +153,10 @@ namespace stdlib
     Text_Output::handle_backspace() noexcept {
         if (cursor_x > 0) [[likely]] {
             cursor_x--;
-            drivers::vga::Text_Mode::put_char_at(' ',
+            drivers::vga::Text_Mode::put_char_at(cursor_x,
+                                                 cursor_y,
                                                  cursor_color,
-                                                 cursor_x,
-                                                 cursor_y);
+                                                 ' ');
         }
     }
 
@@ -170,10 +170,10 @@ namespace stdlib
     void 
     Text_Output::handle_tab() noexcept {
         for (uint32_t i = 0; i < 4; ++i) [[likely]] {
-            drivers::vga::Text_Mode::put_char_at(' ',
-                                        cursor_color,
-                                        cursor_x,
-                                        cursor_y);
+            drivers::vga::Text_Mode::put_char_at(cursor_x,
+                                                 cursor_y,
+                                                 cursor_color,
+                                                 ' ');
             cursor_x++;
 
             if (cursor_x >= drivers::vga::TEXT_MODE_SCREEN_WIDTH) [[unlikely]] {
@@ -191,10 +191,10 @@ namespace stdlib
      */
     void 
     Text_Output::handle_normal_char(_IN_ const char symbol) noexcept {
-        drivers::vga::Text_Mode::put_char_at(symbol,
+        drivers::vga::Text_Mode::put_char_at(cursor_x,
+                                             cursor_y,
                                              cursor_color,
-                                             cursor_x,
-                                             cursor_y);
+                                             symbol);
         cursor_x++;
 
         if (cursor_x >= drivers::vga::TEXT_MODE_SCREEN_WIDTH) [[unlikely]] {

@@ -36,19 +36,6 @@ NOTES:
 
 namespace drivers::ata
 { 
-    uint8_t Programmable_Input_Output::shift_and_mask(_IN_ const uint32_t val,
-                                                      _IN_ const uint32_t shift,
-                                                      _IN_ const uint8_t mask,
-                                                      _IN_ const uint8_t add_mask) 
-                                                      noexcept {
-        if (add_mask == 0x00) [[likely]] {
-            return static_cast<uint8_t>(((val >> shift) & mask));
-        }
-        else [[unlikely]] {
-            return static_cast<uint8_t>(((val >> shift) & mask) | add_mask);
-        }
-    }
-
     status_t 
     Programmable_Input_Output::validate_storage_access(_IN_ const uint32_t partition_length,
                                                        _IN_ const uint32_t relative_lba, 
@@ -87,14 +74,15 @@ namespace drivers::ata
         return status;
     }
 
-    void Programmable_Input_Output::delay() noexcept {
+    void 
+    Programmable_Input_Output::delay() noexcept {
         for (uint32_t i = 0; i < 5; ++i) [[likely]] {
             stdlib::byte_input(status_port());
         }
     }
 
-    void Programmable_Input_Output::reset_driver(const uint16_t dcr_port) 
-                                                 noexcept {
+    void 
+    Programmable_Input_Output::reset_driver(const uint16_t dcr_port) noexcept {
         uint32_t timeout = 5'000'000;
         uint8_t status;
 
@@ -202,7 +190,8 @@ namespace drivers::ata
         return status;
     }
 
-    status_t Programmable_Input_Output::poll_until_drq_or_error() noexcept {
+    status_t 
+    Programmable_Input_Output::poll_until_drq_or_error() noexcept {
         status_t status;
         uint8_t input;
         uint32_t timeout = 5'000'000;
@@ -232,7 +221,8 @@ namespace drivers::ata
         return status;
     }
 
-    status_t Programmable_Input_Output::poll_until_not_busy() noexcept {
+    status_t 
+    Programmable_Input_Output::poll_until_not_busy() noexcept {
         status_t status;
         uint8_t input;
         uint32_t timeout = 5'000'000;
@@ -311,23 +301,30 @@ namespace drivers::ata
         uint8_t final_status;
 
         status = validate_storage_access(partition_length,
-                                          relative_lba,
-                                          sector_count);
+                                         relative_lba,
+                                         sector_count);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
         absolute_lba = relative_lba + lba_start_address;
 
-        stdlib::byte_output(io_port_base + 2, static_cast<uint8_t>(sector_count));
-        stdlib::byte_output(io_port_base + 3, shift_and_mask(absolute_lba, 0, BYTE_MASK));
-        stdlib::byte_output(io_port_base + 4, shift_and_mask(absolute_lba, 8, BYTE_MASK));
-        stdlib::byte_output(io_port_base + 5, shift_and_mask(absolute_lba, 16, BYTE_MASK));
-        stdlib::byte_output(io_port_base + 6, shift_and_mask(absolute_lba,
-                                                             24,
-                                                             NIBBLE_MASK,
-                                                             master_save_flags));
+        stdlib::byte_output(io_port_base + 2, 
+                            static_cast<uint8_t>(sector_count));
 
+        stdlib::byte_output(io_port_base + 3, 
+                            (absolute_lba >> 0) & BYTE_MASK);
+
+        stdlib::byte_output(io_port_base + 4, 
+                            (absolute_lba >> 8) & BYTE_MASK);
+                            
+        stdlib::byte_output(io_port_base + 5, 
+                            (absolute_lba >> 16) & BYTE_MASK);
+
+        stdlib::byte_output(io_port_base + 6, 
+                           (absolute_lba >> 24) & 
+                           NIBBLE_MASK | master_save_flags);
+                           
         if (op == Operations::READ) {
             stdlib::byte_output(status_port(), READ_SECTORS);
         }
@@ -367,7 +364,8 @@ namespace drivers::ata
         return status;
     }
 
-    void Programmable_Input_Output::init() noexcept {
+    _API_ void 
+    Programmable_Input_Output::init() noexcept {
         struct Channel final { 
             uint16_t io_port; 
             uint16_t control_reg; 
@@ -387,17 +385,20 @@ namespace drivers::ata
             }
         }
 
-        kernel::sys::panic("ATA init from 'IDENTIFY' failed, no device detected");
+        kernel::sys::panic(
+            "ATA init from 'IDENTIFY' failed, no device detected"
+        );
 
     cleanup:
         return;
     }
 
-    status_t Programmable_Input_Output::run(_INOUT_ uint16_t* buffer,
-                                            _IN_    uint32_t sector_count,
-                                            _IN_    uint32_t relative_lba,
-                                            _IN_    const Operations op) 
-                                            noexcept {
+    _API_ status_t 
+    Programmable_Input_Output::run(_INOUT_ uint16_t* buffer,
+                                   _IN_    uint32_t sector_count,
+                                   _IN_    uint32_t relative_lba,
+                                   _IN_    const Operations& operation) 
+                                   noexcept {
         status_t status;
         uint32_t chunk;
         uint32_t max_sectors;
@@ -435,7 +436,7 @@ namespace drivers::ata
             }
 
             status = start_pio_disk_read_or_write(buffer,
-                                                  op,
+                                                  operation,
                                                   chunk,
                                                   relative_lba);
             if (status != status::SUCCESS) [[unlikely]] {

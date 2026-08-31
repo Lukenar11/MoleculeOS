@@ -39,7 +39,7 @@ namespace terminal
         stdlib::Text_Output::set_text_color(foreground, background);
         
         const uint8_t color = stdlib::Text_Output::get_text_color();
-        drivers::vga::Text_Mode::put_char_at(' ', color, x, y);
+        drivers::vga::Text_Mode::put_char_at(x, y, color, ' ');
     }
 
     void Terminal::step() noexcept {
