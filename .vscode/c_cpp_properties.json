@@ -26,7 +26,6 @@
                 "${workspaceFolder}/runtime/stdlib/include",
                 "${workspaceFolder}/runtime/apis",
                 "${workspaceFolder}/runtime/types",
-                "${workspaceFolder}/arch/i386/runtime/include",
                 "${workspaceFolder}/arch/i386/kernel/include/idt",
                 "${workspaceFolder}/arch/i386/kernel/include/sys",
                 "${workspaceFolder}/arch/i386/kernel/include",

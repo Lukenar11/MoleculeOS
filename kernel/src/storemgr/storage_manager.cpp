@@ -40,8 +40,8 @@ namespace kernel::storemgr
         }
 
         status = ata::Programmable_Input_Output::run(sector_words,
-                                                     sector_count,
                                                      start_sector,
+                                                     sector_count,
                                                      ata::Operations::READ);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
@@ -83,8 +83,8 @@ namespace kernel::storemgr
         }
                              
         status = ata::Programmable_Input_Output::run(sector_words,
+                                                     start_sector,
                                                      sector_count,
-                                                     start_sector, 
                                                      ata::Operations::READ);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
@@ -98,8 +98,8 @@ namespace kernel::storemgr
         }
     
         status = ata::Programmable_Input_Output::run(sector_words,
+                                                     start_sector,
                                                      sector_count,
-                                                     start_sector, 
                                                      ata::Operations::WRITE);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
@@ -186,7 +186,6 @@ namespace kernel::storemgr
                                      sizeof(MOFS_Header),
                                      &header);
         if (status != status::SUCCESS) [[unlikely]] {
-            status = status::FAIL;
             goto cleanup;
         }
 

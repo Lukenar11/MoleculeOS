@@ -32,8 +32,8 @@ namespace kernel
         heap::Block_Allocator::init(&heap::heap_start, &heap::heap_end);
         drivers::ata::Programmable_Input_Output::init();
         storemgr::Storage_Manager::init();
-
-        if (storemgr::Storage_Manager::load_filesystem() != status::SUCCESS) [[unlikely]] {
+        
+        if (storemgr::Storage_Manager::load_filesystem()) [[unlikely]] {
             sys::panic("load failed");
         }
 

@@ -12,6 +12,7 @@
 ;    The interface is a header file called 'interrupts.hpp'.
 ;
 
+global disable_interrupts
 global enable_interrupts
 global trigger_interrupt
 
@@ -20,6 +21,10 @@ global trigger_interrupt
 %define LAST_INTERRUPT_TABLE_ENTRY 255
 
 section .text
+
+disable_interrupts:
+    cli
+    ret
 
 enable_interrupts:
     sti

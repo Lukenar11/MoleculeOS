@@ -23,9 +23,9 @@ namespace tests
         stdlib::Text_Output::put_string("Status before read: ");
         stdlib::Text_Output::put_hex(stdlib::byte_input(Programmable_Input_Output::status_port()));
 
-        if (Programmable_Input_Output::run(buffer_ptr, 
-                                           sectors, 
+        if (Programmable_Input_Output::run(buffer_ptr,
                                            lba, 
+                                           sectors, 
                                            drivers::ata::Operations::READ) != status::SUCCESS)
             stdlib::Text_Output::put_string("\nRead Success\n\n");
         else
@@ -62,8 +62,8 @@ namespace tests
         stdlib::Text_Output::put_hex(stdlib::byte_input(Programmable_Input_Output::status_port()));
 
         if (Programmable_Input_Output::run(ptr, 
+                                           lba, 
                                            sectors, 
-                                           lba,
                                            drivers::ata::Operations::READ) != status::SUCCESS)
             stdlib::Text_Output::put_string("\nRead Success\n\n");
         else
@@ -95,8 +95,8 @@ namespace tests
 
         for (uint32_t lba = 0; lba < 16; ++lba)
             if (Programmable_Input_Output::run(buffer_ptr, 
+                                               lba, 
                                                sectors, 
-                                               lba,
                                                drivers::ata::Operations::READ) != status::SUCCESS)
                 stdlib::Text_Output::put_string("\nRead Success\n\n");
             else
@@ -126,8 +126,8 @@ namespace tests
         int32_t sectors = 1;
         uint32_t lba = 0;
         Programmable_Input_Output::run(buffer_ptr, 
+                                       lba, 
                                        sectors, 
-                                       lba,
                                        drivers::ata::Operations::WRITE);
         read_sector();
     }

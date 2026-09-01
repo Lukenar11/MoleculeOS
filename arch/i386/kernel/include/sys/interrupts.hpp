@@ -19,6 +19,7 @@ NOTES:
 namespace kernel::sys
 {
     extern "C" {
+        void disable_interrupts();
         void enable_interrupts();
         void trigger_interrupt(uint32_t);
     }

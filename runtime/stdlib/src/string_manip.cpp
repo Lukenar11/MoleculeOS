@@ -37,7 +37,7 @@ namespace stdlib
      */
     [[nodiscard]] status_t
     String_Manipulation::validate_dest_ptr_and_src_ptr(_INOUT_ char* dest_ptr,
-                                                      _IN_ const char* src_ptr)
+                                                       _IN_    const char* src_ptr)
                                                        noexcept {
         status_t status;
 
