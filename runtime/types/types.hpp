@@ -31,6 +31,11 @@ using uint16_t = unsigned short;
 using uint32_t = unsigned int;
 
 
+constexpr uint8_t UINT8_MAX   = 0xFF;
+constexpr uint16_t UINT16_MAX = 0xFF'FF;
+constexpr uint32_t UINT32_MAX = 0xFF'FF'FF'FF;
+
+
 static_assert(sizeof(int8_t)  == 1, "sizeof(int8_t) != 1");
 static_assert(sizeof(int16_t) == 2, "sizeof(int16_t) != 2");
 static_assert(sizeof(int32_t) == 4, "sizeof(int32_t) != 4");

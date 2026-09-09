@@ -13,4 +13,5 @@ NOTES:
     so that the compiler can inline certain methods.
 */
 
+
 #include <circular_buffer.hpp>

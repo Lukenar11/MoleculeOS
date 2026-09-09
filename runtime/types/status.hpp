@@ -92,7 +92,7 @@ namespace status::flags
     constexpr status_t PARAM_A = 0x00'0001'00;
     constexpr status_t PARAM_B = 0x00'0002'00;
     constexpr status_t PARAM_C = 0x00'0004'00;
-    constexpr status_t PARAM_D = 0x00'0004'00;
+    constexpr status_t PARAM_D = 0x00'0008'00;
     
     constexpr status_t READ_ONLY    = 0x00'0010'00;
     constexpr status_t WRITE_ONLY   = 0x00'0020'00;

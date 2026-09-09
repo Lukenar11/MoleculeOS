@@ -439,9 +439,6 @@ namespace kernel::storemgr
                                        stored_file_entrys[i],
                                        file_entry,
                                        header);
-            if (status != status::SUCCESS) [[unlikely]]{
-                goto cleanup;
-            }
         }
 
         status = write_file_entry_table(stored_file_entrys.data(), 

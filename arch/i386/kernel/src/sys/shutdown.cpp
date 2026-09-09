@@ -22,7 +22,11 @@ NOTES:
 namespace kernel::sys
 {
     void shutdown() noexcept {
-        if (storemgr::Storage_Manager::save_filesystem() != status::SUCCESS) [[unlikely]] {
+        status_t status;
+        if ((status = storemgr::Storage_Manager::save_filesystem()) != status::SUCCESS) [[unlikely]] {
+            stdlib::Text_Output::reset();
+            stdlib::Text_Output::put_hex(status);
+            sys::hang();
             sys::panic("save failed");
         }
         

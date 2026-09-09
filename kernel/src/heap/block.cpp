@@ -14,102 +14,201 @@ NOTES:
     because they are so small that the compiler can inline them.
 */
 
+
 #include "heap/block.hpp"
+
 
 namespace kernel::heap
 {
-    void Block_Allocator::compute_block_count(_IN_ const uint32_t start_addr,
-                                              _IN_ const uint32_t end_addr) 
-                                              noexcept {
-        const uint32_t total_raw_bytes = end_addr - start_addr;
-        all_memory_blocks              = total_raw_bytes / MEMORY_BLOCK_SIZE;
-        
+    /** 
+     * @brief Sets all heap metadata and splits the 
+     * heap area into a metadata area and a memory pool.
+     *
+     * @param start_address Heap area start address. 
+     * @param end_address Heap area end address. 
+     */
+    void
+    Block_Allocator::setup_metadata_layout(_IN_ uint32_t start_address,
+                                           _IN_ uint32_t end_address) 
+                                           noexcept {
+        start_address = align_up(start_address, MEMORY_BLOCK_SIZE);
+        end_address   = align_down(end_address, MEMORY_BLOCK_SIZE);
+
+        if (end_address <= start_address) [[unlikely]] {
+            sys::panic("Invalid memory range for heap initialization");
+        }
+
+        all_memory_blocks = (end_address - start_address) / MEMORY_BLOCK_SIZE;
         if (all_memory_blocks == 0) [[unlikely]] {
             sys::panic("Heap area too small");
         }
-    }
 
-    void Block_Allocator::setup_metadata_pointers(_IN_ const uint32_t start_addr) 
-                                                  noexcept {
-        allocation_sizes = reinterpret_cast<uint16_t*>(start_addr);
-        memory_bitmap    = reinterpret_cast<uint32_t*>(start_addr + 
-                                                       all_memory_blocks * 
-                                                       sizeof(uint16_t));
-    }
+        const uint32_t allocation_sizes_bytes = align_up(all_memory_blocks * 
+                                                         sizeof(uint16_t),
+                                                         MEMORY_BLOCK_SIZE);
 
-    void Block_Allocator::setup_memory_pool(_IN_ const uint32_t start_addr,
-                                            _IN_ const uint32_t end_addr,
-                                            _IN_ const uint32_t word_count) 
-                                            noexcept {
-        uint32_t data_pool_start = start_addr +
-                                   all_memory_blocks * sizeof(uint16_t) +
-                                   word_count * sizeof(uint32_t);
+        const uint32_t bitmap_word_count = (all_memory_blocks + 
+                                            BITMAP_WORD_MASK) / 
+                                            BITMAP_WORD_BITS;
+        const uint32_t bitmap_bytes      = align_up(bitmap_word_count * 
+                                                    sizeof(uint32_t),
+                                                    MEMORY_BLOCK_SIZE);
 
-        needed_pool_space = all_memory_blocks * MEMORY_BLOCK_SIZE;
-        data_pool_start   = (data_pool_start + (MEMORY_BLOCK_SIZE - 1)) & 
-                            ~(MEMORY_BLOCK_SIZE - 1);
+        const uint32_t metadata_start = start_address;
+        const uint32_t bitmap_start   = metadata_start + allocation_sizes_bytes;
+        const uint32_t pool_start     = align_up(bitmap_start + 
+                                                 bitmap_bytes,
+                                                 MEMORY_BLOCK_SIZE);
 
-        if (data_pool_start + needed_pool_space > end_addr) {
-            all_memory_blocks--;
-            needed_pool_space = all_memory_blocks * MEMORY_BLOCK_SIZE;
+        if (pool_start >= end_address) [[unlikely]] {
+            sys::panic("Heap metadata area too large");
         }
 
-        memory_pool_ptr = reinterpret_cast<uint8_t*>(data_pool_start);
+        allocation_sizes = reinterpret_cast<uint16_t*>(metadata_start);
+        memory_bitmap    = reinterpret_cast<uint32_t*>(bitmap_start);
+        memory_pool_ptr  = reinterpret_cast<uint8_t*>(pool_start);
+
+        needed_pool_space = end_address - pool_start;
+        needed_pool_space = align_down(needed_pool_space, MEMORY_BLOCK_SIZE);
+
+        if (needed_pool_space == 0) [[unlikely]] {
+            sys::panic("Heap area too small");
+        }
+
+        all_memory_blocks = needed_pool_space / MEMORY_BLOCK_SIZE;
     }
 
-    void Block_Allocator::clear_metadata(_IN_ const uint32_t word_count) 
-                                         noexcept {
-        const uint32_t memory_bitmap_size = word_count * 
-                                            sizeof(uint32_t);
-        stdlib::Memory_Manipulation::set_memory_block(memory_bitmap,
-                                                      ALL_BLOCKS_FREE,
-                                                      memory_bitmap_size);
 
-        const uint32_t memory_blocks_count = all_memory_blocks * 
-                                             sizeof(uint16_t);
+    /** 
+     * @brief Resets all heap metadata. 
+     * 
+     * @param bitmap_word_count Count of available memory blocks in words. 
+     */
+    void
+    Block_Allocator::clear_metadata(_IN_ const uint32_t bitmap_word_count) 
+                                    noexcept {
+        const uint32_t allocation_sizes_bytes = align_up(all_memory_blocks * 
+                                                         sizeof(uint16_t),
+                                                         MEMORY_BLOCK_SIZE);
+
         stdlib::Memory_Manipulation::set_memory_block(allocation_sizes,
                                                       MEMORY_CLEAR,
-                                                      memory_blocks_count);
+                                                      allocation_sizes_bytes);
+
+        const uint32_t memory_bitmap_bytes = align_up(bitmap_word_count * 
+                                                      sizeof(uint32_t),
+                                                      MEMORY_BLOCK_SIZE);
+
+        stdlib::Memory_Manipulation::set_memory_block(memory_bitmap,
+                                                      ALL_BLOCKS_FREE,
+                                                      memory_bitmap_bytes);
     }
 
-    void* Block_Allocator::set_allocation_sizes_entry(_IN_ const uint32_t blocks_needed, 
-                                                      _IN_ const uint32_t i) noexcept {
-        for (uint32_t k = 0; k < blocks_needed; ++k) [[likely]] {
-            set_block_used(i + k);
-        }
 
-        allocation_sizes[i] = static_cast<uint16_t>(blocks_needed);
-        return &memory_pool_ptr[i * MEMORY_BLOCK_SIZE];
-    }
+    /**
+     * @brief Marks memory blocks as used in the memory pool and 
+     *        stores the memory block count.
+     *
+     * @param needed_blocks Number of needed blocks.
+     * @param pool_index Start index in the memory pool.
+     *
+     * @return Pointer to the first block.
+     */
+    void*
+    Block_Allocator::set_allocation_sizes_entry(_IN_ const uint32_t needed_blocks,
+                                                _IN_ const uint32_t pool_index) noexcept {
+        void* ptr;
 
-    bool Block_Allocator::find_enough_free_memory_blocks(_INOUT_ uint32_t& j,
-                                                         _IN_    const uint32_t i, 
-                                                         _IN_    const uint32_t blocks) 
-                                                         noexcept {
-        j = 0;
-        while (j < blocks) [[likely]] {
-            if (!is_block_free(i + j)) [[unlikely]] {
-                return false;
-            }   
-
-            j++;
-        }
-
-        return true;
-    }
-
-    status_t Block_Allocator::validate_allocate_size(_OUT_ uint32_t& blocks_needed,
-                                                     _IN_  const uint32_t size) 
-                                                     noexcept {
-        status_t status;
-        
-        if (size == 0) [[unlikely]] {
-            status = status::INVALID_PARAMETER;
+        if (needed_blocks == 0 ||
+            needed_blocks > UINT16_MAX ||
+            pool_index >= all_memory_blocks ||
+            needed_blocks > (all_memory_blocks - pool_index)) [[unlikely]] {
+            ptr = nullptr;
             goto cleanup;
         }
 
-        blocks_needed = (size + MEMORY_BLOCK_SIZE - 1) / MEMORY_BLOCK_SIZE;
-        if (blocks_needed > all_memory_blocks) [[unlikely]] {
+        for (uint32_t pool_block  = 0; 
+             pool_block < needed_blocks; 
+             pool_block++) [[likely]] {
+            set_block_used(pool_index + pool_block );
+        }
+
+        allocation_sizes[pool_index] = static_cast<uint16_t>(needed_blocks);
+
+        ptr = &memory_pool_ptr[pool_index * MEMORY_BLOCK_SIZE];
+
+    cleanup:
+        return ptr;
+    }
+
+
+    /** 
+     * @brief Checks free memory blocks in the memory pool from a start index.
+     * 
+     * @param checked_blocks Number of blocks checked so far.
+     * @param start_index Start index in the memory pool.
+     * @param needed_blocks Number of blocks needed.
+     * 
+     * @retval `true`  If enough free blocks were found.
+     * @retval `false` If not enough free blocks were found.
+     */
+    bool 
+    Block_Allocator::find_enough_free_memory_blocks(_INOUT_ uint32_t& checked_memory_blocks,
+                                                    _IN_    const uint32_t pool_index,
+                                                    _IN_    const uint32_t needed_blocks) 
+                                                    noexcept {
+        bool status;
+
+        checked_memory_blocks = 0;
+        while (checked_memory_blocks < needed_blocks) [[likely]] {
+            if (!is_block_free(pool_index + 
+                               checked_memory_blocks)) [[unlikely]] {
+                status = false;
+                goto cleanup;
+            }   
+
+            checked_memory_blocks++;
+        }
+
+        status = true;
+
+    cleanup:
+        return status;
+    }
+
+
+    /** 
+     * @brief Shows how many memory blocks are needed for the
+     *        current allocation.
+     * 
+     * @param needed_blocks count of needed memory blocks
+     * @param byte_size allocation bytesize
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+     *          If `byte_size` is `0`.
+     *
+     * @retval `status::HEAP_EXHAUSTED`
+     *          If the memory pool doesn't have enough free space
+     *          or `byte_size` is to large.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
+     */
+    status_t 
+    Block_Allocator::validate_allocate_size(_OUT_ uint32_t& needed_blocks,
+                                            _IN_  const uint32_t byte_size) 
+                                            noexcept {
+        status_t status;
+        
+        if (byte_size == 0) [[unlikely]] {
+            status = status::INVALID_PARAMETER | status::flags::PARAM_B;
+            goto cleanup;
+        }
+
+        needed_blocks = (byte_size + MEMORY_BLOCK_SIZE - 1) / 
+                                MEMORY_BLOCK_SIZE;
+        if (needed_blocks > all_memory_blocks || 
+            needed_blocks > UINT16_MAX) [[unlikely]] {
             status = status::HEAP_EXHAUSTED;
             goto cleanup;
         }
@@ -120,118 +219,217 @@ namespace kernel::heap
         return status;
     }
 
-    status_t Block_Allocator::find_free_memory_region(_OUT_ uint32_t& index,
-                                                      _IN_  const uint32_t blocks_needed)
-                                                      noexcept {
-        status_t status;
-        uint32_t i = 0;
-        uint32_t j = 0;
 
-        while (i <= all_memory_blocks - blocks_needed) [[likely]] {
-            if (find_enough_free_memory_blocks(j, 
-                                               i, 
-                                               blocks_needed)) [[likely]] {
-                index  = i;
+    /**
+     * @brief Finds a free memory region with a specific size
+     *        in the heap memory pool. 
+     * 
+     * @param block_index Index of the found memory region. 
+     * @param needed_blocks Count of all needed memory blocks. 
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
+     *          If `needed_blocks` is `0`. 
+     * 
+     * @retval `status::HEAP_EXHAUSTED` 
+     *          If the memory pool does not have enough free space 
+     *          or `needed_blocks` is too large. 
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
+     */
+    status_t 
+    Block_Allocator::find_free_memory_region(_OUT_ uint32_t& block_index,
+                                             _IN_  const uint32_t needed_blocks)
+                                             noexcept {
+        status_t status;
+        uint32_t pool_index         = 0;
+        uint32_t memory_found_index = 0;
+
+        if (needed_blocks == 0 || 
+            needed_blocks > all_memory_blocks) [[unlikely]] {
+            status = status::INVALID_PARAMETER | status::flags::PARAM_B;
+            goto cleanup;
+        }
+
+        while (pool_index <= 
+               all_memory_blocks - needed_blocks) [[likely]] {
+            if (find_enough_free_memory_blocks(memory_found_index, 
+                                               pool_index, 
+                                               needed_blocks)) {
+                block_index = pool_index;
+                
                 status = status::SUCCESS;
                 goto cleanup;
             }
 
-            i += j + 1;
+            pool_index += memory_found_index + 1;
         }
 
         status = status::HEAP_EXHAUSTED;
 
     cleanup:
+
         return status;
     }
 
-    status_t Block_Allocator::perform_reallocate(_INOUT_ void*& ptr,
-                                                 _IN_    const uint32_t new_size)
-                                                 noexcept {
-        uint32_t index      = 0;
-        uint32_t old_blocks = 0;
-        void* new_ptr       = nullptr;
-        status_t status;
-        uint32_t old_size;
-        uint32_t n;
 
-        if (get_allocation_info(index, 
-                                old_blocks, 
-                                ptr) != status::SUCCESS) [[unlikely]] {
+    /** 
+     * @brief Executes a allocation after the 
+     *        parameter validation in `reallocate`.
+     * 
+     * @param block_ptr pointer to the allocated memory block
+     * @param new_byte_size size of the memory block
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *          If `block_ptr` is a `nullptr`.
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+     *          If `new_byte_size` is `0`.
+     *  
+     * @retval `status::HEAP_EXHAUSTED`
+     *          If the memory pool doesn't have enough free space
+     *          or `new_byte_size` is to large.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
+     */
+    status_t 
+    Block_Allocator::perform_reallocate(_INOUT_ void*& block_ptr,
+                                        _IN_    const uint32_t new_byte_size)
+                                        noexcept {
+        uint32_t block_index       = 0;
+        uint32_t old_memory_blocks = 0;
+        void* new_block_ptr        = nullptr;
+        status_t status;
+        uint32_t old_byte_size;
+        uint32_t memory_block_byte_size;
+
+        if (!block_ptr) [[unlikely]] {
+            status = status::NULL_POINTER | status::flags::PARAM_A;
+            goto cleanup;
+        }
+
+        if (new_byte_size == 0) [[unlikely]] {
+            status = status::INVALID_PARAMETER | status::flags::PARAM_B;
+            goto cleanup;
+        }
+
+        if (get_allocation_info(block_index, 
+                                old_memory_blocks, 
+                                new_block_ptr) != status::SUCCESS) [[unlikely]] {
             sys::panic("Invalid reallocate!");
         }
     
-        status = allocate(new_ptr, new_size);
-        if (status != status::SUCCESS || !new_ptr) [[unlikely]] {
+        status = allocate(new_block_ptr, new_byte_size);
+        if (status != status::SUCCESS || !new_block_ptr) [[unlikely]] {
             goto cleanup;
         }
     
-        old_size = old_blocks * MEMORY_BLOCK_SIZE;
-        if (old_size < new_size) {
-            n = old_size;
+        old_byte_size = old_memory_blocks * MEMORY_BLOCK_SIZE;
+        if (old_byte_size < new_byte_size) {
+            memory_block_byte_size = old_byte_size;
         } 
         else {
-            n = new_size;
-        };
+            memory_block_byte_size = new_byte_size;
+        }
     
-        stdlib::Memory_Manipulation::copy_memory_block(new_ptr, ptr, n);
-        deallocate(ptr);
+        stdlib::Memory_Manipulation::copy_memory_block(new_block_ptr, 
+                                                       block_ptr, 
+                                                       memory_block_byte_size);
+        deallocate(block_ptr);
     
-        ptr    = new_ptr;
+        block_ptr = new_block_ptr;
+
         status = status::SUCCESS;
     
     cleanup:
         return status;
     }
 
-    void Block_Allocator::init(_IN_ const uint8_t* begin, 
-                               _IN_ const uint8_t* end) noexcept  {
-        const uint32_t start_addr = reinterpret_cast<uint32_t>(begin);
-        const uint32_t end_addr   = reinterpret_cast<uint32_t>(end);
 
-        // validate heap range
-        if (end_addr <= start_addr) [[unlikely]] {
-            sys::panic("Invalid memory range for heap initialization");
-        }
-        
-        compute_block_count(start_addr, end_addr);
-
-        const uint32_t bitmap_word_count = (all_memory_blocks + 31) / 32;
-
-        setup_metadata_pointers(start_addr);
-        setup_memory_pool(start_addr, end_addr, bitmap_word_count);
-        clear_metadata(bitmap_word_count);
+    /** 
+     * @brief Initializes the heap.
+     * 
+     * @param heap_begin memory pool start address
+     * @param heap_end memory pool end address
+     */
+    _API_ 
+    void
+    Block_Allocator::init(_IN_ const uint8_t* heap_begin,
+                          _IN_ const uint8_t* heap_end) noexcept {
+        setup_metadata_layout(reinterpret_cast<uint32_t>(heap_begin), 
+                              reinterpret_cast<uint32_t>(heap_end));
+        clear_metadata((all_memory_blocks + 31) / 32);
     }
 
-    status_t Block_Allocator::get_allocation_info(_OUT_ uint32_t& index, 
-                                                  _OUT_ uint32_t& blocks,
-                                                  _IN_  void* ptr) noexcept {
+
+    /** 
+     * @brief Gets the meta data of a allocated memory block.
+     * 
+     * @param pool_index Index of the allocated memory block in 
+     *                          the memory pool.
+     * @param pool_block_size Blocksize of the allocated memory block.
+     * @param block_ptr pointer to the allocated memory block.
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_C`
+     *          If `block_ptr` is a `nullptr`
+     * 
+     * @retval `status::NULL_POINTER`
+     *          If the memory pool pointer inside the heap is empty.
+     * 
+     * @retval `status::POINTER_OUT_OF_RANGE`
+     *          If `block_ptr` is outside if the allocated memory block.
+     * 
+     * @retval `status::HEAP_CORRUPTED`
+     *          If the allocated memory block is not align.
+     * 
+     * @retval `status::FAIL`
+     *          Unknown error.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
+     */
+    _API_ 
+    status_t 
+    Block_Allocator::get_allocation_info(_OUT_ uint32_t& pool_index,
+                                         _OUT_ uint32_t& pool_block_size,
+                                         _IN_  void* block_ptr) 
+                                         noexcept {
         status_t status;
-        uint8_t* block_ptr;
+        uint8_t* new_block_ptr;
         uint32_t offset;
 
-        if (!ptr || !memory_pool_ptr) [[unlikely]] {
+        if (!block_ptr) [[unlikely]] {
+            status = status::NULL_POINTER | status::flags::PARAM_C;
+            goto cleanup;
+        }
+
+        if (!memory_pool_ptr) [[unlikely]] {
             status = status::NULL_POINTER;
             goto cleanup;
         }
 
-        block_ptr = reinterpret_cast<uint8_t*>(ptr);
-        if (block_ptr < memory_pool_ptr ||
-            block_ptr >= memory_pool_ptr + 
-            needed_pool_space) [[unlikely]] {
+        new_block_ptr = reinterpret_cast<uint8_t*>(block_ptr);
+        if (new_block_ptr < memory_pool_ptr ||
+            new_block_ptr >= memory_pool_ptr + needed_pool_space) [[unlikely]] {
             status = status::POINTER_OUT_OF_RANGE;
             goto cleanup;
         }
 
-        offset = static_cast<uint32_t>(block_ptr - memory_pool_ptr);
+        offset = static_cast<uint32_t>(new_block_ptr - memory_pool_ptr);
         if (offset % MEMORY_BLOCK_SIZE != 0) [[unlikely]] {
             status = status::HEAP_CORRUPTED;
             goto cleanup;
         }
 
-        index  = offset / MEMORY_BLOCK_SIZE;
-        blocks = allocation_sizes[index];
-        if (blocks == 0) [[unlikely]] {
+        pool_index = offset / MEMORY_BLOCK_SIZE;
+        if (pool_index >= all_memory_blocks) [[unlikely]] {
+            status = status::HEAP_CORRUPTED;
+            goto cleanup;
+        }
+
+        pool_block_size = allocation_sizes[pool_index];
+        if (pool_block_size == 0) [[unlikely]] {
             status = status::FAIL;
             goto cleanup;
         }
@@ -242,28 +440,55 @@ namespace kernel::heap
         return status;
     }
 
-    status_t Block_Allocator::allocate(_OUT_ void*& ptr,
-                                       _IN_  const uint32_t size) noexcept  {
-        if (!memory_pool_ptr) [[unlikely]] {
+
+    /**  
+     * @brief Allocates a memory block with a specific size.
+     * 
+     * @note Don't forget to free the allocated memory with `deallocate`,
+     *       otherwise memory leaks will occur.
+     * 
+     * @param block_ptr pointer to the allocated memory block
+     * @param byte_size memory block byte size
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+     *          If byte_size` is 0.
+     * 
+     * @retval `status::HEAP_EXHAUSTED`
+     *          If the memory pool doesn't have enough free space or 
+     *          `byte_size` is to large.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
+     */
+    _API_ 
+    status_t 
+    Block_Allocator::allocate(_OUT_ void*& block_ptr, 
+                              _IN_  const uint32_t byte_size) noexcept {
+        if (!memory_pool_ptr || 
+            !allocation_sizes || 
+            !memory_bitmap) [[unlikely]] {
             sys::panic("'Block_allocator' not initialized");
         }
     
         status_t status;
-        uint32_t blocks_needed;
-        uint32_t index;
+        uint32_t needed_blocks;
+        uint32_t block_index;
     
-        status = validate_allocate_size(blocks_needed, size);
+        status = validate_allocate_size(needed_blocks, 
+                                        byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
     
-        status = find_free_memory_region(index, blocks_needed);
+        status = find_free_memory_region(block_index, 
+                                         needed_blocks);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
     
-        ptr = set_allocation_sizes_entry(blocks_needed, index);
-        if (!ptr) [[unlikely]] {
+        block_ptr = set_allocation_sizes_entry(needed_blocks, 
+                                                      block_index);
+        if (!block_ptr) [[unlikely]] {
             status = status::OUT_OF_MEMORY;
             goto cleanup;
         }
@@ -273,78 +498,164 @@ namespace kernel::heap
         goto done;
     
     cleanup:
-        ptr = nullptr;
+        block_ptr = nullptr;
     
     done:
         return status;
     }
 
-    status_t Block_Allocator::clear_allocate(_OUT_ void*& ptr,
-                                             _IN_  const uint32_t size) 
-                                             noexcept {
+
+    /**  
+     * @brief Allocates a memory block with a specific size and
+     *        nulls all bytes in the allocated block.
+     * 
+     * @note Don't forget to free the allocated memory with `deallocate`,
+     *       otherwise memory leaks will occur.
+     * 
+     * @param block_ptr pointer to the allocated memory block
+     * @param byte_size memory block byte size
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+     *          If `byte_size` is `0`.
+     * 
+     * @retval `status::HEAP_EXHAUSTED`
+     *          If the memory pool doesn't have enough free space or 
+     *          `byte_size` is to large.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
+     */
+    _API_ 
+    status_t 
+    Block_Allocator::clear_allocate(_OUT_ void*& block_ptr, 
+                                    _IN_  const uint32_t byte_size) 
+                                    noexcept {
         status_t status;
 
-        if (size == 0) [[unlikely]] {
-            status = status::INVALID_PARAMETER;
+        if (byte_size == 0) [[unlikely]] {
+            status = status::INVALID_PARAMETER | status::flags::PARAM_B;
             goto cleanup;
         }
 
-        status = allocate(ptr, size);
-        if (status != status::SUCCESS || !ptr) [[unlikely]] {
+        status = allocate(block_ptr, byte_size);
+        if (status != status::SUCCESS || !block_ptr) [[unlikely]] {
             goto cleanup;
         }
 
-        stdlib::Memory_Manipulation::set_memory_block(ptr, MEMORY_CLEAR, size);
+        stdlib::Memory_Manipulation::set_memory_block(block_ptr, 
+                                                      MEMORY_CLEAR, 
+                                                      byte_size);
         status = status::SUCCESS;
 
         goto success;
 
     cleanup: 
-        ptr = nullptr;
+        block_ptr = nullptr;
 
     success: 
         return status;
     }
 
-    status_t Block_Allocator::reallocate(_INOUT_ void*& ptr,
-                                         _IN_    const uint32_t new_size) noexcept {
+
+    /** 
+     * @brief Reallocates a memory block with a specific size and 
+     *        preserves the previous contents up to the smaller size. 
+     * 
+     * @note Don't forget to free the allocated memory with `deallocate`, 
+     *       otherwise memory leaks will occur. 
+     * 
+     * @param block_ptr Pointer to the allocated memory block. 
+     * @param new_byte_size New memory block byte size.
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
+     *          If `new_byte_size` is 0. 
+     * 
+     * @retval `status::HEAP_EXHAUSTED` 
+     *          If the memory pool does not have enough free space or
+     *          `new_byte_size` is too large. 
+     * 
+     * @retval `status::SUCCESS` 
+     *          Default case. 
+     */
+    _API_ 
+    status_t 
+    Block_Allocator::reallocate(_INOUT_ void*& block_ptr,
+                                _IN_    const uint32_t new_byte_size) 
+                                noexcept {
         status_t status;
 
-        if (!ptr) [[unlikely]] {
-            status = allocate(ptr, new_size);
+        if (!block_ptr || 
+            !allocation_sizes ||
+            !memory_bitmap) [[unlikely]] {
+            sys::panic("'Block_allocator' not initialized");
+        }
+
+        if (!block_ptr) [[unlikely]] {
+            status = allocate(block_ptr, new_byte_size);
             goto cleanup;
         }
 
-        if (new_size == 0) [[unlikely]] {
-            status = status::INVALID_PARAMETER;
+        if (new_byte_size == 0) [[unlikely]] {
+            status = status::INVALID_PARAMETER | status::flags::PARAM_B;
             goto cleanup;
         }
 
-        status = perform_reallocate(ptr, new_size);
+        status = perform_reallocate(block_ptr, new_byte_size);
 
     cleanup:
         return status;
     }
 
-    status_t Block_Allocator::deallocate(_IN_ void* ptr) noexcept {
+
+    /** 
+     * @brief Deallocates a memory block. 
+     * 
+     * @param block_ptr Pointer to the memory block to be deallocated.
+     * 
+     * @retval `status::NULL_POINTER` 
+     *          If `block_ptr` is a `nullptr`. 
+     * 
+     * @retval `status::HEAP_CORRUPTED` 
+     *          If a deallocation error has occurred. 
+     * 
+     * @retval `status::SUCCESS` 
+     *          Default case. 
+     */
+    _API_
+    status_t
+    Block_Allocator::deallocate(_IN_ void* block_ptr) noexcept {
         status_t status;
 
-        uint32_t block_index = 0;
-        uint32_t block_count = 0;
+        uint32_t block_index   = 0;
+        uint32_t needed_blocks = 0;
 
-        if (!ptr) [[unlikely]] {
+        if (!block_ptr || 
+            !allocation_sizes || 
+            !memory_bitmap) [[unlikely]] {
+            sys::panic("'Block_allocator' not initialized");
+        }
+
+        if (!block_ptr) [[unlikely]] {
             status = status::NULL_POINTER;
             goto cleanup;
         }
 
         if (get_allocation_info(block_index,
-                                block_count,
-                                ptr) != status::SUCCESS) [[unlikely]] {
+                                needed_blocks,
+                                block_ptr) != status::SUCCESS) [[unlikely]] {
             sys::panic("Invalid free");
         }
 
-        for (uint32_t k = 0; k < block_count; ++k) [[likely]] {
-            set_block_free(block_index + k);
+        if (block_index + needed_blocks > 
+            all_memory_blocks) [[unlikely]] {
+            status = status::HEAP_CORRUPTED;
+            goto cleanup;
+        }
+
+        for (uint32_t pool_block = 0; 
+             pool_block < needed_blocks; 
+             pool_block++) [[likely]] {
+            set_block_free(block_index + pool_block);
         }
 
         allocation_sizes[block_index] = 0;
