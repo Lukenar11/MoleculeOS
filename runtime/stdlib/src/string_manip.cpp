@@ -144,7 +144,8 @@ namespace stdlib
                                      _IN_    const char* source_ptr) noexcept {
         status_t status;
 
-        status = validate_destination_ptr_and_source_ptr(destination_ptr, source_ptr);
+        status = validate_destination_ptr_and_source_ptr(destination_ptr, 
+                                                         source_ptr);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }

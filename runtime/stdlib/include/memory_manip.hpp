@@ -46,7 +46,9 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          All parameters are valid.
          */
-        [[nodiscard]] static status_t
+        [[nodiscard]] 
+        static 
+        status_t
         validate_parameters(_IN_ void* dest_ptr, 
                             _IN_ const void* src_ptr, 
                             _IN_ uint32_t size) noexcept;
@@ -72,7 +74,9 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        _API_ static status_t 
+        _API_ 
+        static 
+        status_t 
         copy_memory_block(_IN_ void* dest_ptr, 
                           _IN_ const void* src_ptr, 
                           _IN_ uint32_t size) noexcept;
@@ -98,7 +102,9 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        _API_ static status_t 
+        _API_ 
+        static 
+        status_t 
         move_memory_block(_IN_ void* dest_ptr, 
                           _IN_ const void* src_ptr, 
                           _IN_ uint32_t size) noexcept;
@@ -120,7 +126,9 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        _API_ static status_t 
+        _API_ 
+        static 
+        status_t 
         set_memory_block(_IN_ void* dest_ptr, 
                          _IN_ const int32_t value, 
                          _IN_ uint32_t size) noexcept;
@@ -157,7 +165,9 @@ namespace stdlib
          * @retval `status::EQUAL_TO`
          *          If the contents of both memory-blocks are identical.
          */
-        _API_ static status_t 
+        _API_ 
+        static 
+        status_t 
         compare_memory_block(_IN_ const void* a_ptr, 
                              _IN_ const void* b_ptr,
                              _IN_ uint32_t size) noexcept;

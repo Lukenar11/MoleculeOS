@@ -153,10 +153,10 @@ namespace kernel::heap
      * @retval `false` If not enough free blocks were found.
      */
     bool 
-    Block_Allocator::find_enough_free_memory_blocks(_INOUT_ uint32_t& checked_memory_blocks,
-                                                    _IN_    const uint32_t pool_index,
-                                                    _IN_    const uint32_t needed_blocks) 
-                                                    noexcept {
+    Block_Allocator::find_enough_free_blocks(_INOUT_ uint32_t& checked_memory_blocks,
+                                             _IN_    const uint32_t pool_index,
+                                             _IN_    const uint32_t needed_blocks) 
+                                             noexcept {
         bool status;
 
         checked_memory_blocks = 0;
@@ -253,7 +253,7 @@ namespace kernel::heap
 
         while (pool_index <= 
                all_memory_blocks - needed_blocks) [[likely]] {
-            if (find_enough_free_memory_blocks(memory_found_index, 
+            if (find_enough_free_blocks(memory_found_index, 
                                                pool_index, 
                                                needed_blocks)) {
                 block_index = pool_index;
@@ -302,7 +302,7 @@ namespace kernel::heap
         void* new_block_ptr        = nullptr;
         status_t status;
         uint32_t old_byte_size;
-        uint32_t memory_block_byte_size;
+        uint32_t memory_byte_size;
 
         if (!block_ptr) [[unlikely]] {
             status = status::NULL_POINTER | status::flags::PARAM_A;
@@ -327,15 +327,15 @@ namespace kernel::heap
     
         old_byte_size = old_memory_blocks * MEMORY_BLOCK_SIZE;
         if (old_byte_size < new_byte_size) {
-            memory_block_byte_size = old_byte_size;
+            memory_byte_size = old_byte_size;
         } 
         else {
-            memory_block_byte_size = new_byte_size;
+            memory_byte_size = new_byte_size;
         }
     
         stdlib::Memory_Manipulation::copy_memory_block(new_block_ptr, 
                                                        block_ptr, 
-                                                       memory_block_byte_size);
+                                                       memory_byte_size);
         deallocate(block_ptr);
     
         block_ptr = new_block_ptr;
@@ -584,9 +584,7 @@ namespace kernel::heap
                                 noexcept {
         status_t status;
 
-        if (!block_ptr || 
-            !allocation_sizes ||
-            !memory_bitmap) [[unlikely]] {
+        if (!allocation_sizes || !memory_bitmap) [[unlikely]] {
             sys::panic("'Block_allocator' not initialized");
         }
 
@@ -629,9 +627,7 @@ namespace kernel::heap
         uint32_t block_index   = 0;
         uint32_t needed_blocks = 0;
 
-        if (!block_ptr || 
-            !allocation_sizes || 
-            !memory_bitmap) [[unlikely]] {
+        if (!allocation_sizes || !memory_bitmap) [[unlikely]] {
             sys::panic("'Block_allocator' not initialized");
         }
 

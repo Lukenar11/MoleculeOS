@@ -48,7 +48,9 @@ namespace stdlib
          *
          * @return The incremented index, wrapped around the buffer size.
          */
-        inline constexpr uint32_t 
+        inline 
+        constexpr 
+        uint32_t 
         increment_index(_IN_ const uint32_t i) const noexcept {
             return (i + 1) % S;
         }
@@ -59,8 +61,9 @@ namespace stdlib
          * @brief Inserts an item into the circular buffer.
          *
          * @param item                The element to insert.
-         * @param overwrite_last_item If `true`, the oldest element will be overwritten
-         *                            when the buffer is full.
+         * @param overwrite_last_item If `true`, the 
+         *                            oldest element will be overwritten when 
+         *                            the buffer is full.
          *
          * @retval `status::FULL`
          *          The buffer is full and `overwrite_last_item` is `false`.
@@ -71,7 +74,8 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default Case.
          */
-        _API_ status_t 
+        _API_ 
+        status_t 
         push(_IN_ const T& item, 
              _IN_ const bool overwrite_last_item=false) noexcept {
             status_t status;
@@ -112,7 +116,8 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        _API_ status_t 
+        _API_ 
+        status_t 
         pop(_OUT_ T& item) noexcept {
             status_t status;
 
@@ -143,7 +148,8 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        _API_ status_t 
+        _API_ 
+        status_t 
         peek(_OUT_ T& item) const noexcept {
             status_t status;
 
@@ -163,7 +169,9 @@ namespace stdlib
         /**
          * @brief Resets the buffer.
          */
-        _API_ inline void 
+        _API_ 
+        inline 
+        void 
         reset() noexcept {
             buffer_head    = 0;
             buffer_tail    = 0;
@@ -176,7 +184,11 @@ namespace stdlib
          *
          * @return The buffer capacity.
          */
-        _API_ [[nodiscard]] inline constexpr uint32_t 
+        _API_ 
+        [[nodiscard]] 
+        inline 
+        constexpr 
+        uint32_t 
         capacity() const noexcept { 
             return S; 
         }
@@ -189,7 +201,10 @@ namespace stdlib
          *
          * @return The number of stored elements.
          */
-        _API_ [[nodiscard]] inline uint32_t 
+        _API_ 
+        [[nodiscard]] 
+        inline 
+        uint32_t 
         count() const noexcept {
             uint32_t count;
 
@@ -216,7 +231,11 @@ namespace stdlib
          * @retval `true` If the buffer is empty.
          * @retval `false` Default case.
          */
-        _API_ [[nodiscard]] inline constexpr bool 
+        _API_ 
+        [[nodiscard]] 
+        inline 
+        constexpr 
+        bool 
         empty() const noexcept {
             return (!buffer_is_full && (buffer_head == buffer_tail));
         }
@@ -228,7 +247,11 @@ namespace stdlib
          * @retval `true` If the buffer is full.
          * @retval `false` Default case.
          */
-        _API_ [[nodiscard]] inline constexpr bool 
+        _API_ 
+        [[nodiscard]] 
+        inline 
+        constexpr 
+        bool 
         is_full() const noexcept {
             return buffer_is_full;
         }
@@ -240,7 +263,9 @@ namespace stdlib
          * @note `buffer_head` & `buffer_tail` starts at `0` and
          *        buffer_is_full is `false`.
          */
-        _API_ inline constexpr 
+        _API_ 
+        inline 
+        constexpr 
         Circular_Buffer() noexcept : 
             buffer_head(0), 
             buffer_tail(0), 

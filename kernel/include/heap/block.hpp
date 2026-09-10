@@ -189,10 +189,9 @@ namespace kernel::heap
          */
         static 
         bool 
-        find_enough_free_memory_blocks(_INOUT_ uint32_t& checked_blocks,
-                                       _IN_    const uint32_t start_index, 
-                                       _IN_    const uint32_t needed_blocks)
-                                       noexcept;
+        find_enough_free_blocks(_INOUT_ uint32_t& checked_blocks,
+                                _IN_    const uint32_t start_index, 
+                                _IN_    const uint32_t needed_blocks) noexcept;
 
 
         /** 

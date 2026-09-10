@@ -39,12 +39,17 @@ namespace stdlib
          * 
          * @return reference to the element at the given index
          */
-        _API_ inline constexpr T& 
+        _API_ 
+        inline 
+        constexpr T& 
         operator[](_IN_ uint32_t index) noexcept { 
             return buffer[index]; 
         }
 
-        _API_ inline constexpr const T&
+        _API_ 
+        inline 
+        constexpr 
+        const T&
         operator[](_IN_ const uint32_t index) const noexcept {
             return buffer[index]; 
         }
@@ -53,7 +58,10 @@ namespace stdlib
         /**
          * @brief Returns the count of all array elements.
          */
-        _API_ inline constexpr uint32_t 
+        _API_ 
+        inline 
+        constexpr 
+        uint32_t 
         size() const noexcept { 
             return S; 
         }
@@ -62,12 +70,17 @@ namespace stdlib
         /**
          * @brief Returns a pointer to the first element.
          */
-        _API_ inline constexpr T* 
+        _API_ 
+        inline 
+        constexpr T* 
         begin() noexcept { 
             return buffer; 
         }
 
-        _API_ inline constexpr const T* 
+        _API_ 
+        inline 
+        constexpr 
+        const T* 
         begin() const noexcept { 
             return buffer; 
         }
@@ -76,12 +89,19 @@ namespace stdlib
         /**
          * @brief Returns a pointer to the last element.
          */
-        _API_ inline constexpr T* 
+        _API_ 
+        inline 
+        constexpr 
+        T* 
         end() noexcept { 
             return buffer + S; 
         }
 
-        _API_ inline constexpr const T* 
+        _API_ 
+        inline 
+        constexpr 
+        const 
+        T* 
         end() const noexcept { 
             return buffer + S; 
         }
@@ -92,12 +112,19 @@ namespace stdlib
          *
          * @warning No bounds checking is performed.
          */
-        _API_ inline constexpr T& 
+        _API_ 
+        inline 
+        constexpr 
+        T& 
         front() noexcept { 
             return buffer[0]; 
         }
 
-        _API_ inline constexpr const T& 
+        _API_ 
+        inline 
+        constexpr 
+        const 
+        T& 
         front() const noexcept { 
             return buffer[0];
         }
@@ -108,12 +135,19 @@ namespace stdlib
          *
          * @warning No bounds checking is performed.
          */
-        _API_ inline constexpr T& 
+        _API_ 
+        inline 
+        constexpr 
+        T& 
         back() noexcept { 
             return buffer[S - 1]; 
         }
 
-        _API_ inline constexpr const T& 
+        _API_ 
+        inline 
+        constexpr 
+        const 
+        T& 
         back() const noexcept { 
             return buffer[S - 1]; 
         }
@@ -122,12 +156,19 @@ namespace stdlib
         /**
          * @brief Returns a pointer to the data buffer.
          */
-        _API_ inline constexpr T* 
+        _API_ 
+        inline 
+        constexpr 
+        T* 
         data() noexcept { 
             return buffer; 
         }
 
-        _API_ inline constexpr const T* 
+        _API_ 
+        inline 
+        constexpr 
+        const 
+        T* 
         data() const noexcept { 
             return buffer; 
         }
@@ -139,10 +180,15 @@ namespace stdlib
          * @param value Value with which the array should be filled.
          * 
          */
-        _API_ inline constexpr void 
+        _API_ 
+        inline 
+        constexpr 
+        void 
         fill(_IN_ const T& value) noexcept {
-            for (uint32_t i = 0; i < S; i++) [[likely]] {
-                buffer[i] = value; 
+            for (uint32_t current_value = 0; 
+                 current_value < S; 
+                 current_value++) [[likely]] {
+                buffer[current_value] = value; 
             }
         }
 

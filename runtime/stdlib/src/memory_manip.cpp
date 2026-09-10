@@ -38,7 +38,8 @@ namespace stdlib
      * @retval `status::SUCCESS`
      *          All parameters are valid.
      */
-    [[nodiscard]] status_t
+    [[nodiscard]] 
+    status_t
     Memory_Manipulation::validate_parameters(_IN_ void* dest_ptr, 
                                              _IN_ const void* src_ptr, 
                                              _IN_ uint32_t size) noexcept {
@@ -85,7 +86,8 @@ namespace stdlib
      * @retval `status::SUCCESS`
      *          Default case.
      */
-    _API_ status_t 
+    _API_ 
+    status_t 
     Memory_Manipulation::copy_memory_block(_IN_ void* dest_ptr, 
                                            _IN_ const void* src_ptr, 
                                            _IN_ uint32_t size) noexcept {
@@ -132,7 +134,8 @@ namespace stdlib
      * @retval `status::SUCCESS`
      *          Default case.
      */
-    _API_ status_t 
+    _API_ 
+    status_t 
     Memory_Manipulation::move_memory_block(_IN_ void* dest_ptr, 
                                            _IN_ const void* src_ptr, 
                                            _IN_ uint32_t size) noexcept {
@@ -186,7 +189,8 @@ namespace stdlib
      * @retval `status::SUCCESS`
      *          Default case.
      */
-    _API_ status_t 
+    _API_ 
+    status_t 
     Memory_Manipulation::set_memory_block(_IN_ void* dest_ptr, 
                                           _IN_ const int32_t value, 
                                           _IN_ uint32_t size) noexcept {
@@ -249,7 +253,8 @@ namespace stdlib
      * @retval `status::EQUAL_TO`
      *          If the contents of both memory-blocks are identical.
      */
-    _API_ status_t 
+    _API_ 
+    status_t 
     Memory_Manipulation::compare_memory_block(_IN_ const void* a_ptr, 
                                               _IN_ const void* b_ptr,
                                               _IN_ uint32_t size) noexcept {
