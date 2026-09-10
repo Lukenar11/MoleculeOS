@@ -35,6 +35,14 @@ constexpr uint8_t UINT8_MAX   = 0xFF;
 constexpr uint16_t UINT16_MAX = 0xFF'FF;
 constexpr uint32_t UINT32_MAX = 0xFF'FF'FF'FF;
 
+constexpr int8_t INT8_MIN   = 0x80;
+constexpr int16_t INT16_MIN = 0x80'00;
+constexpr int32_t INT32_MIN = 0x80'00'00'00;
+
+constexpr int8_t INT8_MAX   = 0x7F;
+constexpr int16_t INT16_MAX = 0x7F'FF;
+constexpr int32_t INT32_MAX = 0x7F'FF'FF'FF;
+
 
 static_assert(sizeof(int8_t)  == 1, "sizeof(int8_t) != 1");
 static_assert(sizeof(int16_t) == 2, "sizeof(int16_t) != 2");

@@ -25,8 +25,10 @@ NOTES:
 
 namespace kernel
 {
-    extern "C" [[noreturn]]
-    void kernel_main() noexcept {
+    extern "C" 
+    [[noreturn]]
+    void 
+    kernel_main() noexcept {
         kernel_arch_init();
 
         heap::Block_Allocator::init(&heap::heap_start, &heap::heap_end);

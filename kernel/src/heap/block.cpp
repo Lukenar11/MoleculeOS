@@ -487,7 +487,7 @@ namespace kernel::heap
         }
     
         block_ptr = set_allocation_sizes_entry(needed_blocks, 
-                                                      block_index);
+                                               block_index);
         if (!block_ptr) [[unlikely]] {
             status = status::OUT_OF_MEMORY;
             goto cleanup;

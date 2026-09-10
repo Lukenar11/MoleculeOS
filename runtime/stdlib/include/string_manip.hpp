@@ -30,67 +30,76 @@ namespace stdlib
         /**
          * @brief Validates the parameters for the most class methods.
          * 
-         * @param dest_ptr pointer to validate
-         * @param src_ptr  pointer to validate
+         * @param destination_ptr pointer to validate
+         * @param source_ptr  pointer to validate
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-         *          If `dest_ptr` is `nullptr`.
+         *          If `destination_ptr` is `nullptr`.
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_B`
-         *          If `src_ptr` is `nullptr`.
+         *          If `source_ptr` is `nullptr`.
          * 
          * @retval `status::SUCCESS`
          *          If all pointer are valid.
          */
-        [[nodiscard]] static status_t
-        validate_dest_ptr_and_src_ptr(_INOUT_ char* dest_ptr,
-                                      _IN_    const char* src_ptr) noexcept;
+        [[nodiscard]] 
+        status_t
+        validate_destination_ptr_and_source_ptr(_INOUT_ char* destination_ptr,
+                                                _IN_    const char* source_ptr)
+                                                noexcept;
 
     public:
         /**
          * @brief Copys the content of a string part in another string.
-         * @note The destination buffer must be at least `size` bytes long.
+         * @note The destination buffer must be at least `byte_size` bytes long.
          * 
-         * @param dest_ptr pointer to destination-string
-         * @param src_ptr  pointer to source-string
-         * @param size     string part char size
+         * @param destination_ptr pointer to destination-string
+         * @param source_ptr      pointer to source-string
+         * @param byte_size       string part char size
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-         *          If `dest_ptr` is a `nullptr`.
+         *          If `destination_ptr` is a `nullptr`.
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-         *          If `src_ptr` is a nullptr`.
+         *          If `source_ptr` is a `nullptr`.
          * 
          * @retval `status::SUCCESS | status::flags::SIZE_ZERO`
-         *          If `size` is a `0`.
+         *          If `byte_size` is a `0` or `1`.
          * 
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        _API_ static status_t 
-        copy_string_part(_INOUT_ char* dest_ptr,
-                         _IN_    const char* src_ptr,
-                         _IN_    const uint32_t size) noexcept;
+        _API_ 
+        static
+        status_t
+        copy_string_part(_INOUT_ char* destination_ptr,
+                         _IN_    const char* source_ptr,
+                         _IN_    const uint32_t byte_size) noexcept;
 
 
         /**
          * @brief Copys the content of a string in another string.
          * 
-         * @param dest_ptr pointer to the destination-string
-         * @param src_ptr  pointer to the source-string
+         * @note The destination buffer must be large enough for the 
+         *       full string.
+         * 
+         * @param destination_ptr pointer to the destination-string
+         * @param source_ptr      pointer to the source-string
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-         *          If `dest_ptr` is a `nullptr`.
+         *          If `destination_ptr` is a `nullptr`.
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-         *          If `src_ptr` is a nullptr`.
+         *          If `source_ptr` is a `nullptr`.
          * 
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        _API_ static status_t 
-        copy_string(_INOUT_ char* dest_ptr, 
-                    _IN_    const char* src_ptr) noexcept;
+        _API_ 
+        static
+        status_t 
+        copy_string(_INOUT_ char* destination_ptr, 
+                    _IN_    const char* source_ptr) noexcept;
 
 
         /**
@@ -109,10 +118,12 @@ namespace stdlib
          * @retval `status::SUCCESS` 
          *          Default case.
          */
-        _API_ static status_t 
-        find_char_in_string(_OUT_ const char*& founded_char,
-                            _IN_  const char* string, 
-                            _IN_  const int32_t symbol) noexcept;
+        _API_ 
+        static
+        status_t 
+        find_char_in_string(_OUT_ const char*& found_char,
+                             _IN_  const char* string, 
+                             _IN_  const int32_t symbol) noexcept;
 
 
         /**
@@ -127,7 +138,9 @@ namespace stdlib
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        _API_ static status_t 
+        _API_ 
+        static
+        status_t 
         get_string_length(_OUT_ uint32_t& length,
                           _IN_  const char *string) noexcept;
 
@@ -153,7 +166,9 @@ namespace stdlib
          * @retval `status::EQUAL_TO`
          *          If string-a and string-b are identical.
          */
-        _API_ static status_t 
+        _API_ 
+        static
+        status_t 
         compare_strings(_IN_ const char* a_ptr, 
                         _IN_ const char* b_ptr) noexcept;
 
@@ -167,13 +182,21 @@ namespace stdlib
          * @retval `status::NULL_POINTER | status::flags::PARAM_B`
          *          If `string` is a `nullptr`.
          * 
-         * @retval `status::INVALID_PARAMETER`
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
          *          If one or more char/chars in `string` is not a value.
+         * 
+         * @retval `status::EMPTY`
+         *          If the length of `string` is to short.
+         * 
+         * @retval `status::BUFFER_OVERFLOW`
+         *          If `string` triggers an overflow.
          * 
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        _API_ static status_t 
+        _API_
+        static 
+        status_t 
         string_to_int(_OUT_ int32_t& value,
                       _IN_  const char* string) noexcept;
 
@@ -186,9 +209,11 @@ namespace stdlib
          * @retval `true` if `symbol` is a digit.
          * @retval `false` if `symbol` is not a digit.
          */
-        _API_ static bool 
+        _API_ 
+        static 
+        bool 
         is_digit(_IN_ const int32_t symbol) noexcept {
-            return (symbol >= '0') && (symbol <= '9');
+            return symbol >= '0' && symbol <= '9';
         }
 
 

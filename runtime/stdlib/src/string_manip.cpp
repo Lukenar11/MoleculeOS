@@ -15,6 +15,7 @@ NOTES:
     compiler can better inline them.
 */
 
+
 #include <string_manip.hpp>
 
 
@@ -23,30 +24,31 @@ namespace stdlib
     /**
      * @brief Validates the parameters for the most class methods.
      * 
-     * @param dest_ptr pointer to validate
-     * @param src_ptr  pointer to validate
+     * @param destination_ptr pointer to validate
+     * @param source_ptr  pointer to validate
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `dest_ptr` is `nullptr`.
+     *          If `destination_ptr` is `nullptr`.
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_B`
-     *          If `src_ptr` is `nullptr`.
+     *          If `source_ptr` is `nullptr`.
      * 
      * @retval `status::SUCCESS`
      *          If all pointer are valid.
      */
-    [[nodiscard]] status_t
-    String_Manipulation::validate_dest_ptr_and_src_ptr(_INOUT_ char* dest_ptr,
-                                                       _IN_    const char* src_ptr)
-                                                       noexcept {
+    [[nodiscard]] 
+    status_t
+    String_Manipulation::validate_destination_ptr_and_source_ptr(_INOUT_ char* destination_ptr,
+                                                                 _IN_    const char* source_ptr)
+                                                                 noexcept {
         status_t status;
 
-        if (!dest_ptr) [[unlikely]] {
+        if (!destination_ptr) [[unlikely]] {
             status = status::NULL_POINTER | status::flags::PARAM_A;
             goto cleanup;
         }
 
-        if (!src_ptr) [[unlikely]] {
+        if (!source_ptr) [[unlikely]] {
             status = status::NULL_POINTER | status::flags::PARAM_B;
             goto cleanup;
         }
@@ -60,53 +62,59 @@ namespace stdlib
 
     /**
      * @brief Copys the content of a string part in another string.
-     * @note The destination buffer must be at least `size` bytes long.
      * 
-     * @param dest_ptr pointer to destination-string
-     * @param src_ptr  pointer to source-string
-     * @param size     string part char size
+     * @note The destination buffer must be at least `byte_size` bytes long.
+     * 
+     * @param destination_ptr pointer to destination-string
+     * @param source_ptr      pointer to source-string
+     * @param byte_size       string part char size
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If `dest_ptr` is a `nullptr`.
+     *          If `destination_ptr` is a `nullptr`.
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-     *          If `src_ptr` is a nullptr`.
+     *          If `source_ptr` is a `nullptr`.
      * 
      * @retval `status::SUCCESS | status::flags::SIZE_ZERO`
-     *          If `size` is a `0`.
+     *          If `byte_size` is a `0` or `1`.
      * 
      * @retval `status::SUCCESS`
      *          Default case.
      */
-    _API_ status_t 
-    String_Manipulation::copy_string_part(_INOUT_ char* dest_ptr,
-                                          _IN_    const char* src_ptr,
-                                          _IN_    const uint32_t size) 
+    _API_ 
+    status_t
+    String_Manipulation::copy_string_part(_INOUT_ char* destination_ptr,
+                                          _IN_    const char* source_ptr,
+                                          _IN_    const uint32_t byte_size) 
                                           noexcept {
         status_t status;
-        const char null_char = '\0';
+        uint32_t memory_index = 0;
+        const char null_char  = '\0';
 
-        status = validate_dest_ptr_and_src_ptr(dest_ptr, src_ptr);
+        status = validate_destination_ptr_and_source_ptr(destination_ptr, 
+                                                         source_ptr);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        if (size == 0) [[unlikely]] {
-            status = status::SUCCESS | status::flags::SIZE_ZERO;
+        if (byte_size <= 1) [[unlikely]] {
+            status = status::INVALID_PARAMETER | status::flags::PARAM_C;
             goto cleanup;
         }
 
-        for (uint32_t i = 0; i < size; i++) [[likely]] {
-            if (src_ptr[i] == null_char) {
-                dest_ptr[i] = null_char;
-                status = status::SUCCESS;
-                goto cleanup;
-            }
-
-            dest_ptr[i] = src_ptr[i];
+        while (memory_index + 1 < 
+               byte_size && source_ptr[memory_index] != null_char) [[likely]] {
+            destination_ptr[memory_index] = source_ptr[memory_index];
+            ++memory_index;
         }
 
-        dest_ptr[size - 1] = null_char;
+        if (source_ptr[memory_index] != null_char) [[unlikely]] {
+            status = status::BUFFER_OVERFLOW;
+            goto cleanup;
+        }
+
+        destination_ptr[memory_index] = null_char;
+
         status = status::SUCCESS;
 
     cleanup:
@@ -117,29 +125,31 @@ namespace stdlib
     /**
      * @brief Copys the content of a string in another string.
      * 
-     * @param dest_ptr pointer to the destination-string
-     * @param src_ptr  pointer to the source-string
+     * @note The destination buffer must be large enough for the full string.
+     * 
+     * @param destination_ptr pointer to the destination-string
+     * @param source_ptr      pointer to the source-string
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If `dest_ptr` is a `nullptr`.
+     *          If `destination_ptr` is a `nullptr`.
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-     *          If `src_ptr` is a nullptr`.
+     *          If `source_ptr` is a `nullptr`.
      * 
      * @retval `status::SUCCESS`
      *          Default case.
      */
     _API_ status_t 
-    String_Manipulation::copy_string(_INOUT_ char* dest_ptr, 
-                                     _IN_    const char* src_ptr) noexcept {
+    String_Manipulation::copy_string(_INOUT_ char* destination_ptr, 
+                                     _IN_    const char* source_ptr) noexcept {
         status_t status;
 
-        status = validate_dest_ptr_and_src_ptr(dest_ptr, src_ptr);
+        status = validate_destination_ptr_and_source_ptr(destination_ptr, source_ptr);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        while ((*dest_ptr++ = *src_ptr++)) [[likely]] {
+        while ((*destination_ptr++ = *source_ptr++)) [[likely]] {
         }
 
         status = status::SUCCESS;
@@ -166,30 +176,30 @@ namespace stdlib
      *          Default case.
      */
     _API_ status_t 
-    String_Manipulation::find_char_in_string(_OUT_ const char*& founded_char,
+    String_Manipulation::find_char_in_string(_OUT_ const char*& found_char,
                                              _IN_  const char* string, 
                                              _IN_  const int32_t symbol) 
                                              noexcept {
         status_t status;
 
         if (!string) [[unlikely]] {
-            founded_char = nullptr;
-            status       = status::NULL_POINTER | status::flags::PARAM_B;
+            found_char = nullptr;
+            status     = status::NULL_POINTER | status::flags::PARAM_B;
 
             goto cleanup;
         }
 
         while (*string != static_cast<char>(symbol)) [[likely]] {
             if (!(*string++)) [[unlikely]] {
-                founded_char = nullptr;
-                status       = status::NOT_FOUND;
+                found_char = nullptr;
+                status     = status::NOT_FOUND;
 
                 goto cleanup;
             }
         }
 
-        founded_char = const_cast<char*>(string);
-        status       = status::SUCCESS;
+        found_char = const_cast<char*>(string);
+        status     = status::SUCCESS;
 
     cleanup:
         return status;
@@ -257,9 +267,13 @@ namespace stdlib
                                          _IN_ const char* b_ptr) noexcept {
         status_t status;
 
-        status = validate_dest_ptr_and_src_ptr(const_cast<char*>(a_ptr), 
-                                               b_ptr);
-        if (status != status::SUCCESS) [[unlikely]] {
+        if (!a_ptr) [[unlikely]] {
+            status = status::NULL_POINTER | status::flags::PARAM_A;
+            goto cleanup;
+        }
+
+        if (!b_ptr) [[unlikely]] {
+            status = status::NULL_POINTER | status::flags::PARAM_B;
             goto cleanup;
         }
 
@@ -292,45 +306,86 @@ namespace stdlib
      * @retval `status::NULL_POINTER | status::flags::PARAM_B`
      *          If `string` is a `nullptr`.
      * 
-     * @retval `status::INVALID_PARAMETER`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
      *          If one or more char/chars in `string` is not a value.
+     * 
+     * @retval `status::EMPTY`
+     *          If the length of `string` is to short.
+     * 
+     * @retval `status::BUFFER_OVERFLOW`
+     *          If `string` triggers an overflow.
      * 
      * @retval `status::SUCCESS`
      *          Default case.
      */
-    _API_ status_t 
+    _API_ 
+    status_t 
     String_Manipulation::string_to_int(_OUT_ int32_t& value,
                                        _IN_  const char* string) noexcept {
-        status_t status;
         bool is_negative;
-        value = 0;
+        status_t status;
+        uint32_t digit;
+        uint32_t string_length = 0;
+        uint32_t limit         = 0;
+        uint32_t magnitude     = 0;
+        const uint32_t ten     = 10;
+        value                  = 0;
 
-       if (!string) [[unlikely]] {
+        if (!string) [[unlikely]] {
             status = status::NULL_POINTER | status::flags::PARAM_B;
+            goto cleanup;
+        }
+
+        status = get_string_length(string_length, string);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        if (string_length == 0) [[unlikely]] {
+            status = status::EMPTY;
             goto cleanup;
         }
 
         if (string[0] == '-') {
             is_negative = true;
             string++;
-        }
-        else {
-            is_negative = false;
-        }
 
-        while (*string) [[likely]] {
-            if (!is_digit(*string)) [[unlikely]] {
-                status = status::INVALID_PARAMETER;
+            if (string_length <= 1) [[unlikely]] {
+                status = status::EMPTY;
                 goto cleanup;
             }
 
-            value = value * 10 + (*string - '0');
+            limit = INT32_MIN;
+        }
+        else {
+            is_negative = false;
+            limit       = INT32_MAX;
+        }
+
+        while (*string) {
+            if (!is_digit(*string)) [[unlikely]] {
+                status = status::INVALID_PARAMETER | status::flags::PARAM_B;
+                goto cleanup;
+            }
+
+            digit = static_cast<uint32_t>(*string - '0');
+
+            if  (magnitude > limit / ten ||
+                 (digit > limit % ten &&
+                  magnitude == limit / ten)) [[unlikely]] {
+                status = (is_negative) 
+                         ? status::BUFFER_UNDERFLOW      
+                         : status::BUFFER_OVERFLOW;
+                goto cleanup;
+            }
+
+            magnitude = magnitude * ten + digit;
             ++string;
         }
 
-        if (is_negative) {
-            value = ~value + 1;
-        }
+        value = (is_negative) 
+                ? -magnitude
+                :  magnitude;
 
         status = status::SUCCESS;
 
