@@ -30,37 +30,34 @@ namespace stdlib
         /**
          * @brief Validates the parameters for the most class methods.
          * 
-         * @param dest_ptr pointer to the validate
-         * @param src_ptr  pointer to the validate
-         * @param size     byte size to validate
+         * @param destination_ptr pointer to the validate
+         * @param source_ptr      pointer to the validate
+         * @param byte_size       byte byte_size to validate
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-         *          If `dest_ptr` is `nullptr`.
+         *          If `destination_ptr` is `nullptr`.
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_B`
-         *          If `src_ptr` is `nullptr`.
-         * 
-         * @retval `status::SUCCESS | status::flags::SIZE_ZERO`
-         *          If all parameters are valid but `size` is `0`.
-         * 
+         *          If `source_ptr` is `nullptr`.
+
          * @retval `status::SUCCESS`
          *          All parameters are valid.
          */
         [[nodiscard]] 
         static 
         status_t
-        validate_parameters(_IN_ void* dest_ptr, 
-                            _IN_ const void* src_ptr, 
-                            _IN_ uint32_t size) noexcept;
+        validate_parameters(_IN_ void* destination_ptr, 
+                            _IN_ const void* source_ptr, 
+                            _IN_ uint32_t byte_byte_size) noexcept;
 
                             
     public:
         /**
-         * @brief Copys a memory-block with a specific size.
+         * @brief Copys a memory-block with a specific byte_size.
          *
-         * @param dest_ptr pointer to the destination memory-block
-         * @param src_ptr  pointer to the source memory-block
-         * @param size     memory-block byte size
+         * @param destination_ptr pointer to the destination memory-block
+         * @param source_ptr      pointer to the source memory-block
+         * @param byte_size       memory-block byte byte_size
          *
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
          *          If the destination-pointer is `nullptr`.
@@ -68,27 +65,24 @@ namespace stdlib
          * @retval `status::NULL_POINTER | status::flags::PARAM_B`
          *          If the source-pointer is `nullptr`.
          * 
-         * @retval `status::SUCCESS | status::flags::SIZE_ZERO`
-         *          If the memory-block-byte size is `0`.
-         * 
          * @retval `status::SUCCESS`
          *          Default case.
          */
         _API_ 
         static 
         status_t 
-        copy_memory_block(_IN_ void* dest_ptr, 
-                          _IN_ const void* src_ptr, 
-                          _IN_ uint32_t size) noexcept;
+        copy_memory_block(_IN_ void* destination_ptr, 
+                          _IN_ const void* source_ptr, 
+                          _IN_ uint32_t byte_size) noexcept;
 
 
         /**
-         * @brief Copys a memory-block with a specific size and 
+         * @brief Copys a memory-block with a specific byte_size and 
          *        alows backward copying.
          *
-         * @param dest_ptr pointer to the destination memory-block
-         * @param src_ptr  pointer to the source memory-block
-         * @param size     memory-block byte size
+         * @param destination_ptr pointer to the destination memory-block
+         * @param source_ptr      pointer to the source memory-block
+         * @param byte_size       memory-block byte byte_size
          *
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
          *          If the destination-pointer is `nullptr`.
@@ -96,60 +90,53 @@ namespace stdlib
          * @retval `status::NULL_POINTER | status::flags::PARAM_B`
          *          If the source-pointer is `nullptr`.
          * 
-         * @retval `status::SUCCESS | status::flags::SIZE_ZERO`
-         *          If the memory-block-byte size is `0`.
-         * 
          * @retval `status::SUCCESS`
          *          Default case.
          */
         _API_ 
         static 
         status_t 
-        move_memory_block(_IN_ void* dest_ptr, 
-                          _IN_ const void* src_ptr, 
-                          _IN_ uint32_t size) noexcept;
+        move_memory_block(_IN_ void* destination_ptr, 
+                          _IN_ const void* source_ptr, 
+                          _IN_ uint32_t byte_size) noexcept;
 
 
         /**
-         * @brief Fils a memory-block with a specific size with a specific value.
+         * @brief Fils a memory-block with 
+         *        a specific byte_size with a specific value.
          *
-         * @param dest_ptr pointer to the memory-block
-         * @param value    value with which the memory-block has to be filed
-         * @param size     memory-block byte size
+         * @param destination_ptr pointer to the memory-block
+         * @param value           value with which the memory-block 
+         *                        has to be filed
+         * @param byte_size       memory-block byte byte_size
          *
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-         *          If `dest_ptr` is a `nullptr`.
-         * 
-         * @retval `status::SUCCESS | status::flags::SIZE_ZERO`
-         *          If the memory-block-byte size is `0`.
-         * 
+         *          If `destination_ptr` is a `nullptr`.
+         *
          * @retval `status::SUCCESS`
          *          Default case.
          */
         _API_ 
         static 
         status_t 
-        set_memory_block(_IN_ void* dest_ptr, 
+        set_memory_block(_IN_ void* destination_ptr, 
                          _IN_ const int32_t value, 
-                         _IN_ uint32_t size) noexcept;
+                         _IN_ uint32_t byte_size) noexcept;
 
 
         /**
          * @brief Compares the values in two diffenent memory-blocks 
-         *        with a specific size.
+         *        with a specific byte_size.
          *
-         * @param dest_ptr pointer to the destination memory-block
-         * @param src_ptr  pointer to the source memory-block
-         * @param size     memory-block byte size
+         * @param destination_ptr pointer to the destination memory-block
+         * @param source_ptr      pointer to the source memory-block
+         * @param byte_size       memory-block byte byte_size
          *
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
          *          If the destination-pointer is `nullptr`.
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_B`
          *          If the source-pointer is `nullptr`.
-         * 
-         * @retval `status::SUCCESS | status::flags::SIZE_ZERO`
-         *          If the memory-block-byte size is `0`.
          * 
          * @retval `status::SUCCESS`
          *          Default case.
@@ -170,7 +157,7 @@ namespace stdlib
         status_t 
         compare_memory_block(_IN_ const void* a_ptr, 
                              _IN_ const void* b_ptr,
-                             _IN_ uint32_t size) noexcept;
+                             _IN_ uint32_t byte_size) noexcept;
 
 
         Memory_Manipulation() noexcept  = default;

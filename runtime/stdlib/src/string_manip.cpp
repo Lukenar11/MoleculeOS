@@ -97,6 +97,11 @@ namespace stdlib
             goto cleanup;
         }
 
+        if (destination_ptr == source_ptr) [[unlikely]] {
+            status = status::SUCCESS;
+            goto cleanup;
+        }
+
         if (byte_size <= 1) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_C;
             goto cleanup;
@@ -147,6 +152,11 @@ namespace stdlib
         status = validate_destination_ptr_and_source_ptr(destination_ptr, 
                                                          source_ptr);
         if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        if (destination_ptr == source_ptr) [[unlikely]] {
+            status = status::SUCCESS;
             goto cleanup;
         }
 
@@ -221,7 +231,7 @@ namespace stdlib
      */
     _API_ status_t 
     String_Manipulation::get_string_length(_OUT_ uint32_t& length,
-                                           _IN_  const char *string) noexcept {
+                                           _IN_  const char* string) noexcept {
         status_t status;
         length = 0;
 
@@ -275,6 +285,11 @@ namespace stdlib
 
         if (!b_ptr) [[unlikely]] {
             status = status::NULL_POINTER | status::flags::PARAM_B;
+            goto cleanup;
+        }
+
+        if (a_ptr == b_ptr) [[unlikely]] {
+            status = status::EQUAL_TO;
             goto cleanup;
         }
 
@@ -385,8 +400,8 @@ namespace stdlib
         }
 
         value = (is_negative) 
-                ? -magnitude
-                :  magnitude;
+                ? -static_cast<int32_t>(magnitude)
+                :  static_cast<int32_t>(magnitude);
 
         status = status::SUCCESS;
 

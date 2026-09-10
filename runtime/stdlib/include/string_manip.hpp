@@ -43,6 +43,7 @@ namespace stdlib
          *          If all pointer are valid.
          */
         [[nodiscard]] 
+        static
         status_t
         validate_destination_ptr_and_source_ptr(_INOUT_ char* destination_ptr,
                                                 _IN_    const char* source_ptr)

@@ -22,44 +22,37 @@ namespace stdlib
     /**
      * @brief Validates the parameters for the most class methods.
      * 
-     * @param dest_ptr pointer to the validate
-     * @param src_ptr  pointer to the validate
-     * @param size     byte size to validate
+     * @param destination_ptr pointer to the validate
+     * @param source_ptr      pointer to the validate
+     * @param byte_size       byte byte_size to validate
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `dest_ptr` is `nullptr`.
+     *          If `destination_ptr` is `nullptr`.
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_B`
-     *          If `src_ptr` is `nullptr`.
-     * 
-     * @retval `status::SUCCESS | status::flags::SIZE_ZERO`
-     *          If all parameters are valid but `size` is `0`.
+     *          If `source_ptr` is `nullptr`.
      * 
      * @retval `status::SUCCESS`
      *          All parameters are valid.
      */
     [[nodiscard]] 
     status_t
-    Memory_Manipulation::validate_parameters(_IN_ void* dest_ptr, 
-                                             _IN_ const void* src_ptr, 
-                                             _IN_ uint32_t size) noexcept {
+    Memory_Manipulation::validate_parameters(_IN_ void* destination_ptr, 
+                                             _IN_ const void* source_ptr, 
+                                             _IN_ uint32_t byte_size)
+                                             noexcept {
         status_t status;
 
-        if (!dest_ptr) [[unlikely]] {
+        if (!destination_ptr) [[unlikely]] {
             status = status::NULL_POINTER | status::flags::PARAM_A;
             goto cleanup;
         }
 
-        if (!src_ptr) [[unlikely]] {
+        if (!source_ptr) [[unlikely]] {
             status = status::NULL_POINTER | status::flags::PARAM_B;
             goto cleanup;
         }
 
-        if (size == 0) [[unlikely]] {
-            status = status::SUCCESS | status::flags::SIZE_ZERO;
-            goto cleanup;
-        }
-
         status = status::SUCCESS;
 
     cleanup:
@@ -68,11 +61,11 @@ namespace stdlib
 
 
     /**
-     * @brief Copys a memory-block with a specific size.
+     * @brief Copys a memory-block with a specific byte_size.
      *
-     * @param dest_ptr pointer to the destination memory-block
-     * @param src_ptr  pointer to the source memory-block
-     * @param size     memory-block byte size
+     * @param destination_ptr pointer to the destination memory-block
+     * @param source_ptr      pointer to the source memory-block
+     * @param byte_size       memory-block byte byte_size
      *
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
      *          If the destination-pointer is `nullptr`.
@@ -80,31 +73,41 @@ namespace stdlib
      * @retval `status::NULL_POINTER | status::flags::PARAM_B`
      *          If the source-pointer is `nullptr`.
      * 
-     * @retval `status::SUCCESS | status::flags::SIZE_ZERO`
-     *          If the memory-block-byte size is `0`.
+     * @retval `status::SUCCESS | status::flags::byte_size_ZERO`
+     *          If the memory-block-byte byte_size is `0`.
      * 
      * @retval `status::SUCCESS`
      *          Default case.
      */
     _API_ 
     status_t 
-    Memory_Manipulation::copy_memory_block(_IN_ void* dest_ptr, 
-                                           _IN_ const void* src_ptr, 
-                                           _IN_ uint32_t size) noexcept {
+    Memory_Manipulation::copy_memory_block(_IN_ void* destination_ptr, 
+                                           _IN_ const void* source_ptr, 
+                                           _IN_ uint32_t byte_size) noexcept {
         status_t status;
-        uint8_t* dest;
-        const uint8_t* src;
+        uint8_t* destination_byte_ptr;
+        const uint8_t* source_byte_ptr;
 
-        status = validate_parameters(dest_ptr, src_ptr, size);
+        status = validate_parameters(destination_ptr, source_ptr, byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        dest = static_cast<uint8_t*>(dest_ptr);
-        src  = static_cast<const uint8_t*>(src_ptr);
+        if (byte_size == 0) [[unlikely]] {
+            status = status::SUCCESS;
+            goto cleanup;
+        }
 
-        while (size--) [[likely]] {
-            *dest++ = *src++;
+        if (destination_ptr == source_ptr) [[unlikely]] {
+            status = status::SUCCESS;
+            goto cleanup;
+        }
+
+        destination_byte_ptr = static_cast<uint8_t*>(destination_ptr);
+        source_byte_ptr      = static_cast<const uint8_t*>(source_ptr);
+
+        while (byte_size--) [[likely]] {
+            *destination_byte_ptr++ = *source_byte_ptr++;
         }
 
         status = status::SUCCESS;
@@ -115,12 +118,12 @@ namespace stdlib
 
 
     /**
-     * @brief Copys a memory-block with a specific size and 
+     * @brief Copys a memory-block with a specific byte_size and 
      *        alows backward copying.
      *
-     * @param dest_ptr pointer to the destination memory-block
-     * @param src_ptr  pointer to the source memory-block
-     * @param size     memory-block byte size
+     * @param destination_ptr pointer to the destination memory-block
+     * @param source_ptr      pointer to the source memory-block
+     * @param byte_size       memory-block byte byte_size
      *
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
      *          If the destination-pointer is `nullptr`.
@@ -128,41 +131,54 @@ namespace stdlib
      * @retval `status::NULL_POINTER | status::flags::PARAM_B`
      *          If the source-pointer is `nullptr`.
      * 
-     * @retval `status::SUCCESS | status::flags::SIZE_ZERO`
-     *          If the memory-block-byte size is `0`.
+     * @retval `status::SUCCESS | status::flags::byte_size_ZERO`
+     *          If the memory-block-byte byte_size is `0`.
      * 
      * @retval `status::SUCCESS`
      *          Default case.
      */
     _API_ 
     status_t 
-    Memory_Manipulation::move_memory_block(_IN_ void* dest_ptr, 
-                                           _IN_ const void* src_ptr, 
-                                           _IN_ uint32_t size) noexcept {
+    Memory_Manipulation::move_memory_block(_IN_ void* destination_ptr, 
+                                           _IN_ const void* source_ptr, 
+                                           _IN_ uint32_t byte_size) noexcept {
         status_t status;
-        uint8_t* dest;
-        const uint8_t* src;
+        uint8_t* destination_byte_ptr;
+        const uint8_t* source_byte_ptr;
 
-        status = validate_parameters(dest_ptr, src_ptr, size);
+        status = validate_parameters(destination_ptr, source_ptr, byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        if (byte_size == 0) [[unlikely]] {
+            status = status::SUCCESS;
+            goto cleanup;
+        }
+
+        if (destination_ptr == source_ptr) [[unlikely]] {
+            status = status::SUCCESS;
             goto cleanup;
         }
         
-        dest = static_cast<uint8_t*>(dest_ptr);
-        src  = static_cast<const uint8_t*>(src_ptr);
+        destination_byte_ptr = static_cast<uint8_t*>(destination_ptr);
+        source_byte_ptr  = static_cast<const uint8_t*>(source_ptr);
 
-        if (reinterpret_cast<uint32_t>(dest) < 
-            reinterpret_cast<uint32_t>(src)) [[likely]] {
-            while (size--) [[likely]] {
-                *dest++ = *src++;
+        if (reinterpret_cast<uint32_t>(destination_byte_ptr) < 
+            reinterpret_cast<uint32_t>(source_byte_ptr) ||
+            reinterpret_cast<uint32_t>(destination_byte_ptr) >= 
+            reinterpret_cast<uint32_t>(source_byte_ptr) + 
+            byte_size) [[likely]] {
+            while (byte_size--) [[likely]] {
+                *destination_byte_ptr++ = *source_byte_ptr++;
             }
         } 
         else {
-            dest += size;
-            src  += size;
+            destination_byte_ptr += byte_size;
+            source_byte_ptr      += byte_size;
 
-            while (size--) [[likely]] {
-                *--dest = *--src;
+            while (byte_size--) [[likely]] {
+                *--destination_byte_ptr = *--source_byte_ptr;
             }
         }
 
@@ -174,45 +190,42 @@ namespace stdlib
 
 
     /**
-     * @brief Fils a memory-block with a specific size with a specific value.
+     * @brief Fils a memory-block with a specific byte_size with a specific value.
      *
-     * @param dest_ptr pointer to the memory-block
-     * @param value    value with which the memory-block has to be filed
-     * @param size     memory-block byte size
+     * @param destination_ptr pointer to the memory-block
+     * @param value           value with which the memory-block has to be filed
+     * @param byte_size       memory-block byte byte_size
      *
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `dest_ptr` is a `nullptr`.
-     * 
-     * @retval `status::SUCCESS | status::flags::SIZE_ZERO`
-     *          If the memory-block-byte size is `0`.
-     * 
+     *          If `destination_ptr` is a `nullptr`.
+
      * @retval `status::SUCCESS`
      *          Default case.
      */
     _API_ 
     status_t 
-    Memory_Manipulation::set_memory_block(_IN_ void* dest_ptr, 
+    Memory_Manipulation::set_memory_block(_IN_ void* destination_ptr, 
                                           _IN_ const int32_t value, 
-                                          _IN_ uint32_t size) noexcept {
+                                          _IN_ uint32_t byte_size) noexcept {
         status_t status;
-        uint8_t* dest;
+        uint8_t* destination_byte_ptr;
         uint8_t byte;
 
-        if (!dest_ptr) [[unlikely]] {
+        if (!destination_ptr) [[unlikely]] {
             status = status::NULL_POINTER | status::flags::PARAM_A;
             goto cleanup;
         }
 
-        if (size == 0) [[unlikely]] {
-            status = status::SUCCESS | status::flags::SIZE_ZERO;
+        if (byte_size == 0) [[unlikely]] {
+            status = status::SUCCESS;
             goto cleanup;
         }
 
-        dest = static_cast<uint8_t*>(dest_ptr);
-        byte = static_cast<uint8_t>(value);
+        destination_byte_ptr = static_cast<uint8_t*>(destination_ptr);
+        byte                 = static_cast<uint8_t>(value);
         
-        while (size--) [[likely]] {
-            *dest++ = byte;
+        while (byte_size--) [[likely]] {
+            *destination_byte_ptr++ = byte;
         }
 
         status = status::SUCCESS;
@@ -224,11 +237,11 @@ namespace stdlib
 
     /**
      * @brief Compares the values in two diffenent memory-blocks 
-     *        with a specific size.
+     *        with a specific byte_size.
      *
-     * @param dest_ptr pointer to the destination memory-block
-     * @param src_ptr  pointer to the source memory-block
-     * @param size     memory-block byte size
+     * @param destination_ptr pointer to the destination memory-block
+     * @param source_ptr      pointer to the source memory-block
+     * @param byte_size       memory-block byte byte_size
      *
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
      *          If the destination-pointer is `nullptr`.
@@ -236,8 +249,8 @@ namespace stdlib
      * @retval `status::NULL_POINTER | status::flags::PARAM_B`
      *          If the source-pointer is `nullptr`.
      * 
-     * @retval `status::SUCCESS | status::flags::SIZE_ZERO`
-     *          If the memory-block-byte size is `0`.
+     * @retval `status::SUCCESS | status::flags::byte_size_ZERO`
+     *          If the memory-block-byte `byte_size` is `0`.
      * 
      * @retval `status::SUCCESS`
      *          Default case.
@@ -257,31 +270,42 @@ namespace stdlib
     status_t 
     Memory_Manipulation::compare_memory_block(_IN_ const void* a_ptr, 
                                               _IN_ const void* b_ptr,
-                                              _IN_ uint32_t size) noexcept {
+                                              _IN_ uint32_t byte_size) 
+                                              noexcept {
         status_t status;
-        const uint8_t* a = static_cast<const uint8_t*>(a_ptr);
-        const uint8_t* b = static_cast<const uint8_t*>(b_ptr);
+        const uint8_t* a_byte_ptr = static_cast<const uint8_t*>(a_ptr);
+        const uint8_t* b_byte_ptr = static_cast<const uint8_t*>(b_ptr);
 
         status = validate_parameters(const_cast<void*>(a_ptr), 
                                      b_ptr,
-                                     size);
+                                     byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        while (size--) [[likely]] {
-            if (*a < *b) {
+        if (byte_size == 0) [[unlikely]] {
+            status = status::SUCCESS;
+            goto cleanup;
+        }
+
+        if (a_ptr == b_ptr) [[unlikely]] {
+            status = status::EQUAL_TO;
+            goto cleanup;
+        }
+
+        while (byte_size--) [[likely]] {
+            if (*a_byte_ptr < *b_byte_ptr) {
                 status = status::LESS_THAN;
                 goto cleanup;  
             }
 
-            if (*a > *b) {
+            if (*a_byte_ptr > *b_byte_ptr) {
                 status = status::GREATER_THAN;
                 goto cleanup;  
             }
 
-            a++;
-            b++;
+            a_byte_ptr++;
+            b_byte_ptr++;
         }
 
         status = status::EQUAL_TO;
