@@ -47,8 +47,7 @@ namespace stdlib
         static 
         status_t
         validate_parameters(_IN_ void* destination_ptr, 
-                            _IN_ const void* source_ptr, 
-                            _IN_ uint32_t byte_byte_size) noexcept;
+                            _IN_ const void* source_ptr) noexcept;
 
                             
     public:

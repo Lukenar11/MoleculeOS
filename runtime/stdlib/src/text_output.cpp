@@ -47,30 +47,39 @@ namespace stdlib
     Text_Output::convert_base_to_digits(_OUT_ stdlib::Array<char, 32>& buffer,
                                         _IN_  uint32_t value,
                                         _IN_  const uint32_t base) noexcept {
-        const char null_char = '0';
-        const char a_char    = 'A';
-        const uint32_t ten   = 10;
+        uint32_t chars_written   = 0;
+        uint8_t converted_number = 0;
+        const char null_char     = '0';
+        const char a_char        = 'A';
+        const uint32_t ten       = 10;
 
-        uint32_t i     = 0;
-        uint8_t number = 0;
+        if (base < 2 || base > 16) [[unlikely]] {
+            goto cleanup;
+        }
+
+        if (value == 0) [[unlikely]] {
+            put_char('0');
+            goto cleanup;
+        }
 
         while (value) [[likely]] {
-            if (i >= buffer.size()) [[unlikely]] {
+            if (chars_written >= buffer.size()) [[unlikely]] {
                 break;
             }
 
-            number = value % base;
-            if (number < ten) {
-                buffer[i++] = null_char + number;
+            converted_number = value % base;
+            if (converted_number < ten) {
+                buffer[chars_written++] = null_char + converted_number;
             }
             else {
-                buffer[i++] = a_char + number - ten;
+                buffer[chars_written++] = a_char + converted_number - ten;
             }
 
             value /= base;
         }
 
-        return i;
+    cleanup:
+        return chars_written;
     }
 
 
@@ -87,21 +96,21 @@ namespace stdlib
     Text_Output::put_base(_IN_ uint32_t value, 
                           _IN_ const uint32_t base) noexcept {
         stdlib::Array<char, 32> buffer;
-        uint32_t count;
+        uint32_t buffer_count;
+
+        if (base < 2 || base > 16) [[unlikely]] {
+            goto cleanup;
+        }
 
         if (value == 0) [[unlikely]] {
             put_char('0');
             goto cleanup;
         }
 
-        if (base < 2 || base > 16) [[unlikely]] {
-            goto cleanup;
-        }
+        buffer_count = convert_base_to_digits(buffer, value, base);
 
-        count = convert_base_to_digits(buffer, value, base);
-
-        while (count--) [[likely]] {
-            put_char(buffer[count]);
+        while (buffer_count--) [[likely]] {
+            put_char(buffer[buffer_count]);
         }
 
     cleanup:
@@ -125,21 +134,20 @@ namespace stdlib
     uint32_t 
     Text_Output::convert_uint_to_digits(_OUT_ stdlib::Array<char, 12>& buffer,
                                         _IN_  uint32_t value) noexcept {
-        const char null_char = '0';
-        const uint32_t ten   = 10;
-
-        uint32_t i = 0;
+        uint32_t buffer_count = 0;
+        const char null_char  = '0';
+        const uint32_t ten    = 10;
 
         while (value) [[likely]] {
-            if (i >= buffer.size()) [[unlikely]] {
+            if (buffer_count >= buffer.size()) [[unlikely]] {
                 break;
             }
 
-            buffer[i++] = null_char + (value % ten);
+            buffer[buffer_count++] = null_char + (value % ten);
             value /= ten;
         }
 
-        return i;
+        return buffer_count;
     }
 
 
@@ -169,7 +177,9 @@ namespace stdlib
      */
     void 
     Text_Output::handle_tab() noexcept {
-        for (uint32_t i = 0; i < 4; ++i) [[likely]] {
+        for (uint32_t space_count = 0; 
+             space_count < 4; 
+             space_count++) [[likely]] {
             drivers::vga::Text_Mode::put_char_at(cursor_x,
                                                  cursor_y,
                                                  cursor_color,
@@ -217,8 +227,13 @@ namespace stdlib
         const uint32_t null   = 0;
         uint32_t needed_lines = 1;
         uint32_t x            = cursor_x;
-
         char symbol;
+
+        if (!text || text[0] == '\0') [[unlikely]] {
+            needed_lines = 0;
+            goto cleanup;
+        }
+
         while (*text) [[likely]] {
             symbol = *text++;
             if (symbol == '\n') [[unlikely]] {
@@ -234,6 +249,7 @@ namespace stdlib
             }
         }
 
+    cleanup:
         return needed_lines;
     }
 
@@ -257,7 +273,8 @@ namespace stdlib
      * 
      * @param value integer output
      */
-    _API_ void 
+    _API_ 
+    void 
     Text_Output::put_int(_IN_ int32_t value) noexcept {
         if (value < 0) {
             put_char('-');
@@ -276,9 +293,10 @@ namespace stdlib
      * 
      * @param value integer output
      */
-    _API_ void 
+    _API_ 
+    void 
     Text_Output::put_uint(_IN_ const uint32_t value) noexcept {
-        uint32_t count;
+        uint32_t char_count;
         stdlib::Array<char, 12> buffer;
         
         if (value == 0) [[unlikely]] {
@@ -286,10 +304,10 @@ namespace stdlib
             goto cleanup;
         }
 
-        count = convert_uint_to_digits(buffer, value);
+        char_count = convert_uint_to_digits(buffer, value);
 
-        while (count--) [[likely]] {
-            put_char(buffer[count]);
+        while (char_count--) [[likely]] {
+            put_char(buffer[char_count]);
         }
 
     cleanup:
@@ -309,7 +327,8 @@ namespace stdlib
      * @note - `\n` -> Cursor jump to the next line.
      * @note - `\\"` -> Allows `"` as character output.
      */
-    _API_ void 
+    _API_ 
+    void 
     Text_Output::put_char(_IN_ const char symbol) noexcept {
         switch (symbol) {
         case '\r':
@@ -326,6 +345,9 @@ namespace stdlib
         
         case '\n':
             new_line();
+            break;
+
+        case '\0':
             break;
         
         default:
@@ -347,18 +369,26 @@ namespace stdlib
      * @note - `\n` -> Cursor jump to the next line.
      * @note - `\\"` -> allows `"` in the string output
      */
-    _API_ void
+    _API_ 
+    void
     Text_Output::put_string(_IN_ const char* message) noexcept {
-        const uint32_t needed_lines = calculate_needed_lines(message);
-        const uint32_t remaining    = drivers::vga::TEXT_MODE_SCREEN_HEIGHT - 
-                                      cursor_y;
-        
-        if (needed_lines > remaining) [[unlikely]] {
-            reset();
+        uint32_t needed_lines;
+
+        if (!message || message[0] == '\0') [[unlikely]] {
+            goto cleanup;
         }
 
+        needed_lines = calculate_needed_lines(message);
+        
+        if (needed_lines > 
+            drivers::vga::TEXT_MODE_SCREEN_HEIGHT - cursor_y) [[unlikely]] {
+            reset();
+        }
         while (*message) [[likely]] {
             put_char(*message++);
         }
+
+    cleanup:
+        return;
     }
 } // namespace stdlib

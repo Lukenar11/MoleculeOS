@@ -60,7 +60,8 @@ namespace stdlib
          * 
          * @return size of `buffer`
          */
-        static uint32_t 
+        static 
+        uint32_t 
         convert_base_to_digits(_OUT_ stdlib::Array<char, 32>& buffer,
                                _IN_  uint32_t value,
                                _IN_  const uint32_t base) noexcept;
@@ -75,7 +76,8 @@ namespace stdlib
          * @param value integer output
          * @param base  integer base
          */
-        static void 
+        static 
+        void 
         put_base(_IN_ uint32_t value, 
                  _IN_ const uint32_t base) noexcept;
             
@@ -93,7 +95,8 @@ namespace stdlib
          * 
          * @return size of `buffer`
          */
-        static uint32_t 
+        static 
+        uint32_t 
         convert_uint_to_digits(_OUT_ stdlib::Array<char, 12>& buffer,
                                _IN_  uint32_t value) noexcept;
 
@@ -104,7 +107,8 @@ namespace stdlib
          * 
          * @param symbol character output
          */
-        static void 
+        static 
+        void 
         handle_backspace() noexcept;
         
         
@@ -114,7 +118,8 @@ namespace stdlib
          * 
          * @param symbol character output
          */
-        static void 
+        static 
+        void 
         handle_tab() noexcept;
         
 
@@ -124,7 +129,8 @@ namespace stdlib
          * 
          * @param symbol character output
          */
-        static void 
+        static 
+        void 
         handle_normal_char(_IN_ const char symbol) noexcept;
 
 
@@ -137,14 +143,16 @@ namespace stdlib
          * 
          * @return the count of needed lines.
          */
-        static uint32_t 
+        static 
+        uint32_t 
         calculate_needed_lines(_IN_ const char* text) noexcept;
 
 
         /** 
          * Makes a cursor Jump to the next line.
          */
-        static void 
+        static 
+        void 
         new_line() noexcept;
 
 
@@ -154,7 +162,11 @@ namespace stdlib
          * 
          * @return cursor X coordinate
          */        
-        _API_ [[nodiscard]] static inline uint32_t 
+        _API_ 
+        [[nodiscard]] 
+        static 
+        inline 
+        uint32_t 
         get_cursor_x() noexcept {
             return cursor_x;
         }
@@ -165,7 +177,11 @@ namespace stdlib
          * 
          * @return cursor Y coordinate
          */   
-        _API_ [[nodiscard]] static inline uint32_t 
+        _API_ 
+        [[nodiscard]] 
+        static 
+        inline 
+        uint32_t 
         get_cursor_y() noexcept {
             return cursor_y;
         }
@@ -176,7 +192,11 @@ namespace stdlib
          * 
          * @return text color
          */
-        _API_ [[nodiscard]] static inline uint8_t 
+        _API_ 
+        [[nodiscard]] 
+        static 
+        inline 
+        uint8_t 
         get_text_color() noexcept {
             return cursor_color;
         }
@@ -188,7 +208,10 @@ namespace stdlib
          * @param color      color for symbols
          * @param background background color for symbols
          */
-        _API_ static inline void 
+        _API_ 
+        static 
+        inline 
+        void 
         set_text_color(_IN_ const drivers::vga::Text_Mode_Colors& color,
                        _IN_ const drivers::vga::Text_Mode_Colors& background,
                        _IN_ const bool does_blink=false) noexcept {
@@ -204,18 +227,28 @@ namespace stdlib
          * @param x X coordinate
          * @param y Y coordinate
          */
-        _API_ static inline constexpr void
+        _API_ 
+        static 
+        inline 
+        constexpr 
+        void
         set_cursor(_IN_ const uint32_t x, 
                    _IN_ const uint32_t y) noexcept {
-            cursor_x = x;
-            cursor_y = y;
+            if (x < drivers::vga::TEXT_MODE_SCREEN_WIDTH &&
+                y < drivers::vga::TEXT_MODE_SCREEN_HEIGHT) [[unlikely]] {
+                cursor_x = x;
+                cursor_y = y;
+            }
         }
 
 
         /**
          * @brief Clears the screen and resets the cursor.
          */
-        _API_ static inline void 
+        _API_ 
+        static 
+        inline 
+        void 
         reset() noexcept {
             using namespace drivers;
 
@@ -231,7 +264,9 @@ namespace stdlib
          * 
          * @param value integer output
          */
-        _API_ static void 
+        _API_ 
+        static 
+        void 
         put_int(_IN_  int32_t value) noexcept;
 
 
@@ -240,7 +275,9 @@ namespace stdlib
          * 
          * @param value integer output
          */
-        _API_ static void 
+        _API_ 
+        static 
+        void 
         put_uint(_IN_ const uint32_t value) noexcept;
 
 
@@ -249,7 +286,10 @@ namespace stdlib
          * 
          * @param value number output
          */
-        _API_ static inline void
+        _API_ 
+        static 
+        inline 
+        void
         put_hex(_IN_ const uint32_t value) noexcept {
             put_string("0x");
             put_base(value, 16);
@@ -261,7 +301,10 @@ namespace stdlib
          * 
          * @param value number output
          */
-        _API_ static inline void 
+        _API_ 
+        static 
+        inline 
+        void 
         put_bin(_IN_ const uint32_t value) noexcept {
             put_string("0b");
             put_base(value, 2);
@@ -274,7 +317,10 @@ namespace stdlib
          * 
          * @param value address output
          */
-        _API_ static inline void 
+        _API_ 
+        static 
+        inline 
+        void 
         put_ptr(_IN_ const uint32_t value) noexcept {
             put_string("0x");
             put_base(value, 16);
@@ -293,7 +339,9 @@ namespace stdlib
          * @note - `\n` -> Cursor jump to the next line.
          * @note - `\\"` -> Allows `"` as character output.
          */
-        _API_ static void 
+        _API_ 
+        static 
+        void 
         put_char(_IN_ const char symbol) noexcept;
 
 
@@ -309,7 +357,9 @@ namespace stdlib
          * @note - `\n` -> Cursor jump to the next line.
          * @note - `\\"` -> allows `"` in the string output
          */
-        _API_ static void 
+        _API_ 
+        static 
+        void 
         put_string(_IN_ const char* message) noexcept;
     
 

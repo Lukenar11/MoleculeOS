@@ -79,7 +79,6 @@ namespace stdlib
         push(_IN_ const T& item, 
              _IN_ const bool overwrite_last_item=false) noexcept {
             status_t status;
-
             if (buffer_is_full) [[unlikely]] {
                 if (!overwrite_last_item) [[unlikely]] {
                     status = status::FULL;

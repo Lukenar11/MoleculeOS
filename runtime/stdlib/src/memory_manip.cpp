@@ -38,8 +38,7 @@ namespace stdlib
     [[nodiscard]] 
     status_t
     Memory_Manipulation::validate_parameters(_IN_ void* destination_ptr, 
-                                             _IN_ const void* source_ptr, 
-                                             _IN_ uint32_t byte_size)
+                                             _IN_ const void* source_ptr)
                                              noexcept {
         status_t status;
 
@@ -88,7 +87,7 @@ namespace stdlib
         uint8_t* destination_byte_ptr;
         const uint8_t* source_byte_ptr;
 
-        status = validate_parameters(destination_ptr, source_ptr, byte_size);
+        status = validate_parameters(destination_ptr, source_ptr);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -146,7 +145,7 @@ namespace stdlib
         uint8_t* destination_byte_ptr;
         const uint8_t* source_byte_ptr;
 
-        status = validate_parameters(destination_ptr, source_ptr, byte_size);
+        status = validate_parameters(destination_ptr, source_ptr);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -276,9 +275,7 @@ namespace stdlib
         const uint8_t* a_byte_ptr = static_cast<const uint8_t*>(a_ptr);
         const uint8_t* b_byte_ptr = static_cast<const uint8_t*>(b_ptr);
 
-        status = validate_parameters(const_cast<void*>(a_ptr), 
-                                     b_ptr,
-                                     byte_size);
+        status = validate_parameters(const_cast<void*>(a_ptr), b_ptr);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
