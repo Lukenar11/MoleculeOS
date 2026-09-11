@@ -9,15 +9,18 @@ DESCRIPTION:
 
     This driver contains the operation to be performed (READ/WRITE), 
     a pointer, the number of sectors, the relative 'LBA-address', 
-    and will either perform a hard drive read operation or a hard drive write operation.
+    and will either perform a hard drive read operation or 
+    a hard drive write operation.
 
 NOTES:
     Some methods are defined only in the header file so that the 
     compiler can inline them more easily.
 
-    For the sake of simplicity, support for 48-bit 'LBA-addresses' has been omitted.
+    For the sake of simplicity, support for 48-bit 'LBA-addresses' 
+    has been omitted.
 
-    The forward-declaration for the 'kernel::sys::panic();' function is intends, 
+    The forward-declaration for the 
+    'kernel::sys::panic();' function is intends, 
     because the inclusion of the '<kernel.hpp>' regarding conflicts with the 
     '<drivers.hpp>'.
 */
@@ -51,9 +54,9 @@ namespace drivers::ata
      * @retval `status::SUCCESS`
      *         Default case.
      */
-    status_t 
-    Programmable_Input_Output::validate_storage_access(_IN_ const uint32_t relative_lba, 
-                                                       _IN_ const uint32_t to_transfer) 
+    status_t
+    Programmable_Input_Output::validate_storage_access(_IN_ const uint32_t relative_lba,
+                                                       _IN_ const uint32_t to_transfer)
                                                        noexcept {
         status_t status;
 
@@ -62,16 +65,16 @@ namespace drivers::ata
             goto cleanup;
         }
 
-        if (relative_lba > partition_length ||
-            relative_lba > partition_length - to_transfer) [[unlikely]] {
-            status = status::ATA_INVALID_LBA | status::flags::PARAM_B;
-            goto cleanup;
-        }
-
-        if (to_transfer == 0 || 
+        if (to_transfer == 0 ||
             to_transfer > partition_length ||
             to_transfer > MAX_ALLOWED_SECTOR_COUNT) [[unlikely]] {
             status = status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C;
+            goto cleanup;
+        }
+
+        if (relative_lba >= partition_length ||
+            relative_lba > (partition_length - to_transfer)) [[unlikely]] {
+            status = status::ATA_INVALID_LBA | status::flags::PARAM_B;
             goto cleanup;
         }
 
@@ -88,8 +91,9 @@ namespace drivers::ata
      * @note The ATA specification requires a minimum delay of 400 ns 
      *       after certain operations.
      * 
-     * @note This implementation performs five consecutive read operations from the
-     *       status port, each lasting ~100 ns, to ensure a safe delay is achieved.
+     * @note This implementation performs five consecutive read 
+     *       operations from the status port, 
+     *       each lasting ~100 ns, to ensure a safe delay is achieved.
      * 
      * @note Since the operation being performed does not 
      *       generate a delay of exactly 100 ns, 
@@ -98,7 +102,7 @@ namespace drivers::ata
      */
     void 
     Programmable_Input_Output::delay() noexcept {
-        for (uint32_t i = 0; i < 5; ++i) [[likely]] {
+        for (uint32_t ns_delay = 0; ns_delay < 5; ns_delay++) [[likely]] {
             stdlib::byte_input(status_port());
         }
     }
@@ -136,7 +140,7 @@ namespace drivers::ata
      *
      * @param identify_data Output buffer for the `IDENTIFY` data
      * @param io_base       Base I/O port of the ATA channel
-     * @param control_reg   Control register port of the ATA channel
+     * @param control_register   Control register port of the ATA channel
      *
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
      *         If the pointer to `identify_data` is `nullptr`.
@@ -145,7 +149,7 @@ namespace drivers::ata
      *         If `io_base` is not a valid ATA channel.
      *
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
-     *         If the `control_reg` port is invalid.
+     *         If the `control_register` port is invalid.
      *
      * @retval `status::ATA_ERROR`
      *         If an error is reported during the `IDENTIFY` operation.
@@ -162,7 +166,7 @@ namespace drivers::ata
     status_t
     Programmable_Input_Output::identify_drive(_OUT_ uint16_t identify_data[SECTOR_WORD_SIZE],
                                               _IN_  const uint16_t io_base,
-                                              _IN_  const uint16_t control_reg) 
+                                              _IN_  const uint16_t control_register) 
                                               noexcept {
         status_t status;
 
@@ -177,14 +181,14 @@ namespace drivers::ata
             goto cleanup;
         }
 
-        if (control_reg != IDE_PRIMARY_DCR_BASE &&
-            control_reg != IDE_SECONDARY_DCR_BASE) [[unlikely]] {
+        if (control_register != IDE_PRIMARY_DCR_BASE &&
+            control_register != IDE_SECONDARY_DCR_BASE) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_C;
             goto cleanup;
         }
 
-        device_control_reg = control_reg;
-        reset_driver(control_reg);
+        device_control_register = control_register;
+        reset_driver(control_register);
 
         io_port_base = io_base;
 
@@ -211,8 +215,8 @@ namespace drivers::ata
      * @brief Probes an ATA channel (master + slave) and configures the driver
      *        if a valid hard drive is detected.
      *
-     * @param io_port     Base I/O port of the ATA channel
-     * @param control_reg Control register port of the ATA channel
+     * @param io_port          Base I/O port of the ATA channel
+     * @param control_register Control register port of the ATA channel
      *
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
      *         If the I/O port is invalid.
@@ -237,7 +241,7 @@ namespace drivers::ata
      */
     status_t 
     Programmable_Input_Output::probe_and_configure_channel(_IN_ const uint16_t io_port,
-                                                           _IN_ const uint16_t control_reg) 
+                                                           _IN_ const uint16_t control_register)
                                                            noexcept {
         status_t status;
         stdlib::Array<uint16_t, SECTOR_WORD_SIZE> identify_data;
@@ -250,8 +254,8 @@ namespace drivers::ata
             goto cleanup;
         }
 
-        if (control_reg != IDE_PRIMARY_DCR_BASE &&
-            control_reg != IDE_SECONDARY_DCR_BASE) [[unlikely]] {
+        if (control_register != IDE_PRIMARY_DCR_BASE &&
+            control_register != IDE_SECONDARY_DCR_BASE) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_B;
             goto cleanup;
         }
@@ -261,9 +265,9 @@ namespace drivers::ata
 
             status = identify_drive(identify_data.data(),
                                     io_port,
-                                    control_reg);
+                                    control_register);
             if (status != status::SUCCESS) [[unlikely]] {
-                reset_driver(control_reg);
+                reset_driver(control_register);
                 continue;
             }
 
@@ -271,7 +275,7 @@ namespace drivers::ata
                             static_cast<uint32_t>(identify_data[60]);
 
             io_port_base       = io_port;
-            device_control_reg = control_reg;
+            device_control_register = control_register;
             lba_start_address  = 0;
 
             if (is_master) {
@@ -402,7 +406,7 @@ namespace drivers::ata
      *        for a given number of sectors.
      *
      * @param buffer       I/O buffer for sector data.
-     * @param op           Operation (`READ` or `WRITE`).
+     * @param operation    Operation (`READ` or `WRITE`).
      * @param sector_count Number of sectors to transfer.
      *
      * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
@@ -422,17 +426,30 @@ namespace drivers::ata
      */
     status_t 
     Programmable_Input_Output::poll_and_read_or_write_disk(_INOUT_ uint16_t* buffer,
-                                                           _IN_    const Operations op,
+                                                           _IN_    const Operations operation,
                                                            _IN_    const uint32_t sector_count) 
                                                            noexcept {
         status_t status;
+
+        if (!buffer) [[unlikely]] {
+            status = status::INVALID_PARAMETER | status::flags::PARAM_A;
+            goto cleanup;
+        }
+
+        if (operation != Operations::READ && 
+            operation != Operations::WRITE) [[unlikely]] {
+            status = status::INVALID_PARAMETER | status::flags::PARAM_B;
+            goto cleanup;
+        }
 
         if (sector_count == 0) [[unlikely]] {
             status = status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C;
             goto cleanup;
         }
 
-        for (uint32_t i = 0; i < sector_count; ++i) [[likely]] {
+        for (uint32_t word_count = 0;
+             word_count < sector_count; 
+             word_count++) [[likely]] {
             delay();
 
             status = poll_until_drq_or_error();
@@ -440,7 +457,7 @@ namespace drivers::ata
                 goto cleanup;
             }
 
-            if (op == Operations::READ) {
+            if (operation == Operations::READ) {
                 stdlib::word_input_stream(io_port_base,
                                           SECTOR_WORD_SIZE,
                                           buffer);
@@ -469,9 +486,9 @@ namespace drivers::ata
      *        a specific LBA address.
      *
      * @param buffer       I/O buffer for sector data.
-     * @param op           Operation type (READ or WRITE).
-     * @param sector_count Number of sectors to transfer.
      * @param relative_lba Starting LBA address.
+     * @param sector_count Number of sectors to transfer.
+     * @param operation    Operation type (READ or WRITE).
      *
      * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_B`
      *         If the LBA range is invalid.
@@ -495,7 +512,7 @@ namespace drivers::ata
     Programmable_Input_Output::start_pio_disk_read_or_write(_INOUT_ uint16_t* buffer,
                                                             _IN_    const uint32_t relative_lba,
                                                             _IN_    const uint32_t sector_count,
-                                                            _IN_    const Operations op) 
+                                                            _IN_    const Operations operation) 
                                                             noexcept {
         status_t status;
         uint32_t absolute_lba;
@@ -525,19 +542,19 @@ namespace drivers::ata
                             ((absolute_lba >> 24) & NIBBLE_MASK) | lba_flags);
 
                            
-        if (op == Operations::READ) {
+        if (operation == Operations::READ) {
             stdlib::byte_output(status_port(), READ_SECTORS);
         }
         else {
             stdlib::byte_output(status_port(), WRITE_SECTORS);
         }
 
-        status = poll_and_read_or_write_disk(buffer, op, sector_count);
+        status = poll_and_read_or_write_disk(buffer, operation, sector_count);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        if (op == Operations::WRITE) {
+        if (operation == Operations::WRITE) {
             stdlib::byte_output(status_port(), FLUSH_CACHE);
 
             status = poll_until_not_bsy_or_error();
@@ -568,22 +585,28 @@ namespace drivers::ata
     /**
      * @brief Initializes the ATA-PIO driver.
      */
-    _API_ void 
+    _API_ 
+    void 
     Programmable_Input_Output::init() noexcept {
-        struct Channel final { 
+        const struct Channel final { 
             uint16_t io_port; 
-            uint16_t control_reg; 
-        };
-
-        const Channel channels[] = { 
-            {IDE_PRIMARY_IO_BASE,   IDE_PRIMARY_DCR_BASE}, 
-            {IDE_SECONDARY_IO_BASE, IDE_SECONDARY_DCR_BASE} 
+            uint16_t control_register; 
+        }
+        channels[] = { 
+            {
+                .io_port=IDE_PRIMARY_IO_BASE,   
+                .control_register=IDE_PRIMARY_DCR_BASE
+            }, 
+            {
+                .io_port=IDE_SECONDARY_IO_BASE, 
+                .control_register=IDE_SECONDARY_DCR_BASE
+            } 
         };
 
         status_t status;
         for (const auto& channel : channels) [[likely]] {
             status = probe_and_configure_channel(channel.io_port, 
-                                                 channel.control_reg);
+                                                 channel.control_register);
             if (status == status::SUCCESS) {
                 goto cleanup;
             }
@@ -625,17 +648,16 @@ namespace drivers::ata
      * @retval `status::SUCCESS`
      *         Default case.
      */
-    _API_ status_t 
+    _API_ 
+    status_t 
     Programmable_Input_Output::run(_INOUT_ uint16_t* buffer,
                                    _IN_    uint32_t relative_lba,
                                    _IN_    uint32_t sector_count,
-                                   _IN_    const Operations& operation) 
+                                   _IN_    const Operations operation) 
                                    noexcept {
         status_t status;
         uint32_t chunk;
         uint32_t max_sectors;
-
-        kernel::sys::disable_interrupts();
 
         status = validate_storage_access(relative_lba, sector_count);
         if (status != status::SUCCESS) [[unlikely]] {
@@ -650,6 +672,8 @@ namespace drivers::ata
             status = status::ATA_INVALID_LBA | status::flags::PARAM_B;
             goto cleanup;
         }
+
+        kernel::sys::disable_interrupts();
 
         status = poll_until_not_bsy_or_error();
         if (status != status::SUCCESS) [[unlikely]] {

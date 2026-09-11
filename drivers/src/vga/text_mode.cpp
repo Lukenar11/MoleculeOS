@@ -38,15 +38,16 @@ namespace drivers::vga
      * @param symbol character output
      * 
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
-     *          If `x` is greater then the screen width.
+     *          If `x` is greater then or equal to the screen width.
      * 
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
-     *          If `y` is less then the screen height.
+     *          If `y` is greater then or equal to the screen height.
      * 
      * @retval `status::success`
      *          Default Case.
      */
-    _API_ status_t 
+    _API_ 
+    status_t 
     Text_Mode::put_char_at(_IN_ const uint32_t x,
                            _IN_ const uint32_t y,
                            _IN_ const uint8_t color,
@@ -79,15 +80,16 @@ namespace drivers::vga
      * 
      * @param background screen color
      */
-    _API_ void 
-    Text_Mode::clear_screen(_IN_ const Text_Mode_Colors& background) noexcept {
+    _API_ 
+    void 
+    Text_Mode::clear_screen(_IN_ const Text_Mode_Colors background) noexcept {
         const uint8_t color  = make_color(Text_Mode_Colors::BLACK, background);
         const uint16_t entry = make_symbol_entry(' ', color);
 
-        const uint32_t n = TEXT_MODE_SCREEN_WIDTH * TEXT_MODE_SCREEN_HEIGHT;
-
-        for (uint32_t i = 0; i < n; i++) [[likely]] {
-            SCREEN_BUFFER[i] = entry;
+        for (uint32_t buffer_index = 0; 
+             buffer_index < TEXT_MODE_SCREEN_WIDTH * TEXT_MODE_SCREEN_HEIGHT; 
+             buffer_index++) [[likely]] {
+            SCREEN_BUFFER[buffer_index] = entry;
         }
     }
 } // namespace drivers::vga

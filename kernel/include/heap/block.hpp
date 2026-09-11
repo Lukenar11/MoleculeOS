@@ -34,7 +34,7 @@ namespace kernel::heap
         static inline constexpr uint32_t MEMORY_BLOCK_SIZE = 16;
 
         static inline constexpr uint32_t BITMAP_WORD_BITS  = 32;
-        static inline constexpr uint32_t BITMAP_BIT        = 1u;
+        static inline constexpr uint32_t BITMAP_BIT        = 1;
         static inline constexpr uint32_t BITMAP_WORD_SHIFT = 5;
         static inline constexpr uint32_t BITMAP_WORD_MASK  = BITMAP_WORD_BITS - 1;
 

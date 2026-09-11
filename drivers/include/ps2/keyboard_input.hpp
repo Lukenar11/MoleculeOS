@@ -57,7 +57,9 @@ namespace drivers::ps2
          * @retval `true`  Keyboard has a pending scancode.
          * @retval `false` Keyboard has not a pending scancode.
          */
-        static inline bool 
+        static 
+        inline 
+        bool 
         has_pending_scancode() noexcept {
             return stdlib::byte_input(KEYBOARD_STATUS_PORT) & LOWEST_BIT;
         }
@@ -87,12 +89,16 @@ namespace drivers::ps2
          * @retval `status::SUCCESS`
          *          Default case.
          */
-        [[nodiscard]] static status_t 
+        [[nodiscard]] 
+        static 
+        status_t 
         get_key(_OUT_ char& key) noexcept;
 
 
     public:
-        _API_ static inline 
+        _API_ 
+        static 
+        inline 
         stdlib::Circular_Buffer<char, ALLOWED_SCANCODE_SIZE> scancode_buffer;
         
 
@@ -106,7 +112,9 @@ namespace drivers::ps2
          * 
          * @param Registers dump of all CPU registers (not used).
          */
-        _API_ static void 
+        _API_ 
+        static 
+        void 
         keyboard_irq_handler(_IN_ kernel::Registers*) noexcept;
     
 

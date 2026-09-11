@@ -120,7 +120,6 @@ namespace drivers::ps2
     }
 
 
-
     /** 
      * @brief Pushed the pressed keyboard key into the scancode_buffer,
      *        if a  the interrupt descriptor event `IRQ 1` was triggered.
@@ -131,7 +130,8 @@ namespace drivers::ps2
      * 
      * @param Registers dump of all CPU registers (not used).
      */
-    _API_ void 
+    _API_ 
+    void 
     Keyboard_Input::keyboard_irq_handler(_IN_ kernel::Registers*) noexcept {
         char symbol;
         status_t status;  

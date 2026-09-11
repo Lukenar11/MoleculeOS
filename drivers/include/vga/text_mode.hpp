@@ -35,7 +35,10 @@ namespace drivers::vga
     private:
         static constexpr uint8_t BLINK_MODE_BIT = 0x80;
 
-        static inline volatile uint16_t* 
+        static 
+        inline 
+        volatile 
+        uint16_t* 
         const SCREEN_BUFFER = reinterpret_cast<volatile uint16_t*>(0xB8000);
 
 
@@ -50,7 +53,12 @@ namespace drivers::vga
          * 
          * @return symbol entry
          */
-        _API_ [[nodiscard]] static inline constexpr uint16_t 
+        _API_ 
+        [[nodiscard]] 
+        static 
+        inline 
+        constexpr 
+        uint16_t 
         make_symbol_entry(_IN_ const char symbol, 
                           _IN_ const uint8_t color) noexcept {
             return (static_cast<uint16_t>(color) << 8) | 
@@ -68,9 +76,14 @@ namespace drivers::vga
          * 
          * @return symbol color layout
          */
-        _API_ [[nodiscard]] static inline constexpr uint8_t
-        make_color(_IN_ const Text_Mode_Colors& foreground,
-                   _IN_ const Text_Mode_Colors& background,
+        _API_ 
+        [[nodiscard]] 
+        static 
+        inline 
+        constexpr 
+        uint8_t
+        make_color(_IN_ const Text_Mode_Colors foreground,
+                   _IN_ const Text_Mode_Colors background,
                    _IN_ const bool does_blink=false) noexcept {
             const uint8_t color = (static_cast<uint8_t>(background) << 4) | 
                                    static_cast<uint8_t>(foreground);
@@ -92,15 +105,17 @@ namespace drivers::vga
          * @param symbol character output
          * 
          * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
-         *          If `x` is greater then the screen width.
+         *          If `x` is greater then or equal to the screen width.
          * 
          * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
-         *          If `y` is less then the screen height.
+         *          If `y` is greater then or equal to the screen height.
          * 
          * @retval `status::success`
          *          Default Case.
          */
-        _API_ static status_t 
+        _API_ 
+        static 
+        status_t 
         put_char_at(_IN_ const uint32_t x,
                     _IN_ const uint32_t y,
                     _IN_ const uint8_t color,
@@ -112,8 +127,10 @@ namespace drivers::vga
          * 
          * @param background screen color
          */
-        _API_ static void 
-        clear_screen(_IN_ const Text_Mode_Colors& color) noexcept;
+        _API_ 
+        static 
+        void 
+        clear_screen(_IN_ const Text_Mode_Colors color) noexcept;
 
 
         Text_Mode() noexcept  = default;
