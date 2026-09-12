@@ -10,20 +10,21 @@ DESCRIPTION:
     'MOFS_Header' begins at the first hard-drive sector and 
     includes meta infos for the file system.
 
-    A 'Serialized_File_Header'-table contains the file_header infos which is fetched from the 
-    file_headers in RAM.
-    The Serialized_File_Header table begins in the second sector of the hard drive,
-    immediately after the file-system header.
+    A 'Serialized_File_Header'-table contains the file_header infos which 
+    is fetched from the file_headers in RAM.
+    The Serialized_File_Header table begins in the 
+    second sector of the hard drive, immediately after the file-system header.
 
 NOTES:
-
 */
+
 
 #pragma once
 
 #include "filesys/mofs2.hpp"
 #include <types.hpp>
 #include <array.hpp>
+
 
 namespace kernel::storemgr
 {
@@ -34,6 +35,7 @@ namespace kernel::storemgr
         uint32_t file_entry_table_offset = 0;
         uint32_t data_offset             = 0;
     };
+
 
     struct Stored_File_Entry final {
         stdlib::Array<char, filesys::MAX_FILE_NAME_LENGTH + 1> file_name;

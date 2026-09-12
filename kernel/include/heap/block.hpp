@@ -324,7 +324,7 @@ namespace kernel::heap
          * @param byte_size memory block byte size
          * 
          * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
-         *          If byte_size` is 0.
+         *          If `byte_size` is `0`.
          * 
          * @retval `status::HEAP_EXHAUSTED`
          *          If the memory pool doesn't have enough free space or 

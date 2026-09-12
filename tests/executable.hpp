@@ -15,14 +15,12 @@ namespace tests
      */
 
     void 
-    program_main()
-    {
+    program_main() {
         stdlib::Text_Output::reset();
     }
 
     void 
-    exec() 
-    {
+    exec() {
         kernel::filesys::File_Entry* file_entry;
         kernel::filesys::MoleculeOS_File_System_2::create_file(file_entry, 
                                                                "hello", 
