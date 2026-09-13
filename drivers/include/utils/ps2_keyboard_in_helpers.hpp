@@ -24,9 +24,11 @@ NOTES:
     ordering would result in incorrect character translation.
 */
 
+
 #pragma once
 
 #include <types.hpp>
+
 
 namespace drivers::ps2
 {
@@ -37,12 +39,14 @@ namespace drivers::ps2
         'z','x','c','v','b','n','m',',','.','/', 0, '*', 0, ' ',
     };
 
+    
     constexpr char us_qwerty_shift_key_mapping[128] = {
         0, 27, '!','@','#','$','%','^','&','*','(',')','_','+', '\b',
         '\t','Q','W','E','R','T','Y','U','I','O','P','{','}','\n', 0,
         'A','S','D','F','G','H','J','K','L',':','\"','~', 0, '|',
         'Z','X','C','V','B','N','M','<','>','?', 0, '*', 0, ' ',
     };
+
 
     enum class Special_Keyboard_Keys : uint8_t {
         LEFT_SHIFT          = 0x2A,

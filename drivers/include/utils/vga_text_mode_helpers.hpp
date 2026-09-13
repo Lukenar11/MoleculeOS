@@ -18,15 +18,18 @@ DESCRIPTION:
 NOTES:
 */
 
+
 #pragma once
 
 #include <types.hpp>
+
 
 namespace drivers::vga 
 {
     constexpr uint32_t TEXT_MODE_SCREEN_WIDTH  = 80;
     constexpr uint32_t TEXT_MODE_SCREEN_HEIGHT = 25;
 
+    
     enum class Text_Mode_Colors : uint8_t {
         BLACK         = 0x00,
         BLUE          = 0x01,

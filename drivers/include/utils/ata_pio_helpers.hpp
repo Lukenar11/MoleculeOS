@@ -11,14 +11,18 @@ DESCRIPTION:
 NOTES:
 */
 
+
 #pragma once
 
 #include <types.hpp>
 
+
 namespace drivers::ata
 {
     inline constexpr uint32_t SECTOR_SIZE = 512;
-    inline constexpr uint32_t SECTOR_WORD_SIZE = SECTOR_SIZE / sizeof(uint16_t);
+    inline constexpr uint32_t SECTOR_WORD_SIZE = SECTOR_SIZE / 
+                                                 sizeof(uint16_t);
+
 
     enum class Operations : uint32_t {
         READ  = 0,

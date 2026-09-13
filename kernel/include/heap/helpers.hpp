@@ -16,9 +16,11 @@ NOTES:
     in the linker script ('linker.ld').
 */
 
+
 #pragma once
 
 #include <types.hpp>
+
 
 namespace kernel::heap
 {
