@@ -65,9 +65,9 @@ namespace kernel::storemgr
          */
         static
         status_t
-        validate_byte_reads_and_writes(_IN_ uint16_t* buffer,
-                                       _IN_ uint16_t* sector_words,
-                                       _IN_ const uint32_t size,
+        validate_byte_reads_and_writes(_IN_ uint16_t* buffer_ptr,
+                                       _IN_ uint16_t* temp_buffer_ptr,
+                                       _IN_ const uint32_t byte_size,
                                        _IN_ const uint32_t sector_count)
                                        noexcept;
 
@@ -114,9 +114,9 @@ namespace kernel::storemgr
          */
         static
         status_t 
-        read_bytes(_OUT_ uint16_t* buffer,
-                   _IN_  uint16_t* sector_words,
-                   _IN_  const uint32_t size,
+        read_bytes(_OUT_ uint16_t* buffer_ptr,
+                   _IN_  uint16_t* temp_buffer_ptr,
+                   _IN_  const uint32_t byte_size,
                    _IN_  const uint32_t sector_count,
                    _IN_  const uint32_t start_sector,
                    _IN_  const uint32_t sector_offset) noexcept;
@@ -164,9 +164,9 @@ namespace kernel::storemgr
          */
         static
         status_t 
-        write_bytes(_IN_ uint16_t* buffer,
-                    _IN_ uint16_t* sector_words,
-                    _IN_ const uint32_t size,
+        write_bytes(_IN_ uint16_t* buffer_ptr,
+                    _IN_ uint16_t* temp_buffer_ptr,
+                    _IN_ const uint32_t byte_size,
                     _IN_ const uint32_t sector_count,
                     _IN_ const uint32_t start_sector,
                     _IN_ const uint32_t sector_offset) noexcept;
@@ -213,8 +213,8 @@ namespace kernel::storemgr
          */
         static 
         status_t 
-        read_or_write_bytes(_INOUT_ void* buffer,
-                            _IN_    const uint32_t size,
+        read_or_write_bytes(_INOUT_ void* buffer_ptr,
+                            _IN_    const uint32_t byte_size,
                             _IN_    const uint32_t offset,
                             _IN_    drivers::ata::Operations operation) 
                             noexcept;
@@ -319,7 +319,8 @@ namespace kernel::storemgr
          * @param header            Filesystem header. 
          * @param stored_file_entry Stored file entry that contains the 
          *                          file metadata and the on-disk data offset. 
-         * @param file_entry_index  Index of target file entry in the file system.
+         * @param file_entry_index  Index of target file entry in the 
+         *                          file system.
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
          *          If `buffer` is `nullptr`. 
@@ -361,8 +362,8 @@ namespace kernel::storemgr
         static
         status_t 
         load_single_file(_IN_ const MOFS_Header& header,
-                         _IN_ const Stored_File_Entry& stored,
-                         _IN_ const uint32_t index) noexcept;
+                         _IN_ const Stored_File_Entry& stored_file_entry,
+                         _IN_ const uint32_t file_entry_index) noexcept;
 
 
         /** 
@@ -423,8 +424,8 @@ namespace kernel::storemgr
          * @brief Initializes the file entry table from the file system, 
          *        in the RAM. 
          * 
-         * @param entry_table_ptr Pointer to a new table with all file headers from 
-         *                        the hard drive. 
+         * @param entry_table_ptr Pointer to a new table with all file headers 
+         *                        from the hard drive. 
          * @param header          Filesystem header. 
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
@@ -459,7 +460,7 @@ namespace kernel::storemgr
          */
         static
         status_t 
-        write_file_entry_table(_OUT_ Stored_File_Entry* table,
+        write_file_entry_table(_OUT_ Stored_File_Entry* entry_table_ptr,
                                _IN_  const MOFS_Header& header) noexcept;
     
 
