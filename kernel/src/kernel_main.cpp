@@ -18,13 +18,16 @@ NOTES:
     a kernel panic is triggered to prevent undefined behavior.
 */
 
+
 #include <kernel.hpp>
 #include <status.hpp>
 #include <terminal.hpp>
 #include <drivers.hpp>
 
+
 namespace kernel
-{
+{                
+    _API_
     extern "C" 
     [[noreturn]]
     void 

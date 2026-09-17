@@ -36,7 +36,6 @@ namespace stdlib
      * @retval `status::SUCCESS`
      *          If all pointer are valid.
      */
-    [[nodiscard]] 
     status_t
     String_Manipulation::validate_destination_ptr_and_source_ptr(_INOUT_ char* destination_ptr,
                                                                  _IN_    const char* source_ptr)
@@ -144,7 +143,8 @@ namespace stdlib
      * @retval `status::SUCCESS`
      *          Default case.
      */
-    _API_ status_t 
+    _API_ 
+    status_t 
     String_Manipulation::copy_string(_INOUT_ char* destination_ptr, 
                                      _IN_    const char* source_ptr) noexcept {
         status_t status;
@@ -186,7 +186,8 @@ namespace stdlib
      * @retval `status::SUCCESS` 
      *          Default case.
      */
-    _API_ status_t 
+    _API_ 
+    status_t 
     String_Manipulation::find_char_in_string(_OUT_ const char*& found_char,
                                              _IN_  const char* string, 
                                              _IN_  const int32_t symbol) 
@@ -229,7 +230,8 @@ namespace stdlib
      * @retval `status::SUCCESS`
      *          Default case.
      */
-    _API_ status_t 
+    _API_ 
+    status_t 
     String_Manipulation::get_string_length(_OUT_ uint32_t& length,
                                            _IN_  const char* string) noexcept {
         status_t status;
@@ -273,7 +275,8 @@ namespace stdlib
      * @retval `status::EQUAL_TO`
      *          If string-a and string-b are identical.
      */
-    _API_ status_t 
+    _API_ 
+    status_t 
     String_Manipulation::compare_strings(_IN_ const char* a_ptr, 
                                          _IN_ const char* b_ptr) noexcept {
         status_t status;
@@ -330,6 +333,9 @@ namespace stdlib
      * 
      * @retval `status::BUFFER_OVERFLOW`
      *          If `string` triggers an overflow.
+     * 
+     * @retval `status::BUFFER_UNDERFLOW`
+     *          If `string` triggers an underflow.
      * 
      * @retval `status::SUCCESS`
      *          Default case.

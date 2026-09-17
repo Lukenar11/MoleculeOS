@@ -192,6 +192,9 @@ namespace stdlib
          * @retval `status::BUFFER_OVERFLOW`
          *          If `string` triggers an overflow.
          * 
+         * @retval `status::BUFFER_UNDERFLOW`
+         *          If `string` triggers an underflow.
+         * 
          * @retval `status::SUCCESS`
          *          Default case.
          */

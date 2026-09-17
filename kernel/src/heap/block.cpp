@@ -316,7 +316,7 @@ namespace kernel::heap
 
         if (get_allocation_info(block_index, 
                                 old_memory_blocks, 
-                                new_block_ptr) != status::SUCCESS) [[unlikely]] {
+                                block_ptr) != status::SUCCESS) [[unlikely]] {
             sys::panic("Invalid reallocate!");
         }
     

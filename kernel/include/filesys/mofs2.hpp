@@ -77,46 +77,49 @@ namespace kernel::filesys
         static
         status_t 
         init_file_entry(_OUT_ File_Entry*& header,
-                        _IN_  uint32_t index,
                         _IN_  const char* name,
                         _IN_  const char* format,
+                        _IN_  uint32_t index,
                         _IN_  uint32_t name_hash,
                         _IN_  uint32_t format_hash,
-                        _IN_  uint32_t byte_size) noexcept;
+                        _IN_  uint32_t byte_size)  noexcept;
 
 
         static 
         status_t 
-        find_file_for_deletion(_IN_ const char* name,
-                               _IN_ const char* format,
-                               _OUT_ uint32_t& index) noexcept;
+        find_file_for_deletion(_OUT_ uint32_t& index,
+                               _IN_  const char* name,
+                               _IN_  const char* format) noexcept;
 
 
         static
         status_t 
-        clear_file_data(_IN_ const uint32_t i) noexcept;
+        clear_file_data(_IN_ const uint32_t file_index) noexcept;
 
 
-    public:
+    public:              
+        _API_
         static 
         inline 
         constexpr 
         File_Entry& 
-        get_file_entry(_IN_ const uint32_t i) noexcept {
-            return file_entry_table[i];
+        get_file_entry(_IN_ const uint32_t file_index) noexcept {
+            return file_entry_table[file_index];
         }
 
-
+                    
+        _API_
         static 
         inline 
         constexpr 
         void 
         set_file_entry(_IN_ const File_Entry& file_entry, 
-                       _IN_ const uint32_t i) noexcept {
-            file_entry_table[i] = file_entry;
+                       _IN_ const uint32_t file_index) noexcept {
+            file_entry_table[file_index] = file_entry;
         }
 
-
+                    
+        _API_
         static 
         status_t 
         create_file(_OUT_ File_Entry*& file_entry,
@@ -124,36 +127,41 @@ namespace kernel::filesys
                     _IN_  const char* format, 
                     _IN_  const uint32_t byte_size) noexcept;
 
-
+                    
+        _API_
         static 
         status_t 
-        delete_file(_IN_ const char* file_name, 
-                    _IN_ const char* file_format) noexcept;
+        delete_file(_IN_ const char* name, 
+                    _IN_ const char* format) noexcept;
 
-
+                    
+        _API_
         static 
         status_t 
         find_file(_OUT_ File_Entry*& file_entry,
                   _IN_  const char* name,
                   _IN_  const char* format) noexcept;
 
-
+                    
+        _API_
         static 
         status_t 
         write_file(_IN_ File_Entry* file_entry,
+                   _IN_ const uint8_t* data,
                    _IN_ const uint32_t offset,
                    _IN_ const uint32_t length,
-                   _IN_ const uint32_t data_size,
-                   _IN_ const uint8_t* data) noexcept;
+                   _IN_ const uint32_t data_size) noexcept;
 
-
+                    
+        _API_
         static 
         status_t 
         append_file(_IN_ File_Entry* file_entry,
                     _IN_ const uint8_t* data,
                     _IN_ const uint32_t data_size) noexcept;
 
-
+                    
+        _API_
         static 
         status_t 
         clear_file(_IN_ File_Entry* file_entry) noexcept;
@@ -161,20 +169,22 @@ namespace kernel::filesys
 
         static 
         status_t 
-        rename_file(_IN_ const char* old_name,
-                    _IN_ const char* old_format,
-                    _IN_ const char* new_name,
-                    _IN_ const char* new_format) noexcept;
+        rename_file(_IN_ const char* new_name,
+                    _IN_ const char* new_format,
+                    _IN_ const char* old_name,
+                    _IN_ const char* old_format) noexcept;
 
 
+        _API_
         static 
         status_t 
-        copy_file(_IN_ const char* src_name,
-                  _IN_ const char* src_format,
-                  _IN_ const char* dest_name,
-                  _IN_ const char* dest_format) noexcept;
+        copy_file(_IN_ const char* destination_name,
+                  _IN_ const char* destination_format,
+                  _IN_ const char* source_name,
+                  _IN_ const char* source_format) noexcept;
 
 
+        _API_
         static 
         status_t 
         read_file(_IN_ File_Entry* file_entry,
@@ -184,12 +194,14 @@ namespace kernel::filesys
                   _IN_ const uint32_t length) noexcept;
 
 
+        _API_
         static 
         status_t 
-        resize_file_size(_IN_ File_Entry* file_entry, 
-                         _IN_ const uint32_t new_size) noexcept;
+        resize_file_size(_INOUT_ File_Entry* file_entry, 
+                         _IN_    const uint32_t new_size) noexcept;
 
 
+        _API_
         static 
         bool 
         is_valid_name_or_format_char(_IN_ const char symbol) noexcept;
