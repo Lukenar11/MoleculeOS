@@ -359,6 +359,7 @@ namespace kernel::filesys
             return file_entry_table[file_index];
         }
 
+        
         /** 
          * @brief Creates a file with a specific name, format and size.
          * 
