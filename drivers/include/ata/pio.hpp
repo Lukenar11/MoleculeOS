@@ -38,7 +38,6 @@ NOTES:
 
 namespace kernel::sys
 {
-    [[noreturn]] 
     void
     panic(const char* message) noexcept;
 
