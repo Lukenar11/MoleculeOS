@@ -325,7 +325,40 @@ namespace kernel::filesys
         clear_file_data(_IN_ const uint32_t file_index) noexcept;
 
 
-    public:              
+    public: 
+        /**
+         * @brief Sets a file entry with a specific index.
+         * 
+         * @param file_entry data to set the file entry.
+         * @param file_index Index of the file entry to get.
+         */
+        _API_
+        static 
+        inline 
+        constexpr 
+        void 
+        set_file_entry(_IN_ const File_Entry& file_entry, 
+                       _IN_ const uint32_t file_index) noexcept {
+            if (file_index < FILE_TABLE_ENTRYS) [[likely]] {
+                file_entry_table[file_index] = file_entry;
+            }
+        }
+
+
+        /**
+         * @brief Gets a file entry with a specific index.
+         * 
+         * @param file_index Index of the file entry to get.
+         */
+        _API_
+        static 
+        inline 
+        constexpr 
+        File_Entry& 
+        get_file_entry(_IN_ const uint32_t file_index) noexcept {
+            return file_entry_table[file_index];
+        }
+
         /** 
          * @brief Creates a file with a specific name, format and size.
          * 
@@ -370,76 +403,13 @@ namespace kernel::filesys
          */
         _API_
         static 
-        inline 
-        constexpr 
-        File_Entry& 
-        get_file_entry(_IN_ const uint32_t file_index) noexcept {
-            return file_entry_table[file_index];
-        }
-
-
-        _API_
-        static 
-        inline 
-        constexpr 
-        void 
-        set_file_entry(_IN_ const File_Entry& file_entry, 
-                       _IN_ const uint32_t file_index) noexcept {
-            file_entry_table[file_index] = file_entry;
-        }
-
-             
-        /** 
-         * @brief Deletes a file with a specific name and format.
-         * 
-         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-         *          If `name` is a `nullptr`.
-         *
-         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
-         *          If `name` is empty.
-         *
-         * @retval `status::NULL_POINTER | status::flags::PARAM_B`
-         *          If `format` is a `nullptr`.
-         *
-         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
-         *          If `format` is empty.
-         *
-         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
-         *          If the length of `name` is `0`.
-         * 
-         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
-         *          If the length of `format` is `0`.
-         *
-         * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_A`
-         *          If the `name` is to long.
-         *
-         * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_B`
-         *          If `format` is to long.
-         * 
-         * @retval `status::INVALID_PARAMETER`
-         *          If `index` of the file is out of range.
-         *
-         * @retval `status::EMPTY`
-         *          If the file is empty.
-         * 
-         * @retval `status::NULL_POINTER` 
-         *          If the file can't be deallocated.
-         * 
-         * @retval `status::HEAP_CORRUPTED` 
-         *          If a deallocation error has occurred.
-         *
-         * @retval `status::SUCCESS`
-         *          Default case.
-         */
-        _API_
-        static 
         status_t 
         create_file(_OUT_ File_Entry*& file_entry,
                     _IN_  const char* name, 
                     _IN_  const char* format, 
                     _IN_  const uint32_t byte_size) noexcept;
 
-               
+
         /** 
          * @brief Deletes a file with a specific name and format.
          * 
@@ -698,7 +668,7 @@ namespace kernel::filesys
 
 
         /**
-         * @brief copys the content fo a file to another file.
+         * @brief Copys the content fo a file to another file.
          * 
          * @param destination_name   Name of the destination file.
          * @param destination_format Format of the destination file.

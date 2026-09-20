@@ -1172,7 +1172,7 @@ namespace kernel::filesys
 
 
     /**
-     * @brief copys the content fo a file to another file.
+     * @brief Copys the content fo a file to another file.
      * 
      * @param destination_name   Name of the destination file.
      * @param destination_format Format of the destination file.
