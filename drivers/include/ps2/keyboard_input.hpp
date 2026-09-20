@@ -115,7 +115,7 @@ namespace drivers::ps2
         _API_ 
         static 
         void 
-        keyboard_irq_handler(_IN_ kernel::Registers*) noexcept;
+        keyboard_irq_handler(_IN_ kernel::Registers* _) noexcept;
     
 
         Keyboard_Input() noexcept  = default;

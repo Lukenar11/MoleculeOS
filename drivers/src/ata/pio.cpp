@@ -260,8 +260,10 @@ namespace drivers::ata
             goto cleanup;
         }
 
-        for (uint32_t i = 0; i < 2; ++i) [[likely]] {
-            is_master = (i == 0);
+        for (uint32_t configure_try = 0; 
+             configure_try < 2; 
+             configure_try++) [[likely]] {
+            is_master = (configure_try == 0);
 
             status = identify_drive(identify_data.data(),
                                     io_port,
@@ -594,12 +596,12 @@ namespace drivers::ata
         }
         channels[] = { 
             {
-                .io_port=IDE_PRIMARY_IO_BASE,   
-                .control_register=IDE_PRIMARY_DCR_BASE
+                IDE_PRIMARY_IO_BASE,   
+                IDE_PRIMARY_DCR_BASE
             }, 
             {
-                .io_port=IDE_SECONDARY_IO_BASE, 
-                .control_register=IDE_SECONDARY_DCR_BASE
+                IDE_SECONDARY_IO_BASE, 
+                IDE_SECONDARY_DCR_BASE
             } 
         };
 

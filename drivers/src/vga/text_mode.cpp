@@ -65,7 +65,7 @@ namespace drivers::vga
             goto cleanup;
         }
 
-        buffer_index = y * TEXT_MODE_SCREEN_WIDTH + x;
+        buffer_index                = y * TEXT_MODE_SCREEN_WIDTH + x;
         SCREEN_BUFFER[buffer_index] = make_symbol_entry(symbol, color);
 
         status = status::SUCCESS;

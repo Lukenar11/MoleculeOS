@@ -132,7 +132,7 @@ namespace drivers::ps2
      */
     _API_ 
     void 
-    Keyboard_Input::keyboard_irq_handler(_IN_ kernel::Registers*) noexcept {
+    Keyboard_Input::keyboard_irq_handler(_IN_ kernel::Registers* _) noexcept {
         char symbol;
         status_t status;  
 

@@ -44,15 +44,15 @@ namespace stdlib
          * @note This function performs modulo arithmetic to ensure that the
          *       index always stays within the valid range `[0...S-1]`.
          *
-         * @param i The current index value.
+         * @param index The current index value.
          *
          * @return The incremented index, wrapped around the buffer size.
          */
         inline 
         constexpr 
         uint32_t 
-        increment_index(_IN_ const uint32_t i) const noexcept {
-            return (i + 1) % S;
+        increment_index(_IN_ const uint32_t index) const noexcept {
+            return (index + 1) % S;
         }
 
 
@@ -236,7 +236,7 @@ namespace stdlib
         constexpr 
         bool 
         empty() const noexcept {
-            return (!buffer_is_full && (buffer_head == buffer_tail));
+            return !buffer_is_full && (buffer_head == buffer_tail);
         }
 
 

@@ -41,7 +41,8 @@ namespace stdlib
          */
         _API_ 
         inline 
-        constexpr T& 
+        constexpr 
+        T& 
         operator[](_IN_ uint32_t index) noexcept { 
             return buffer[index]; 
         }
@@ -49,7 +50,8 @@ namespace stdlib
         _API_ 
         inline 
         constexpr 
-        const T&
+        const 
+        T&
         operator[](_IN_ const uint32_t index) const noexcept {
             return buffer[index]; 
         }
