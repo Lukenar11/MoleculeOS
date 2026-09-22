@@ -643,8 +643,8 @@ namespace drivers::ata
      *        operations over a specific sector range.
      *
      * @param buffer       I/O buffer for sector data
-     * @param sector_count Number of sectors to transfer
      * @param relative_lba Starting LBA address
+     * @param sector_count Number of sectors to transfer
      * @param operation    Operation (`READ` or `WRITE`)
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`

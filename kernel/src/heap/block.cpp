@@ -92,7 +92,7 @@ namespace kernel::heap
                                                          MEMORY_BLOCK_SIZE);
 
         stdlib::Memory_Manipulation::set_memory_block(allocation_sizes,
-                                                      MEMORY_CLEAR,
+                                                      0x00,
                                                       allocation_sizes_bytes);
 
         const uint32_t memory_bitmap_bytes = align_up(bitmap_word_count * 
@@ -557,7 +557,7 @@ namespace kernel::heap
         }
 
         stdlib::Memory_Manipulation::set_memory_block(block_ptr, 
-                                                      MEMORY_CLEAR, 
+                                                      0x00, 
                                                       byte_size);
         status = status::SUCCESS;
 
@@ -628,6 +628,8 @@ namespace kernel::heap
     /** 
      * @brief Deallocates a memory block. 
      * 
+     * @note If the deallocation was success, this nulls `block_ptr`.
+     * 
      * @param block_ptr Pointer to the memory block to be deallocated.
      * 
      * @retval `status::NULL_POINTER` 
@@ -677,6 +679,7 @@ namespace kernel::heap
         }
 
         allocation_sizes[block_index] = 0;
+        // block_ptr                     = nullptr;
 
         status = status::SUCCESS;
 

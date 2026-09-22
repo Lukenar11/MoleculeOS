@@ -403,8 +403,8 @@ namespace drivers::ata
          *        operations over a specific sector range.
          *
          * @param buffer       I/O buffer for sector data
-         * @param sector_count Number of sectors to transfer
          * @param relative_lba Starting LBA address
+         * @param sector_count Number of sectors to transfer
          * @param operation    Operation (`READ` or `WRITE`)
          *
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
@@ -432,8 +432,8 @@ namespace drivers::ata
         static 
         status_t 
         run(_INOUT_ uint16_t* buffer,
-            _IN_    uint32_t sector_count,
             _IN_    uint32_t relative_lba,
+            _IN_    uint32_t sector_count,
             _IN_    const Operations operation) noexcept;
 
 

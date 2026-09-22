@@ -34,7 +34,7 @@ namespace stdlib
          * @param source_ptr  pointer to validate
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-         *          If `destination_ptr` is `nullptr` or empty or to short.
+         *          If `destination_ptr` is `nullptr` or to short.
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_B`
          *          If `source_ptr` is `nullptr` or empty or to short.

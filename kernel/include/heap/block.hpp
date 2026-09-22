@@ -30,7 +30,6 @@ namespace kernel::heap
     class Block_Allocator final {
     private:
         static inline constexpr uint32_t ALL_BLOCKS_FREE   = 0xFFFF'FFFF;
-        static inline constexpr uint32_t MEMORY_CLEAR      = 0;
         static inline constexpr uint32_t MEMORY_BLOCK_SIZE = 16;
 
         static inline constexpr uint32_t BITMAP_WORD_BITS  = 32;
@@ -396,6 +395,8 @@ namespace kernel::heap
 
         /** 
          * @brief Deallocates a memory block. 
+         * 
+         * @note If the deallocation was success, this nulls `block_ptr`.
          * 
          * @param block_ptr Pointer to the memory block to be deallocated.
          * 

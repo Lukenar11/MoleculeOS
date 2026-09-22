@@ -23,6 +23,7 @@ NOTES:
 #include <kernel.hpp>
 #include <drivers.hpp>
 #include <memory_manip.hpp>
+#include <string_manip.hpp>
 
 
 namespace kernel::storemgr

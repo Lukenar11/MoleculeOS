@@ -440,6 +440,7 @@ namespace kernel::storemgr
         if (stdlib::String_Manipulation::compare_strings(header.magic.data(),
                                                          MOFS_HEADER_MAGIC)
             != status::EQUAL_TO) [[unlikely]] {
+
             status = status::FS_INVALID_FILE_ENTRY;
             goto cleanup;
         }
@@ -813,17 +814,17 @@ namespace kernel::storemgr
      * 
      * @note This function panics on failure. 
      */
-    _API_ 
-    void 
+    _API_
+    void
     Storage_Manager::init() noexcept {
         using namespace drivers;
         using namespace filesys;
-
+    
         MOFS_Header header;
         status_t status;
-
+    
         sys::disable_interrupts();
-
+    
         status = read_or_write_bytes(&header,
                                      sizeof(header),
                                      MOFS_HEADER_OFFSET,
@@ -831,12 +832,16 @@ namespace kernel::storemgr
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
-
-        if (stdlib::String_Manipulation::compare_strings(header.magic.data(), 
+    
+        if (stdlib::String_Manipulation::compare_strings(header.magic.data(),
                                                          MOFS_HEADER_MAGIC)
             != status::EQUAL_TO) [[unlikely]] {
-            stdlib::String_Manipulation::copy_string(header.magic.data(), 
+            stdlib::String_Manipulation::copy_string(header.magic.data(),
                                                      MOFS_HEADER_MAGIC);
+            if (status != status::SUCCESS) [[unlikely]] {
+                goto cleanup;
+            }
+
             header.version                 = MOFS_VERSION;
             header.file_entry_count        = FILE_TABLE_ENTRYS;
             header.file_entry_table_offset = FILE_ENTRY_TABLE_OFFSET;
@@ -850,13 +855,13 @@ namespace kernel::storemgr
                 goto cleanup;
             }
         }
-
+    
         goto done;
-
+    
     cleanup:
         sys::enable_interrupts();
         sys::panic("Storage manager init failed!");
-
+    
     done:
         sys::enable_interrupts();
     }
