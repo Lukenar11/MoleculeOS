@@ -130,9 +130,6 @@ namespace stdlib
      * @retval `status::NULL_POINTER | status::flags::PARAM_B`
      *          If the source-pointer is `nullptr`.
      * 
-     * @retval `status::SUCCESS | status::flags::byte_size_ZERO`
-     *          If the memory-block-byte byte_size is `0`.
-     * 
      * @retval `status::SUCCESS`
      *          Default case.
      */
@@ -247,9 +244,6 @@ namespace stdlib
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_B`
      *          If the source-pointer is `nullptr`.
-     * 
-     * @retval `status::SUCCESS | status::flags::byte_size_ZERO`
-     *          If the memory-block-byte `byte_size` is `0`.
      * 
      * @retval `status::SUCCESS`
      *          Default case.
