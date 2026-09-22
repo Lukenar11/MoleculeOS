@@ -34,10 +34,10 @@ namespace stdlib
          * @param source_ptr  pointer to validate
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-         *          If `destination_ptr` is `nullptr`.
+         *          If `destination_ptr` is `nullptr` or empty or to short.
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_B`
-         *          If `source_ptr` is `nullptr`.
+         *          If `source_ptr` is `nullptr` or empty or to short.
          * 
          * @retval `status::SUCCESS`
          *          If all pointer are valid.
@@ -134,7 +134,7 @@ namespace stdlib
          * @param string the string for the length calculation.
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_B`
-         *          If `string` is a `nullptr`.
+         *          If `string` is a `nullptr` or empty.
          * 
          * @retval `status::SUCCESS`
          *          Default case.

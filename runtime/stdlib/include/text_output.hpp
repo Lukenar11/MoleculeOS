@@ -235,7 +235,7 @@ namespace stdlib
         set_cursor(_IN_ const uint32_t x, 
                    _IN_ const uint32_t y) noexcept {
             if (x < drivers::vga::TEXT_MODE_SCREEN_WIDTH &&
-                y < drivers::vga::TEXT_MODE_SCREEN_HEIGHT) [[unlikely]] {
+                y < drivers::vga::TEXT_MODE_SCREEN_HEIGHT) [[likely]] {
                 cursor_x = x;
                 cursor_y = y;
             }
