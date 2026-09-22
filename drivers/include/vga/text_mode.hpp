@@ -110,7 +110,7 @@ namespace drivers::vga
          * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
          *          If `y` is greater then or equal to the screen height.
          * 
-         * @retval `status::success`
+         * @retval `status::SUCCESS`
          *          Default Case.
          */
         _API_ 

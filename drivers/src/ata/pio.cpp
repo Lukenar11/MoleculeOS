@@ -35,10 +35,14 @@ namespace drivers::ata
      * @brief Checks whether a memory access operation is within the
      *        allowed LBA range.
      *
-     * @param partition_length Total number of sectors
-     * @param relative_lba     Starting LBA address
+     * @param buffer           Pointer to the I/O buffer.
+     * @param partition_length Total number of sectors.
+     * @param relative_lba     Starting LBA address.
      * @param to_transfer      Number of sectors to read or write.
      *
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *         If `buffer` is a `nullptr`.
+     * 
      * @retval `status::ATA_NO_DEVICE`
      *         If the `partition_length` is `0`.
      *
@@ -55,10 +59,16 @@ namespace drivers::ata
      *         Default case.
      */
     status_t
-    Programmable_Input_Output::validate_storage_access(_IN_ const uint32_t relative_lba,
+    Programmable_Input_Output::validate_storage_access(_IN_ const uint16_t* buffer,
+                                                       _IN_ const uint32_t relative_lba,
                                                        _IN_ const uint32_t to_transfer)
                                                        noexcept {
         status_t status;
+
+        if (!buffer) [[unlikely]] {
+            status = status::NULL_POINTER | status::flags::PARAM_A;
+            goto cleanup;
+        }
 
         if (partition_length == 0) [[unlikely]] {
             status = status::ATA_NO_DEVICE;
@@ -138,8 +148,8 @@ namespace drivers::ata
      * @brief Uses the ATA command `IDENTIFY` to retrieve the
      *        hard drive's identification data.
      *
-     * @param identify_data Output buffer for the `IDENTIFY` data
-     * @param io_base       Base I/O port of the ATA channel
+     * @param identify_data      Output buffer for the `IDENTIFY` data
+     * @param io_base            Base I/O port of the ATA channel
      * @param control_register   Control register port of the ATA channel
      *
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
@@ -276,9 +286,9 @@ namespace drivers::ata
             storage_size = (static_cast<uint32_t>(identify_data[61]) << 16) |
                             static_cast<uint32_t>(identify_data[60]);
 
-            io_port_base       = io_port;
+            io_port_base            = io_port;
             device_control_register = control_register;
-            lba_start_address  = 0;
+            lba_start_address       = 0;
 
             if (is_master) {
                 drive_select_flags = MASTER_SELECT;
@@ -411,6 +421,9 @@ namespace drivers::ata
      * @param operation    Operation (`READ` or `WRITE`).
      * @param sector_count Number of sectors to transfer.
      *
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *         If `buffer` is a `nullptr`.
+     * 
      * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
      *         If `sector_count` is `0`.
      *
@@ -492,6 +505,9 @@ namespace drivers::ata
      * @param sector_count Number of sectors to transfer.
      * @param operation    Operation type (READ or WRITE).
      *
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *         If `buffer` is a `nullptr`.
+     * 
      * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_B`
      *         If the LBA range is invalid.
      *
@@ -520,8 +536,7 @@ namespace drivers::ata
         uint32_t absolute_lba;
         uint8_t final_status;
 
-        status = validate_storage_access(relative_lba,
-                                         sector_count);
+        status = validate_storage_access(buffer, relative_lba, sector_count);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -631,6 +646,9 @@ namespace drivers::ata
      * @param sector_count Number of sectors to transfer
      * @param relative_lba Starting LBA address
      * @param operation    Operation (`READ` or `WRITE`)
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *         If `buffer` is a `nullptr`.
      *
      * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B`
      *         If the sector count is zero or exceeds the allowed maximum.
@@ -661,7 +679,7 @@ namespace drivers::ata
         uint32_t chunk;
         uint32_t max_sectors;
 
-        status = validate_storage_access(relative_lba, sector_count);
+        status = validate_storage_access(buffer, relative_lba, sector_count);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }

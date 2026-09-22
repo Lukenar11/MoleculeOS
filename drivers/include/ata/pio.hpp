@@ -109,6 +109,9 @@ namespace drivers::ata
          * @param relative_lba     Starting LBA address
          * @param to_transfer      Number of sectors to read or write.
          *
+         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+         *         If `buffer` is a `nullptr`.
+         * 
          * @retval `status::ATA_NO_DEVICE`
          *         If the `partition_length` is `0`.
          *
@@ -127,7 +130,8 @@ namespace drivers::ata
         [[nodiscard]] 
         static 
         status_t 
-        validate_storage_access(_IN_ const uint32_t relative_lba, 
+        validate_storage_access(_IN_ const uint16_t* buffer,
+                                _IN_ const uint32_t relative_lba, 
                                 _IN_ const uint32_t to_transfer) noexcept;
 
 
@@ -283,9 +287,12 @@ namespace drivers::ata
          *        for a given number of sectors.
          *
          * @param buffer       I/O buffer for sector data.
-         * @param op           Operation (`READ` or `WRITE`).
+         * @param operation    Operation (`READ` or `WRITE`).
          * @param sector_count Number of sectors to transfer.
          *
+         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+         *         If `buffer` is a `nullptr`.
+         * 
          * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
          *         If `sector_count` is `0`.
          *
@@ -305,7 +312,7 @@ namespace drivers::ata
         static 
         status_t
         poll_and_read_or_write_disk(_INOUT_ uint16_t* buffer,
-                                     _IN_   const Operations op,
+                                     _IN_   const Operations operation,
                                      _IN_   const uint32_t sector_count) 
                                      noexcept;
 
@@ -318,6 +325,9 @@ namespace drivers::ata
          * @param relative_lba Starting LBA address.
          * @param sector_count Number of sectors to transfer.
          * @param operation    Operation type (READ or WRITE).
+         * 
+         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+         *        If `buffer` is a `nullptr`.
          * 
          * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_B`
          *         If the LBA range is invalid.
@@ -397,6 +407,9 @@ namespace drivers::ata
          * @param relative_lba Starting LBA address
          * @param operation    Operation (`READ` or `WRITE`)
          *
+         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+         *         If `buffer` is a `nullptr`.
+         * 
          * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B`
          *         If the sector count is zero or exceeds the allowed maximum.
          *
