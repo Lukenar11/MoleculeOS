@@ -105,7 +105,7 @@ namespace kernel::heap
         /** 
          * @brief Aligns a value up. 
          * 
-         * @param value Value to align. 
+         * @param value     Value to align. 
          * @param alignment Alignment value. 
          *
          * @return aligned value.
@@ -122,7 +122,7 @@ namespace kernel::heap
         /** 
          * @brief Aligns a value down. 
          * 
-         * @param value Value to align. 
+         * @param value q   Value to align. 
          * @param alignment Alignment value. 
          * 
          * @return Aligned value. 
@@ -141,7 +141,7 @@ namespace kernel::heap
          * heap area into a metadata area and a memory pool.
          *
          * @param start_address Heap area start address. 
-         * @param end_address Heap area end address. 
+         * @param end_address   Heap area end address. 
          */
         static
         void
@@ -156,7 +156,7 @@ namespace kernel::heap
          * @param bitmap_word_count Count of available memory blocks in words.
          */
         static 
-        void 
+        status_t 
         clear_metadata(_IN_ const uint32_t bitmap_word_count) noexcept;
 
 
@@ -165,7 +165,7 @@ namespace kernel::heap
          *        stores the memory block count.
          *
          * @param needed_blocks Number of needed blocks.
-         * @param pool_index Start index in the memory pool.
+         * @param pool_index    Start index in the memory pool.
          *
          * @return Pointer to the first block.
          */
@@ -180,8 +180,8 @@ namespace kernel::heap
          *        memory pool from a start index.
          * 
          * @param checked_blocks Number of blocks checked so far.
-         * @param start_index Start index in the memory pool.
-         * @param needed_blocks Number of blocks needed.
+         * @param start_index    Start index in the memory pool.
+         * @param needed_blocks  Number of blocks needed.
          * 
          * @retval `true`  If enough free blocks were found.
          * @retval `false` If not enough free blocks were found.
@@ -198,7 +198,7 @@ namespace kernel::heap
          *        current allocation.
          * 
          * @param needed_blocks count of needed memory blocks
-         * @param byte_size allocation bytesize
+         * @param byte_size     allocation bytesize
          * 
          * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
          *          If `byte_size` is `0`.
@@ -220,7 +220,7 @@ namespace kernel::heap
          * @brief Finds a free memory region with a specific size
          *        in the heap memory pool. 
          * 
-         * @param block_index Index of the found memory region. 
+         * @param block_index   Index of the found memory region. 
          * @param needed_blocks Count of all needed memory blocks. 
          * 
          * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
@@ -243,7 +243,7 @@ namespace kernel::heap
          * @brief Executes a allocation after the 
          *        parameter validation in `reallocate`.
          * 
-         * @param block_ptr pointer to the allocated memory block
+         * @param block_ptr     pointer to the allocated memory block
          * @param new_byte_size size of the memory block
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
@@ -251,10 +251,25 @@ namespace kernel::heap
          * 
          * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
          *          If `new_byte_size` is `0`.
+         * 
+         * @retval `status::NULL_POINTER` 
+         *          If the memory pool pointer inside the heap is empty.
+         * 
+         * @retval `status::POINTER_OUT_OF_RANGE` 
+         *          If block_ptr is outside if the allocated memory block.
          *  
          * @retval `status::HEAP_EXHAUSTED`
          *          If the memory pool doesn't have enough free space
          *          or `new_byte_size` is to large.
+         * 
+         * @retval `status::HEAP_CORRUPTED` 
+         *          If the allocated memory block is not align.
+         * 
+         * @retval `status::OUT_OF_MEMORY`
+         *         If the heap can't mark memory blocks as used.
+         * 
+         * @retval `status::FAIL` 
+         *          Unknown error.
          * 
          * @retval `status::SUCCESS`
          *          Default case.
@@ -270,7 +285,7 @@ namespace kernel::heap
          * @brief Initializes the heap.
          * 
          * @param heap_begin memory pool start address
-         * @param heap_end memory pool end address
+         * @param heap_end   memory pool end address
          */
         _API_ 
         static 
@@ -282,10 +297,10 @@ namespace kernel::heap
         /** 
          * @brief Gets the meta data of a allocated memory block.
          * 
-         * @param pool_index Index of the allocated memory block in 
-         *                          the memory pool.
+         * @param pool_index      Index of the allocated memory block in 
+         *                        the memory pool.
          * @param pool_block_size Blocksize of the allocated memory block.
-         * @param block_ptr pointer to the allocated memory block.
+         * @param block_ptr       Pointer to the allocated memory block.
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_C`
          *          If `block_ptr` is a `nullptr`
@@ -356,6 +371,12 @@ namespace kernel::heap
          *          If the memory pool doesn't have enough free space or 
          *          `byte_size` is to large.
          * 
+         * @retval `status::OUT_OF_MEMORY`
+         *          If the heap can't mark memory blocks as used.
+         * 
+         * @retval `status::FAIL` 
+         *          Unknown error.
+         * 
          * @retval `status::SUCCESS`
          *          Default case.
          */
@@ -373,15 +394,33 @@ namespace kernel::heap
          * @note Don't forget to free the allocated memory with `deallocate`, 
          *       otherwise memory leaks will occur. 
          * 
-         * @param block_ptr Pointer to the allocated memory block. 
+         * @param block_ptr     Pointer to the allocated memory block. 
          * @param new_byte_size New memory block byte size.
+         * 
+         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+         *          If `block_ptr` is a `nullptr`.
          * 
          * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
          *          If `new_byte_size` is 0. 
          * 
+         * @retval `status::NULL_POINTER` 
+         *          If the memory pool pointer inside the heap is empty.
+         * 
+         * @retval `status::POINTER_OUT_OF_RANGE` 
+         *          If block_ptr is outside if the allocated memory block.
+         * 
          * @retval `status::HEAP_EXHAUSTED` 
          *          If the memory pool does not have enough free space or
          *          `new_byte_size` is too large. 
+         * 
+         * @retval `status::HEAP_CORRUPTED` 
+         *          If the allocated memory block is not align.
+         * 
+         * @retval `status::OUT_OF_MEMORY`
+         *          If the heap can't mark memory blocks as used.
+         * 
+         * @retval `status::FAIL` 
+         *          Unknown error.
          * 
          * @retval `status::SUCCESS` 
          *          Default case. 
@@ -401,10 +440,17 @@ namespace kernel::heap
          * @param block_ptr Pointer to the memory block to be deallocated.
          * 
          * @retval `status::NULL_POINTER` 
-         *          If `block_ptr` is a `nullptr`. 
+         *          If `block_ptr` is a `nullptr` or the 
+         *          memory pool pointer inside the heap is empty. 
+         * 
+         * @retval `status::POINTER_OUT_OF_RANGE`
+         *         If block_ptr is outside if the allocated memory block.
          * 
          * @retval `status::HEAP_CORRUPTED` 
          *          If a deallocation error has occurred. 
+         * 
+         * @retval `status::FAIL` 
+         *          Unknown error.
          * 
          * @retval `status::SUCCESS` 
          *          Default case. 
