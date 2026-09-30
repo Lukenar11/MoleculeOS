@@ -70,6 +70,12 @@ namespace kernel::filesys
      * 
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
      *          If the length of `format` is `0`.
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+     *          If `name` is has not valid chars.
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+     *          If `name` is has not valid chars.
      *
      * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_A`
      *          If the `name` is to long.
@@ -140,6 +146,25 @@ namespace kernel::filesys
             status = status::FS_OUT_OF_SPACE | status::flags::PARAM_B;
             goto cleanup;
         }
+
+        for (uint32_t name_index = 0;
+             name_index < name_length;
+             name_index++) [[likely]] {
+            if (!is_valid_name_or_format_char(name[name_index])) [[unlikely]] {
+                status = status::INVALID_PARAMETER | status::flags::PARAM_A;
+                goto cleanup;
+            }
+        }
+
+        for (uint32_t format_index = 0;
+             format_index < format_length;
+             format_index++) [[likely]] {
+            if (!is_valid_name_or_format_char(format[format_index])) [[unlikely]] {
+                status = status::INVALID_PARAMETER | status::flags::PARAM_B;
+                goto cleanup;
+            }
+        }
+
 
         status = status::SUCCESS;
 

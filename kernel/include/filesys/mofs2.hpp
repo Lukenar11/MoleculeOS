@@ -75,6 +75,12 @@ namespace kernel::filesys
          * 
          * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
          *          If the length of `format` is `0`.
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+         *          If `name` is has not valid chars.
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+         *          If `name` is has not valid chars.
          *
          * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_A`
          *          If the `name` is to long.
