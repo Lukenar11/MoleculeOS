@@ -38,6 +38,60 @@ namespace kernel::filesys
 
 
         /**
+         * @brief Remaps `status` with `replace_status` if the 
+         *        status or status flag is the same as `searched_status`.
+         * 
+         * @note This function has no error validation mechanisms at all, 
+         *       so be careful how you use it.
+         * 
+         * @param status          Status code.
+         * @param replace_status  Status for remapping.
+         * @param searched_status Searched status code.
+         * 
+         * @return Remapped status code.
+         */
+        static
+        inline
+        constexpr 
+        status_t
+        remap_status(_IN_ status_t status, 
+                     _IN_ status_t replace_status, 
+                     _IN_ status_t searched_status) noexcept {
+            if (status & searched_status) {
+                status ^= searched_status;
+                status |= replace_status;
+            }
+        
+            return status;
+        }
+
+
+        /**
+         * @brief Removes a status code or flag.
+         * 
+         * @note This function has no error validation mechanisms at all, 
+         *       so be careful how you use it.
+         * 
+         * @param status        Status code to edit.
+         * @param searched_flag Searched flag or status.
+         * 
+         * @return Edited status code.
+         */
+        static
+        inline
+        constexpr 
+        status_t
+        remove_status_flag(_IN_ status_t status, 
+                           _IN_ status_t searched_flag) noexcept {
+            if (status & searched_flag) {
+                status ^= searched_flag;
+            }       
+
+            return status;
+        }
+
+
+        /**
          * @brief Hashes a string to FNV-1a.
          *
          * @note This is used to create file name and format hashes for
@@ -269,28 +323,28 @@ namespace kernel::filesys
          * @param name    File name to search for.
          * @param format  File format to search for.
          *
-         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+         * @retval `status::NULL_POINTER | status::flags::PARAM_B`
          *          If `name` is a `nullptr`.
          *
-         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
          *          If `name` is empty.
          *
-         * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+         * @retval `status::NULL_POINTER | status::flags::PARAM_C`
          *          If `format` is a `nullptr`.
          *
-         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
          *          If `format` is empty.
          *
-         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
          *          If the length of `name` is `0`.
          *
-         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
          *          If the length of `format` is `0`.
          *
-         * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_A`
+         * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_B`
          *          If `name` is to long.
          *
-         * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_B`
+         * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_C`
          *          If `format` is to long.
          *
          * @retval `status::NOT_FOUND`
@@ -466,46 +520,46 @@ namespace kernel::filesys
                     _IN_ const char* format) noexcept;
 
               
-       /** 
-        * @brief Finds a file with a specific name and format.
-        * 
-        * @param file_entry Output pointer to file entry of the found file.
-        * @param name       Name of the file to find.
-        * @param format     Format of the file to find.
-        * 
-        * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-        *          If `name` is a `nullptr`.
-        *
-        * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
-        *          If `name` is empty.
-        *
-        * @retval `status::NULL_POINTER | status::flags::PARAM_B`
-        *          If `format` is a `nullptr`.
-        *
-        * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
-        *          If `format` is empty.
-        *
-        * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
-        *          If the length of `name` is `0`.
-        *
-        * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
-        *          If the length of `format` is `0`.
-        *
-        * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_A`
-        *          If `name` is to long.
-        *
-        * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_B`
-        *          If `format` is to long.
-        *
-        * @retval `status::ALREADY_EXISTS`
-        *          If the file already exists.
-        *
-        * @retval `status::NOT_FOUND`
-        *          If the file was not found.
-        * 
-        * @retval `status::SUCCESS`
-        *          Default case.
-        */
+        /** 
+         * @brief Finds a file with a specific name and format.
+         * 
+         * @param file_entry Output pointer to file entry of the found file.
+         * @param name       Name of the file to find.
+         * @param format     Format of the file to find.
+         * 
+         * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+         *          If `name` is a `nullptr`.
+         *
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+         *          If `name` is empty.
+         *
+         * @retval `status::NULL_POINTER | status::flags::PARAM_C`
+         *          If `format` is a `nullptr`.
+         *
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
+         *          If `format` is empty.
+         *
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+         *          If the length of `name` is `0`.
+         *
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
+         *          If the length of `format` is `0`.
+         *
+         * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_B`
+         *          If `name` is to long.
+         *
+         * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_C`
+         *          If `format` is to long.
+         *
+         * @retval `status::ALREADY_EXISTS`
+         *          If the file already exists.
+         *
+         * @retval `status::NOT_FOUND`
+         *          If the file was not found.
+         * 
+         * @retval `status::SUCCESS`
+         *          Default case.
+         */
         _API_
         static 
         status_t 
@@ -609,28 +663,28 @@ namespace kernel::filesys
          * @param old_name   Name of the file to rename.
          * @param old_format Format of the file to rename.
          * 
-         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+         * @retval `status::NULL_POINTER | status::flags::PARAM_C`
          *          If `old_name` is a `nullptr`.
          *
-         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
          *          If `old_name` is empty.
          *
-         * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+         * @retval `status::NULL_POINTER | status::flags::PARAM_D`
          *          If `old_format` is a `nullptr`.
          *
-         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D`
          *          If `old_format` is empty.
          *
-         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
          *          If the length of `old_name` is `0`.
          * 
-         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D`
          *          If the length of `old_format` is `0`.
          *
-         * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_A`
+         * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_C`
          *          If the `old_name` is to long.
          *
-         * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_B`
+         * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_D`
          *          If `old_format` is to long.
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
@@ -706,28 +760,28 @@ namespace kernel::filesys
          * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_B`
          *          If `destination_format` is to long.
          * 
-         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+         * @retval `status::NULL_POINTER | status::flags::PARAM_C`
          *          If `source_name` is a `nullptr`.
          *
-         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
          *          If `source_name` is empty.
          *
-         * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+         * @retval `status::NULL_POINTER | status::flags::PARAM_D`
          *          If `source_format` is a `nullptr`.
          *
-         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D`
          *          If `source_format` is empty.
          *
-         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
          *          If the length of `source_name` is `0`.
          * 
-         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D`
          *          If the length of `source_format` is `0`.
          *
-         * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_A`
+         * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_C`
          *          If the `source_name` is to long.
          *
-         * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_B`
+         * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_D`
          *          If `source_format` is to long.
          * 
          * @retval `status::NOT_FOUND`

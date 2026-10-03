@@ -23,6 +23,7 @@ NOTES:
 
 namespace kernel::filesys
 {
+
     /**
      * @brief Hashes a string to FNV-1a.
      *
@@ -227,6 +228,14 @@ namespace kernel::filesys
 
         status = validate_name_and_format(name, format);
         if (status != status::SUCCESS) [[unlikely]] {
+            status = remap_status(status,
+                                  status::flags::PARAM_C, 
+                                  status::flags::PARAM_B);
+
+            status = remap_status(status,
+                                  status::flags::PARAM_B, 
+                                  status::flags::PARAM_A);
+
             goto cleanup;
         }
 
@@ -244,6 +253,7 @@ namespace kernel::filesys
             if (name_status == status::EQUAL_TO && 
                 format_status == status::EQUAL_TO) [[unlikely]] {
                 status = status::ALREADY_EXISTS;
+
                 goto cleanup;
             }
         }
@@ -419,12 +429,23 @@ namespace kernel::filesys
 
         status = validate_name_and_format(name, format);
         if (status != status::SUCCESS) [[unlikely]] {
+            status = remap_status(status,
+                                  status::flags::PARAM_C, 
+                                  status::flags::PARAM_B);
+
+            status = remap_status(status,
+                                  status::flags::PARAM_B, 
+                                  status::flags::PARAM_A);
+
             goto cleanup;
         }
 
         status = heap::Block_Allocator::allocate(file_data_ptr, byte_size);
         if (status != status::SUCCESS || !file_data_ptr) [[unlikely]] {
+            status = remove_status_flag(status, status::flags::PARAM_B);
+
             file_entry = nullptr;
+
             goto cleanup;
         }
 
@@ -462,28 +483,28 @@ namespace kernel::filesys
      * @param name    File name to search for.
      * @param format  File format to search for.
      *
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
      *          If `name` is a `nullptr`.
      *
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
      *          If `name` is empty.
      *
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+     * @retval `status::NULL_POINTER | status::flags::PARAM_C`
      *          If `format` is a `nullptr`.
      *
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
      *          If `format` is empty.
      *
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
      *          If the length of `name` is `0`.
      *
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
      *          If the length of `format` is `0`.
      *
-     * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_A`
+     * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_B`
      *          If `name` is to long.
      *
-     * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_B`
+     * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_C`
      *          If `format` is to long.
      *
      * @retval `status::NOT_FOUND`
@@ -503,6 +524,14 @@ namespace kernel::filesys
 
         status = validate_name_and_format(name, format);
         if (status != status::SUCCESS) [[unlikely]] {
+            status = remap_status(status,
+                                  status::flags::PARAM_C,
+                                  status::flags::PARAM_B);
+
+            status = remap_status(status,
+                                  status::flags::PARAM_B,
+                                  status::flags::PARAM_A);
+
             goto cleanup;
         }
 
@@ -645,6 +674,14 @@ namespace kernel::filesys
 
         status = validate_name_and_format(name, format);
         if (status != status::SUCCESS) [[unlikely]] {
+            status = remap_status(status,
+                                  status::flags::PARAM_C,  
+                                  status::flags::PARAM_B);
+
+            status = remap_status(status,
+                                  status::flags::PARAM_B,  
+                                  status::flags::PARAM_A);
+
             goto cleanup;
         }
 
@@ -742,11 +779,23 @@ namespace kernel::filesys
             
         status = find_file_for_deletion(index, name, format);
         if (status != status::SUCCESS) [[unlikely]] {
+            status = remap_status(status,
+                                  status::flags::PARAM_B, 
+                                  status::flags::PARAM_C);
+
+            status = remap_status(status,
+                                  status::flags::PARAM_A, 
+                                  status::flags::PARAM_B);
+
             goto cleanup;
         }
 
         status = clear_file_data(index);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status == status::INVALID_PARAMETER) {
+                status = status::FAIL;
+            }
+
             goto cleanup;
         }
 
@@ -764,28 +813,28 @@ namespace kernel::filesys
      * @param name       Name of the file to find.
      * @param format     Format of the file to find.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
      *          If `name` is a `nullptr`.
      *
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
      *          If `name` is empty.
      *
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+     * @retval `status::NULL_POINTER | status::flags::PARAM_C`
      *          If `format` is a `nullptr`.
      *
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
      *          If `format` is empty.
      *
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
      *          If the length of `name` is `0`.
      *
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
      *          If the length of `format` is `0`.
      *
-     * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_A`
+     * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_B`
      *          If `name` is to long.
      *
-     * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_B`
+     * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_C`
      *          If `format` is to long.
      *
      * @retval `status::ALREADY_EXISTS`
@@ -808,6 +857,14 @@ namespace kernel::filesys
 
         status = validate_name_and_format(name, format);
         if (status != status::SUCCESS) [[unlikely]] {
+            status = remap_status(status,
+                                  status::flags::PARAM_C, 
+                                  status::flags::PARAM_B);
+
+            status = remap_status(status,
+                                  status::flags::PARAM_B,  
+                                  status::flags::PARAM_A);
+
             goto cleanup;
         }
 
@@ -903,7 +960,7 @@ namespace kernel::filesys
         }
 
         if (data_byte_size < length) [[unlikely]] {
-            status = status::INVALID_PARAMETER | status::flags::PARAM_D;
+            status = status::INVALID_PARAMETER;
             goto cleanup;
         }
 
@@ -1061,28 +1118,28 @@ namespace kernel::filesys
      * @param old_name   Name of the file to rename.
      * @param old_format Format of the file to rename.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     * @retval `status::NULL_POINTER | status::flags::PARAM_C`
      *          If `old_name` is a `nullptr`.
      *
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
      *          If `old_name` is empty.
      *
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+     * @retval `status::NULL_POINTER | status::flags::PARAM_D`
      *          If `old_format` is a `nullptr`.
      *
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D`
      *          If `old_format` is empty.
      *
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
      *          If the length of `old_name` is `0`.
      * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D`
      *          If the length of `old_format` is `0`.
      *
-     * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_A`
+     * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_C`
      *          If the `old_name` is to long.
      *
-     * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_B`
+     * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_D`
      *          If `old_format` is to long.
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
@@ -1132,13 +1189,21 @@ namespace kernel::filesys
         uint32_t new_name_hash;
         uint32_t new_format_hash;
 
-        status = validate_name_and_format(old_name, old_format);
+        status = validate_name_and_format(new_name, new_format);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        status = validate_name_and_format(new_name, new_format);
+        status = validate_name_and_format(old_name, old_format);
         if (status != status::SUCCESS) [[unlikely]] {
+            status = remap_status(status,
+                                  status::flags::PARAM_D, 
+                                  status::flags::PARAM_B);
+
+            status = remap_status(status,
+                                  status::flags::PARAM_C, 
+                                  status::flags::PARAM_A);
+
             goto cleanup;
         }
 
@@ -1228,28 +1293,28 @@ namespace kernel::filesys
      * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_B`
      *          If `destination_format` is to long.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     * @retval `status::NULL_POINTER | status::flags::PARAM_C`
      *          If `source_name` is a `nullptr`.
      *
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
      *          If `source_name` is empty.
      *
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+     * @retval `status::NULL_POINTER | status::flags::PARAM_D`
      *          If `source_format` is a `nullptr`.
      *
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D`
      *          If `source_format` is empty.
      *
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
      *          If the length of `source_name` is `0`.
      * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D`
      *          If the length of `source_format` is `0`.
      *
-     * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_A`
+     * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_C`
      *          If the `source_name` is to long.
      *
-     * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_B`
+     * @retval `status::FS_OUT_OF_SPACE | status::flags::PARAM_D`
      *          If `source_format` is to long.
      * 
      * @retval `status::NOT_FOUND`
@@ -1287,19 +1352,35 @@ namespace kernel::filesys
         uint8_t* destination_ptr;
         uint32_t source_byte_size;
 
-        status = validate_name_and_format(source_name, source_format);
-        if (status != status::SUCCESS) [[unlikely]] {
-            goto cleanup;
-        }
-
         status = validate_name_and_format(destination_name, 
                                           destination_format);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
+        status = validate_name_and_format(source_name, source_format);
+        if (status != status::SUCCESS) [[unlikely]] {
+            status = remap_status(status,
+                                  status::flags::PARAM_D, 
+                                  status::flags::PARAM_B);
+
+            status = remap_status(status,
+                                  status::flags::PARAM_C, 
+                                  status::flags::PARAM_A);
+
+            goto cleanup;
+        }
+
         status = find_file(source_file_entry, source_name, source_format);
         if (status != status::SUCCESS) [[unlikely]] {
+            status = remap_status(status,
+                                  status::flags::PARAM_D, 
+                                  status::flags::PARAM_C);
+
+            status = remap_status(status,
+                                  status::flags::PARAM_C,  
+                                  status::flags::PARAM_B);
+
             goto cleanup;
         }
 
@@ -1308,11 +1389,27 @@ namespace kernel::filesys
         status = find_file(destination_file_entry, 
                            destination_name, 
                            destination_format);
+        if (status != status::SUCCESS) [[unlikely]] {
+            status = remap_status(status,
+                                  status::flags::PARAM_B,
+                                  status::flags::PARAM_C);
+
+            status = remap_status(status,
+                                  status::flags::PARAM_A, 
+                                  status::flags::PARAM_B);
+        }
+
         if (status == status::SUCCESS) [[likely]] {
             if (source_byte_size > destination_file_entry->file_byte_size) {
                 status = resize_file_size(destination_file_entry, 
                                           source_byte_size);
                 if (status != status::SUCCESS) [[unlikely]] {
+                    status = remove_status_flag(status, 
+                                                status::flags::PARAM_A);
+
+                    status = remove_status_flag(status, 
+                                                status::flags::PARAM_B);
+
                     goto cleanup;
                 }
             }
@@ -1323,6 +1420,9 @@ namespace kernel::filesys
                                  destination_format,
                                  source_byte_size);
             if (status != status::SUCCESS) [[unlikely]] {
+                status = remove_status_flag(status, status::flags::PARAM_A);
+                status = remove_status_flag(status, status::flags::PARAM_B); 
+
                 goto cleanup;
             }
         }
@@ -1342,6 +1442,9 @@ namespace kernel::filesys
                                                         source_ptr,
                                                         source_byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
+            status = remove_status_flag(status, status::flags::PARAM_A);
+            status = remove_status_flag(status, status::flags::PARAM_B);
+
             goto cleanup;
         }
 
@@ -1437,6 +1540,14 @@ namespace kernel::filesys
                                                         source_ptr + offset, 
                                                         length);
         if (status != status::SUCCESS) [[unlikely]] {
+            status = remap_status(status,
+                                  status::flags::PARAM_A, 
+                                  status::flags::PARAM_B);
+
+            status = remap_status(status,
+                                  status::flags::PARAM_B, 
+                                  status::flags::PARAM_A);
+
             goto cleanup;
         }
 
