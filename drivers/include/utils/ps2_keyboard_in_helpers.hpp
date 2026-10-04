@@ -32,7 +32,7 @@ NOTES:
 
 namespace drivers::ps2
 {
-    constexpr char us_qwerty_std_key_mapping[128] = {
+    constexpr char qwerty_std_key_mapping[128] = {
         0, 27, '1','2','3','4','5','6','7','8','9','0', '-','=', '\b',
         '\t','q','w','e','r','t','y','u','i','o','p','[',']','\n', 0,
         'a','s','d','f','g','h','j','k','l',';','\'','`', 0, '\\',
@@ -40,7 +40,7 @@ namespace drivers::ps2
     };
 
     
-    constexpr char us_qwerty_shift_key_mapping[128] = {
+    constexpr char qwerty_shift_key_mapping[128] = {
         0, 27, '!','@','#','$','%','^','&','*','(',')','_','+', '\b',
         '\t','Q','W','E','R','T','Y','U','I','O','P','{','}','\n', 0,
         'A','S','D','F','G','H','J','K','L',':','\"','~', 0, '|',

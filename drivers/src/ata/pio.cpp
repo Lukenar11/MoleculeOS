@@ -58,8 +58,9 @@ namespace drivers::ata
      * @retval `status::SUCCESS`
      *         Default case.
      */
+    [[nodiscard]] 
     status_t
-    Programmable_Input_Output::validate_storage_access(_IN_ const uint16_t* buffer,
+    Programmable_Input_Output::validate_storage_access(_IN_ const uint16_t* const buffer,
                                                        _IN_ const uint32_t relative_lba,
                                                        _IN_ const uint32_t to_transfer)
                                                        noexcept {
@@ -113,7 +114,7 @@ namespace drivers::ata
     void 
     Programmable_Input_Output::delay() noexcept {
         for (uint32_t ns_delay = 0; ns_delay < 5; ns_delay++) [[likely]] {
-            stdlib::byte_input(status_port());
+            stdlib::byte_input(status_port);
         }
     }
 
@@ -121,21 +122,19 @@ namespace drivers::ata
     /**
      * @brief Performs a software reset of the hard drive and waits
      *        until the controller is operational again.
-     *
-     * @param dcr_port Port of the ATA channel's hard drive status register.
      */
     void 
-    Programmable_Input_Output::reset_driver(const uint16_t dcr_port) noexcept {
+    Programmable_Input_Output::reset_driver() noexcept {
         uint32_t timeout = 5'000'000;
         uint8_t status;
 
-        stdlib::byte_output(dcr_port, SRST);
-        stdlib::byte_output(dcr_port, DCR_DEFAULT);
+        stdlib::byte_output(device_control_register, SRST);
+        stdlib::byte_output(device_control_register, DCR_DEFAULT);
 
         delay();
 
         while (timeout--) [[likely]] {
-            status = stdlib::byte_input(status_port());
+            status = stdlib::byte_input(status_port);
 
             if (!(status & ATA_BSY) && (status & ATA_DRDY)) {
                 break;
@@ -174,7 +173,7 @@ namespace drivers::ata
      *         Default case.
      */
     status_t
-    Programmable_Input_Output::identify_drive(_OUT_ uint16_t identify_data[SECTOR_WORD_SIZE],
+    Programmable_Input_Output::identify_drive(_OUT_ uint16_t* const identify_data,
                                               _IN_  const uint16_t io_base,
                                               _IN_  const uint16_t control_register) 
                                               noexcept {
@@ -198,12 +197,13 @@ namespace drivers::ata
         }
 
         device_control_register = control_register;
-        reset_driver(control_register);
+        reset_driver();
 
         io_port_base = io_base;
+        status_port  = io_port_base + 7;
 
-        stdlib::byte_output(status_port() - 1, drive_select_flags);
-        stdlib::byte_output(status_port(), ATA_IDENTIFY);
+        stdlib::byte_output(status_port - 1, drive_select_flags);
+        stdlib::byte_output(status_port, ATA_IDENTIFY);
 
         delay();
 
@@ -279,7 +279,7 @@ namespace drivers::ata
                                     io_port,
                                     control_register);
             if (status != status::SUCCESS) [[unlikely]] {
-                reset_driver(control_register);
+                reset_driver();
                 continue;
             }
 
@@ -333,6 +333,7 @@ namespace drivers::ata
      * @retval `status::SUCCESS`
      *         Default case.
      */
+    [[nodiscard]] 
     status_t 
     Programmable_Input_Output::poll_until_drq_or_error() noexcept {
         status_t status;
@@ -340,7 +341,7 @@ namespace drivers::ata
         uint32_t timeout = 5'000'000;
 
         while (timeout--) [[likely]] {
-            input = stdlib::byte_input(status_port());
+            input = stdlib::byte_input(status_port);
 
             if (input & ATA_ERR) [[unlikely]] {
                 status = status::ATA_ERROR;
@@ -381,6 +382,7 @@ namespace drivers::ata
      * @retval `status::SUCCESS`
      *         Default case.
      */
+    [[nodiscard]]
     status_t 
     Programmable_Input_Output::poll_until_not_bsy_or_error() noexcept {
         status_t status;
@@ -388,7 +390,7 @@ namespace drivers::ata
         uint32_t timeout = 5'000'000;
 
         while (timeout--) [[likely]] {
-            input = stdlib::byte_input(status_port());
+            input = stdlib::byte_input(status_port);
 
             if (input & ATA_ERR) [[unlikely]] {
                 status = status::ATA_ERROR;
@@ -439,11 +441,12 @@ namespace drivers::ata
      * @retval `status::SUCCESS`
      *         Default case.
      */
+    [[nodiscard]]
     status_t 
     Programmable_Input_Output::poll_and_read_or_write_disk(_INOUT_ uint16_t* buffer,
                                                            _IN_    const Operations operation,
                                                            _IN_    const uint32_t sector_count) 
-                                                           noexcept {
+                                                           noexcept { 
         status_t status;
 
         if (!buffer) [[unlikely]] {
@@ -526,8 +529,9 @@ namespace drivers::ata
      * @retval `status::SUCCESS`
      *         Default case.
      */
+    [[nodiscard]]
     status_t 
-    Programmable_Input_Output::start_pio_disk_read_or_write(_INOUT_ uint16_t* buffer,
+    Programmable_Input_Output::start_pio_disk_read_or_write(_INOUT_ uint16_t* const buffer,
                                                             _IN_    const uint32_t relative_lba,
                                                             _IN_    const uint32_t sector_count,
                                                             _IN_    const Operations operation) 
@@ -560,10 +564,10 @@ namespace drivers::ata
 
                            
         if (operation == Operations::READ) {
-            stdlib::byte_output(status_port(), READ_SECTORS);
+            stdlib::byte_output(status_port, READ_SECTORS);
         }
         else {
-            stdlib::byte_output(status_port(), WRITE_SECTORS);
+            stdlib::byte_output(status_port, WRITE_SECTORS);
         }
 
         status = poll_and_read_or_write_disk(buffer, operation, sector_count);
@@ -572,7 +576,7 @@ namespace drivers::ata
         }
 
         if (operation == Operations::WRITE) {
-            stdlib::byte_output(status_port(), FLUSH_CACHE);
+            stdlib::byte_output(status_port, FLUSH_CACHE);
 
             status = poll_until_not_bsy_or_error();
             if (status != status::SUCCESS) [[unlikely]] {
@@ -580,7 +584,7 @@ namespace drivers::ata
             }
         }
 
-        final_status = stdlib::byte_input(status_port());
+        final_status = stdlib::byte_input(status_port);
 
         if (final_status & ATA_ERR) [[unlikely]] {
             status = status::ATA_ERROR;
@@ -724,7 +728,7 @@ namespace drivers::ata
         status = status::SUCCESS;
 
     cleanup:
-        reset_driver(dcr_port());
+        reset_driver();
 
         kernel::sys::enable_interrupts();
 

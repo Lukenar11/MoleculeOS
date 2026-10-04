@@ -95,7 +95,7 @@ namespace kernel::heap
         bool 
         is_block_free(_IN_ const uint32_t block_index) noexcept {
             const uint32_t bitmap_index = block_index >> BITMAP_WORD_SHIFT;
-            const bool block_status     = (1u << 
+            const bool block_status     = (1U << 
                                            (block_index & BITMAP_WORD_MASK));
 
             return memory_bitmap[bitmap_index] & block_status;
@@ -112,6 +112,7 @@ namespace kernel::heap
         */
         static 
         inline 
+        constexpr
         uint32_t
         align_up(_IN_ const uint32_t value,
                  _IN_ const uint32_t alignment) noexcept {
@@ -129,6 +130,7 @@ namespace kernel::heap
          */
         static 
         inline 
+        constexpr
         uint32_t
         align_down(_IN_ const uint32_t value,
                    _IN_ const uint32_t alignment) noexcept {
@@ -172,7 +174,8 @@ namespace kernel::heap
         static 
         void* 
         set_allocation_sizes_entry(_IN_ const uint32_t needed_blocks, 
-                                   _IN_ const uint32_t pool_index) noexcept;
+                                   _IN_ const uint32_t pool_index) 
+                                   noexcept;
 
 
         /** 
@@ -190,7 +193,8 @@ namespace kernel::heap
         bool 
         find_enough_free_blocks(_INOUT_ uint32_t& checked_blocks,
                                 _IN_    const uint32_t start_index, 
-                                _IN_    const uint32_t needed_blocks) noexcept;
+                                _IN_    const uint32_t needed_blocks) 
+                                noexcept;
 
 
         /** 
@@ -236,7 +240,8 @@ namespace kernel::heap
         static 
         status_t 
         find_free_memory_region(_OUT_ uint32_t& block_index,
-                                _IN_  const uint32_t blocks_needed) noexcept;
+                                _IN_  const uint32_t blocks_needed)
+                                noexcept;
 
 
         /** 
@@ -277,7 +282,8 @@ namespace kernel::heap
         static 
         status_t 
         perform_reallocate(_INOUT_ void*& block_ptr,
-                           _IN_    const uint32_t new_byte_size) noexcept;
+                           _IN_    const uint32_t new_byte_size) 
+                           noexcept;
 
 
     public:
@@ -290,8 +296,8 @@ namespace kernel::heap
         _API_ 
         static 
         void 
-        init(_IN_ const uint8_t* heap_begin, 
-             _IN_ const uint8_t* heap_end) noexcept;
+        init(_IN_ const uint8_t* const heap_begin, 
+             _IN_ const uint8_t* const heap_end) noexcept;
 
 
         /** 

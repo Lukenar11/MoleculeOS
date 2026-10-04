@@ -47,6 +47,7 @@ namespace drivers::ps2
      * @retval `status::SUCCESS`
      *          Default case.
      */
+    [[nodiscard]] 
     status_t 
     Keyboard_Input::get_key(_OUT_ char& key) noexcept {
         status_t status;
@@ -93,10 +94,10 @@ namespace drivers::ps2
         }
     
         if (!shift_is_pressed) [[likely]] {
-            key = us_qwerty_std_key_mapping[scancode]; 
+            key = qwerty_std_key_mapping[scancode]; 
         }
         else [[unlikely]] {
-            key = us_qwerty_shift_key_mapping[scancode];
+            key = qwerty_shift_key_mapping[scancode];
         }
 
         if (caps_is_enabled) [[unlikely]] {

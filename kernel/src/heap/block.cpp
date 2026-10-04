@@ -127,7 +127,7 @@ namespace kernel::heap
      * @param pool_index    Start index in the memory pool.
      *
      * @return Pointer to the first block.
-     */
+     */ 
     void*
     Block_Allocator::set_allocation_sizes_entry(_IN_ const uint32_t needed_blocks,
                                                 _IN_ const uint32_t pool_index) 
@@ -250,7 +250,7 @@ namespace kernel::heap
      *          or `needed_blocks` is too large. 
      * 
      * @retval `status::SUCCESS`
-     *          Default case.
+     *            Default case.
      */
     status_t 
     Block_Allocator::find_free_memory_region(_OUT_ uint32_t& block_index,
@@ -406,8 +406,8 @@ namespace kernel::heap
      */
     _API_ 
     void
-    Block_Allocator::init(_IN_ const uint8_t* heap_begin,
-                          _IN_ const uint8_t* heap_end) noexcept {
+    Block_Allocator::init(_IN_ const uint8_t* const heap_begin,
+                          _IN_ const uint8_t* const heap_end) noexcept {
         sys::disable_interrupts();
 
         setup_metadata_layout(reinterpret_cast<uint32_t>(heap_begin), 
@@ -596,7 +596,7 @@ namespace kernel::heap
      *          Default case.
      */
     _API_ 
-    status_t 
+    status_t
     Block_Allocator::clear_allocate(_OUT_ void*& block_ptr, 
                                     _IN_  const uint32_t byte_size) 
                                     noexcept {
@@ -675,7 +675,7 @@ namespace kernel::heap
      *          Default case. 
      */
     _API_ 
-    status_t 
+    status_t
     Block_Allocator::reallocate(_INOUT_ void*& block_ptr,
                                 _IN_    const uint32_t new_byte_size) 
                                 noexcept {

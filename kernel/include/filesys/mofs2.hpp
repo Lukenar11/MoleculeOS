@@ -33,8 +33,9 @@ namespace kernel::filesys
 {
     class MoleculeOS_File_System_2 final {
     private:
-        static inline stdlib::Array<File_Entry, 
-                                    FILE_TABLE_ENTRYS> file_entry_table;
+        static 
+        inline 
+        stdlib::Array<File_Entry, FILE_TABLE_ENTRYS> file_entry_table;
 
 
         /**
@@ -55,8 +56,8 @@ namespace kernel::filesys
         constexpr 
         status_t
         remap_status(_IN_ status_t status, 
-                     _IN_ status_t replace_status, 
-                     _IN_ status_t searched_status) noexcept {
+                     _IN_ const status_t replace_status, 
+                     _IN_ const status_t searched_status) noexcept {
             if (status & searched_status) {
                 status ^= searched_status;
                 status |= replace_status;
@@ -82,7 +83,7 @@ namespace kernel::filesys
         constexpr 
         status_t
         remove_status_flag(_IN_ status_t status, 
-                           _IN_ status_t searched_flag) noexcept {
+                           _IN_ const status_t searched_flag) noexcept {
             if (status & searched_flag) {
                 status ^= searched_flag;
             }       
@@ -101,7 +102,8 @@ namespace kernel::filesys
          *
          * @return FNV-1a hash of `text`.
          */
-        static 
+        static
+        constexpr
         uint32_t 
         to_fnv1a_hash(_IN_ const char* txt) noexcept;
 
@@ -148,8 +150,8 @@ namespace kernel::filesys
         [[nodiscard]]
         static
         status_t 
-        validate_name_and_format(_IN_ const char* name, 
-                                 _IN_ const char* format) noexcept;
+        validate_name_and_format(_IN_ const char* const name, 
+                                 _IN_ const char* const format) noexcept;
 
 
         /**
@@ -194,8 +196,8 @@ namespace kernel::filesys
         static 
         status_t 
         file_already_exists(_IN_ const File_Entry& file_entry, 
-                            _IN_ const char* name, 
-                            _IN_ const char* format,
+                            _IN_ const char* const name, 
+                            _IN_ const char* const format,
                             _IN_ const uint32_t name_hash,
                             _IN_ const uint32_t format_hash) noexcept;
 
@@ -242,8 +244,8 @@ namespace kernel::filesys
         status_t
         check_file_not_exists(_IN_ const char* name,
                               _IN_ const char* format,
-                              _IN_ uint32_t name_hash,
-                              _IN_ uint32_t format_hash) noexcept;
+                              _IN_ const uint32_t name_hash,
+                              _IN_ const uint32_t format_hash) noexcept;
 
 
         /**
@@ -307,12 +309,12 @@ namespace kernel::filesys
         static
         status_t 
         init_file_entry(_OUT_ File_Entry*& file_entry,
-                        _IN_  const char* name,
-                        _IN_  const char* format,
-                        _IN_  uint32_t name_hash,
-                        _IN_  uint32_t format_hash,
-                        _IN_  uint32_t byte_size,
-                        _IN_  uint32_t index)  noexcept;
+                        _IN_  const char* const name,
+                        _IN_  const char* const format,
+                        _IN_  const uint32_t name_hash,
+                        _IN_  const uint32_t format_hash,
+                        _IN_  const uint32_t byte_size,
+                        _IN_  const uint32_t index) noexcept;
 
 
         /**
@@ -356,8 +358,8 @@ namespace kernel::filesys
         static 
         status_t 
         find_file_for_deletion(_OUT_ uint32_t& index,
-                               _IN_  const char* name,
-                               _IN_  const char* format) noexcept;
+                               _IN_  const char* const name,
+                               _IN_  const char* const format) noexcept;
 
 
         /**
@@ -414,7 +416,7 @@ namespace kernel::filesys
         static 
         inline 
         constexpr 
-        File_Entry& 
+        File_Entry&
         get_file_entry(_IN_ const uint32_t file_index) noexcept {
             return file_entry_table[file_index];
         }
@@ -466,8 +468,8 @@ namespace kernel::filesys
         static 
         status_t 
         create_file(_OUT_ File_Entry*& file_entry,
-                    _IN_  const char* name, 
-                    _IN_  const char* format, 
+                    _IN_  const char* const name, 
+                    _IN_  const char* const format, 
                     _IN_  const uint32_t byte_size) noexcept;
 
 
@@ -516,8 +518,8 @@ namespace kernel::filesys
         _API_
         static 
         status_t 
-        delete_file(_IN_ const char* name, 
-                    _IN_ const char* format) noexcept;
+        delete_file(_IN_ const char* const name, 
+                    _IN_ const char* const format) noexcept;
 
               
         /** 
@@ -564,8 +566,8 @@ namespace kernel::filesys
         static 
         status_t 
         find_file(_OUT_ File_Entry*& file_entry,
-                  _IN_  const char* name,
-                  _IN_  const char* format) noexcept;
+                  _IN_  const char* const name,
+                  _IN_  const char* const format) noexcept;
 
 
         /**
@@ -598,8 +600,8 @@ namespace kernel::filesys
         _API_
         static 
         status_t 
-        write_file(_IN_ File_Entry* file_entry,
-                   _IN_ const uint8_t* data,
+        write_file(_IN_ const File_Entry* const file_entry,
+                   _IN_ const uint8_t* const data,
                    _IN_ const uint32_t offset,
                    _IN_ const uint32_t length,
                    _IN_ const uint32_t data_size) noexcept;
@@ -631,7 +633,7 @@ namespace kernel::filesys
         static 
         status_t 
         append_file(_IN_ File_Entry* file_entry,
-                    _IN_ const uint8_t* data,
+                    _IN_ const uint8_t* const data,
                     _IN_ const uint32_t data_size) noexcept;
 
             
@@ -652,7 +654,7 @@ namespace kernel::filesys
         _API_
         static 
         status_t 
-        clear_file(_IN_ File_Entry* file_entry) noexcept;
+        clear_file(_IN_ File_Entry* const file_entry) noexcept;
 
 
         /** 
@@ -722,10 +724,10 @@ namespace kernel::filesys
          */
         static 
         status_t 
-        rename_file(_IN_ const char* new_name,
-                    _IN_ const char* new_format,
-                    _IN_ const char* old_name,
-                    _IN_ const char* old_format) noexcept;
+        rename_file(_IN_ const char* const new_name,
+                    _IN_ const char* const new_format,
+                    _IN_ const char* const old_name,
+                    _IN_ const char* const old_format) noexcept;
 
 
         /**
@@ -806,10 +808,10 @@ namespace kernel::filesys
         _API_
         static 
         status_t 
-        copy_file(_IN_ const char* destination_name,
-                  _IN_ const char* destination_format,
-                  _IN_ const char* source_name,
-                  _IN_ const char* source_format) noexcept;
+        copy_file(_IN_ const char* const destination_name,
+                  _IN_ const char* const destination_format,
+                  _IN_ const char* const source_name,
+                  _IN_ const char* const source_format) noexcept;
 
 
         /**
@@ -845,8 +847,8 @@ namespace kernel::filesys
         _API_
         static 
         status_t 
-        read_file(_IN_ File_Entry* file_entry,
-                  _IN_ uint8_t* buffer_ptr,
+        read_file(_IN_ const File_Entry* const file_entry,
+                  _IN_ uint8_t* const buffer_ptr,
                   _IN_ const uint32_t buffer_size,
                   _IN_ const uint32_t offset,
                   _IN_ const uint32_t length) noexcept;
@@ -877,7 +879,7 @@ namespace kernel::filesys
         _API_
         static 
         status_t 
-        resize_file_size(_INOUT_ File_Entry* file_entry, 
+        resize_file_size(_INOUT_ File_Entry* const file_entry, 
                          _IN_    const uint32_t new_byte_size) noexcept;
 
 
@@ -891,7 +893,13 @@ namespace kernel::filesys
          */
         _API_
         static 
+        constexpr
         bool 
-        is_valid_name_or_format_char(_IN_ const char symbol) noexcept;
+        is_valid_name_or_format_char(_IN_ const char symbol) noexcept {
+            return (symbol >= 'A' && symbol <= 'Z') ||
+                   (symbol >= 'a' && symbol <= 'z') ||
+                   (symbol >= '0' && symbol <= '9') ||
+                   (symbol == '_' || symbol == '-');
+        }
     };
 } // namespace kernel::filesys

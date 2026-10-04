@@ -93,13 +93,13 @@ namespace drivers::ata
         static_assert(CHUNK_SECTORS <= MAX_ALLOWED_SECTOR_COUNT, 
                       "CHUNK_SECTORS <= MAX_ALLOWED_SECTOR_COUNT");
 
-        static inline uint32_t partition_length   = 0;
-        static inline uint32_t lba_start_address  = 0;
+        static inline uint32_t partition_length        = 0;
+        static inline uint32_t lba_start_address       = 0;
         static inline uint16_t device_control_register = 0;
-        static inline uint16_t io_port_base       = 0;
-        static inline uint8_t drive_select_flags  = 0;
-        static inline uint8_t lba_flags           = 0;
-
+        static inline uint16_t io_port_base            = 0;
+        static inline uint8_t drive_select_flags       = 0;
+        static inline uint8_t lba_flags                = 0;
+        static inline uint16_t status_port             = 0;
 
         /**
          * @brief Checks whether a memory access operation is within the
@@ -128,11 +128,12 @@ namespace drivers::ata
          *         Default case.
          */
         [[nodiscard]] 
-        static 
+        static
         status_t 
-        validate_storage_access(_IN_ const uint16_t* buffer,
+        validate_storage_access(_IN_ const uint16_t* const buffer,
                                 _IN_ const uint32_t relative_lba, 
-                                _IN_ const uint32_t to_transfer) noexcept;
+                                _IN_ const uint32_t to_transfer) 
+                                noexcept;
 
 
         /**
@@ -158,13 +159,10 @@ namespace drivers::ata
         /**
          * @brief Performs a software reset of the hard drive and waits
          *        until the controller is operational again.
-         *
-         * @param dcr_port Port of the ATA channel's 
-         *                 hard drive status register.
          */
         static 
         void 
-        reset_driver(const uint16_t dcr_port) noexcept;
+        reset_driver() noexcept;
 
 
         /**
@@ -198,7 +196,7 @@ namespace drivers::ata
          */
         static 
         status_t 
-        identify_drive(_OUT_ uint16_t identify_data[SECTOR_WORD_SIZE],
+        identify_drive(_OUT_ uint16_t* const identify_data,
                        _IN_  const uint16_t io_base,
                        _IN_  const uint16_t control_register) noexcept;
 
@@ -350,7 +348,7 @@ namespace drivers::ata
         [[nodiscard]] 
         static 
         status_t 
-        start_pio_disk_read_or_write(_INOUT_ uint16_t* buffer,
+        start_pio_disk_read_or_write(_INOUT_ uint16_t* const buffer,
                                      _IN_    const uint32_t relative_lba,
                                      _IN_    const uint32_t sector_count,
                                      _IN_    const Operations operation) 
@@ -358,37 +356,6 @@ namespace drivers::ata
 
 
     public:
-        /**
-         * @brief Returns the I/O port address of the ATA status register.
-         *
-         * @retval The computed status port address.
-         */
-        _API_ 
-        [[nodiscard]] 
-        static 
-        inline 
-        uint16_t 
-        status_port() noexcept { 
-            return static_cast<uint16_t>(io_port_base + 7); 
-        }
-
-
-        /**
-         * @brief Returns the I/O port address of the 
-         *        ATA device control register.
-         *
-         * @retval The computed status port address.
-         */
-        _API_ 
-        [[nodiscard]] 
-        static 
-        inline 
-        uint16_t 
-        dcr_port() noexcept { 
-            return device_control_register; 
-        }
-
-
         /**
          * @brief Initializes the ATA-PIO driver.
          */
