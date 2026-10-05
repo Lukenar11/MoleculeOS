@@ -31,7 +31,7 @@ namespace stdlib
          * @brief Validates the parameters for the most class methods.
          * 
          * @param destination_ptr pointer to validate
-         * @param source_ptr  pointer to validate
+         * @param source_ptr      pointer to validate
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
          *          If `destination_ptr` is `nullptr` or to short.
@@ -43,10 +43,10 @@ namespace stdlib
          *          If all pointer are valid.
          */
         [[nodiscard]] 
-        static
+        static 
         status_t
-        validate_destination_ptr_and_source_ptr(_INOUT_ char* destination_ptr,
-                                                _IN_    const char* source_ptr)
+        validate_destination_ptr_and_source_ptr(_INOUT_ const char* const destination_ptr,
+                                                _IN_    const char* const source_ptr)
                                                 noexcept;
 
     public:
@@ -73,8 +73,8 @@ namespace stdlib
         _API_ 
         static
         status_t
-        copy_string_part(_INOUT_ char* destination_ptr,
-                         _IN_    const char* source_ptr,
+        copy_string_part(_INOUT_ char* const destination_ptr,
+                         _IN_    const char* const source_ptr,
                          _IN_    const uint32_t byte_size) noexcept;
 
 
@@ -123,8 +123,8 @@ namespace stdlib
         static
         status_t 
         find_char_in_string(_OUT_ const char*& found_char,
-                             _IN_  const char* string, 
-                             _IN_  const int32_t symbol) noexcept;
+                            _IN_  const char* string, 
+                            _IN_  const int32_t symbol) noexcept;
 
 
         /**
@@ -140,10 +140,10 @@ namespace stdlib
          *          Default case.
          */
         _API_ 
-        static
+        static 
         status_t 
         get_string_length(_OUT_ uint32_t& length,
-                          _IN_  const char *string) noexcept;
+                          _IN_  const char* string) noexcept;
 
 
         /**

@@ -78,7 +78,7 @@ namespace stdlib
          */
         static 
         void 
-        put_base(_IN_ uint32_t value, 
+        put_base(_IN_ const uint32_t value, 
                  _IN_ const uint32_t base) noexcept;
             
 
@@ -145,7 +145,7 @@ namespace stdlib
          */
         static 
         uint32_t 
-        calculate_needed_lines(_IN_ const char* text) noexcept;
+        calculate_needed_lines(_IN_ const char* const text) noexcept;
 
 
         /** 
@@ -180,7 +180,7 @@ namespace stdlib
         _API_ 
         [[nodiscard]] 
         static 
-        inline 
+        inline  
         uint32_t 
         get_cursor_y() noexcept {
             return cursor_y;
@@ -195,7 +195,7 @@ namespace stdlib
         _API_ 
         [[nodiscard]] 
         static 
-        inline 
+        inline  
         uint8_t 
         get_text_color() noexcept {
             return cursor_color;
@@ -211,6 +211,7 @@ namespace stdlib
         _API_ 
         static 
         inline 
+        constexpr
         void 
         set_text_color(_IN_ const drivers::vga::Text_Mode_Colors& color,
                        _IN_ const drivers::vga::Text_Mode_Colors& background,
@@ -267,7 +268,7 @@ namespace stdlib
         _API_ 
         static 
         void 
-        put_int(_IN_  int32_t value) noexcept;
+        put_int(_IN_ int32_t value) noexcept;
 
 
         /** 
@@ -360,7 +361,7 @@ namespace stdlib
         _API_ 
         static 
         void 
-        put_string(_IN_ const char* message) noexcept;
+        put_string(_IN_ const char* const message) noexcept;
     
 
         Text_Output() noexcept  = default;

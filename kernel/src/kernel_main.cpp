@@ -41,7 +41,7 @@ namespace kernel
         if (storemgr::Storage_Manager::load_filesystem() != status::SUCCESS) [[unlikely]] {
             sys::panic("load failed");
         }
-
+        
         // schedule MoleculeOS
         static terminal::Terminal terminal;
         while (true) {

@@ -149,7 +149,7 @@ namespace stdlib
          */
         _API_ 
         status_t 
-        peek(_OUT_ T& item) const noexcept {
+        peek(_OUT_ const T& item) const noexcept {
             status_t status;
 
             if (empty()) [[unlikely]] {

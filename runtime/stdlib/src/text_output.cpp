@@ -93,7 +93,7 @@ namespace stdlib
      * @param base  integer base
      */
     void 
-    Text_Output::put_base(_IN_ uint32_t value, 
+    Text_Output::put_base(_IN_ const uint32_t value, 
                           _IN_ const uint32_t base) noexcept {
         stdlib::Array<char, 32> buffer;
         uint32_t buffer_count;
@@ -144,7 +144,7 @@ namespace stdlib
             }
 
             buffer[buffer_count++] = null_char + (value % ten);
-            value /= ten;
+            value                 /= ten;
         }
 
         return buffer_count;
@@ -223,8 +223,8 @@ namespace stdlib
      * @return the count of needed lines.
      */
     uint32_t 
-    Text_Output::calculate_needed_lines(_IN_ const char* text) noexcept {
-        const uint32_t null   = 0;
+    Text_Output::calculate_needed_lines(_IN_ const char* const text) noexcept {
+        const char new_line   = '\n';
         uint32_t needed_lines = 1;
         uint32_t x            = cursor_x;
         char symbol;
@@ -234,20 +234,23 @@ namespace stdlib
             goto cleanup;
         }
 
-        while (*text) [[likely]] {
-            symbol = *text++;
-            if (symbol == '\n') [[unlikely]] {
+        for (uint32_t text_char = 0; 
+             text[text_char] != '\0';
+             text_char++) [[likely]] {
+            symbol = text[text_char];
+            if (symbol == new_line) [[unlikely]] {
                 needed_lines++;
-                x = null;
+                x ^= x;
                 continue;
             }
 
             x++;
             if (x >= drivers::vga::TEXT_MODE_SCREEN_WIDTH) [[unlikely]] {
                 needed_lines++;
-                x = null;
+                x ^= x;
             }
         }
+
 
     cleanup:
         return needed_lines;
@@ -371,7 +374,7 @@ namespace stdlib
      */
     _API_ 
     void
-    Text_Output::put_string(_IN_ const char* message) noexcept {
+    Text_Output::put_string(_IN_ const char* const message) noexcept {
         uint32_t needed_lines;
 
         if (!message || message[0] == '\0') [[unlikely]] {
@@ -384,8 +387,11 @@ namespace stdlib
             drivers::vga::TEXT_MODE_SCREEN_HEIGHT - cursor_y) [[unlikely]] {
             reset();
         }
-        while (*message) [[likely]] {
-            put_char(*message++);
+
+        for (uint32_t current_char = 0; 
+             message[current_char] != '\0';
+             current_char++) [[likely]] {
+            put_char(message[current_char]);
         }
 
     cleanup:

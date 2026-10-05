@@ -46,8 +46,8 @@ namespace stdlib
         [[nodiscard]] 
         static 
         status_t
-        validate_parameters(_IN_ void* destination_ptr, 
-                            _IN_ const void* source_ptr) noexcept;
+        validate_parameters(_IN_ const void* const destination_ptr, 
+                            _IN_ const void* const source_ptr) noexcept;
 
                             
     public:
@@ -70,8 +70,8 @@ namespace stdlib
         _API_ 
         static 
         status_t 
-        copy_memory_block(_IN_ void* destination_ptr, 
-                          _IN_ const void* source_ptr, 
+        copy_memory_block(_IN_ void* const destination_ptr, 
+                          _IN_ const void* const source_ptr, 
                           _IN_ uint32_t byte_size) noexcept;
 
 
@@ -95,8 +95,8 @@ namespace stdlib
         _API_ 
         static 
         status_t 
-        move_memory_block(_IN_ void* destination_ptr, 
-                          _IN_ const void* source_ptr, 
+        move_memory_block(_IN_ void* const destination_ptr, 
+                          _IN_ const void* const source_ptr, 
                           _IN_ uint32_t byte_size) noexcept;
 
 
@@ -118,7 +118,7 @@ namespace stdlib
         _API_ 
         static 
         status_t 
-        set_memory_block(_IN_ void* destination_ptr, 
+        set_memory_block(_IN_ void* const destination_ptr, 
                          _IN_ const int32_t value, 
                          _IN_ uint32_t byte_size) noexcept;
 
@@ -154,8 +154,8 @@ namespace stdlib
         _API_ 
         static 
         status_t 
-        compare_memory_block(_IN_ const void* a_ptr, 
-                             _IN_ const void* b_ptr,
+        compare_memory_block(_IN_ const void* const a_ptr, 
+                             _IN_ const void* const b_ptr,
                              _IN_ uint32_t byte_size) noexcept;
 
 

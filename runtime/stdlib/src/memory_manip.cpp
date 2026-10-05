@@ -37,8 +37,8 @@ namespace stdlib
      */
     [[nodiscard]] 
     status_t
-    Memory_Manipulation::validate_parameters(_IN_ void* destination_ptr, 
-                                             _IN_ const void* source_ptr)
+    Memory_Manipulation::validate_parameters(_IN_ const void* const destination_ptr, 
+                                             _IN_ const void* const source_ptr)
                                              noexcept {
         status_t status;
 
@@ -80,9 +80,10 @@ namespace stdlib
      */
     _API_ 
     status_t 
-    Memory_Manipulation::copy_memory_block(_IN_ void* destination_ptr, 
-                                           _IN_ const void* source_ptr, 
-                                           _IN_ uint32_t byte_size) noexcept {
+    Memory_Manipulation::copy_memory_block(_IN_ void* const destination_ptr, 
+                                           _IN_ const void* const source_ptr, 
+                                           _IN_ uint32_t byte_size) 
+                                           noexcept {
         status_t status;
         uint8_t* destination_byte_ptr;
         const uint8_t* source_byte_ptr;
@@ -135,9 +136,10 @@ namespace stdlib
      */
     _API_ 
     status_t 
-    Memory_Manipulation::move_memory_block(_IN_ void* destination_ptr, 
-                                           _IN_ const void* source_ptr, 
-                                           _IN_ uint32_t byte_size) noexcept {
+    Memory_Manipulation::move_memory_block(_IN_ void* const destination_ptr, 
+                                           _IN_ const void* const source_ptr, 
+                                           _IN_ uint32_t byte_size) 
+                                           noexcept {
         status_t status;
         uint8_t* destination_byte_ptr;
         const uint8_t* source_byte_ptr;
@@ -200,9 +202,10 @@ namespace stdlib
      */
     _API_ 
     status_t 
-    Memory_Manipulation::set_memory_block(_IN_ void* destination_ptr, 
+    Memory_Manipulation::set_memory_block(_IN_ void* const destination_ptr, 
                                           _IN_ const int32_t value, 
-                                          _IN_ uint32_t byte_size) noexcept {
+                                          _IN_ uint32_t byte_size) 
+                                          noexcept {
         status_t status;
         uint8_t* destination_byte_ptr;
         uint8_t byte;
@@ -261,8 +264,8 @@ namespace stdlib
      */
     _API_ 
     status_t 
-    Memory_Manipulation::compare_memory_block(_IN_ const void* a_ptr, 
-                                              _IN_ const void* b_ptr,
+    Memory_Manipulation::compare_memory_block(_IN_ const void* const a_ptr, 
+                                              _IN_ const void* const b_ptr,
                                               _IN_ uint32_t byte_size) 
                                               noexcept {
         status_t status;

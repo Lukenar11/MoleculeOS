@@ -25,7 +25,7 @@ namespace stdlib
      * @brief Validates the parameters for the most class methods.
      * 
      * @param destination_ptr pointer to validate
-     * @param source_ptr  pointer to validate
+     * @param source_ptr      pointer to validate
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
      *          If `destination_ptr` is `nullptr` or to short.
@@ -37,8 +37,8 @@ namespace stdlib
      *          If all pointer are valid.
      */
     status_t
-    String_Manipulation::validate_destination_ptr_and_source_ptr(_INOUT_ char* destination_ptr,
-                                                                 _IN_    const char* source_ptr)
+    String_Manipulation::validate_destination_ptr_and_source_ptr(_INOUT_ const char* const destination_ptr,
+                                                                 _IN_    const char* const source_ptr)
                                                                  noexcept {
         status_t status;
 
@@ -85,10 +85,10 @@ namespace stdlib
      * @retval `status::SUCCESS`
      *          Default case.
      */
-    _API_ 
+    _API_  
     status_t
-    String_Manipulation::copy_string_part(_INOUT_ char* destination_ptr,
-                                          _IN_    const char* source_ptr,
+    String_Manipulation::copy_string_part(_INOUT_ char* const destination_ptr,
+                                          _IN_    const char* const source_ptr,
                                           _IN_    const uint32_t byte_size) 
                                           noexcept {
         status_t status;
@@ -148,10 +148,11 @@ namespace stdlib
      * @retval `status::SUCCESS`
      *          Default case.
      */
-    _API_ 
+    _API_  
     status_t 
     String_Manipulation::copy_string(_INOUT_ char* destination_ptr, 
-                                     _IN_    const char* source_ptr) noexcept {
+                                     _IN_    const char* source_ptr) 
+                                     noexcept {
         status_t status;
 
         status = validate_destination_ptr_and_source_ptr(destination_ptr, 
@@ -191,7 +192,7 @@ namespace stdlib
      * @retval `status::SUCCESS` 
      *          Default case.
      */
-    _API_ 
+    _API_  
     status_t 
     String_Manipulation::find_char_in_string(_OUT_ const char*& found_char,
                                              _IN_  const char* string, 
@@ -235,10 +236,11 @@ namespace stdlib
      * @retval `status::SUCCESS`
      *          Default case.
      */
-    _API_ 
+    _API_  
     status_t 
     String_Manipulation::get_string_length(_OUT_ uint32_t& length,
-                                           _IN_  const char* string) noexcept {
+                                           _IN_  const char* string) 
+                                           noexcept {
         status_t status;
         length = 0;
 
@@ -280,10 +282,11 @@ namespace stdlib
      * @retval `status::EQUAL_TO`
      *          If string-a and string-b are identical.
      */
-    _API_ 
+    _API_  
     status_t 
     String_Manipulation::compare_strings(_IN_ const char* a_ptr, 
-                                         _IN_ const char* b_ptr) noexcept {
+                                         _IN_ const char* b_ptr) 
+                                         noexcept {
         status_t status;
 
         if (!a_ptr) [[unlikely]] {
@@ -345,10 +348,11 @@ namespace stdlib
      * @retval `status::SUCCESS`
      *          Default case.
      */
-    _API_ 
+    _API_  
     status_t 
     String_Manipulation::string_to_int(_OUT_ int32_t& value,
-                                       _IN_  const char* string) noexcept {
+                                       _IN_  const char* string) 
+                                       noexcept {
         bool is_negative;
         status_t status;
         uint32_t digit;

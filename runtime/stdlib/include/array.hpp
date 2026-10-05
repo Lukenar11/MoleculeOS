@@ -29,6 +29,7 @@ namespace stdlib
 
         T buffer[S] = {};
 
+        
     public:
         /**
          * @brief Returns the element at the given index.
