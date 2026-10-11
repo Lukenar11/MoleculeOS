@@ -213,8 +213,8 @@ namespace stdlib
         inline 
         constexpr
         void 
-        set_text_color(_IN_ const drivers::vga::Text_Mode_Colors& color,
-                       _IN_ const drivers::vga::Text_Mode_Colors& background,
+        set_text_color(_IN_ const drivers::vga::Text_Mode_Colors color,
+                       _IN_ const drivers::vga::Text_Mode_Colors background,
                        _IN_ const bool does_blink=false) noexcept {
             cursor_color = drivers::vga::Text_Mode::make_color(color, 
                                                                background, 

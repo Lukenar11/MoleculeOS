@@ -28,10 +28,10 @@ namespace kernel::storemgr
      * @param sector_count    Count of sectors to read or write.
      *
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `buffer` is `nullptr`.
+     *          If `buffer_ptr` is `nullptr`.
      *
      * @retval `status::NULL_POINTER | status::flags::PARAM_B`
-     *          If `temp_buffer` is `nullptr`.
+     *          If `temp_buffer_ptr` is `nullptr`.
      *
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
      *          If `byte_size` is `0`.
@@ -88,31 +88,22 @@ namespace kernel::storemgr
      * @param sector_offset   Offset inside the start sector.
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If `buffer` is `nullptr`. 
+     *          If `buffer_ptr` is `nullptr`. 
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-     *          If `temp_buffer` is `nullptr`. 
+     *          If `temp_buffer_ptr` is `nullptr`. 
      * 
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C` 
      *          If `byte_size` is `0`. 
      * 
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D` 
      *          If `sector_count` is `0`. 
+     *
+     * @retval `status::IO_ERROR`
+     *          If the hardware reports an error.
      * 
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B` 
-     *          If `sector_count` is zero or exceeds the allowed maximum.
-     * 
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C` 
-     *          If the LBA range is invalid.
-     * 
-     * @retval `status::ATA_ERROR` 
-     *          If the hard drive reports an error.
-     * 
-     * @retval `status::ATA_DEVICE_FAULT` 
-     *          If the hard drive sets the DF bit.
-     * 
-     * @retval `status::ATA_TIMEOUT` 
-     *          If no response is received in the timeout period.
+     * @retval `status::FAIL`
+     *          Unknown error.
      * 
      * @retval `status::SUCCESS` 
      *          Default case. 
@@ -143,6 +134,19 @@ namespace kernel::storemgr
                                                      sector_count,
                                                      ata::Operations::READ);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status & status::flags::PARAM_A) {
+                status ^= status::flags::PARAM_A;
+                status |= status::flags::PARAM_B;
+            }
+            else if (status == status::ATA_ERROR || 
+                     status == status::ATA_TIMEOUT || 
+                     status == status::ATA_DEVICE_FAULT) {
+                status = status::IO_ERROR;
+            }
+            else {
+                status = status::FAIL;
+            }
+
             goto cleanup;
         }
 
@@ -173,10 +177,10 @@ namespace kernel::storemgr
      * @param sector_offset   Offset inside the start sector.
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If `buffer` is `nullptr`. 
+     *          If `buffer_ptr` is `nullptr`. 
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-     *          If `temp_buffer` is `nullptr`. 
+     *          If `temp_buffer_ptr` is `nullptr`. 
      * 
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C` 
      *          If `byte_size` is `0`. 
@@ -184,20 +188,11 @@ namespace kernel::storemgr
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D` 
      *          If `sector_count` is `0`. 
      * 
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B` 
-     *          If `sector_count` is zero or exceeds the allowed maximum.
+     * @retval `status::IO_ERROR`
+     *          If the hardware reports an error.
      * 
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C` 
-     *          If the LBA range is invalid.
-     * 
-     * @retval `status::ATA_ERROR` 
-     *          If the hard drive reports an error.
-     * 
-     * @retval `status::ATA_DEVICE_FAULT` 
-     *          If the hard drive sets the DF bit.
-     * 
-     * @retval `status::ATA_TIMEOUT` 
-     *          If no response is received in the timeout period.
+     * @retval `status::FAIL`
+     *          Unknown error.
      * 
      * @retval `status::SUCCESS` 
      *          Default case. 
@@ -227,6 +222,19 @@ namespace kernel::storemgr
                                                      sector_count,
                                                      ata::Operations::READ);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status & status::flags::PARAM_A) {
+                status ^= status::flags::PARAM_A;
+                status |= status::flags::PARAM_B;
+            }
+            else if (status == status::ATA_ERROR || 
+                     status == status::ATA_TIMEOUT || 
+                     status == status::ATA_DEVICE_FAULT) {
+                status = status::IO_ERROR;
+            }
+            else {
+                status = status::FAIL;
+            }
+
             goto cleanup;
         }
     
@@ -236,6 +244,15 @@ namespace kernel::storemgr
                                                                 buffer_ptr,
                                                                 byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status & status::flags::PARAM_A) {
+                status ^= status::flags::PARAM_A;
+                status |= status::flags::PARAM_B;
+            }
+            else {
+                status ^= status::flags::PARAM_B;
+                status |= status::flags::PARAM_A;
+            }
+
             goto cleanup;
         }
     
@@ -244,6 +261,19 @@ namespace kernel::storemgr
                                                      sector_count,
                                                      ata::Operations::WRITE);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status & status::flags::PARAM_A) {
+                status ^= status::flags::PARAM_A;
+                status |= status::flags::PARAM_B;
+            }
+            else if (status == status::ATA_ERROR || 
+                     status == status::ATA_TIMEOUT || 
+                     status == status::ATA_DEVICE_FAULT) {
+                status = status::IO_ERROR;
+            }
+            else {
+                status = status::FAIL;
+            }
+
             goto cleanup;
         }
     
@@ -263,35 +293,23 @@ namespace kernel::storemgr
      * @param offset     Offset in the data area. 
      * @param operation  Read or write operation.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If `buffer` is `nullptr`. 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *          If `buffer_ptr` is `nullptr`. 
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-     *          If `temp_buffer` is `nullptr`. 
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C` 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
      *          If `byte_size` is `0`. 
      * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D` 
-     *          If `sector_count` is `0`. 
+     * @retval `status::BUFFER_OVERFLOW`
+     *          If `byte_size` is to big.
      * 
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B` 
-     *          If `sector_count` is zero or exceeds the allowed maximum.
+     * @retval `status::FAIL`
+     *          Unknown error.
      * 
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C` 
-     *          If the LBA range is invalid.
+     * @retval `status::IO_ERROR`
+     *          If the hardware reports an error.
      * 
-     * @retval `status::ATA_ERROR` 
-     *          If the hard drive reports an error.
-     * 
-     * @retval `status::ATA_DEVICE_FAULT` 
-     *          If the hard drive sets the DF bit.
-     * 
-     * @retval `status::ATA_TIMEOUT` 
-     *          If no response is received in the timeout period.
-     * 
-     * @retval `status::SUCCESS` 
-     *          Default case. 
+     * @retval `status::SUCCESS`
+     *          Default case.
      */
     status_t
     Storage_Manager::read_or_write_bytes(_INOUT_ void* buffer_ptr,
@@ -333,7 +351,7 @@ namespace kernel::storemgr
                         drivers::ata::SECTOR_SIZE;
 
         if (sector_count == 0) [[unlikely]] {
-            status = status::INVALID_PARAMETER | status::flags::PARAM_C;
+            status = status::FAIL;
             goto cleanup;
         }
 
@@ -346,6 +364,8 @@ namespace kernel::storemgr
 
         status = heap::Block_Allocator::allocate(ptr, allocation_size);
         if (status != status::SUCCESS) [[unlikely]] {
+            status = status::FAIL;
+
             goto cleanup;
         }
 
@@ -368,8 +388,28 @@ namespace kernel::storemgr
                                  sector_offset);
         }
 
+        if (status != status::SUCCESS &&
+            status != status::IO_ERROR && 
+            status != status::FAIL &&
+            !(status & status::flags::PARAM_A)) [[unlikely]] {
+            if (status & status::flags::PARAM_C) {
+                status ^= status::flags::PARAM_C;
+                status |= status::flags::PARAM_B;
+            }
+            else {
+                status = status::FAIL;
+            }
+
+            goto cleanup;
+        }
+
     cleanup:
-        heap::Block_Allocator::deallocate(ptr);
+        if (ptr) {
+            if (heap::Block_Allocator::deallocate(ptr) 
+                != status::SUCCESS) [[unlikely]] {
+                status = status::FAIL;
+            }
+        }
 
         return status;
     }
@@ -381,38 +421,20 @@ namespace kernel::storemgr
      * 
      * @param header Header of the filesystem.
      * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
+     *          If `header` is `nullptr`. 
+     * 
      * @retval `status::FS_VERSION_MISMATCH` 
      *          If the filesystem version is invalid. 
      * 
      * @retval `status::FS_INVALID_FILE_ENTRY` 
      *          If the magic value is invalid. 
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If `buffer` is `nullptr`. 
-     * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-     *          If `temp_buffer` is `nullptr`. 
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C` 
-     *          If `byte_size` is `0`. 
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D` 
-     *          If `sector_count` is `0`. 
-     * 
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B` 
-     *          If `sector_count` is zero or exceeds the allowed maximum.
-     * 
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C` 
-     *          If the LBA range is invalid.
-     * 
-     * @retval `status::ATA_ERROR` 
-     *          If the hard drive reports an error.
-     * 
-     * @retval `status::ATA_DEVICE_FAULT` 
-     *          If the hard drive sets the DF bit.
-     * 
-     * @retval `status::ATA_TIMEOUT` 
-     *          If no response is received in the timeout period.
+     * @retval `status::IO_ERROR`
+     *          If the hardware reports an error.
+
+     * @retval `status::FAIL`
+     *          Unknown error.
      * 
      * @retval `status::SUCCESS` 
      *          Default case. 
@@ -421,6 +443,7 @@ namespace kernel::storemgr
     Storage_Manager::read_filesystem_header(_OUT_ MOFS_Header& header)
                                             noexcept {
         using namespace drivers;
+        using namespace stdlib;
 
         status_t status;
 
@@ -429,6 +452,12 @@ namespace kernel::storemgr
                                      MOFS_HEADER_OFFSET,
                                      ata::Operations::READ);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status != (status::NULL_POINTER | status::flags::PARAM_A) &&
+                status != status::FAIL &&
+                status != status::IO_ERROR) {
+                status = status::FAIL;
+            }
+
             goto cleanup;
         }
 
@@ -437,9 +466,12 @@ namespace kernel::storemgr
             goto cleanup;
         }
 
-        if (stdlib::String_Manipulation::compare_strings(header.magic.data(),
-                                                         MOFS_HEADER_MAGIC)
-            != status::EQUAL_TO) [[unlikely]] {
+        status = String_Manipulation::compare_strings(header.magic.data(),
+                                                      MOFS_HEADER_MAGIC);
+        if (status != status::EQUAL_TO) [[unlikely]] {
+            if (status & status::flags::PARAM_A) {
+                goto cleanup;
+            }
 
             status = status::FS_INVALID_FILE_ENTRY;
             goto cleanup;
@@ -453,42 +485,22 @@ namespace kernel::storemgr
 
 
     /** 
-     * @brief Stores one file from the RAM into the hard drive.
+     * @brief Stores the filesystem header from the RAM to the 
+     *        first sector of the hard drive.
      * 
-     * @param header New filesystem header.
-     * 
-     * @retval `status::FS_VERSION_MISMATCH` 
-     *          If the filesystem version is invalid. 
-     * 
-     * @retval `status::FS_INVALID_FILE_ENTRY` 
-     *          If the magic value is invalid. 
+     * @param header Header of the filesystem.
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If `buffer` is `nullptr`. 
+     *          If `header` is `nullptr`. 
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-     *          If `temp_buffer` is `nullptr`. 
+     * @retval `status::IO_ERROR`
+     *          If the hardware reports an error.
      * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C` 
-     *          If `byte_size` is `0`. 
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D` 
-     *          If `sector_count` is `0`. 
-     * 
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B` 
-     *          If `sector_count` is zero or exceeds the allowed maximum.
-     * 
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C` 
-     *          If the LBA range is invalid.
-     * 
-     * @retval `status::ATA_ERROR` 
-     *          If the hard drive reports an error.
-     * 
-     * @retval `status::ATA_DEVICE_FAULT` 
-     *          If the hard drive sets the DF bit.
-     * 
-     * @retval `status::ATA_TIMEOUT` 
-     *          If no response is received in the timeout period.
+     * @retval `status::FS_CORRUPTED`
+     *          If the filesystem header magic isn't correct.
+     *
+     * @retval `status::FAIL`
+     *          Unknown error.
      * 
      * @retval `status::SUCCESS` 
      *          Default case. 
@@ -504,6 +516,13 @@ namespace kernel::storemgr
         status = stdlib::String_Manipulation::copy_string(header.magic.data(),
                                                           MOFS_HEADER_MAGIC);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status & status::flags::PARAM_B) {
+                status = status::FAIL;
+            }
+            else if (!(status & status::flags::PARAM_A)) {
+                status = status::FS_CORRUPTED;
+            }
+
             goto cleanup;
         }
 
@@ -517,6 +536,12 @@ namespace kernel::storemgr
                                      MOFS_HEADER_OFFSET,
                                      ata::Operations::WRITE);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status != (status::NULL_POINTER | status::flags::PARAM_A) &&
+                status != status::FAIL &&
+                status != status::IO_ERROR) {
+                status = status::FAIL;
+            }
+
             goto cleanup;
         }
 
@@ -535,39 +560,11 @@ namespace kernel::storemgr
      *                          file metadata and the on-disk data offset. 
      * @param file_entry_index  Index of target file entry in the file system.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If `buffer` is `nullptr`. 
+     * @retval `status::IO_ERROR`
+     *          If the hardware reports an error.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-     *          If `temp_buffer` is `nullptr`. 
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C` 
-     *          If `byte_size` is `0`. 
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D` 
-     *          If `sector_count` is `0`. 
-     * 
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B` 
-     *          If `sector_count` is zero or exceeds the allowed maximum.
-     * 
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C` 
-     *          If the LBA range is invalid.
-     * 
-     * @retval `status::ATA_ERROR` 
-     *          If the hard drive reports an error.
-     * 
-     * @retval `status::ATA_DEVICE_FAULT` 
-     *          If the hard drive sets the DF bit.
-     * 
-     * @retval `status::ATA_TIMEOUT` 
-     *          If no response is received in the timeout period.
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
-     *          If `byte_size` is `0`.
-     * 
-     * @retval `status::HEAP_EXHAUSTED`
-     *          If the memory pool doesn't have enough free space or 
-     *          `byte_size` is to large.
+     * @retval `status::FAIL`
+     *          Unknown error.
      * 
      * @retval `status::SUCCESS` 
      *          Default case. 
@@ -596,6 +593,10 @@ namespace kernel::storemgr
         status = heap::Block_Allocator::allocate(data_ptr, 
                                                  stored_file_entry.file_byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status == status::HEAP_EXHAUSTED) {
+                status = status::FAIL;
+            }
+
             goto done;
         }
 
@@ -606,6 +607,10 @@ namespace kernel::storemgr
                                      file_offset,
                                      ata::Operations::READ);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status & status::flags::PARAM_A) {
+                status = status::FAIL;
+            }
+
             goto cleanup;
         }
 
@@ -613,6 +618,10 @@ namespace kernel::storemgr
                                                         stored_file_entry.file_name.data(),
                                                         name_length);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status & status::flags::PARAM_A) {
+                status = status::FAIL;
+            }
+
             goto cleanup;
         }
 
@@ -620,6 +629,10 @@ namespace kernel::storemgr
                                                         stored_file_entry.file_format.data(),
                                                         format_length);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status & status::flags::PARAM_A) {
+                status = status::FAIL;
+            }
+
             goto cleanup;
         }
 
@@ -629,6 +642,11 @@ namespace kernel::storemgr
         file_entry.used_data_byte_size = stored_file_entry.used_data_byte_size;
         file_entry.file_data_ptr       = data_ptr;
 
+        if (file_entry_index >= filesys::FILE_TABLE_ENTRYS) [[unlikely]] {
+            status = status::FAIL;
+            goto cleanup;
+        }
+
         filesys::MoleculeOS_File_System_2::set_file_entry(file_entry, 
                                                           file_entry_index);
 
@@ -637,7 +655,10 @@ namespace kernel::storemgr
         goto done;
 
     cleanup:
-        heap::Block_Allocator::deallocate(data_ptr);
+        if (heap::Block_Allocator::deallocate(data_ptr) 
+            != status::SUCCESS) [[unlikely]] {
+            status = status::FAIL;
+        }
 
     done:
         return status;
@@ -653,39 +674,11 @@ namespace kernel::storemgr
      * @param file_entry          Active file entry in RAM. 
      * @param header              Filesystem header.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If `buffer` is `nullptr`. 
+     * @retval `status::FAIL` 
+     *          Unknown error.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-     *          If `temp_buffer` is `nullptr`. 
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C` 
-     *          If `byte_size` is `0`. 
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D` 
-     *          If `sector_count` is `0`. 
-     * 
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B` 
-     *          If `sector_count` is zero or exceeds the allowed maximum.
-     * 
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C` 
-     *          If the LBA range is invalid.
-     * 
-     * @retval `status::ATA_ERROR` 
-     *          If the hard drive reports an error.
-     * 
-     * @retval `status::ATA_DEVICE_FAULT` 
-     *          If the hard drive sets the DF bit.
-     * 
-     * @retval `status::ATA_TIMEOUT` 
-     *          If no response is received in the timeout period.
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
-     *          If `byte_size` is `0`.
-     * 
-     * @retval `status::HEAP_EXHAUSTED`
-     *          If the memory pool doesn't have enough free space or 
-     *          `byte_size` is to large.
+     * @retval `status::IO_ERROR` 
+     *          If the hardware reports an error. 
      * 
      * @retval `status::SUCCESS` 
      *          Default case. 
@@ -702,8 +695,7 @@ namespace kernel::storemgr
 
         status_t status;
 
-        if (!file_entry.file_data_ptr || 
-            file_entry.file_byte_size == 0) [[unlikely]] {
+        if (!file_entry.file_data_ptr) [[unlikely]] {
             status = status::SUCCESS;
             goto cleanup;
         }
@@ -712,6 +704,15 @@ namespace kernel::storemgr
                                                         file_entry.file_name.data(),
                                                         MAX_FILE_NAME_LENGTH + 1);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status & status::flags::PARAM_A) {
+                status ^= status::flags::PARAM_A;
+                status |= status::flags::PARAM_B;
+            }
+            else if (status & status::flags::PARAM_B) {
+                status ^= status::flags::PARAM_B;
+                status |= status::flags::PARAM_C;
+            }
+
             goto cleanup;
         }
 
@@ -719,6 +720,15 @@ namespace kernel::storemgr
                                                         file_entry.file_format.data(),
                                                         MAX_FILE_FORMAT_LENGTH + 1);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status & status::flags::PARAM_A) {
+                status ^= status::flags::PARAM_A;
+                status |= status::flags::PARAM_B;
+            }
+            else if (status & status::flags::PARAM_B) {
+                status ^= status::flags::PARAM_B;
+                status |= status::flags::PARAM_C;
+            }
+
             goto cleanup;
         }
 
@@ -733,6 +743,13 @@ namespace kernel::storemgr
                                      header.data_offset + current_data_offset,
                                      ata::Operations::WRITE);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status & status::flags::PARAM_A ||
+                status & status::flags::PARAM_B) {
+                status ^= status::flags::PARAM_A;
+                status ^= status::flags::PARAM_B;
+                status |= status::flags::PARAM_C;
+            }
+
             goto cleanup;
         }
 
@@ -754,31 +771,16 @@ namespace kernel::storemgr
      * @param header          Filesystem header. 
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If `buffer` is `nullptr`. 
+     *          If `entry_table_ptr` is `nullptr`. 
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-     *          If `temp_buffer` is `nullptr`. 
+     * @retval `status::IO_ERROR`
+     *          If the hardware reports an error.
      * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C` 
-     *          If `byte_size` is `0`. 
+     * @retval `status::BUFFER_OVERFLOW`
+     *          If the file entry count in `header` is wrong.
      * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D` 
-     *          If `sector_count` is `0`. 
-     * 
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B` 
-     *          If `sector_count` is zero or exceeds the allowed maximum.
-     * 
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C` 
-     *          If the LBA range is invalid.
-     * 
-     * @retval `status::ATA_ERROR` 
-     *          If the hard drive reports an error.
-     * 
-     * @retval `status::ATA_DEVICE_FAULT` 
-     *          If the hard drive sets the DF bit.
-     * 
-     * @retval `status::ATA_TIMEOUT` 
-     *          If no response is received in the timeout period.
+     * @retval `status::FAIL`
+     *          Unknown error.
      * 
      * @retval `status::SUCCESS` 
      *          Default case. 
@@ -799,6 +801,12 @@ namespace kernel::storemgr
                                      header.file_entry_table_offset,
                                      ata::Operations::WRITE);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (!(status & status::BUFFER_OVERFLOW) && 
+                !(status & status::IO_ERROR) &&
+                !(status & status::flags::PARAM_B)) {
+                status = status::FAIL;
+            }
+
             goto cleanup;
         }
 
@@ -819,6 +827,7 @@ namespace kernel::storemgr
     Storage_Manager::init() noexcept {
         using namespace drivers;
         using namespace filesys;
+        using namespace stdlib;
     
         MOFS_Header header;
         status_t status;
@@ -833,11 +842,11 @@ namespace kernel::storemgr
             goto cleanup;
         }
     
-        if (stdlib::String_Manipulation::compare_strings(header.magic.data(),
-                                                         MOFS_HEADER_MAGIC)
-            != status::EQUAL_TO) [[unlikely]] {
-            stdlib::String_Manipulation::copy_string(header.magic.data(),
-                                                     MOFS_HEADER_MAGIC);
+        status = String_Manipulation::compare_strings(header.magic.data(),
+                                                      MOFS_HEADER_MAGIC);
+        if (status != status::EQUAL_TO) [[unlikely]] {
+            status = String_Manipulation::copy_string(header.magic.data(),
+                                                      MOFS_HEADER_MAGIC);
             if (status != status::SUCCESS) [[unlikely]] {
                 goto cleanup;
             }
@@ -856,6 +865,8 @@ namespace kernel::storemgr
             }
         }
     
+        status = status::SUCCESS;
+
         goto done;
     
     cleanup:
@@ -871,41 +882,20 @@ namespace kernel::storemgr
      * @brief Saves the filesystem with all his current datas from the 
      *        RAM into the hard drive. 
      * 
-     * @retval `status::FS_VERSION_MISMATCH` 
-     *          If the filesystem version is invalid. 
+     * @retval `status::IO_ERROR`
+     *          If the hardware reports an error.
      * 
-     * @retval `status::FS_INVALID_FILE_ENTRY` 
-     *          If the magic value is invalid. 
+     * @retval `status::FS_CORRUPTED`
+     *          If the filesystem header magic isn't correct.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If `buffer` is `nullptr`. 
+     * @retval `status::BUFFER_OVERFLOW` 
+     *          If the file entry count in filesystem header is wrong.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-     *          If `temp_buffer` is `nullptr`. 
+     * @retval `status::FAIL`
+     *          Unknown error.
      * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C` 
-     *          If `byte_size` is `0`. 
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D` 
-     *          If `sector_count` is `0`. 
-     * 
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B` 
-     *          If `sector_count` is zero or exceeds the allowed maximum.
-     * 
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C` 
-     *          If the LBA range is invalid.
-     * 
-     * @retval `status::ATA_ERROR` 
-     *          If the hard drive reports an error.
-     * 
-     * @retval `status::ATA_DEVICE_FAULT` 
-     *          If the hard drive sets the DF bit.
-     * 
-     * @retval `status::ATA_TIMEOUT` 
-     *          If no response is received in the timeout period.
-     * 
-     * @retval `status::SUCCESS` 
-     *          Default case. 
+     * @retval `status::SUCCESS`
+     *          Default case.
      */
     _API_ 
     status_t 
@@ -925,6 +915,15 @@ namespace kernel::storemgr
 
         status = write_filesystem_header(header);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status & status::flags::PARAM_A) {
+                status = status::FAIL;
+            }
+
+            goto cleanup;
+        }
+
+        if (header.file_entry_count != FILE_TABLE_ENTRYS) [[unlikely]] {
+            status = status::BUFFER_OVERFLOW;
             goto cleanup;
         }
 
@@ -934,22 +933,28 @@ namespace kernel::storemgr
             File_Entry& 
             file_entry = MoleculeOS_File_System_2::get_file_entry(current_entry);
 
-            if (file_entry.used_data_byte_size == 0) [[unlikely]] {
-                continue;
-            }
-
             status = store_single_file(current_data_offset,
                                        stored_file_entrys[current_entry],
                                        file_entry,
                                        header);
             if (status != status::SUCCESS) [[unlikely]] {
+                if (status & status::flags::PARAM_A ||
+                    status & status::flags::PARAM_B ||
+                    status & status::flags::PARAM_C) {
+                    status = status::FAIL;
+                }
+
                 goto cleanup;
             }
         }
 
         status = write_file_entry_table(stored_file_entrys.data(), 
                                         header);
-        if (status != status::SUCCESS) [[unlikely]]{
+        if (status != status::SUCCESS) [[unlikely]] {
+            if (status & status::flags::PARAM_A) {
+                status = status::FAIL;
+            }
+
             goto cleanup;
         }
 
@@ -972,32 +977,14 @@ namespace kernel::storemgr
      * @retval `status::FS_INVALID_FILE_ENTRY` 
      *          If the magic value is invalid. 
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If `buffer` is `nullptr`. 
+     * @retval `status::IO_ERROR`
+     *          If the hardware reports an error.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-     *          If `temp_buffer` is `nullptr`. 
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C` 
-     *          If `byte_size` is `0`. 
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D` 
-     *          If `sector_count` is `0`. 
-     * 
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B` 
-     *          If `sector_count` is zero or exceeds the allowed maximum.
-     * 
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C` 
-     *          If the LBA range is invalid.
-     * 
-     * @retval `status::ATA_ERROR` 
-     *          If the hard drive reports an error.
-     * 
-     * @retval `status::ATA_DEVICE_FAULT` 
-     *          If the hard drive sets the DF bit.
-     * 
-     * @retval `status::ATA_TIMEOUT` 
-     *          If no response is received in the timeout period.
+     * @retval `status::BUFFER_OVERFLOW` 
+     *          If the file entry count in filesystem header is wrong.
+     *
+     * @retval `status::FAIL`
+     *          Unknown error.
      * 
      * @retval `status::SUCCESS` 
      *          Default case. 
@@ -1019,6 +1006,16 @@ namespace kernel::storemgr
 
         status = read_filesystem_header(header);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status & status::flags::PARAM_A) {
+                status = status::FAIL;
+            }
+
+            goto cleanup;
+        }
+
+        if (header.file_entry_count 
+            != filesys::FILE_TABLE_ENTRYS) [[unlikely]] {
+            status = status::BUFFER_OVERFLOW;
             goto cleanup;
         }
 
@@ -1029,6 +1026,11 @@ namespace kernel::storemgr
                                      header.file_entry_table_offset,
                                      ata::Operations::READ);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status & status::flags::PARAM_A || 
+                status & status::flags::PARAM_B) {
+                status = status::FAIL;
+            }
+
             goto cleanup;
         }
 
@@ -1039,6 +1041,10 @@ namespace kernel::storemgr
                                       stored_file_entrys[current_entry], 
                                       current_entry);
             if (status != status::SUCCESS) [[unlikely]] {
+                if (status & status::flags::PARAM_B) {
+                    status = status::FAIL;
+                }
+
                 goto cleanup;
             }
         }
