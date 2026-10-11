@@ -9,13 +9,13 @@
 ;    that is called by an external boot loader (GRUB).
 ;
 ;    This entry point initializes the GDT, the stack
-;    and starts the kernel by calling 'kernel::startup_i386_system'.
+;    and starts the kernel by calling 'kernel::platform_bootstrap'.
 ;
 ; NOTES:
 ;    The entry point must be named '_start', as GRUB expects it to be.
 ;
 
-extern startup_i386_system
+extern platform_bootstrap
 extern stack_bottom
 extern stack_top
 global _start
@@ -73,5 +73,5 @@ _start:
 
 .flush:
     mov esp, stack_top
-    jmp startup_i386_system
+    jmp platform_bootstrap
     

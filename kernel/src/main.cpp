@@ -6,11 +6,11 @@ LICENSE:
 
 DESCRIPTION:
     This file contains the kernel entry point 'kernel::main', which
-    is called from 'startup_i386_system' after the 
+    is called from 'kernel::platform_bootstrap' after the 
     bootloader hands control over to the kernel.
 
     The function initializes core subsyss such as the 'IDT' with the
-    function 'startup_i386_system', performs a simple interrupt- and 
+    function 'kernel::platform_bootstrap', performs a simple interrupt- and 
     endless-loop-driven scheduling, and starts the shell.
 
 NOTES:

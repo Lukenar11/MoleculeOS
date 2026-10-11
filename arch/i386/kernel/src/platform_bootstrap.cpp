@@ -41,7 +41,7 @@ namespace kernel
     _API_
     extern "C"
     void 
-    startup_i386_system() noexcept {
+    platform_bootstrap() noexcept {
         static idt::Interrupt_Descriptor_Table idt;
 
         for (const auto& entry : pic_mappings)

@@ -4,7 +4,7 @@
 # https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 # 
 
-OBJS += $(BUILD)/startup_i386_system.o \
+OBJS += $(BUILD)/platform_bootstrap.o \
 
 $(BUILD)/%.o: arch/i386/kernel/src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
