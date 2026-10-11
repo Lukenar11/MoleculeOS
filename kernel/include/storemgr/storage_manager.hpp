@@ -66,8 +66,8 @@ namespace kernel::storemgr
          */
         static
         status_t
-        validate_byte_reads_and_writes(_IN_ uint16_t* buffer_ptr,
-                                       _IN_ uint16_t* temp_buffer_ptr,
+        validate_byte_reads_and_writes(_IN_ const uint16_t* const buffer_ptr,
+                                       _IN_ const uint16_t* const temp_buffer_ptr,
                                        _IN_ const uint32_t byte_size,
                                        _IN_ const uint32_t sector_count)
                                        noexcept;
@@ -106,8 +106,8 @@ namespace kernel::storemgr
          */
         static
         status_t 
-        read_bytes(_OUT_ uint16_t* buffer_ptr,
-                   _IN_  uint16_t* temp_buffer_ptr,
+        read_bytes(_OUT_ uint16_t* const buffer_ptr,
+                   _IN_  uint16_t* const temp_buffer_ptr,
                    _IN_  const uint32_t byte_size,
                    _IN_  const uint32_t sector_count,
                    _IN_  const uint32_t start_sector,
@@ -147,8 +147,8 @@ namespace kernel::storemgr
          */
         static
         status_t 
-        write_bytes(_IN_ uint16_t* buffer_ptr,
-                    _IN_ uint16_t* temp_buffer_ptr,
+        write_bytes(_IN_ uint16_t* const buffer_ptr,
+                    _IN_ uint16_t* const temp_buffer_ptr,
                     _IN_ const uint32_t byte_size,
                     _IN_ const uint32_t sector_count,
                     _IN_ const uint32_t start_sector,
@@ -184,10 +184,10 @@ namespace kernel::storemgr
          */
         static 
         status_t 
-        read_or_write_bytes(_INOUT_ void* buffer_ptr,
+        read_or_write_bytes(_INOUT_ void* const buffer_ptr,
                             _IN_    const uint32_t byte_size,
                             _IN_    const uint32_t offset,
-                            _IN_    drivers::ata::Operations operation) 
+                            _IN_    const drivers::ata::Operations operation) 
                             noexcept;
 
 
@@ -292,7 +292,7 @@ namespace kernel::storemgr
         status_t 
         store_single_file(_INOUT_ uint32_t& current_data_offset,
                           _OUT_   Stored_File_Entry& stored,
-                          _IN_    filesys::File_Entry& file_entry,
+                          _IN_    const filesys::File_Entry& file_entry,
                           _IN_    const MOFS_Header& header) noexcept;
 
 
@@ -321,7 +321,7 @@ namespace kernel::storemgr
          */
         static
         status_t 
-        write_file_entry_table(_OUT_ Stored_File_Entry* entry_table_ptr,
+        write_file_entry_table(_OUT_ Stored_File_Entry* const entry_table_ptr,
                                _IN_  const MOFS_Header& header) noexcept;
     
 
