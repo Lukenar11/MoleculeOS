@@ -19,7 +19,8 @@ NOTES:
 #include <stddef.h>
 
 #ifdef __cplusplus
-extern "C"
+#include <sal.hpp>
+_C_API_
 {
 #endif
 
