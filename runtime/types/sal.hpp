@@ -14,7 +14,6 @@ DESCRIPTION:
         - _OUT_   => Output
         - _INOUT_ => input => 2. output
         - _API_   => public method
-        - extern "C" => function with C-Interface 
 
 NOTES:
 */
@@ -34,6 +33,11 @@ NOTES:
 #   define _INOUT_
 #endif
 
+
 #ifndef _API_
 #   define _API_
+#endif
+
+#ifndef _C_API_
+#   define _C_API_ extern "C"
 #endif

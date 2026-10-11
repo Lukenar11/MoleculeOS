@@ -41,7 +41,7 @@ namespace kernel::sys
     void
     panic(const char* message) noexcept;
 
-    extern "C" {
+    _C_API_ {
         void disable_interrupts();
         void enable_interrupts();
     }

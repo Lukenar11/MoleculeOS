@@ -19,12 +19,13 @@ NOTES:
 
 #pragma once
 
+#include <sal.hpp>
 #include <types.hpp>
 
 
 namespace kernel::heap
 {
-    extern "C" { 
+    _C_API_ { 
         extern uint8_t heap_start;
         extern uint8_t heap_end;
     }

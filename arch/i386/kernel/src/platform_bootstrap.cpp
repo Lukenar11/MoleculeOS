@@ -38,8 +38,7 @@ namespace kernel
         {.port=0x0021, .value=0xFD}   // enable IRQ 1 (PS/2 controller)
     };
 
-    _API_
-    extern "C"
+    _C_API_
     void 
     platform_bootstrap() noexcept {
         static idt::Interrupt_Descriptor_Table idt;
