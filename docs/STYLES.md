@@ -53,7 +53,7 @@ Examples:
 **snake_case**
 
 Examples:
-- `kernel_main.cpp`
+- `main.cpp`
 - `text_output.hpp`
 - `sleep.asm`
 
@@ -834,7 +834,7 @@ Example:
     ;
     ;     The routine loads the Global Descriptor Table (GDT), initializes the
     ;     kernel stack, aligns it to a 16-byte boundary, and then jumps into
-    ;     the C++ high-level entry point "kernel_main".
+    ;     the C++ high-level entry point "main".
     ;
     ; NOTES:
     ;     The internal implementation of "kernel_stack_top" 
@@ -842,7 +842,7 @@ Example:
     ;     The internal implementation of "load_gdt" is located in "gdt.asm".
     ;
 
-    extern kernel_main
+    extern main
     extern kernel_stack_top
     extern load_gdt
     global _start
@@ -858,7 +858,7 @@ Example:
         mov esp, kernel_stack_top
         and esp, STACK_ALIGN_16_MASK
 
-        jmp kernel_main
+        jmp main
 ```
 
 ---
@@ -1029,7 +1029,7 @@ The kernel consists of clearly separated Subsystem
         |   # Kernel Subsystem/Components
         ├── ...
         |
-        └── kernel_main.cpp
+        └── main.cpp
 ```
 
 ---
@@ -1170,7 +1170,7 @@ The `arch/` directory contains all architecture-specific code
 - No inline assembly (use `.asm` files instead)
 - names should be written out in full; do not use abbreviations unless they are common and well-known.
 - Use `[[likely]]` and `[[unlikely]]` in some places to optimize the hot path.
-- `kernel_main` is declared as `[[noreturn]]`
+- `main` is declared as `[[noreturn]]`
 - Use `[[nodiscard]]` for methods and functions where the return value cannot be ignored under any circumstances.
 - Do not use C code in C++
 - Declare C++ functions that serve as an assembly interface using `extern "C"`, `extern "C"`. 

@@ -9,13 +9,13 @@
 ;    that is called by an external boot loader (GRUB).
 ;
 ;    This entry point initializes the GDT, the stack
-;    and starts the kernel by calling 'kernel_main'.
+;    and starts the kernel by calling 'kernel::main'.
 ;
 ; NOTES:
 ;    The entry point must be named '_start', as GRUB expects it to be.
 ;
 
-extern kernel_main
+extern main
 extern stack_bottom
 extern stack_top
 global _start
@@ -73,5 +73,5 @@ _start:
 
 .flush:
     mov esp, stack_top
-    jmp kernel_main
+    jmp main
     

@@ -5,7 +5,7 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This function is called from 'kernel_main' and 
+    This function is called from 'kernel::main' and 
     initializes all architecture specific components/systems
     such as the IDT and remap the PIC.
 
