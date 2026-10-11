@@ -14,6 +14,7 @@ DESCRIPTION:
         - _OUT_   => Output
         - _INOUT_ => input => 2. output
         - _API_   => public method
+        - extern "C" => function with C-Interface 
 
 NOTES:
 */
@@ -21,7 +22,18 @@ NOTES:
 
 #pragma once
 
-#define _IN_
-#define _OUT_
-#define _INOUT_
-#define _API_
+#ifndef _IN_
+#   define _IN_
+#endif
+
+#ifndef _OUT_
+#   define _OUT_
+#endif
+
+#ifndef _INOUT_
+#   define _INOUT_
+#endif
+
+#ifndef _API_
+#   define _API_
+#endif
