@@ -25,7 +25,6 @@ NOTES:
 #include "kernel/include/storemgr/storage_manager.hpp"
 
 #ifdef __I386__
-#   include "arch/i386/kernel/include/kernel_arch_init.hpp"
 #   include "arch/i386/kernel/include/utils/regs.hpp"
 
 #   include "arch/i386/kernel/include/sys/eflags.hpp"

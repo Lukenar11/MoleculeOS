@@ -5,20 +5,22 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This file contains the kernel entry point 'main', which
-    is called directly after the bootloader hands control over to the kernel.
+    This file contains the kernel entry point 'kernel::main', which
+    is called from 'startup_i386_system' after the 
+    bootloader hands control over to the kernel.
 
     The function initializes core subsyss such as the 'IDT' with the
-    function 'kernel_arch_init", performs a simple interrupt- and 
+    function 'startup_i386_system', performs a simple interrupt- and 
     endless-loop-driven scheduling, and starts the shell.
 
 NOTES:
-    This 'main' function must never return. 
-    If execution reaches the end of 'main', 
+    This 'kernel::main' function must never return. 
+    If execution reaches the end of 'kernel::main', 
     a kernel panic is triggered to prevent undefined behavior.
 */
 
 
+#include "main.hpp"
 #include <kernel.hpp>
 #include <status.hpp>
 #include <terminal.hpp>
@@ -28,12 +30,9 @@ NOTES:
 namespace kernel
 {                
     _API_
-    extern "C" 
     [[noreturn]]
     void 
     main() noexcept {
-        kernel_arch_init();
-
         heap::Block_Allocator::init(&heap::heap_start, &heap::heap_end);
         drivers::ata::Programmable_Input_Output::init();
         storemgr::Storage_Manager::init();
@@ -53,6 +52,6 @@ namespace kernel
             sys::panic("save failed");
         }
 
-        sys::panic("Unexpected return from the \"main\" scheduler main loop");
+        sys::panic("Unexpected return from the \"kernel_main\" scheduler main loop");
     }
 }

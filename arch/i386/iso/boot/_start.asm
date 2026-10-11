@@ -9,18 +9,18 @@
 ;    that is called by an external boot loader (GRUB).
 ;
 ;    This entry point initializes the GDT, the stack
-;    and starts the kernel by calling 'kernel::main'.
+;    and starts the kernel by calling 'kernel::startup_i386_system'.
 ;
 ; NOTES:
 ;    The entry point must be named '_start', as GRUB expects it to be.
 ;
 
-extern main
+extern startup_i386_system
 extern stack_bottom
 extern stack_top
 global _start
 
-%define KERNEL_DATA_SEGMENT_SELECTOR 0x10
+%define DATA_SEGMENT_SELECTOR 0x10
 
 section .gdt
 align 8
@@ -62,7 +62,7 @@ _start:
 
     lgdt [gdt_descriptor]
 
-    mov ax, KERNEL_DATA_SEGMENT_SELECTOR
+    mov ax, DATA_SEGMENT_SELECTOR
     mov ds, ax
     mov es, ax
     mov fs, ax
@@ -73,5 +73,5 @@ _start:
 
 .flush:
     mov esp, stack_top
-    jmp main
+    jmp startup_i386_system
     

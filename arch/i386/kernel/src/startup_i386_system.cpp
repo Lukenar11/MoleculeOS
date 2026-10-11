@@ -5,28 +5,28 @@ LICENSE:
     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 
 DESCRIPTION:
-    This function is called from 'kernel::main' and 
-    initializes all architecture specific components/systems
+    This function is called from '_start' ('arch/i386/iso/boot/') and 
+    initializes all architecture specific components
     such as the IDT and remap the PIC.
 
 NOTES:
 */
 
-#pragma once
-
+#include "kernel/include/main.hpp"
 #include "idt/idt.hpp"
 #include "sys/interrupts.hpp"
+#include <sal.hpp>
 #include <types.hpp>
 #include <io.hpp>
 
-namespace 
+
+namespace kernel
 {
-    struct PIC_Mapping final {
+    constexpr struct PIC_Mapping final {
         uint16_t port = 0;
         uint8_t value = 0;
-    };
-
-    constexpr PIC_Mapping pic_mappings[] = {
+    }
+    pic_mappings[] = {
         {.port=0x0020, .value=0x11},  // init master IPC
         {.port=0x00A0, .value=0x11},  // init slave IPC
         {.port=0x0021, .value=0x20},  // set master interrupt vector offsets
@@ -37,9 +37,18 @@ namespace
         {.port=0x00A1, .value=0x01},  // set slave 8086/88 mode
         {.port=0x0021, .value=0xFD}   // enable IRQ 1 (PS/2 controller)
     };
-}
 
-namespace kernel
-{
-    void kernel_arch_init() noexcept;
+    _API_
+    extern "C"
+    void 
+    startup_i386_system() noexcept {
+        static idt::Interrupt_Descriptor_Table idt;
+
+        for (const auto& entry : pic_mappings)
+            stdlib::byte_output(entry.port, entry.value);
+
+        sys::enable_interrupts();
+
+        main();
+    }
 } // namespace kernel
