@@ -43,7 +43,9 @@ namespace kernel::sys
 
     _C_API_ {
         void disable_interrupts();
-        void enable_interrupts();
+        
+        uint32_t save_eflags(void);
+        void restore_eflags(uint32_t);
     }
 } // namespace kernel::sys
 
@@ -108,6 +110,7 @@ namespace drivers::ata
          * @param partition_length Total number of sectors
          * @param relative_lba     Starting LBA address
          * @param to_transfer      Number of sectors to read or write.
+         * @param operation        Operation witch sets the driver working path.
          *
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
          *         If `buffer` is a `nullptr`.
@@ -123,6 +126,9 @@ namespace drivers::ata
          *
          * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
          *         If `to_transfer` is `0` or exceeds the `partition_length`.
+         * 
+         * @retval `status::UNSUPPORTED_OPERATION | status::flags::PARAM_D`
+         *         If `operation` is not `READ` or `WRITE`.
          *
          * @retval `status::SUCCESS`
          *         Default case.
@@ -132,7 +138,8 @@ namespace drivers::ata
         status_t 
         validate_storage_access(_IN_ const uint16_t* const buffer,
                                 _IN_ const uint32_t relative_lba, 
-                                _IN_ const uint32_t to_transfer) 
+                                _IN_ const uint32_t to_transfer,
+                                _IN_ const Operations operation) 
                                 noexcept;
 
 
@@ -172,6 +179,10 @@ namespace drivers::ata
          * @param identify_data    Output buffer for the `IDENTIFY` data
          * @param io_base          Base I/O port of the ATA channel
          * @param control_register Control register port of the ATA channel
+         * @param drive_select     Drive/Head register base value that 
+         *                         selects master or slave.
+         * @param lba_mode         Drive/Head register base flags for 
+         *                         LBA operation.
          *
          * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
          *         If the pointer to `identify_data` is `nullptr`.
@@ -194,11 +205,14 @@ namespace drivers::ata
          * @retval `status::SUCCESS`
          *         Default case.
          */
+        [[nodiscard]]
         static 
         status_t 
         identify_drive(_OUT_ uint16_t* const identify_data,
                        _IN_  const uint16_t io_base,
-                       _IN_  const uint16_t control_register) noexcept;
+                       _IN_  const uint16_t control_register,
+                       _IN_  const uint8_t drive_select,
+                       _IN_  const uint8_t lba_mode) noexcept;
 
 
         /**
@@ -229,6 +243,7 @@ namespace drivers::ata
          * @retval `status::SUCCESS`
          *         If a device was successfully detected and configured.
          */
+        [[nodiscard]]
         static 
         status_t 
         probe_and_configure_channel(_IN_ const uint16_t io_port,
@@ -316,22 +331,25 @@ namespace drivers::ata
 
 
         /**
-         * @brief Executes a complete ATA-PIO read or write operation starting 
-         *        at a specific LBA address.
+         * @brief Executes a complete ATA-PIO read or write operation starting at
+         *        a specific LBA address.
          *
          * @param buffer       I/O buffer for sector data.
          * @param relative_lba Starting LBA address.
          * @param sector_count Number of sectors to transfer.
          * @param operation    Operation type (READ or WRITE).
-         * 
+         *
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-         *        If `buffer` is a `nullptr`.
+         *         If `buffer` is a `nullptr`.
          * 
          * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_B`
          *         If the LBA range is invalid.
          *
          * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
          *         If `sector_count` is invalid.
+         * 
+         * @retval `status::UNSUPPORTED_OPERATION | status::flags::PARAM_D`
+         *         If `operation` is not `READ` or `WRITE`.
          *
          * @retval `status::ATA_ERROR`
          *         If the hard drive reports an error.
@@ -382,6 +400,9 @@ namespace drivers::ata
          *
          * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
          *         If the LBA range is invalid.
+         * 
+         * @retval `status::UNSUPPORTED_OPERATION | status::flags::PARAM_D`
+         *         If `operation` is not `READ` or `WRITE`.
          *
          * @retval `status::ATA_ERROR`
          *         If the hard drive reports an error.
@@ -396,6 +417,7 @@ namespace drivers::ata
          *         Default case.
          */
         _API_ 
+        [[nodiscard]]
         static 
         status_t 
         run(_INOUT_ uint16_t* buffer,

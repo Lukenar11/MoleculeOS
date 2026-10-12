@@ -39,6 +39,7 @@ namespace drivers::ata
      * @param partition_length Total number of sectors.
      * @param relative_lba     Starting LBA address.
      * @param to_transfer      Number of sectors to read or write.
+     * @param operation        Operation witch sets the driver working path.
      *
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
      *         If `buffer` is a `nullptr`.
@@ -54,6 +55,9 @@ namespace drivers::ata
      *
      * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
      *         If `to_transfer` is `0` or exceeds the `partition_length`.
+     * 
+     * @retval `status::UNSUPPORTED_OPERATION | status::flags::PARAM_D`
+     *         If `operation` is not `READ` or `WRITE`.
      *
      * @retval `status::SUCCESS`
      *         Default case.
@@ -62,7 +66,8 @@ namespace drivers::ata
     status_t
     Programmable_Input_Output::validate_storage_access(_IN_ const uint16_t* const buffer,
                                                        _IN_ const uint32_t relative_lba,
-                                                       _IN_ const uint32_t to_transfer)
+                                                       _IN_ const uint32_t to_transfer,
+                                                       _IN_ const Operations operation)
                                                        noexcept {
         status_t status;
 
@@ -86,6 +91,12 @@ namespace drivers::ata
         if (relative_lba >= partition_length ||
             relative_lba > (partition_length - to_transfer)) [[unlikely]] {
             status = status::ATA_INVALID_LBA | status::flags::PARAM_B;
+            goto cleanup;
+        }
+
+        if (operation != Operations::READ && 
+            operation != Operations::WRITE) [[unlikely]] {
+            status = status::UNSUPPORTED_OPERATION | status::flags::PARAM_D;
             goto cleanup;
         }
 
@@ -147,9 +158,13 @@ namespace drivers::ata
      * @brief Uses the ATA command `IDENTIFY` to retrieve the
      *        hard drive's identification data.
      *
-     * @param identify_data      Output buffer for the `IDENTIFY` data
-     * @param io_base            Base I/O port of the ATA channel
-     * @param control_register   Control register port of the ATA channel
+     * @param identify_data    Output buffer for the `IDENTIFY` data
+     * @param io_base          Base I/O port of the ATA channel
+     * @param control_register Control register port of the ATA channel
+     * @param drive_select     Drive/Head register base value that 
+     *                         selects master or slave.
+     * @param lba_mode         Drive/Head register base flags for 
+     *                         LBA operation.
      *
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
      *         If the pointer to `identify_data` is `nullptr`.
@@ -172,10 +187,13 @@ namespace drivers::ata
      * @retval `status::SUCCESS`
      *         Default case.
      */
+    [[nodiscard]]
     status_t
     Programmable_Input_Output::identify_drive(_OUT_ uint16_t* const identify_data,
                                               _IN_  const uint16_t io_base,
-                                              _IN_  const uint16_t control_register) 
+                                              _IN_  const uint16_t control_register,
+                                              _IN_  const uint8_t drive_select,
+                                              _IN_  const uint8_t lba_mode)
                                               noexcept {
         status_t status;
 
@@ -196,15 +214,18 @@ namespace drivers::ata
             goto cleanup;
         }
 
+        io_port_base            = io_base;
+        status_port             = io_port_base + 7;
         device_control_register = control_register;
+        drive_select_flags      = drive_select;
+        lba_flags               = lba_mode;
+
         reset_driver();
 
-        io_port_base = io_base;
-        status_port  = io_port_base + 7;
+        stdlib::byte_output(io_port_base + 6, drive_select_flags);
+        delay();
 
-        stdlib::byte_output(status_port - 1, drive_select_flags);
         stdlib::byte_output(status_port, ATA_IDENTIFY);
-
         delay();
 
         status = poll_until_drq_or_error();
@@ -249,14 +270,29 @@ namespace drivers::ata
      * @retval `status::SUCCESS`
      *         If a device was successfully detected and configured.
      */
-    status_t 
+    [[nodiscard]]
+    status_t
     Programmable_Input_Output::probe_and_configure_channel(_IN_ const uint16_t io_port,
                                                            _IN_ const uint16_t control_register)
                                                            noexcept {
         status_t status;
         stdlib::Array<uint16_t, SECTOR_WORD_SIZE> identify_data;
         uint32_t storage_size;
-        bool is_master;
+
+        const struct Device_Config final {
+            uint8_t drive_select = 0;
+            uint8_t lba_mode     = 0;
+        }
+        devices[] = {
+            {
+                MASTER_SELECT, 
+                MASTER
+            },
+            {
+                SLAVE_SELECT,  
+                SLAVE
+            }
+        };
 
         if (io_port != IDE_PRIMARY_IO_BASE &&
             io_port != IDE_SECONDARY_IO_BASE) [[unlikely]] {
@@ -270,14 +306,13 @@ namespace drivers::ata
             goto cleanup;
         }
 
-        for (uint32_t configure_try = 0; 
-             configure_try < 2; 
-             configure_try++) [[likely]] {
-            is_master = (configure_try == 0);
-
+        for (const auto& device : devices) [[likely]] {
             status = identify_drive(identify_data.data(),
                                     io_port,
-                                    control_register);
+                                    control_register,
+                                    device.drive_select,
+                                    device.lba_mode);
+
             if (status != status::SUCCESS) [[unlikely]] {
                 reset_driver();
                 continue;
@@ -290,20 +325,11 @@ namespace drivers::ata
             device_control_register = control_register;
             lba_start_address       = 0;
 
-            if (is_master) {
-                drive_select_flags = MASTER_SELECT;
-                lba_flags          = MASTER;
-            } 
-            else {
-                drive_select_flags = SLAVE_SELECT;
-                lba_flags          = SLAVE;
-            }
-
-            if (storage_size == ATA_LBA28_OVERFLOW_MARKER) [[unlikely]] {
-                partition_length = ATA_LBA28_MAX_ADDRESS;
-            }
-            else [[likely]] {
+            if (storage_size != ATA_LBA28_OVERFLOW_MARKER) [[likely]] {
                 partition_length = storage_size;
+            }
+            else [[unlikely]] {
+                partition_length = ATA_LBA28_MAX_ADDRESS;
             }
 
             status = status::SUCCESS;
@@ -465,9 +491,9 @@ namespace drivers::ata
             goto cleanup;
         }
 
-        for (uint32_t word_count = 0;
-             word_count < sector_count; 
-             word_count++) [[likely]] {
+        for (uint32_t sector  = 0;
+             sector < sector_count; 
+             sector++) [[likely]] {
             delay();
 
             status = poll_until_drq_or_error();
@@ -516,6 +542,9 @@ namespace drivers::ata
      *
      * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
      *         If `sector_count` is invalid.
+     * 
+     * @retval `status::UNSUPPORTED_OPERATION | status::flags::PARAM_D`
+     *         If `operation` is not `READ` or `WRITE`.
      *
      * @retval `status::ATA_ERROR`
      *         If the hard drive reports an error.
@@ -540,7 +569,7 @@ namespace drivers::ata
         uint32_t absolute_lba;
         uint8_t final_status;
 
-        status = validate_storage_access(buffer, relative_lba, sector_count);
+        status = validate_storage_access(buffer, relative_lba, sector_count, operation);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -561,7 +590,6 @@ namespace drivers::ata
 
         stdlib::byte_output(io_port_base + 6,
                             ((absolute_lba >> 24) & NIBBLE_MASK) | lba_flags);
-
                            
         if (operation == Operations::READ) {
             stdlib::byte_output(status_port, READ_SECTORS);
@@ -609,11 +637,17 @@ namespace drivers::ata
     _API_ 
     void 
     Programmable_Input_Output::init() noexcept {
-        const struct Channel final { 
+        uint32_t eflags;
+        struct Channel final { 
             uint16_t io_port; 
             uint16_t control_register; 
-        }
-        channels[] = { 
+        };
+        status_t status;
+
+        eflags = kernel::sys::save_eflags();
+        kernel::sys::disable_interrupts();
+
+        const Channel channels[] = { 
             {
                 IDE_PRIMARY_IO_BASE,   
                 IDE_PRIMARY_DCR_BASE
@@ -624,7 +658,6 @@ namespace drivers::ata
             } 
         };
 
-        status_t status;
         for (const auto& channel : channels) [[likely]] {
             status = probe_and_configure_channel(channel.io_port, 
                                                  channel.control_register);
@@ -633,11 +666,13 @@ namespace drivers::ata
             }
         }
 
+        kernel::sys::restore_eflags(eflags);
         kernel::sys::panic(
             "ATA init from 'IDENTIFY' failed, no device detected"
         );
 
     cleanup:
+        kernel::sys::restore_eflags(eflags);
         return;
     }
 
@@ -659,6 +694,9 @@ namespace drivers::ata
      *
      * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
      *         If the LBA range is invalid.
+     * 
+     * @retval `status::UNSUPPORTED_OPERATION | status::flags::PARAM_D`
+     *         If `operation` is not `READ` or `WRITE`.
      *
      * @retval `status::ATA_ERROR`
      *         If the hard drive reports an error.
@@ -673,6 +711,7 @@ namespace drivers::ata
      *         Default case.
      */
     _API_ 
+    [[nodiscard]]
     status_t 
     Programmable_Input_Output::run(_INOUT_ uint16_t* buffer,
                                    _IN_    uint32_t relative_lba,
@@ -681,23 +720,23 @@ namespace drivers::ata
                                    noexcept {
         status_t status;
         uint32_t chunk;
-        uint32_t max_sectors;
+        uint32_t eflags;
+        bool transfer_ok;
+        
+        eflags = kernel::sys::save_eflags();
+        kernel::sys::disable_interrupts();
+        
+        if (sector_count == 0) [[unlikely]] {
+            sector_count = 256;
+        }
 
-        status = validate_storage_access(buffer, relative_lba, sector_count);
+        status = validate_storage_access(buffer, 
+                                         relative_lba,
+                                         sector_count,
+                                         operation);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
-
-        max_sectors = partition_length - 1;
-
-        if (relative_lba > max_sectors ||
-            sector_count > max_sectors ||
-            relative_lba > (max_sectors - sector_count + 1)) [[unlikely]] {
-            status = status::ATA_INVALID_LBA | status::flags::PARAM_B;
-            goto cleanup;
-        }
-
-        kernel::sys::disable_interrupts();
 
         status = poll_until_not_bsy_or_error();
         if (status != status::SUCCESS) [[unlikely]] {
@@ -712,11 +751,24 @@ namespace drivers::ata
                 chunk = sector_count;
             }
 
-            status = start_pio_disk_read_or_write(buffer,
-                                                  relative_lba,
-                                                  chunk,
-                                                  operation);
-            if (status != status::SUCCESS) [[unlikely]] {
+            transfer_ok = false;
+
+            for (int32_t retry = 4; retry >= 0; --retry) [[likely]] {
+                status = start_pio_disk_read_or_write(buffer,
+                                                      relative_lba,
+                                                      chunk,
+                                                      operation);
+
+                if (status == status::SUCCESS) {
+                    transfer_ok = true;
+                    break;
+                }
+
+                reset_driver();
+                delay();
+            }
+
+            if (!transfer_ok) [[unlikely]] {
                 goto cleanup;
             }
 
@@ -730,7 +782,7 @@ namespace drivers::ata
     cleanup:
         reset_driver();
 
-        kernel::sys::enable_interrupts();
+        kernel::sys::restore_eflags(eflags);
 
         return status;
     }
