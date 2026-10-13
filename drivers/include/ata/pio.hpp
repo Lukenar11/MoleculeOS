@@ -95,6 +95,8 @@ namespace drivers::ata
         static_assert(CHUNK_SECTORS <= MAX_ALLOWED_SECTOR_COUNT, 
                       "CHUNK_SECTORS <= MAX_ALLOWED_SECTOR_COUNT");
 
+        static constexpr uint32_t MAX_RETRYS = 4;
+
         static inline uint32_t partition_length        = 0;
         static inline uint32_t lba_start_address       = 0;
         static inline uint16_t device_control_register = 0;

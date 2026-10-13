@@ -753,7 +753,7 @@ namespace drivers::ata
 
             transfer_ok = false;
 
-            for (int32_t retry = 4; retry >= 0; --retry) [[likely]] {
+            for (int32_t retry = MAX_RETRYS; retry >= 0; --retry) [[likely]] {
                 status = start_pio_disk_read_or_write(buffer,
                                                       relative_lba,
                                                       chunk,
