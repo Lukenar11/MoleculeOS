@@ -21,7 +21,6 @@ OBJS += $(BUILD)/shell.o \
 		$(BUILD)/rename.o \
 		$(BUILD)/copy.o \
 		$(BUILD)/exists.o \
-		$(BUILD)/allocinfo.o \
 
 $(BUILD)/%.o: shell/src/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@

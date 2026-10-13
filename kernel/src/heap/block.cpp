@@ -399,32 +399,6 @@ namespace kernel::heap
 
 
     /** 
-     * @brief Initializes the heap.
-     * 
-     * @param heap_begin memory pool start address
-     * @param heap_end   memory pool end address
-     */
-    _API_ 
-    void
-    Block_Allocator::init(_IN_ const uint8_t* const heap_begin,
-                          _IN_ const uint8_t* const heap_end) noexcept {
-        setup_metadata_layout(reinterpret_cast<uint32_t>(heap_begin), 
-                              reinterpret_cast<uint32_t>(heap_end));
-  
-        if (clear_metadata((all_memory_blocks + BITMAP_WORD_BITS - 1) / 
-                            BITMAP_WORD_BITS) != status::SUCCESS) [[unlikely]] {
-            sys::panic("'Block_Allocator' init failed!");
-        };
-
-        if (!memory_pool_ptr || 
-            !allocation_sizes || 
-            !memory_bitmap) [[unlikely]] {
-            sys::panic("'Block_Allocator' not initialized!");
-        }
-    }
-
-
-    /** 
      * @brief Gets the meta data of a allocated memory block.
      * 
      * @param pool_index      Index of the allocated memory block in 
@@ -498,6 +472,32 @@ namespace kernel::heap
 
     cleanup:
         return status;
+    }
+    
+
+    /** 
+     * @brief Initializes the heap.
+     * 
+     * @param heap_begin memory pool start address
+     * @param heap_end   memory pool end address
+     */
+    _API_ 
+    void
+    Block_Allocator::init(_IN_ const uint8_t* const heap_begin,
+                          _IN_ const uint8_t* const heap_end) noexcept {
+        setup_metadata_layout(reinterpret_cast<uint32_t>(heap_begin), 
+                              reinterpret_cast<uint32_t>(heap_end));
+  
+        if (clear_metadata((all_memory_blocks + BITMAP_WORD_BITS - 1) / 
+                            BITMAP_WORD_BITS) != status::SUCCESS) [[unlikely]] {
+            sys::panic("'Block_Allocator' init failed!");
+        };
+
+        if (!memory_pool_ptr || 
+            !allocation_sizes || 
+            !memory_bitmap) [[unlikely]] {
+            sys::panic("'Block_Allocator' not initialized!");
+        }
     }
 
 

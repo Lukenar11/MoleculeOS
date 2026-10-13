@@ -287,21 +287,7 @@ namespace kernel::heap
                            _IN_    const uint32_t new_byte_size) 
                            noexcept;
 
-
-    public:
-        /** 
-         * @brief Initializes the heap.
-         * 
-         * @param heap_begin memory pool start address
-         * @param heap_end   memory pool end address
-         */
-        _API_ 
-        static 
-        void 
-        init(_IN_ const uint8_t* const heap_begin, 
-             _IN_ const uint8_t* const heap_end) noexcept;
-
-
+                           
         /** 
          * @brief Gets the meta data of a allocated memory block.
          * 
@@ -334,6 +320,20 @@ namespace kernel::heap
         get_allocation_info(_OUT_ uint32_t& pool_index, 
                             _OUT_ uint32_t& pool_block_size,
                             _IN_  void* block_ptr) noexcept;
+
+
+    public:
+        /** 
+         * @brief Initializes the heap.
+         * 
+         * @param heap_begin memory pool start address
+         * @param heap_end   memory pool end address
+         */
+        _API_ 
+        static 
+        void 
+        init(_IN_ const uint8_t* const heap_begin, 
+             _IN_ const uint8_t* const heap_end) noexcept;
 
 
         /**  

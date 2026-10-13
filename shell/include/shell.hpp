@@ -53,7 +53,6 @@ namespace
         {make_hash("rename"),    [](auto& args) -> void {shell::commands::rename(args);}},
         {make_hash("copy"),      [](auto& args) -> void {shell::commands::copy(args);}},
         {make_hash("exists"),    [](auto& args) -> void {shell::commands::exists(args);}},
-        {make_hash("allocinfo"), [](auto& args) -> void {shell::commands::allocinfo(args);}}
     };
 }
 
