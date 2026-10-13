@@ -47,7 +47,6 @@ namespace shell::commands
             "\t- rename (renames a file) | rename [File] [NewFileName]\n"
             "\t- copy (copys file content to another file) | copy [SrcFile] [DestFile]\n"
             "\t- exists (checks if a file already exists) | exists [File]\n"
-            "\t- allocinfo (prints the file allocation info) | allocinfo [File]\n"
         };
 
         stdlib::Text_Output::reset();
