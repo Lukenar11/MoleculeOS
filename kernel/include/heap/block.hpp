@@ -37,6 +37,8 @@ namespace kernel::heap
         static inline constexpr uint32_t BITMAP_WORD_SHIFT = 5;
         static inline constexpr uint32_t BITMAP_WORD_MASK  = BITMAP_WORD_BITS - 1;
 
+        static inline constexpr uint8_t MEMORY_NULL = 0x00;
+
         static inline uint32_t all_memory_blocks = 0;
         static inline uint32_t needed_pool_space = 0;
 
@@ -464,7 +466,7 @@ namespace kernel::heap
         _API_ 
         static 
         status_t 
-        deallocate(_IN_ void* block_ptr) noexcept;
+        deallocate(_INOUT_ void* block_ptr) noexcept;
 
 
         Block_Allocator() noexcept  = default;

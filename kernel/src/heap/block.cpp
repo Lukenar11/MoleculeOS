@@ -101,7 +101,7 @@ namespace kernel::heap
                                                       MEMORY_BLOCK_SIZE);
 
         status = Memory_Manipulation::set_memory_block(allocation_sizes,
-                                                       0x00,
+                                                       MEMORY_NULL,
                                                        allocation_sizes_bytes);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
@@ -356,7 +356,7 @@ namespace kernel::heap
 
             goto cleanup;
         }
-    
+
         status = allocate(new_block_ptr, new_byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
@@ -408,8 +408,6 @@ namespace kernel::heap
     void
     Block_Allocator::init(_IN_ const uint8_t* const heap_begin,
                           _IN_ const uint8_t* const heap_end) noexcept {
-        sys::disable_interrupts();
-
         setup_metadata_layout(reinterpret_cast<uint32_t>(heap_begin), 
                               reinterpret_cast<uint32_t>(heap_end));
   
@@ -423,8 +421,6 @@ namespace kernel::heap
             !memory_bitmap) [[unlikely]] {
             sys::panic("'Block_Allocator' not initialized!");
         }
-
-        sys::enable_interrupts();
     }
 
 
@@ -454,14 +450,11 @@ namespace kernel::heap
      * @retval `status::SUCCESS`
      *          Default case.
      */
-    _API_ 
     status_t 
     Block_Allocator::get_allocation_info(_OUT_ uint32_t& pool_index,
                                          _OUT_ uint32_t& pool_block_size,
                                          _IN_  void* block_ptr) 
                                          noexcept {
-        sys::disable_interrupts();
-
         status_t status;
         uint8_t* new_block_ptr;
         uint32_t offset;
@@ -504,8 +497,6 @@ namespace kernel::heap
         status = status::SUCCESS;
 
     cleanup:
-        sys::enable_interrupts();
-
         return status;
     }
 
@@ -537,13 +528,13 @@ namespace kernel::heap
         uint32_t needed_blocks;
         uint32_t block_index;
 
+        sys::disable_interrupts();
+
         status = validate_allocate_size(needed_blocks, byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
     
-        sys::disable_interrupts();
-        
         status = find_free_memory_region(block_index, needed_blocks);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
@@ -600,6 +591,7 @@ namespace kernel::heap
     Block_Allocator::clear_allocate(_OUT_ void*& block_ptr, 
                                     _IN_  const uint32_t byte_size) 
                                     noexcept {
+        const uint32_t memory_size = align_up(byte_size, MEMORY_BLOCK_SIZE);
         status_t status;
 
         if (byte_size == 0) [[unlikely]] {
@@ -607,22 +599,26 @@ namespace kernel::heap
             goto cleanup;
         }
 
-        sys::disable_interrupts();
-
         status = allocate(block_ptr, byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
+        sys::disable_interrupts();
+
         status = stdlib::Memory_Manipulation::set_memory_block(block_ptr, 
-                                                               0x00, 
-                                                               byte_size);
+                                                               MEMORY_NULL, 
+                                                               memory_size);
         if (status != status::SUCCESS) [[unlikely]] {
+            sys::enable_interrupts();
+
             status = status::FAIL;
             goto cleanup;
         }
 
         status = status::SUCCESS;
+
+        sys::enable_interrupts();
 
         goto success;
 
@@ -630,8 +626,6 @@ namespace kernel::heap
         block_ptr = nullptr;
 
     success: 
-        sys::enable_interrupts();
-
         return status;
     }
 
@@ -681,23 +675,25 @@ namespace kernel::heap
                                 noexcept {
         status_t status;
 
-        sys::disable_interrupts();
-
         if (!block_ptr) [[unlikely]] {
             status = allocate(block_ptr, new_byte_size);
             goto cleanup;
         }
 
+        sys::disable_interrupts();
+
         if (new_byte_size == 0) [[unlikely]] {
+            sys::enable_interrupts();
+
             status = status::INVALID_PARAMETER | status::flags::PARAM_B;
             goto cleanup;
         }
 
         status = perform_reallocate(block_ptr, new_byte_size);
 
-    cleanup:
         sys::enable_interrupts();
 
+    cleanup:
         return status;
     }
 
@@ -727,18 +723,18 @@ namespace kernel::heap
      */
     _API_
     status_t
-    Block_Allocator::deallocate(_IN_ void* block_ptr) noexcept {
+    Block_Allocator::deallocate(_INOUT_ void* block_ptr) noexcept {
         status_t status;
 
         uint32_t block_index   = 0;
         uint32_t needed_blocks = 0;
 
+        sys::disable_interrupts();
+
         if (!block_ptr) [[unlikely]] {
             status = status::NULL_POINTER;
             goto cleanup;
         }
-
-        sys::disable_interrupts();
 
         status = get_allocation_info(block_index, needed_blocks, block_ptr);
         if (status != status::SUCCESS) [[unlikely]] {

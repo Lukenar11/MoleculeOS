@@ -52,6 +52,6 @@ namespace kernel
             sys::panic("save failed");
         }
 
-        sys::panic("Unexpected return from the \"kernel_main\" scheduler main loop");
+        sys::panic("Unexpected return from the \"kernel::main\" scheduler main loop");
     }
 }
