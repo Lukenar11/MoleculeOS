@@ -54,15 +54,28 @@ namespace stdlib
          * @warning No bounds checking is performed. 
          *          If the buffer is too small, the output will be truncated.
          * 
-         * @param buffer casted integer
-         * @param value  integer for casting
-         * @param base   integer base
+         * @param buffer        casted integer
+         * @param chars_written size of `buffer`
+         * @param value         integer for casting
+         * @param base          integer base
          * 
-         * @return size of `buffer`
+         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+         *          If `buffer` is a `nullptr`
+         * 
+         * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+         *          If `chars_written` is a `nullptr`
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D`
+         *          If `base is not` between 2 and 16.
+         * 
+         * @retval `status::SUCCESS`
+         *          Default case.
          */
+        [[nodiscard]]
         static 
-        uint32_t 
+        status_t 
         convert_base_to_digits(_OUT_ stdlib::Array<char, 32>& buffer,
+                               _OUT_ uint32_t& chars_written,
                                _IN_  uint32_t value,
                                _IN_  const uint32_t base) noexcept;
 
@@ -75,9 +88,28 @@ namespace stdlib
          * 
          * @param value integer output
          * @param base  integer base
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+         *          If `base is not` between 2 and 16.
+         * 
+         * @retval `status::FAIL`
+         *          Unknown Error.
+         * 
+         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+         *          If `buffer` is a `nullptr`
+         * 
+         * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+         *          If `chars_written` is a `nullptr`
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D`
+         *          If `base is not` between 2 and 16.
+         * 
+         * @retval `status::SUCCESS`
+         *          Default case.
          */
+        [[nodiscard]]
         static 
-        void 
+        status_t 
         put_base(_IN_ const uint32_t value, 
                  _IN_ const uint32_t base) noexcept;
             
@@ -90,14 +122,24 @@ namespace stdlib
          * @warning No bounds checking is performed. 
          *          If the buffer is too small, the output will be truncated.
          * 
-         * @param buffer casted integer
-         * @param value  integer for casting
+         * @param buffer       casted integer
+         * @param buffer_count size of `buffer`
+         * @param value        integer for casting
          * 
-         * @return size of `buffer`
+         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+         *          If the budder is a `nullptr`.
+         * 
+         * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+         *          If the `buffer_count` is a `nullptr`.
+         * 
+         * @retval `status::SUCCESS`
+         *          Default case.
          */
+        [[nodiscard]]
         static 
-        uint32_t 
+        status_t 
         convert_uint_to_digits(_OUT_ stdlib::Array<char, 12>& buffer,
+                               _OUT_ uint32_t& buffer_count,
                                _IN_  uint32_t value) noexcept;
 
 
@@ -106,9 +148,19 @@ namespace stdlib
          *        a new line if the screen width is reached.
          * 
          * @param symbol character output
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
+         *          If x is greater then or equal to the screen width.
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
+         *          If y is greater then or equal to the screen height.
+         * 
+         * @retval `status::SUCCESS 
+         *          Default Case.
          */
+        [[nodiscard]]
         static 
-        void 
+        status_t 
         handle_backspace() noexcept;
         
         
@@ -117,9 +169,19 @@ namespace stdlib
          *        a new line if the screen width is reached.
          * 
          * @param symbol character output
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
+         *          If x is greater then or equal to the screen width.
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
+         *          If y is greater then or equal to the screen height.
+         * 
+         * @retval `status::SUCCESS`
+         *          Default Case.
          */
+        [[nodiscard]]
         static 
-        void 
+        status_t 
         handle_tab() noexcept;
         
 
@@ -128,9 +190,19 @@ namespace stdlib
          *        a new line if the screen width is reached.
          * 
          * @param symbol character output
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
+         *          If x is greater then or equal to the screen width.
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
+         *          If y is greater then or equal to the screen height.
+         * 
+         * @retval `status::SUCCESS` 
+         *          Default Case.
          */
+        [[nodiscard]]
         static 
-        void 
+        status_t 
         handle_normal_char(_IN_ const char symbol) noexcept;
 
 
@@ -139,13 +211,26 @@ namespace stdlib
          * 
          * @note This function does not modify the cursor position.
          * 
-         * @param text text for the line calculation
+         * @param needed_lines count of needed lines
+         * @param text         text for the line calculation
          * 
-         * @return the count of needed lines.
+         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+         *          If `needed_lines` is a `nullptr`.
+         * 
+         * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+         *          If `text` is a `nullptr`.
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+         *          If `text` is empty.
+         * 
+         * @retval `status::SUCCESS`
+         *          Default case.
          */
+        [[nodiscard]]
         static 
-        uint32_t 
-        calculate_needed_lines(_IN_ const char* const text) noexcept;
+        status_t 
+        calculate_needed_lines(_OUT_ uint32_t& needed_lines, 
+                               _IN_  const char* const text) noexcept;
 
 
         /** 
@@ -264,21 +349,50 @@ namespace stdlib
          * @brief Puts a signed integer.
          * 
          * @param value integer output
+         *  
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
+         *          If x is greater then or equal to the screen width.
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
+         *          If y is greater then or equal to the screen height.
+         * 
+         * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
+         *          If the budder is a nullptr.
+         * 
+         * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
+         *          If the buffer_count is a nullptr.
+         * 
+         * @retval `status::SUCCESS`
+         *          Default case.
          */
         _API_ 
-        static 
-        void 
-        put_int(_IN_ int32_t value) noexcept;
+        status_t 
+        put_int(_IN_ int32_t value) const noexcept;
 
 
         /** 
          * @brief Outputs a unsigned integer to the terminal.
          * 
          * @param value integer output
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
+         *          If x is greater then or equal to the screen width.
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
+         *          If y is greater then or equal to the screen height.
+         * 
+         * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
+         *          If the budder is a nullptr.
+         * 
+         * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
+         *          If the buffer_count is a nullptr.
+         * 
+         * @retval `status::SUCCESS`
+         *          Default case.
          */
         _API_ 
         static 
-        void 
+        status_t 
         put_uint(_IN_ const uint32_t value) noexcept;
 
 
@@ -290,10 +404,19 @@ namespace stdlib
         _API_ 
         static 
         inline 
-        void
+        status_t
         put_hex(_IN_ const uint32_t value) noexcept {
-            put_string("0x");
-            put_base(value, 16);
+            status_t status;
+
+            status = put_string("0x");
+            if (status != status::SUCCESS) [[unlikely]] {
+                goto cleanup;
+            }
+
+            status = put_base(value, 16);
+
+        cleanup:
+            return status;
         }
 
 
@@ -305,10 +428,19 @@ namespace stdlib
         _API_ 
         static 
         inline 
-        void 
+        status_t 
         put_bin(_IN_ const uint32_t value) noexcept {
-            put_string("0b");
-            put_base(value, 2);
+            status_t status;
+
+            status = put_string("0b");
+            if (status != status::SUCCESS) [[unlikely]] {
+                goto cleanup;
+            }
+
+            status = put_base(value, 2);
+
+        cleanup:
+            return status;
         }
 
 
@@ -321,10 +453,19 @@ namespace stdlib
         _API_ 
         static 
         inline 
-        void 
+        status_t 
         put_ptr(_IN_ const uint32_t value) noexcept {
-            put_string("0x");
-            put_base(value, 16);
+            status_t status;
+
+            status = put_string("0x");
+            if (status != status::SUCCESS) [[unlikely]] {
+                goto cleanup;
+            }
+
+            status = put_base(value, 16);
+
+        cleanup:
+            return status;
         }
 
 
@@ -339,10 +480,19 @@ namespace stdlib
          * @note - `\t` -> Outputs a TAB.
          * @note - `\n` -> Cursor jump to the next line.
          * @note - `\\"` -> Allows `"` as character output.
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
+         *          If x is greater then or equal to the screen width.
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
+         *          If y is greater then or equal to the screen height.
+         * 
+         * @retval `status::SUCCESS`
+         *          Default case.
          */
         _API_ 
         static 
-        void 
+        status_t 
         put_char(_IN_ const char symbol) noexcept;
 
 
@@ -357,10 +507,28 @@ namespace stdlib
          * @note - `\t` -> Outputs a TAB.
          * @note - `\n` -> Cursor jump to the next line.
          * @note - `\\"` -> allows `"` in the string output
+         * 
+         * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
+         *          If `needed_lines` is a `nullptr`.
+         * 
+         * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+         *          If `text` is a `nullptr`.
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+         *          If `text` is `empty`.
+         *
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
+         *          If x is greater then or equal to the screen width.
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
+         *          If y is greater then or equal to the screen height.
+         * 
+         * @retval `status::SUCCESS`
+         *          Default case.
          */
         _API_ 
         static 
-        void 
+        status_t
         put_string(_IN_ const char* const message) noexcept;
     
 

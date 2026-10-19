@@ -37,33 +37,61 @@ namespace stdlib
      * @warning No bounds checking is performed. 
      *          If the buffer is too small, the output will be truncated.
      * 
-     * @param buffer casted integer
-     * @param value  integer for casting
-     * @param base   integer base
+     * @param buffer        casted integer
+     * @param chars_written size of `buffer`
+     * @param value         integer for casting
+     * @param base          integer base
      * 
-     * @return size of `buffer`
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *          If `buffer` is a `nullptr`
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+     *          If `chars_written` is a `nullptr`
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D`
+     *          If `base is not` between 2 and 16.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
      */
-    uint32_t 
+    [[nodiscard]]
+    status_t 
     Text_Output::convert_base_to_digits(_OUT_ stdlib::Array<char, 32>& buffer,
+                                        _OUT_ uint32_t& chars_written,
                                         _IN_  uint32_t value,
                                         _IN_  const uint32_t base) noexcept {
-        uint32_t chars_written   = 0;
+        status_t status;
         uint8_t converted_number = 0;
         const char null_char     = '0';
-        const char a_char        = 'A';
+        const char a             = 'A';
         const uint32_t ten       = 10;
 
+        chars_written = 0;
+
+        if (!buffer.data()) [[unlikely]] {
+            status = status::NULL_POINTER | status::flags::PARAM_A;
+            goto cleanup;
+        }
+
+        if (!chars_written) [[unlikely]] {
+            status = status::NULL_POINTER | status::flags::PARAM_B;
+            goto cleanup;
+        }
+
         if (base < 2 || base > 16) [[unlikely]] {
+            status = status::INVALID_PARAMETER | status::flags::PARAM_D;
             goto cleanup;
         }
 
         if (value == 0) [[unlikely]] {
             put_char('0');
+
+            status = status::SUCCESS;
             goto cleanup;
         }
 
         while (value) [[likely]] {
-            if (chars_written >= buffer.size()) [[unlikely]] {
+            if (chars_written >= buffer.size()) {
                 break;
             }
 
@@ -72,14 +100,16 @@ namespace stdlib
                 buffer[chars_written++] = null_char + converted_number;
             }
             else {
-                buffer[chars_written++] = a_char + converted_number - ten;
+                buffer[chars_written++] = a + converted_number - ten;
             }
 
             value /= base;
         }
 
+        status = status::SUCCESS;
+
     cleanup:
-        return chars_written;
+        return status;
     }
 
 
@@ -91,30 +121,60 @@ namespace stdlib
      * 
      * @param value integer output
      * @param base  integer base
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+     *          If `base is not` between 2 and 16.
+     * 
+     * @retval `status::FAIL`
+     *          Unknown Error.
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *          If `buffer` is a `nullptr`
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+     *          If `chars_written` is a `nullptr`
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D`
+     *          If `base is not` between 2 and 16.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
      */
-    void 
+    [[nodiscard]]
+    status_t 
     Text_Output::put_base(_IN_ const uint32_t value, 
                           _IN_ const uint32_t base) noexcept {
         stdlib::Array<char, 32> buffer;
         uint32_t buffer_count;
+        status_t status;
 
         if (base < 2 || base > 16) [[unlikely]] {
+            status = status::INVALID_PARAMETER | status::flags::PARAM_B;
             goto cleanup;
         }
 
         if (value == 0) [[unlikely]] {
             put_char('0');
+            status = status::SUCCESS;
             goto cleanup;
         }
 
-        buffer_count = convert_base_to_digits(buffer, value, base);
-
-        while (buffer_count--) [[likely]] {
-            put_char(buffer[buffer_count]);
+        status = convert_base_to_digits(buffer, buffer_count, value, base);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
         }
 
+        while (buffer_count--) [[likely]] {
+            status = put_char(buffer[buffer_count]);
+            if (status != status::SUCCESS) [[unlikely]] {
+                goto cleanup;
+            }
+        }
+
+        status = status::SUCCESS;
+
     cleanup:
-        return;
+        return status;
     }
 
 
@@ -126,20 +186,40 @@ namespace stdlib
      * @warning No bounds checking is performed. 
      *          If the buffer is too small, the output will be truncated.
      * 
-     * @param buffer casted integer
-     * @param value  integer for casting
+     * @param buffer       casted integer
+     * @param buffer_count size of `buffer`
+     * @param value        integer for casting
      * 
-     * @return size of `buffer`
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *          If the budder is a `nullptr`.
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+     *          If the `buffer_count` is a `nullptr`.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
      */
-    uint32_t 
+    [[nodiscard]]
+    status_t 
     Text_Output::convert_uint_to_digits(_OUT_ stdlib::Array<char, 12>& buffer,
+                                        _OUT_ uint32_t& buffer_count,
                                         _IN_  uint32_t value) noexcept {
-        uint32_t buffer_count = 0;
+        status_t status;
         const char null_char  = '0';
         const uint32_t ten    = 10;
 
+        if (!buffer.data()) [[unlikely]] {
+            status = status::NULL_POINTER | status::flags::PARAM_A;
+            goto cleanup;
+        }
+
+        if (!buffer_count) [[unlikely]] {
+            status = status::NULL_POINTER | status::flags::PARAM_B;
+            goto cleanup;
+        }
+
         while (value) [[likely]] {
-            if (buffer_count >= buffer.size()) [[unlikely]] {
+            if (buffer_count >= buffer.size()) {
                 break;
             }
 
@@ -147,7 +227,10 @@ namespace stdlib
             value                 /= ten;
         }
 
-        return buffer_count;
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
     }
 
 
@@ -156,16 +239,33 @@ namespace stdlib
      *        a new line if the screen width is reached.
      * 
      * @param symbol character output
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
+     *          If x is greater then or equal to the screen width.
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
+     *          If y is greater then or equal to the screen height.
+     * 
+     * @retval `status::SUCCESS 
+     *          Default Case.
      */
-    void 
+    [[nodiscard]]
+    status_t 
     Text_Output::handle_backspace() noexcept {
+        status_t status;
+
         if (cursor_x > 0) [[likely]] {
             cursor_x--;
-            drivers::vga::Text_Mode::put_char_at(cursor_x,
-                                                 cursor_y,
-                                                 cursor_color,
-                                                 ' ');
+            status = drivers::vga::Text_Mode::put_char_at(cursor_x,
+                                                          cursor_y,
+                                                          cursor_color,
+                                                          ' ');
         }
+        else {
+            status = status::FAIL;
+        }
+
+        return status;
     }
 
 
@@ -174,22 +274,41 @@ namespace stdlib
      *        a new line if the screen width is reached.
      * 
      * @param symbol character output
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
+     *          If x is greater then or equal to the screen width.
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
+     *          If y is greater then or equal to the screen height.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default Case.
      */
-    void 
+    [[nodiscard]]
+    status_t 
     Text_Output::handle_tab() noexcept {
+        status_t status;
+
         for (uint32_t space_count = 0; 
              space_count < 4; 
              space_count++) [[likely]] {
-            drivers::vga::Text_Mode::put_char_at(cursor_x,
-                                                 cursor_y,
-                                                 cursor_color,
-                                                 ' ');
+            status = drivers::vga::Text_Mode::put_char_at(cursor_x,
+                                                          cursor_y,
+                                                          cursor_color,
+                                                          ' ');
+            if (status != status::SUCCESS) [[unlikely]] {
+                break;
+            }
+
             cursor_x++;
 
-            if (cursor_x >= drivers::vga::TEXT_MODE_SCREEN_WIDTH) [[unlikely]] {
+            if (cursor_x >= 
+                drivers::vga::TEXT_MODE_SCREEN_WIDTH) [[unlikely]] {
                 new_line();
             }
         }
+
+        return status;
     }
 
 
@@ -198,18 +317,35 @@ namespace stdlib
      *        a new line if the screen width is reached.
      * 
      * @param symbol character output
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
+     *          If x is greater then or equal to the screen width.
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
+     *          If y is greater then or equal to the screen height.
+     * 
+     * @retval `status::SUCCESS` 
+     *          Default Case.
      */
-    void 
+    [[nodiscard]]
+    status_t 
     Text_Output::handle_normal_char(_IN_ const char symbol) noexcept {
-        drivers::vga::Text_Mode::put_char_at(cursor_x,
-                                             cursor_y,
-                                             cursor_color,
-                                             symbol);
+        status_t status = drivers::vga::Text_Mode::put_char_at(cursor_x,
+                                                               cursor_y,
+                                                               cursor_color,
+                                                               symbol);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
         cursor_x++;
 
         if (cursor_x >= drivers::vga::TEXT_MODE_SCREEN_WIDTH) [[unlikely]] {
             new_line();
         }
+
+    cleanup:
+        return status;
     }
 
 
@@ -218,19 +354,47 @@ namespace stdlib
      * 
      * @note This function does not modify the cursor position.
      * 
-     * @param text text for the line calculation
+     * @param needed_lines count of needed lines
+     * @param text         text for the line calculation
      * 
-     * @return the count of needed lines.
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *          If `needed_lines` is a `nullptr`.
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+     *          If `text` is a `nullptr`.
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+     *          If `text` is empty.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
      */
-    uint32_t 
-    Text_Output::calculate_needed_lines(_IN_ const char* const text) noexcept {
-        const char new_line   = '\n';
-        uint32_t needed_lines = 1;
-        uint32_t x            = cursor_x;
+    [[nodiscard]]
+    status_t 
+    Text_Output::calculate_needed_lines(_OUT_ uint32_t& needed_lines, 
+                                        _IN_  const char* const text) 
+                                        noexcept {
+        const char new_line = '\n';
+        uint32_t x          = cursor_x;
         char symbol;
+        status_t status;
 
-        if (!text || text[0] == '\0') [[unlikely]] {
+        needed_lines = 1;
+
+        if (!needed_lines) [[unlikely]] {
+            status = status::NULL_POINTER | status::flags::PARAM_A;
+            goto cleanup;
+        }
+
+        if (!text) [[unlikely]] {
             needed_lines = 0;
+            status       = status::NULL_POINTER | status::flags::PARAM_B;
+            goto cleanup;
+        }
+
+        if (text[0] == '\0') [[unlikely]] {
+            needed_lines = 0;
+            status       = status::INVALID_PARAMETER | status::flags::PARAM_B;
             goto cleanup;
         }
 
@@ -251,9 +415,10 @@ namespace stdlib
             }
         }
 
+        status = status::SUCCESS;
 
     cleanup:
-        return needed_lines;
+        return status;
     }
 
 
@@ -275,19 +440,42 @@ namespace stdlib
      * @brief Puts a signed integer.
      * 
      * @param value integer output
+     *  
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
+     *          If x is greater then or equal to the screen width.
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
+     *          If y is greater then or equal to the screen height.
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
+     *          If the budder is a nullptr.
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
+     *          If the buffer_count is a nullptr.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
      */
     _API_ 
-    void 
-    Text_Output::put_int(_IN_ int32_t value) noexcept {
-        if (value < 0) {
-            put_char('-');
+    status_t 
+    Text_Output::put_int(_IN_ int32_t value) const noexcept {
+        status_t status;
 
-            value = static_cast<uint32_t>(-(value + 1)) + 1;
-            put_uint(value);
+        if (value < 0) {
+            status = put_char('-');
+            if (status != status::SUCCESS) [[unlikely]] {
+                goto cleanup;
+            }
+
+            value  = static_cast<uint32_t>(-(value + 1)) + 1;
+            status = put_uint(value);
         }
         else {
-            put_uint(value);
+            status = put_uint(value);
         }
+
+    cleanup:
+        return status;
     }
 
 
@@ -295,26 +483,45 @@ namespace stdlib
      * @brief Outputs a unsigned integer to the terminal.
      * 
      * @param value integer output
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
+     *          If x is greater then or equal to the screen width.
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
+     *          If y is greater then or equal to the screen height.
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
+     *          If the budder is a nullptr.
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
+     *          If the buffer_count is a nullptr.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
      */
-    _API_ 
-    void 
+    _API_
+    status_t 
     Text_Output::put_uint(_IN_ const uint32_t value) noexcept {
         uint32_t char_count;
         stdlib::Array<char, 12> buffer;
+        status_t status;
         
         if (value == 0) [[unlikely]] {
-            put_char('0');
+            status = put_char('0');
             goto cleanup;
         }
 
-        char_count = convert_uint_to_digits(buffer, value);
+        status = convert_uint_to_digits(buffer, char_count, value);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
 
         while (char_count--) [[likely]] {
-            put_char(buffer[char_count]);
+            status = put_char(buffer[char_count]);
         }
 
     cleanup:
-        return;
+        return status;
     }
 
 
@@ -329,34 +536,50 @@ namespace stdlib
      * @note - `\t` -> Outputs a TAB.
      * @note - `\n` -> Cursor jump to the next line.
      * @note - `\\"` -> Allows `"` as character output.
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
+     *          If x is greater then or equal to the screen width.
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
+     *          If y is greater then or equal to the screen height.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
      */
     _API_ 
-    void 
+    status_t 
     Text_Output::put_char(_IN_ const char symbol) noexcept {
+        status_t status;
+
         switch (symbol) {
         case '\r':
+            status   = status::SUCCESS;
             cursor_x = 0;
             break;
         
         case '\b':
-            handle_backspace();
+            status = handle_backspace();
             break;
         
         case '\t':
-            handle_tab();
+            status = handle_tab();
             break;
         
         case '\n':
+            status = status::SUCCESS;
             new_line();
             break;
 
         case '\0':
+            status = status::SUCCESS;
             break;
         
         default:
-            handle_normal_char(symbol);
+            status = handle_normal_char(symbol);
             break;
         }
+
+        return status;
     }
 
 
@@ -371,17 +594,45 @@ namespace stdlib
      * @note - `\t` -> Outputs a TAB.
      * @note - `\n` -> Cursor jump to the next line.
      * @note - `\\"` -> allows `"` in the string output
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
+     *          If `needed_lines` is a `nullptr`.
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+     *          If `text` is a `nullptr`.
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+     *          If `text` is `empty`.
+     *
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
+     *          If x is greater then or equal to the screen width.
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
+     *          If y is greater then or equal to the screen height.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
      */
     _API_ 
-    void
+    status_t
     Text_Output::put_string(_IN_ const char* const message) noexcept {
+        status_t status;
         uint32_t needed_lines;
 
-        if (!message || message[0] == '\0') [[unlikely]] {
+        if (!message) [[unlikely]] {
+            status = status::NULL_POINTER;
             goto cleanup;
         }
 
-        needed_lines = calculate_needed_lines(message);
+        if (message[0] == '\0') [[unlikely]] {
+            status = status::INVALID_PARAMETER;
+            goto cleanup;
+        }
+
+        status = calculate_needed_lines(needed_lines, message);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
         
         if (needed_lines > 
             drivers::vga::TEXT_MODE_SCREEN_HEIGHT - cursor_y) [[unlikely]] {
@@ -391,10 +642,10 @@ namespace stdlib
         for (uint32_t current_char = 0; 
              message[current_char] != '\0';
              current_char++) [[likely]] {
-            put_char(message[current_char]);
+            status = put_char(message[current_char]);
         }
 
     cleanup:
-        return;
+        return status;
     }
 } // namespace stdlib
