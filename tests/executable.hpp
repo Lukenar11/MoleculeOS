@@ -22,7 +22,7 @@ namespace tests
     void 
     exec() {
         kernel::filesys::File_Entry* file_entry;
-        kernel::filesys::MoleculeOS_File_System_2::create_file(file_entry, 
+        kernel::filesys::create_file(file_entry, 
                                                                "hello", 
                                                                "run", 
                                                                48);

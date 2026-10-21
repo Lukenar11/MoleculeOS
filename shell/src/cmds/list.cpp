@@ -30,7 +30,7 @@ namespace shell::commands
 
         File_Entry file_entry;
         for (uint32_t i = 0; i < FILE_TABLE_ENTRYS; i++) [[likely]] {
-            file_entry = MoleculeOS_File_System_2::get_file_entry(i);
+            file_entry = get_file_entry(i);
 
             if (!file_entry.file_data_ptr) {
                 continue;

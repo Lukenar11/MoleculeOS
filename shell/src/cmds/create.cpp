@@ -87,7 +87,7 @@ namespace shell::commands
         }
 
         File_Entry* file_entry; 
-        MoleculeOS_File_System_2::create_file(file_entry, 
+        create_file(file_entry, 
                                               parsed_filename.name.data(),
                                               parsed_filename.format.data(),
                                               file_size);

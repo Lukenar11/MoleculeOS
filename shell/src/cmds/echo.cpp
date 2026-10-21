@@ -138,11 +138,11 @@ namespace shell::commands
         }
 
         File_Entry* file_entry;
-        MoleculeOS_File_System_2::find_file(file_entry,
+        find_file(file_entry,
                                             parsed_filename.name.data(),
                                             parsed_filename.format.data());
         if (!file_entry)
-            MoleculeOS_File_System_2::create_file(file_entry,
+            create_file(file_entry,
                                                   parsed_filename.name.data(),
                                                   parsed_filename.format.data(),
                                                   file_instream.size());
@@ -150,7 +150,7 @@ namespace shell::commands
         uint32_t length;
         String_Manipulation::get_string_length(length, file_instream.data());
         const auto& instream = reinterpret_cast<const uint8_t*>(file_instream.data());
-        MoleculeOS_File_System_2::append_file(file_entry, instream, length);
+        append_file(file_entry, instream, length);
     }
 
     void handle_file_outstream(const stdlib::Array<char,64>& filename) noexcept {
@@ -167,7 +167,7 @@ namespace shell::commands
         }
 
         File_Entry* file_entry;
-        MoleculeOS_File_System_2::find_file(file_entry,
+        find_file(file_entry,
                                             parsed_filename.name.data(),
                                             parsed_filename.format.data());
         if (!file_entry) {
@@ -186,7 +186,7 @@ namespace shell::commands
             return;
         }
 
-        if (MoleculeOS_File_System_2::read_file(file_entry,
+        if (read_file(file_entry,
                                                 buffer,
                                                 size,
                                                 0,

@@ -20,9 +20,74 @@ NOTES:
 
 #include "filesys/mofs2.hpp"
 
+#include <string_manip.hpp>
+#include <memory_manip.hpp>
+#include <kernel.hpp>
+
 
 namespace kernel::filesys
 {
+    stdlib::Array<File_Entry, FILE_TABLE_ENTRYS> file_entry_table;
+}
+
+
+namespace
+{
+    using namespace kernel;
+    using namespace filesys;
+
+
+    /**
+     * @brief Remaps `status` with `replace_status` if the 
+     *        status or status flag is the same as `searched_status`.
+     * 
+     * @note This function has no error validation mechanisms at all, 
+     *       so be careful how you use it.
+     * 
+     * @param status          Status code.
+     * @param replace_status  Status for remapping.
+     * @param searched_status Searched status code.
+     * 
+     * @return Remapped status code.
+     */
+    inline
+    constexpr 
+    status_t
+    remap_status(_IN_ status_t status, 
+                 _IN_ const status_t replace_status, 
+                 _IN_ const status_t searched_status) noexcept {
+        if (status & searched_status) {
+            status ^= searched_status;
+            status |= replace_status;
+        }
+    
+        return status;
+    }
+
+
+    /**
+     * @brief Removes a status code or flag.
+     * 
+     * @note This function has no error validation mechanisms at all, 
+     *       so be careful how you use it.
+     * 
+     * @param status        Status code to edit.
+     * @param searched_flag Searched flag or status.
+     * 
+     * @return Edited status code.
+     */
+    inline
+    constexpr 
+    status_t
+    remove_status_flag(_IN_ status_t status, 
+                       _IN_ const status_t searched_flag) noexcept {
+        if (status & searched_flag) {
+            status ^= searched_flag;
+        }       
+
+        return status;
+    }
+
 
     /**
      * @brief Hashes a string to FNV-1a.
@@ -36,8 +101,7 @@ namespace kernel::filesys
      */
     constexpr 
     uint32_t 
-    MoleculeOS_File_System_2::to_fnv1a_hash(_IN_ const char* text) 
-                                            noexcept {
+    to_fnv1a_hash(_IN_ const char* text) noexcept {
         const uint32_t prime_offset = 0x01000193;
         uint32_t hash               = 0x811C9DC5;
         
@@ -91,9 +155,8 @@ namespace kernel::filesys
      */
     [[nodiscard]] 
     status_t 
-    MoleculeOS_File_System_2::validate_name_and_format(_IN_ const char* const name, 
-                                                       _IN_ const char* const format) 
-                                                       noexcept {
+    validate_name_and_format(_IN_ const char* const name, 
+                             _IN_ const char* const format) noexcept {
         status_t status;
         uint32_t name_length;
         uint32_t format_length;
@@ -216,12 +279,11 @@ namespace kernel::filesys
      *          Default case.
      */
     status_t 
-    MoleculeOS_File_System_2::file_already_exists(_IN_ const File_Entry& file_entry, 
-                                                  _IN_ const char* const name, 
-                                                  _IN_ const char* const format,
-                                                  _IN_ const uint32_t name_hash,
-                                                  _IN_ const uint32_t format_hash) 
-                                                  noexcept {
+    file_already_exists(_IN_ const File_Entry& file_entry, 
+                        _IN_ const char* const name, 
+                        _IN_ const char* const format,
+                        _IN_ const uint32_t name_hash,
+                        _IN_ const uint32_t format_hash) noexcept {
         using namespace stdlib;
 
         status_t status;
@@ -306,11 +368,10 @@ namespace kernel::filesys
      *          Default case.
      */
     status_t 
-    MoleculeOS_File_System_2::check_file_not_exists(_IN_ const char* name,
-                                                    _IN_ const char* format,
-                                                    _IN_ const uint32_t name_hash,
-                                                    _IN_ const uint32_t format_hash) 
-                                                    noexcept {
+    check_file_not_exists(_IN_ const char* name,
+                          _IN_ const char* format,
+                          _IN_ const uint32_t name_hash,
+                          _IN_ const uint32_t format_hash) noexcept {
         status_t status;
 
         status = validate_name_and_format(name, format);
@@ -350,8 +411,7 @@ namespace kernel::filesys
      *          Default case.
      */
     status_t 
-    MoleculeOS_File_System_2::find_free_file_entry(_OUT_ uint32_t& index)
-                                                   noexcept {
+    find_free_file_entry(_OUT_ uint32_t& index) noexcept {
         status_t status;
 
         for (uint32_t current_entry = 0; 
@@ -415,14 +475,13 @@ namespace kernel::filesys
      *          Default case.
      */
     status_t
-    MoleculeOS_File_System_2::init_file_entry(_OUT_ File_Entry*& file_entry,
-                                              _IN_  const char* const name,
-                                              _IN_  const char* const format,
-                                              _IN_  const uint32_t name_hash,
-                                              _IN_  const uint32_t format_hash,
-                                              _IN_  const uint32_t index,
-                                              _IN_  const uint32_t byte_size) 
-                                              noexcept {
+    init_file_entry(_OUT_ File_Entry*& file_entry,
+                    _IN_  const char* const name,
+                    _IN_  const char* const format,
+                    _IN_  const uint32_t name_hash,
+                    _IN_  const uint32_t format_hash,
+                    _IN_  const uint32_t index,
+                    _IN_  const uint32_t byte_size) noexcept {
         using namespace stdlib;
 
         status_t status;
@@ -516,10 +575,9 @@ namespace kernel::filesys
      *          Default case.
      */
     status_t 
-    MoleculeOS_File_System_2::find_file_for_deletion(_OUT_ uint32_t& index,
-                                                     _IN_  const char* const name,
-                                                     _IN_  const char* const format)
-                                                     noexcept {
+    find_file_for_deletion(_OUT_ uint32_t& index,
+                           _IN_  const char* const name,
+                           _IN_  const char* const format)noexcept {
         status_t status;
         uint32_t name_hash;
         uint32_t format_hash;
@@ -583,8 +641,7 @@ namespace kernel::filesys
      *          Default case.
      */
     status_t 
-    MoleculeOS_File_System_2::clear_file_data(_IN_ const uint32_t file_index) 
-                                              noexcept {
+    clear_file_data(_IN_ const uint32_t file_index) noexcept {
         using namespace heap;
 
         status_t status;
@@ -619,8 +676,39 @@ namespace kernel::filesys
     cleanup:
         return status;
     }
+} // namespace
 
-        
+
+namespace kernel::filesys
+{
+    /**
+     * @brief Sets a file entry with a specific index.
+     * 
+     * @param file_entry data to set the file entry.
+     * @param file_index Index of the file entry to get.
+     */
+    _API_  
+    void 
+    set_file_entry(_IN_ const File_Entry& file_entry, 
+                   _IN_ const uint32_t file_index) noexcept {
+        if (file_index < FILE_TABLE_ENTRYS) [[likely]] {
+            file_entry_table[file_index] = file_entry;
+        }
+    }
+
+
+    /**
+     * @brief Gets a file entry with a specific index.
+     * 
+     * @param file_index Index of the file entry to get.
+     */
+    _API_   
+    File_Entry&
+    get_file_entry(_IN_ const uint32_t file_index) noexcept {
+        return file_entry_table[file_index];
+    }
+
+
     /** 
      * @brief Creates a file with a specific name, format and size.
      * 
@@ -665,11 +753,10 @@ namespace kernel::filesys
      */
     _API_
     status_t 
-    MoleculeOS_File_System_2::create_file(_OUT_ File_Entry*& file_entry,
-                                          _IN_  const char* const name,
-                                          _IN_  const char* const format,
-                                          _IN_  const uint32_t byte_size) 
-                                          noexcept {
+    create_file(_OUT_ File_Entry*& file_entry,
+                _IN_  const char* const name,
+                _IN_  const char* const format,
+                _IN_  const uint32_t byte_size) noexcept {
         status_t status;
         uint32_t index;
         uint32_t name_hash;
@@ -768,9 +855,8 @@ namespace kernel::filesys
      */
     _API_
     status_t 
-    MoleculeOS_File_System_2::delete_file(_IN_ const char* const name, 
-                                          _IN_ const char* const format) 
-                                          noexcept {
+    delete_file(_IN_ const char* const name, 
+                _IN_ const char* const format) noexcept {
         using namespace stdlib;
 
         status_t status;
@@ -852,10 +938,9 @@ namespace kernel::filesys
      */
     _API_
     status_t 
-    MoleculeOS_File_System_2::find_file(_OUT_ File_Entry*& file_entry,
-                                        _IN_  const char* const name,
-                                        _IN_  const char* const format) 
-                                        noexcept {
+    find_file(_OUT_ File_Entry*& file_entry,
+              _IN_  const char* const name,
+              _IN_  const char* const format) noexcept {
         status_t status;
         uint32_t name_hash;  
         uint32_t format_hash;
@@ -931,12 +1016,11 @@ namespace kernel::filesys
      */
     _API_
     status_t 
-    MoleculeOS_File_System_2::write_file(_IN_ const File_Entry* const file_entry,
-                                         _IN_ const uint8_t* const data_ptr,
-                                         _IN_ const uint32_t offset,
-                                         _IN_ const uint32_t length,
-                                         _IN_ const uint32_t data_byte_size) 
-                                         noexcept {
+    write_file(_IN_ const File_Entry* const file_entry,
+               _IN_ const uint8_t* const data_ptr,
+               _IN_ const uint32_t offset,
+               _IN_ const uint32_t length,
+               _IN_ const uint32_t data_byte_size) noexcept {
         using namespace stdlib;
 
         status_t status;
@@ -1010,10 +1094,9 @@ namespace kernel::filesys
      */
     _API_
     status_t 
-    MoleculeOS_File_System_2::append_file(_IN_ File_Entry* file_entry,
-                                          _IN_ const uint8_t* const data_ptr,
-                                          _IN_ const uint32_t data_byte_size) 
-                                          noexcept {
+    append_file(_IN_ File_Entry* file_entry,
+                _IN_ const uint8_t* const data_ptr,
+                _IN_ const uint32_t data_byte_size) noexcept {
         using namespace stdlib;
 
         status_t status;
@@ -1076,8 +1159,7 @@ namespace kernel::filesys
      */
     _API_
     status_t 
-    MoleculeOS_File_System_2::clear_file(_IN_ File_Entry* const file_entry) 
-                                         noexcept {
+    clear_file(_IN_ File_Entry* const file_entry) noexcept {
         using namespace stdlib;
 
         status_t status;
@@ -1182,11 +1264,10 @@ namespace kernel::filesys
      */
     _API_
     status_t
-    MoleculeOS_File_System_2::rename_file(_IN_ const char* const new_name,
-                                          _IN_ const char* const new_format,
-                                          _IN_ const char* const old_name,
-                                          _IN_ const char* const old_format) 
-                                          noexcept {
+    rename_file(_IN_ const char* const new_name,
+                _IN_ const char* const new_format,
+                _IN_ const char* const old_name,
+                _IN_ const char* const old_format) noexcept {
         using namespace stdlib;
 
         status_t status;
@@ -1343,11 +1424,10 @@ namespace kernel::filesys
      */
     _API_
     status_t
-    MoleculeOS_File_System_2::copy_file(_IN_ const char* const destination_name,
-                                        _IN_ const char* const destination_format,
-                                        _IN_ const char* const source_name,
-                                        _IN_ const char* const source_format) 
-                                        noexcept {
+    copy_file(_IN_ const char* const destination_name,
+              _IN_ const char* const destination_format,
+              _IN_ const char* const source_name,
+              _IN_ const char* const source_format) noexcept {
         using namespace stdlib;
 
         status_t status;
@@ -1495,12 +1575,11 @@ namespace kernel::filesys
      */
     _API_
     status_t 
-    MoleculeOS_File_System_2::read_file(_IN_ const File_Entry* const file_entry,
-                                        _IN_ uint8_t* const buffer_ptr,
-                                        _IN_ const uint32_t buffer_size,
-                                        _IN_ const uint32_t offset,
-                                        _IN_ const uint32_t length) 
-                                        noexcept {
+    read_file(_IN_ const File_Entry* const file_entry,
+              _IN_ uint8_t* const buffer_ptr,
+              _IN_ const uint32_t buffer_size,
+              _IN_ const uint32_t offset,
+              _IN_ const uint32_t length) noexcept {
         using namespace stdlib;
 
         status_t status;
@@ -1587,9 +1666,8 @@ namespace kernel::filesys
      */
     _API_
     status_t 
-    MoleculeOS_File_System_2::resize_file_size(_INOUT_ File_Entry* const file_entry,
-                                               _IN_    const uint32_t new_byte_size) 
-                                            noexcept {
+    resize_file_size(_INOUT_ File_Entry* const file_entry,
+                     _IN_    const uint32_t new_byte_size) noexcept {
         status_t status;
 
         if (!file_entry) [[unlikely]] {
@@ -1622,5 +1700,23 @@ namespace kernel::filesys
 
     cleanup:
         return status;
+    }
+
+
+    /**
+     * @brief Validates if a character is valid for file names and formats.
+     *
+     * @param symbol Character to validate.
+     *
+     * @return `true` if `symbol` is valid for file names or formats,
+     *         otherwise `false`.
+     */
+    _API_
+    bool 
+    is_valid_name_or_format_char(_IN_ const char symbol) noexcept {
+        return (symbol >= 'A' && symbol <= 'Z') ||
+               (symbol >= 'a' && symbol <= 'z') ||
+               (symbol >= '0' && symbol <= '9') ||
+               (symbol == '_' || symbol == '-');
     }
 } // namespace kernel::filesys

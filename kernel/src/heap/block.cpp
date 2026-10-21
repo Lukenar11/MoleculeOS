@@ -18,6 +18,7 @@ NOTES:
 #include "heap/block.hpp"
 
 #include <kernel.hpp>
+#include <memory_manip.hpp>
 
 
 namespace

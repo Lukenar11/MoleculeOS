@@ -80,7 +80,7 @@ namespace shell::commands
             return;
         }
 
-        if (MoleculeOS_File_System_2::copy_file(dest_parsed.name.data(),
+        if (copy_file(dest_parsed.name.data(),
                                                 dest_parsed.format.data(),
                                                 src_parsed.name.data(),
                                                 src_parsed.format.data()) != status::SUCCESS) {

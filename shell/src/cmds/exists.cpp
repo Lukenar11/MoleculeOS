@@ -35,7 +35,7 @@ namespace shell::commands
         }
 
         kernel::filesys::File_Entry* file_entry;
-        kernel::filesys::MoleculeOS_File_System_2::find_file(file_entry,
+        kernel::filesys::find_file(file_entry,
                                                              parsed_filename.name.data(), 
                                                              parsed_filename.format.data());
         if (!file_entry) {

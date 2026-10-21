@@ -323,7 +323,7 @@ Examples (without exceeding the character limit):
 Example (with long args):
 
 ```cpp
-    kernel::filesys::MoleculeOS_File_System_2::copy_file(src_parsed.name.data(),
+    kernel::filesys::copy_file(src_parsed.name.data(),
                                                          src_parsed.format.data(),
                                                          dest_parsed.name.data(),
                                                          dest_parsed.format.data());

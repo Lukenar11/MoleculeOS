@@ -84,7 +84,7 @@ namespace shell::commands
         }
 
         for (uint32_t i = 0; parsed_filename.name[i] != '\0'; i++)
-            if (!kernel::filesys::MoleculeOS_File_System_2::
+            if (!kernel::filesys::
                  is_valid_name_or_format_char(parsed_filename.name[i])) {
                 static const char* error_message = "not a valid File Name";
                 stdlib::String_Manipulation::copy_string(parsed_filename.error.data(),
@@ -93,7 +93,7 @@ namespace shell::commands
             }
 
         for (uint32_t i = 0; parsed_filename.format[i] != '\0'; i++)
-            if (!kernel::filesys::MoleculeOS_File_System_2::
+            if (!kernel::filesys::
                  is_valid_name_or_format_char(parsed_filename.format[i])) {
                 static const char* error_message = "not a valid File Format";
                 stdlib::String_Manipulation::copy_string(parsed_filename.error.data(), 

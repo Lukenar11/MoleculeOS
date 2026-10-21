@@ -18,6 +18,8 @@ NOTES:
 
 #include <drivers.hpp>
 #include <kernel.hpp>
+#include <memory_manip.hpp>
+#include <string_manip.hpp>
 
 
 namespace
@@ -679,7 +681,7 @@ namespace
             goto cleanup;
         }
 
-        filesys::MoleculeOS_File_System_2::set_file_entry(file_entry, 
+        filesys::set_file_entry(file_entry, 
                                                           file_entry_index);
 
         status = status::SUCCESS;
@@ -964,7 +966,7 @@ namespace kernel::storemgr
              current_entry < header.file_entry_count; 
              current_entry++) [[likely]] {
             File_Entry& 
-            file_entry = MoleculeOS_File_System_2::get_file_entry(current_entry);
+            file_entry = get_file_entry(current_entry);
 
             status = store_single_file(current_data_offset,
                                        stored_file_entrys[current_entry],

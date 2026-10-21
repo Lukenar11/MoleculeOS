@@ -94,7 +94,7 @@ namespace shell::commands
             return;
         }
 
-        if (MoleculeOS_File_System_2::rename_file(new_parsed_filename.name.data(),
+        if (rename_file(new_parsed_filename.name.data(),
                                                   new_parsed_filename.format.data(),
                                                   old_parsed_filename.name.data(),
                                                   old_parsed_filename.format.data()) 
