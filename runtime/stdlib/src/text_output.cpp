@@ -255,6 +255,7 @@ namespace stdlib
         status_t status;
 
         if (cursor_x > 0) [[likely]] {
+            cursor_x--;
             status = drivers::vga::Text_Mode::put_char_at(cursor_x,
                                                           cursor_y,
                                                           cursor_color,
