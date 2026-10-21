@@ -15,7 +15,7 @@ namespace tests
         void* p = nullptr;
 
         // 1) allocate 16 bytes
-        s = kernel::heap::Block_Allocator::allocate(p, 16);
+        s = kernel::heap::allocate(p, 16);
         stdlib::Text_Output::put_string("Allocated 16 bytes at: ");
         stdlib::Text_Output::put_ptr(reinterpret_cast<uint32_t>(p));
         stdlib::Text_Output::put_char('\n');
@@ -30,7 +30,7 @@ namespace tests
             b[i] = i;
 
         // 3) reallocate to 64 bytes
-        s = kernel::heap::Block_Allocator::reallocate(p, 64);
+        s = kernel::heap::reallocate(p, 64);
         stdlib::Text_Output::put_string("Reallocated to 64 bytes at: ");
         stdlib::Text_Output::put_ptr(reinterpret_cast<uint32_t>(p));
         stdlib::Text_Output::put_char('\n');
@@ -49,7 +49,7 @@ namespace tests
         stdlib::Text_Output::put_string(ok ? "Copy OK\n" : "Copy FAILED\n");
 
         // 5) shrink to 8 bytes
-        s = kernel::heap::Block_Allocator::reallocate(p, 8);
+        s = kernel::heap::reallocate(p, 8);
         stdlib::Text_Output::put_string("Shrink to 8 bytes at: ");
         stdlib::Text_Output::put_ptr(reinterpret_cast<uint32_t>(p));
         stdlib::Text_Output::put_char('\n');
@@ -59,7 +59,7 @@ namespace tests
                                         : "Relloc FAILED\n");
 
         // 6) free
-        s = kernel::heap::Block_Allocator::deallocate(p);
+        s = kernel::heap::deallocate(p);
         stdlib::Text_Output::put_string("Freed final block\n");
 
         kernel::sys::hang();
@@ -71,13 +71,13 @@ namespace tests
 
         // realloc(nullptr, size) → allocate(size)
         void* p = nullptr;
-        kernel::heap::Block_Allocator::reallocate(p, 32);
+        kernel::heap::reallocate(p, 32);
         stdlib::Text_Output::put_string("realloc(nullptr, 32) → ");
         stdlib::Text_Output::put_ptr(reinterpret_cast<uint32_t>(p));
         stdlib::Text_Output::put_char('\n');
 
         // realloc(ptr, 0) → free(ptr)
-        kernel::heap::Block_Allocator::reallocate(p, 0);
+        kernel::heap::reallocate(p, 0);
         stdlib::Text_Output::put_string("realloc(ptr, 0) → ");
         stdlib::Text_Output::put_ptr(reinterpret_cast<uint32_t>(p));
         stdlib::Text_Output::put_char('\n');
@@ -90,19 +90,19 @@ namespace tests
     //     stdlib::Text_Output::put_string("=== deallocate checks ===\n");
 // 
     //     // 1) normal free
-    //     void* p = kernel::heap::Block_Allocator::allocate(32);
-    //     kernel::heap::Block_Allocator::deallocate(p);
+    //     void* p = kernel::heap::allocate(32);
+    //     kernel::heap::deallocate(p);
     //     stdlib::Text_Output::put_string("Normal free OK\n");
 // 
     //     // 2) double free
-    //     kernel::heap::Block_Allocator::deallocate(p);
+    //     kernel::heap::deallocate(p);
 // 
     //     // 3) misaligned pointer
     //     uint8_t* bad = reinterpret_cast<uint8_t*>(p) + 1;
-    //     kernel::heap::Block_Allocator::deallocate(bad);
+    //     kernel::heap::deallocate(bad);
 // 
     //     // 4) pointer outside the heap
-    //     kernel::heap::Block_Allocator::deallocate(reinterpret_cast<void*>(0x12345678));
+    //     kernel::heap::deallocate(reinterpret_cast<void*>(0x12345678));
 // 
     //     kernel::sys::hang();
     // }
@@ -115,12 +115,12 @@ namespace tests
     //     uint32_t blocks = 0;
 // 
     //     // 1) allocate 32 bytes → should be 3 blocks (with a block size of 16 bytes)
-    //     void* p = kernel::heap::Block_Allocator::allocate(40);
+    //     void* p = kernel::heap::allocate(40);
     //     stdlib::Text_Output::put_string("Allocated pointer: ");
     //     stdlib::Text_Output::put_ptr(reinterpret_cast<uint32_t>(p));
     //     stdlib::Text_Output::put_char('\n');
 // 
-    //     bool ok = kernel::heap::Block_Allocator::get_allocation_info(p, index, blocks);
+    //     bool ok = kernel::heap::get_allocation_info(p, index, blocks);
 // 
     //     stdlib::Text_Output::put_string("Valid pointer: ");
     //     stdlib::Text_Output::put_string(ok ? "yes\n" : "no\n");
@@ -135,21 +135,21 @@ namespace tests
 // 
     //     // 2) misaligned pointer
     //     uint8_t* misaligned = reinterpret_cast<uint8_t*>(p) + 1;
-    //     ok = kernel::heap::Block_Allocator::get_allocation_info(misaligned, index, blocks);
+    //     ok = kernel::heap::get_allocation_info(misaligned, index, blocks);
 // 
     //     stdlib::Text_Output::put_string("Misaligned pointer valid: ");
     //     stdlib::Text_Output::put_string(ok ? "yes\n" : "no\n");
 // 
     //     // 3) pointer outside the heap
     //     void* outside = reinterpret_cast<void*>(0x12345678);
-    //     ok = kernel::heap::Block_Allocator::get_allocation_info(outside, index, blocks);
+    //     ok = kernel::heap::get_allocation_info(outside, index, blocks);
 // 
     //     stdlib::Text_Output::put_string("Outside pointer valid: ");
     //     stdlib::Text_Output::put_string(ok ? "yes\n" : "no\n");
 // 
     //     // 4) free block → should be invalid
-    //     kernel::heap::Block_Allocator::deallocate(p);
-    //     ok = kernel::heap::Block_Allocator::get_allocation_info(p, index, blocks);
+    //     kernel::heap::deallocate(p);
+    //     ok = kernel::heap::get_allocation_info(p, index, blocks);
 // 
     //     stdlib::Text_Output::put_string("Freed pointer valid: ");
     //     stdlib::Text_Output::put_string(ok ? "yes\n" : "no\n");

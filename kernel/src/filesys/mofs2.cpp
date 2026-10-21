@@ -442,7 +442,7 @@ namespace kernel::filesys
             goto cleanup;
         }
 
-        status = heap::Block_Allocator::allocate(file_data_ptr, byte_size);
+        status = heap::allocate(file_data_ptr, byte_size);
         if (status != status::SUCCESS || !file_data_ptr) [[unlikely]] {
             status = remove_status_flag(status, status::flags::PARAM_B);
 
@@ -601,7 +601,7 @@ namespace kernel::filesys
             goto cleanup;
         }
 
-        status = Block_Allocator::deallocate(file_data_ptr);
+        status = deallocate(file_data_ptr);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -1607,7 +1607,7 @@ namespace kernel::filesys
             goto cleanup;
         }
 
-        status = heap::Block_Allocator::reallocate(file_entry->file_data_ptr, 
+        status = heap::reallocate(file_entry->file_data_ptr, 
                                                    new_byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;

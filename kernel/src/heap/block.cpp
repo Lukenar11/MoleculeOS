@@ -17,9 +17,117 @@ NOTES:
 
 #include "heap/block.hpp"
 
+#include <kernel.hpp>
 
-namespace kernel::heap
+
+namespace
 {
+    using namespace kernel;
+    using namespace heap;
+
+
+    constexpr uint32_t ALL_BLOCKS_FREE   = 0xFFFF'FFFF;
+    constexpr uint32_t MEMORY_BLOCK_SIZE = 16;
+
+    constexpr uint32_t BITMAP_WORD_BITS  = 32;
+    constexpr uint32_t BITMAP_BIT        = 1;
+    constexpr uint32_t BITMAP_WORD_SHIFT = 5;
+    constexpr uint32_t BITMAP_WORD_MASK  = BITMAP_WORD_BITS - 1;
+
+    constexpr uint8_t MEMORY_NULL = 0x00;
+
+    uint32_t all_memory_blocks = 0;
+    uint32_t needed_pool_space = 0;
+
+    uint8_t* memory_pool_ptr   = nullptr;
+    uint16_t* allocation_sizes = nullptr;
+    uint32_t* memory_bitmap    = nullptr;
+
+
+    /** 
+     * @brief Marks a memory block in the memory poll block as used. 
+     * 
+     * @param block_index Index of the memory blocks to use.
+     */
+    inline 
+    void
+    set_block_used(_IN_ const uint32_t block_index) noexcept {
+        const uint32_t bitmap_index = block_index >> BITMAP_WORD_SHIFT;
+        const uint32_t used_block   = ~(BITMAP_BIT << (block_index & BITMAP_WORD_MASK));
+
+        memory_bitmap[bitmap_index] &= used_block;
+    }
+
+
+    /** 
+     * @brief Marks a memory block in the memory poll block as free. 
+     * 
+     * @param block_index Index of the memory blocks to free. 
+     */
+    inline 
+    void 
+    set_block_free(_IN_ const uint32_t block_index) noexcept {
+        const uint32_t bitmap_index = block_index >> BITMAP_WORD_SHIFT;
+        const uint32_t free_block   = (BITMAP_BIT << (block_index & BITMAP_WORD_MASK));
+
+        memory_bitmap[bitmap_index] |= free_block;
+    }
+
+
+    /** 
+     * @brief Checks whether a memory block in the memory pool is free.
+     * 
+     * @param block_index Memory block index.
+     * 
+     * @retval `true`  
+     *          If the memory block is free. 
+     * 
+     * @retval `false` 
+     *          If the ,emory block is used. 
+     */
+    inline 
+    bool 
+    is_block_free(_IN_ const uint32_t block_index) noexcept {
+        const uint32_t bitmap_index = block_index >> BITMAP_WORD_SHIFT;
+        const bool block_status     = (1U << (block_index & BITMAP_WORD_MASK));
+
+        return memory_bitmap[bitmap_index] & block_status;
+    }
+
+
+    /** 
+     * @brief Aligns a value up. 
+     * 
+     * @param value     Value to align. 
+     * @param alignment Alignment value. 
+     *
+     * @return aligned value.
+    */
+    inline 
+    constexpr
+    uint32_t
+    align_up(_IN_ const uint32_t value,
+             _IN_ const uint32_t alignment) noexcept {
+        return (value + (alignment - 1)) & ~(alignment - 1);
+    }
+
+
+    /** 
+     * @brief Aligns a value down. 
+     * 
+     * @param value q   Value to align. 
+     * @param alignment Alignment value. 
+     * 
+     * @return Aligned value. 
+     */
+    inline 
+    constexpr
+    uint32_t
+    align_down(_IN_ const uint32_t value,
+               _IN_ const uint32_t alignment) noexcept {
+        return value & ~(alignment - 1);
+    }
+
     /** 
      * @brief Sets all heap metadata and splits the 
      * heap area into a metadata area and a memory pool.
@@ -27,10 +135,9 @@ namespace kernel::heap
      * @param start_address Heap area start address. 
      * @param end_address   Heap area end address. 
      */
-    void
-    Block_Allocator::setup_metadata_layout(_IN_ uint32_t start_address,
-                                           _IN_ uint32_t end_address) 
-                                           noexcept {
+    void 
+    setup_metadata_layout(_IN_ uint32_t start_address,
+                          _IN_ uint32_t end_address) noexcept {
         start_address = align_up(start_address, MEMORY_BLOCK_SIZE);
         end_address   = align_down(end_address, MEMORY_BLOCK_SIZE);
 
@@ -86,8 +193,7 @@ namespace kernel::heap
      * @param bitmap_word_count Count of available memory blocks in words. 
      */
     status_t
-    Block_Allocator::clear_metadata(_IN_ const uint32_t bitmap_word_count) 
-                                    noexcept {
+    clear_metadata(_IN_ const uint32_t bitmap_word_count) noexcept {
         using namespace stdlib;
 
         status_t status;
@@ -129,9 +235,8 @@ namespace kernel::heap
      * @return Pointer to the first block.
      */ 
     void*
-    Block_Allocator::set_allocation_sizes_entry(_IN_ const uint32_t needed_blocks,
-                                                _IN_ const uint32_t pool_index) 
-                                                noexcept {
+    set_allocation_sizes_entry(_IN_ const uint32_t needed_blocks,
+                               _IN_ const uint32_t pool_index) noexcept {
         void* ptr;
 
         if (needed_blocks == 0 ||
@@ -168,10 +273,9 @@ namespace kernel::heap
      * @retval `false` If not enough free blocks were found.
      */
     bool 
-    Block_Allocator::find_enough_free_blocks(_INOUT_ uint32_t& checked_memory_blocks,
-                                             _IN_    const uint32_t pool_index,
-                                             _IN_    const uint32_t needed_blocks) 
-                                             noexcept {
+    find_enough_free_blocks(_INOUT_ uint32_t& checked_memory_blocks,
+                            _IN_    const uint32_t pool_index,
+                            _IN_    const uint32_t needed_blocks) noexcept {
         bool status;
 
         checked_memory_blocks = 0;
@@ -210,9 +314,8 @@ namespace kernel::heap
      *          Default case.
      */
     status_t 
-    Block_Allocator::validate_allocate_size(_OUT_ uint32_t& needed_blocks,
-                                            _IN_  const uint32_t byte_size) 
-                                            noexcept {
+    validate_allocate_size(_OUT_ uint32_t& needed_blocks,
+                           _IN_  const uint32_t byte_size) noexcept {
         status_t status;
         
         if (byte_size == 0) [[unlikely]] {
@@ -253,9 +356,8 @@ namespace kernel::heap
      *            Default case.
      */
     status_t 
-    Block_Allocator::find_free_memory_region(_OUT_ uint32_t& block_index,
-                                             _IN_  const uint32_t needed_blocks)
-                                             noexcept {
+    find_free_memory_region(_OUT_ uint32_t& block_index,
+                            _IN_  const uint32_t needed_blocks) noexcept {
         status_t status;
         uint32_t pool_index         = 0;
         uint32_t memory_found_index = 0;
@@ -284,6 +386,82 @@ namespace kernel::heap
 
     cleanup:
 
+        return status;
+    }
+
+
+        /** 
+     * @brief Gets the meta data of a allocated memory block.
+     * 
+     * @param pool_index      Index of the allocated memory block in 
+     *                        the memory pool.
+     * @param pool_block_size Blocksize of the allocated memory block.
+     * @param block_ptr       Pointer to the allocated memory block.
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_C`
+     *          If `block_ptr` is a `nullptr`
+     * 
+     * @retval `status::NULL_POINTER`
+     *          If the memory pool pointer inside the heap is empty.
+     * 
+     * @retval `status::POINTER_OUT_OF_RANGE`
+     *          If `block_ptr` is outside if the allocated memory block.
+     * 
+     * @retval `status::HEAP_CORRUPTED`
+     *          If the allocated memory block is not align.
+     * 
+     * @retval `status::FAIL`
+     *          Unknown error.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
+     */
+    status_t 
+    get_allocation_info(_OUT_ uint32_t& pool_index,
+                        _OUT_ uint32_t& pool_block_size,
+                        _IN_  void* block_ptr) noexcept {
+        status_t status;
+        uint8_t* new_block_ptr;
+        uint32_t offset;
+
+        if (!block_ptr) [[unlikely]] {
+            status = status::NULL_POINTER | status::flags::PARAM_C;
+            goto cleanup;
+        }
+
+        if (!memory_pool_ptr) [[unlikely]] {
+            status = status::NULL_POINTER;
+            goto cleanup;
+        }
+
+        new_block_ptr = reinterpret_cast<uint8_t*>(block_ptr);
+        if (new_block_ptr < memory_pool_ptr ||
+            new_block_ptr >= memory_pool_ptr + needed_pool_space) [[unlikely]] {
+            status = status::POINTER_OUT_OF_RANGE;
+            goto cleanup;
+        }
+
+        offset = static_cast<uint32_t>(new_block_ptr - memory_pool_ptr);
+        if (offset % MEMORY_BLOCK_SIZE != 0) [[unlikely]] {
+            status = status::HEAP_CORRUPTED;
+            goto cleanup;
+        }
+
+        pool_index = offset / MEMORY_BLOCK_SIZE;
+        if (pool_index >= all_memory_blocks) [[unlikely]] {
+            status = status::HEAP_CORRUPTED;
+            goto cleanup;
+        }
+
+        pool_block_size = allocation_sizes[pool_index];
+        if (pool_block_size == 0) [[unlikely]] {
+            status = status::FAIL;
+            goto cleanup;
+        }
+
+        status = status::SUCCESS;
+
+    cleanup:
         return status;
     }
 
@@ -324,9 +502,8 @@ namespace kernel::heap
      *          Default case.
      */
     status_t 
-    Block_Allocator::perform_reallocate(_INOUT_ void*& block_ptr,
-                                        _IN_    const uint32_t new_byte_size)
-                                        noexcept {
+    perform_reallocate(_INOUT_ void*& block_ptr,
+                       _IN_    const uint32_t new_byte_size) noexcept {
         using namespace stdlib;
 
         uint32_t block_index       = 0;
@@ -395,86 +572,12 @@ namespace kernel::heap
     
     cleanup:
         return status;
-    }
+    }    
+} // namespace
 
 
-    /** 
-     * @brief Gets the meta data of a allocated memory block.
-     * 
-     * @param pool_index      Index of the allocated memory block in 
-     *                        the memory pool.
-     * @param pool_block_size Blocksize of the allocated memory block.
-     * @param block_ptr       Pointer to the allocated memory block.
-     * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_C`
-     *          If `block_ptr` is a `nullptr`
-     * 
-     * @retval `status::NULL_POINTER`
-     *          If the memory pool pointer inside the heap is empty.
-     * 
-     * @retval `status::POINTER_OUT_OF_RANGE`
-     *          If `block_ptr` is outside if the allocated memory block.
-     * 
-     * @retval `status::HEAP_CORRUPTED`
-     *          If the allocated memory block is not align.
-     * 
-     * @retval `status::FAIL`
-     *          Unknown error.
-     * 
-     * @retval `status::SUCCESS`
-     *          Default case.
-     */
-    status_t 
-    Block_Allocator::get_allocation_info(_OUT_ uint32_t& pool_index,
-                                         _OUT_ uint32_t& pool_block_size,
-                                         _IN_  void* block_ptr) 
-                                         noexcept {
-        status_t status;
-        uint8_t* new_block_ptr;
-        uint32_t offset;
-
-        if (!block_ptr) [[unlikely]] {
-            status = status::NULL_POINTER | status::flags::PARAM_C;
-            goto cleanup;
-        }
-
-        if (!memory_pool_ptr) [[unlikely]] {
-            status = status::NULL_POINTER;
-            goto cleanup;
-        }
-
-        new_block_ptr = reinterpret_cast<uint8_t*>(block_ptr);
-        if (new_block_ptr < memory_pool_ptr ||
-            new_block_ptr >= memory_pool_ptr + needed_pool_space) [[unlikely]] {
-            status = status::POINTER_OUT_OF_RANGE;
-            goto cleanup;
-        }
-
-        offset = static_cast<uint32_t>(new_block_ptr - memory_pool_ptr);
-        if (offset % MEMORY_BLOCK_SIZE != 0) [[unlikely]] {
-            status = status::HEAP_CORRUPTED;
-            goto cleanup;
-        }
-
-        pool_index = offset / MEMORY_BLOCK_SIZE;
-        if (pool_index >= all_memory_blocks) [[unlikely]] {
-            status = status::HEAP_CORRUPTED;
-            goto cleanup;
-        }
-
-        pool_block_size = allocation_sizes[pool_index];
-        if (pool_block_size == 0) [[unlikely]] {
-            status = status::FAIL;
-            goto cleanup;
-        }
-
-        status = status::SUCCESS;
-
-    cleanup:
-        return status;
-    }
-    
-
+namespace kernel::heap
+{
     /** 
      * @brief Initializes the heap.
      * 
@@ -483,8 +586,8 @@ namespace kernel::heap
      */
     _API_ 
     void
-    Block_Allocator::init(_IN_ const uint8_t* const heap_begin,
-                          _IN_ const uint8_t* const heap_end) noexcept {
+    init(_IN_ const uint8_t* const heap_begin,
+         _IN_ const uint8_t* const heap_end) noexcept {
         setup_metadata_layout(reinterpret_cast<uint32_t>(heap_begin), 
                               reinterpret_cast<uint32_t>(heap_end));
   
@@ -522,8 +625,8 @@ namespace kernel::heap
      */
     _API_ 
     status_t 
-    Block_Allocator::allocate(_OUT_ void*& block_ptr, 
-                              _IN_  const uint32_t byte_size) noexcept {
+    allocate(_OUT_ void*& block_ptr, 
+             _IN_  const uint32_t byte_size) noexcept {
         status_t status;
         uint32_t needed_blocks;
         uint32_t block_index;
@@ -588,9 +691,8 @@ namespace kernel::heap
      */
     _API_ 
     status_t
-    Block_Allocator::clear_allocate(_OUT_ void*& block_ptr, 
-                                    _IN_  const uint32_t byte_size) 
-                                    noexcept {
+    clear_allocate(_OUT_ void*& block_ptr, 
+                   _IN_  const uint32_t byte_size) noexcept {
         const uint32_t memory_size = align_up(byte_size, MEMORY_BLOCK_SIZE);
         status_t status;
 
@@ -670,9 +772,8 @@ namespace kernel::heap
      */
     _API_ 
     status_t
-    Block_Allocator::reallocate(_INOUT_ void*& block_ptr,
-                                _IN_    const uint32_t new_byte_size) 
-                                noexcept {
+    reallocate(_INOUT_ void*& block_ptr,
+               _IN_    const uint32_t new_byte_size) noexcept {
         status_t status;
 
         if (!block_ptr) [[unlikely]] {
@@ -723,7 +824,7 @@ namespace kernel::heap
      */
     _API_
     status_t
-    Block_Allocator::deallocate(_INOUT_ void* block_ptr) noexcept {
+    deallocate(_INOUT_ void* block_ptr) noexcept {
         status_t status;
 
         uint32_t block_index   = 0;

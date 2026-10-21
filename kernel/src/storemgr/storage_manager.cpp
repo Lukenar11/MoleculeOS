@@ -362,7 +362,7 @@ namespace kernel::storemgr
             goto cleanup;
         }
 
-        status = heap::Block_Allocator::allocate(ptr, allocation_size);
+        status = heap::allocate(ptr, allocation_size);
         if (status != status::SUCCESS) [[unlikely]] {
             status = status::FAIL;
 
@@ -405,7 +405,7 @@ namespace kernel::storemgr
 
     cleanup:
         if (ptr) {
-            if (heap::Block_Allocator::deallocate(ptr) 
+            if (heap::deallocate(ptr) 
                 != status::SUCCESS) [[unlikely]] {
                 status = status::FAIL;
             }
@@ -590,7 +590,7 @@ namespace kernel::storemgr
             goto done;
         }
 
-        status = heap::Block_Allocator::allocate(data_ptr, 
+        status = heap::allocate(data_ptr, 
                                                  stored_file_entry.file_byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status == status::HEAP_EXHAUSTED) {
@@ -655,7 +655,7 @@ namespace kernel::storemgr
         goto done;
 
     cleanup:
-        if (heap::Block_Allocator::deallocate(data_ptr) 
+        if (heap::deallocate(data_ptr) 
             != status::SUCCESS) [[unlikely]] {
             status = status::FAIL;
         }

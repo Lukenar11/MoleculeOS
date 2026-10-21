@@ -27,13 +27,19 @@ NOTES:
 #include <drivers.hpp>
 
 
+_C_API_ { 
+    extern uint8_t heap_start;
+    extern uint8_t heap_end;
+}
+
+
 namespace kernel
 {                
     _API_
     [[noreturn]]
     void 
     main() noexcept {
-        heap::Block_Allocator::init(&heap::heap_start, &heap::heap_end);
+        heap::init(&heap_start, &heap_end);
         drivers::ata::Programmable_Input_Output::init();
         storemgr::Storage_Manager::init();
 

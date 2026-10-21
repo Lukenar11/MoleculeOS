@@ -52,7 +52,7 @@ namespace tests
         uint32_t lba = 0;
         int32_t sectors = 1;
         void* temp_ptr;
-        kernel::heap::Block_Allocator::allocate(temp_ptr, reserved_words << 1)
+        kernel::heap::allocate(temp_ptr, reserved_words << 1)
         uint16_t* ptr = static_cast<uint16_t*>(temp_ptr);
 
         for (uint32_t i = 0; i < reserved_words; i++)
@@ -77,7 +77,7 @@ namespace tests
         stdlib::Text_Output::put_string("\n\nStatus after read: ");
         stdlib::Text_Output::put_hex(stdlib::byte_input(Programmable_Input_Output::status_port()));
                                       
-        kernel::heap::Block_Allocator::deallocate(ptr);
+        kernel::heap::deallocate(ptr);
         kernel::sys::hang();
     }
 

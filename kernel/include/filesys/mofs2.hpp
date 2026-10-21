@@ -26,6 +26,7 @@ NOTES:
 #include <types.hpp>
 #include <sal.hpp>
 #include <status.hpp>
+#include <memory_manip.hpp>
 #include <string_manip.hpp>
 
 

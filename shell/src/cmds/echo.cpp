@@ -178,7 +178,7 @@ namespace shell::commands
 
         const uint32_t size = file_entry->used_data_byte_size + 1;
         void* ptr;
-        Block_Allocator::allocate(ptr, size);
+        allocate(ptr, size);
         uint8_t* buffer = static_cast<uint8_t*>(ptr);
         if (!buffer) {
             print_command_error(command_name);
@@ -195,7 +195,7 @@ namespace shell::commands
             print_command_error(command_name);
             print_command_error("could not read file\n");
 
-            Block_Allocator::deallocate(buffer);
+            deallocate(buffer);
             return;
         }
 
@@ -204,7 +204,7 @@ namespace shell::commands
         for (uint32_t i = 0; buffer[i] != '\0'; i++)
             stdlib::Text_Output::put_char(buffer[i]);
 
-        Block_Allocator::deallocate(buffer);
+        deallocate(buffer);
     }
 
     void echo(const stdlib::Array<char, 64>& args) noexcept {
