@@ -41,9 +41,9 @@ namespace kernel
     main() noexcept {
         heap::init(&heap_start, &heap_end);
         drivers::ata::Programmable_Input_Output::init();
-        storemgr::Storage_Manager::init();
+        storemgr::init();
 
-        if (storemgr::Storage_Manager::load_filesystem() != status::SUCCESS) [[unlikely]] {
+        if (storemgr::load_filesystem() != status::SUCCESS) [[unlikely]] {
             sys::panic("load failed");
         }
         
@@ -54,7 +54,7 @@ namespace kernel
             terminal.step();
         }
 
-        if (storemgr::Storage_Manager::save_filesystem() != status::SUCCESS) [[unlikely]] {
+        if (storemgr::save_filesystem() != status::SUCCESS) [[unlikely]] {
             sys::panic("save failed");
         }
 
