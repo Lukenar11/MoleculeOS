@@ -255,7 +255,6 @@ namespace stdlib
         status_t status;
 
         if (cursor_x > 0) [[likely]] {
-            cursor_x--;
             status = drivers::vga::Text_Mode::put_char_at(cursor_x,
                                                           cursor_y,
                                                           cursor_color,
@@ -289,9 +288,9 @@ namespace stdlib
     Text_Output::handle_tab() noexcept {
         status_t status;
 
-        for (uint32_t space_count = 0; 
-             space_count < 4; 
-             space_count++) [[likely]] {
+        for (uint32_t puted_spaces = 0; 
+             puted_spaces < 4 - (cursor_y % 4);
+             puted_spaces++) [[likely]] {
             status = drivers::vga::Text_Mode::put_char_at(cursor_x,
                                                           cursor_y,
                                                           cursor_color,

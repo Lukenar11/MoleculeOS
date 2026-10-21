@@ -75,6 +75,41 @@ namespace drivers::vga
     }
 
 
+    _API_
+    status_t 
+    Text_Mode::get_char_from(_OUT_ char& symbol,
+                             _OUT_ uint8_t& color,
+                             _IN_  const uint32_t x,
+                             _IN_  const uint32_t y) noexcept {
+        status_t status;
+
+        const uint16_t entry = SCREEN_BUFFER[y * TEXT_MODE_SCREEN_WIDTH + x];
+
+        if (x >= TEXT_MODE_SCREEN_WIDTH) [[unlikely]] {
+            status = status::INVALID_PARAMETER | status::flags::PARAM_C;
+            goto cleanup;
+        }
+
+        if (y >= TEXT_MODE_SCREEN_HEIGHT) [[unlikely]] {
+            status = status::INVALID_PARAMETER | status::flags::PARAM_D;
+            goto cleanup;
+        }
+
+        if (y * TEXT_MODE_SCREEN_WIDTH + x > *SCREEN_BUFFER) [[unlikely]] {
+            status = status::FAIL;
+            goto cleanup;
+        }
+
+        symbol = static_cast<char>(entry & BYTE_MASK);
+        color  = static_cast<uint8_t>((entry >> 8) & BYTE_MASK);
+
+        status = status::SUCCESS;
+
+    cleanup:
+        return status;
+    }
+
+
     /** 
      * @brief Clears the screen and sets a special screen color.
      * 

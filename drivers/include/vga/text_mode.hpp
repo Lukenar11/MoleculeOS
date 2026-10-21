@@ -41,6 +41,8 @@ namespace drivers::vga
         uint16_t* 
         const SCREEN_BUFFER = reinterpret_cast<volatile uint16_t*>(0xB8000);
 
+        static inline constexpr uint16_t BYTE_MASK = 0x00FF;
+
 
         /** 
          * @brief Makes a symbol entry for the 
@@ -120,6 +122,15 @@ namespace drivers::vga
                     _IN_ const uint32_t y,
                     _IN_ const uint8_t color,
                     _IN_ const char symbol) noexcept;
+
+                    
+        _API_
+        static
+        status_t
+        get_char_from(_OUT_ char& symbol,
+                      _OUT_ uint8_t& color,
+                      _IN_  const uint32_t x,
+                      _IN_  const uint32_t y) noexcept;
 
 
         /** 
