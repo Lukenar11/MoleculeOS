@@ -22,9 +22,7 @@ NOTES:
  * @note This is only documentation for the developer and 
  *       doesn't chance anything in the logic or mutability.
  */
-#ifndef _INOUT_
-#   define _INOUT_
-#endif
+#define _INOUT_
 
 
 /**
@@ -33,9 +31,7 @@ NOTES:
  * @note This is only documentation for the developer and 
  *       doesn't chance anything in the logic or mutability.
  */
-#ifndef _OUT_
-#   define _OUT_
-#endif
+#define _OUT_
 
 
 /**
@@ -44,9 +40,7 @@ NOTES:
  * @note This is only documentation for the developer and 
  *       doesn't chance anything in the logic or mutability.
  */
-#ifndef _IN_
-#   define _IN_
-#endif
+#define _IN_
 
 
 /**
@@ -55,9 +49,7 @@ NOTES:
  * @note This is only documentation for the developer and 
  *       doesn't chance anything in the logic or mutability.
  */
-#ifndef _API_
-#   define _API_
-#endif
+#define _API_
 
 
 /**
@@ -65,6 +57,4 @@ NOTES:
  * 
  * @note Always use this macro instead of `extern "C"`.
  */
-#ifndef _C_API_
-#   define _C_API_ extern "C"
-#endif
+#define _C_API_ extern "C"
