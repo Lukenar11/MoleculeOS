@@ -34,6 +34,7 @@
         "endmacro",
         "endrep",
         "filesys",
+        "INOUT",
         "insw",
         "intstrem",
         "iretd",
@@ -52,7 +53,9 @@
         "redict",
         "resb",
         "rodata",
+        "SCANCODE",
         "SRST",
         "storemgr",
+        "testsuit"
     ]
 }

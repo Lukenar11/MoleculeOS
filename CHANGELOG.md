@@ -250,3 +250,116 @@
 - Filesystem is volatile
 - Filesystem is flat
 - Hard Drive driver is not used
+
+---
+
+## *[0.4.0-alpha] – October 21, 2026*
+
+### Added
+- `status_t` for status code handling
+- status codes using the `status_t` type
+  - `SUCCESS`
+  - `FAIL`
+  - `INVALID_PARAMETER`
+  - `NOT_FOUND`
+  - `OUT_OF_MEMORY`
+  - `IO_ERROR`
+  - `END_OF_FILE`
+  - `MISSING_PARAMETER`
+  - `INVALID_STATE`
+  - `BUFFER_TOO_SMALL`
+  - `BUFFER_OVERFLOW`
+  - `BUFFER_UNDERFLOW`
+  - `UNSUPPORTED_OPERATION`
+  - `NOT_IMPLEMENTED`
+  - `GREATER_THAN`
+  - `LESS_THAN`
+  - `EQUAL_TO`
+  - `FULL`
+  - `EMPTY`
+  - `NULL_POINTER`
+  - `INVALID_POINTER`
+  - `UNALIGNED_POINTER`
+  - `POINTER_OUT_OF_RANGE`
+  - `HEAP_CORRUPTED`
+  - `HEAP_EXHAUSTED`
+  - `ALIGNMENT_ERROR`
+  - `FS_CORRUPTED`
+  - `FS_INVALID_FILE_ENTRY`
+  - `FS_INVALID_BLOCK`
+  - `FS_OUT_OF_SPACE`
+  - `FS_INVALID_INODE`
+  - `ALREADY_EXISTS`
+  - `FS_VERSION_MISMATCH`
+  - `ATA_TIMEOUT`
+  - `ATA_DEVICE_FAULT`
+  - `ATA_BAD_SECTOR`
+  - `ATA_NO_DEVICE`
+  - `ATA_INVALID_SECTOR_COUNT`
+  - `ATA_INVALID_LBA`
+  - `ATA_ERROR`
+  - `PS2_SCANCODE_TOO_BIG`
+  - `PS2_KEYBOARD_RELEASE`
+  - `PS2_CAPS_LOCK`
+  - `PS2_SHIFT`
+- status code flags for more detailed error reporting
+  - `PARAM_A`
+  - `PARAM_B`
+  - `PARAM_C`
+  - `PARAM_D`
+  - `READ_ONLY`
+  - `WRITE_ONLY`
+  - `EXECUTE_ONLY`
+  - `UNALIGNED`
+  - `OUT_OF_RANGE`
+  - `SIZE_ZERO`
+  - `TOO_LARGE`
+  - `OVERWRITTEN`
+  - `IS_EMPTY`
+  - `KEY_PRESS`
+  - `KEY_RELEASE`
+- a storage manager that interacts with the hard drive to load the file system into RAM and save it back to disk
+  - `kernel::storemgr::Storage_Manager::load_filesystem();`
+  - `kernel::storemgr::Storage_Manager::save_filesystem();`
+- a simple **SAL** (**Source Annotation Language**) for documenting code
+  - `_INOUT_`
+  - `_OUT_`
+  - `_IN_`
+  - `_API_`
+  - `_C_API_`
+- DocBlocks for all functions/methods in `kernel/`, `runtime/`, and `drivers/` for documenting code
+
+### Changed
+- `kernel::kernel_main` renamed to `kernel::main`
+- `kernel::kernel_arch_init` renamed to `kernel::platform_bootstrap`
+- boot path changed from **`_start -> kernel::kernel_main -> kernel::kernel_arch_init -> kernel::kernel_main`** to **`_start -> kernel::platform_bootstrap -> kernel::main`**
+- `[[likely]]` added to all loops
+- `[[likely]]` and `[[unlikely]]` added to the most relevant conditional statements
+- `kernel/src/kernel_main.cpp` renamed to `kernel/src/main.cpp`
+- `arch/i386/kernel/src/kernel_arch_init.cpp` renamed to `arch/i386/kernel/src/platform_bootstrap.cpp`
+- `arch/i386/kernel/include/kernel_arch_init.hpp` removed
+- the hard drive driver is now used
+- `goto` cleanup paths added for resource and status management in most functions/methods in `kernel/`, `runtime/`, and `drivers/`
+- `status_t` handling added for error validation in most functions/methods in `kernel/`, `runtime/`, and `drivers/`
+- interrupt guards added with `kernel::sys::save_eflags()`, `kernel::sys::enable_flags()`, and `kernel::sys::disable_flags()` at critical points in `kernel/`, `runtime/`, and `drivers/`
+
+### Improved
+- error validation with `status_t`
+- resource management with `goto` cleanup paths
+- hard drive driver stability
+- the file system is no longer volatile
+- more error guards and validation functions
+- interrupt guards to prevent failures at critical points
+- better documentation because of the SAL and the DocBlocks
+
+### Fixed
+
+### Known Issues
+- outdated references in `STYLES.md`
+- no multitasking
+- no scheduler
+- no user mode
+- no user programs
+- file system is flat
+- Makefile structure is not flexible
+- no test suite
