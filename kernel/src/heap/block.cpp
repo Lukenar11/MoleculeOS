@@ -18,7 +18,7 @@ NOTES:
 #include "heap/block.hpp"
 
 #include <kernel.hpp>
-#include <memory_manip.hpp>
+#include <memory.hpp>
 
 
 namespace
@@ -207,16 +207,12 @@ namespace
                                                       sizeof(uint32_t),
                                                       MEMORY_BLOCK_SIZE);
 
-        status = Memory_Manipulation::set_memory_block(allocation_sizes,
-                                                       MEMORY_NULL,
-                                                       allocation_sizes_bytes);
+        status = stdlib::memory::set_memory_block(allocation_sizes, MEMORY_NULL, allocation_sizes_bytes);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        status = Memory_Manipulation::set_memory_block(memory_bitmap,
-                                                       ALL_BLOCKS_FREE,
-                                                       memory_bitmap_bytes);
+        status = stdlib::memory::set_memory_block(memory_bitmap, ALL_BLOCKS_FREE, memory_bitmap_bytes);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -548,9 +544,7 @@ namespace
             memory_byte_size = new_byte_size;
         }
     
-        status = Memory_Manipulation::copy_memory_block(new_block_ptr, 
-                                                        block_ptr, 
-                                                        memory_byte_size);
+        status = stdlib::memory::copy_memory_block(new_block_ptr, block_ptr, memory_byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_B) {
                 status ^= status::flags::PARAM_B;
@@ -709,9 +703,7 @@ namespace kernel::heap
 
         sys::disable_interrupts();
 
-        status = stdlib::Memory_Manipulation::set_memory_block(block_ptr, 
-                                                               MEMORY_NULL, 
-                                                               memory_size);
+        status = stdlib::memory::set_memory_block(block_ptr, MEMORY_NULL, memory_size);
         if (status != status::SUCCESS) [[unlikely]] {
             sys::enable_interrupts();
 

@@ -5,7 +5,7 @@
 #include <array.hpp>
 #include <drivers.hpp>
 #include <kernel.hpp>
-#include <memory_manip.hpp>
+#include <memory.hpp>
 #include <string.hpp>
 
 namespace tests
@@ -118,9 +118,7 @@ namespace tests
         stdlib::string::get_string_length(length, message_to_write);
         
         buffer.fill(0);
-        stdlib::Memory_Manipulation::copy_memory_block(buffer.begin(), 
-                                                       message_to_write, 
-                                                       length);
+        stdlib::memory::copy_memory_block(buffer.begin(), message_to_write, length);
 
         uint16_t* buffer_ptr = buffer.begin();
         int32_t sectors = 1;

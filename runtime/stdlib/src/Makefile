@@ -5,7 +5,7 @@
 # 
 
 OBJS += $(BUILD)/text_output.o \
-		$(BUILD)/memory_manip.o \
+		$(BUILD)/memory.o \
 		$(BUILD)/circular_buffer.o \
 		$(BUILD)/string.o \
 		$(BUILD)/compiler_c_api.o \

@@ -3,7 +3,7 @@
 #include <types.hpp>
 #include <text_output.hpp>
 #include <kernel.hpp>
-#include <memory_manip.hpp>
+#include <memory.hpp>
 
 namespace tests
 {
@@ -31,9 +31,7 @@ namespace tests
         uint8_t* 
         program_start = reinterpret_cast<const uint8_t*>(&program_main);
 
-        stdlib::Memory_Manipulation::copy_memory_block(file_entry->file_data_ptr,
-                                                       program_start,
-                                                       48);
+        stdlib::memory::copy_memory_block(file_entry->file_data_ptr, program_start, 48);
 
         auto* run_program = reinterpret_cast<void(*)()>(file_entry->file_data_ptr);
         run_program();
