@@ -19,7 +19,7 @@ NOTES:
 #include <drivers.hpp>
 #include <kernel.hpp>
 #include <memory_manip.hpp>
-#include <string_manip.hpp>
+#include <string.hpp>
 
 
 namespace
@@ -502,8 +502,7 @@ namespace
             goto cleanup;
         }
 
-        status = String_Manipulation::compare_strings(header.magic.data(),
-                                                      MOFS_HEADER_MAGIC);
+        status = stdlib::string::compare_strings(header.magic.data(), MOFS_HEADER_MAGIC);
         if (status != status::EQUAL_TO) [[unlikely]] {
             if (status & status::flags::PARAM_A) {
                 goto cleanup;
@@ -548,8 +547,7 @@ namespace
 
         status_t status;
 
-        status = stdlib::String_Manipulation::copy_string(header.magic.data(),
-                                                          MOFS_HEADER_MAGIC);
+        status = stdlib::string::copy_string(header.magic.data(), MOFS_HEADER_MAGIC);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_B) {
                 status = status::FAIL;
@@ -877,11 +875,9 @@ namespace kernel::storemgr
             goto cleanup;
         }
     
-        status = String_Manipulation::compare_strings(header.magic.data(),
-                                                      MOFS_HEADER_MAGIC);
+        status = stdlib::string::compare_strings(header.magic.data(), MOFS_HEADER_MAGIC);
         if (status != status::EQUAL_TO) [[unlikely]] {
-            status = String_Manipulation::copy_string(header.magic.data(),
-                                                      MOFS_HEADER_MAGIC);
+            status = stdlib::string::copy_string(header.magic.data(), MOFS_HEADER_MAGIC);
             if (status != status::SUCCESS) [[unlikely]] {
                 goto cleanup;
             }

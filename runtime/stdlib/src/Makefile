@@ -7,7 +7,7 @@
 OBJS += $(BUILD)/text_output.o \
 		$(BUILD)/memory_manip.o \
 		$(BUILD)/circular_buffer.o \
-		$(BUILD)/string_manip.o \
+		$(BUILD)/string.o \
 		$(BUILD)/compiler_c_api.o \
 
 $(BUILD)/%.o: runtime/stdlib/src/%.cpp

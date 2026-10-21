@@ -20,7 +20,7 @@ NOTES:
 
 #include "filesys/mofs2.hpp"
 
-#include <string_manip.hpp>
+#include <string.hpp>
 #include <memory_manip.hpp>
 #include <kernel.hpp>
 
@@ -181,14 +181,12 @@ namespace
             goto cleanup;
         }
 
-        status = stdlib::String_Manipulation::get_string_length(name_length, 
-                                                                name);
+        status = stdlib::string::get_string_length(name_length, name);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        status = stdlib::String_Manipulation::get_string_length(format_length, 
-                                                                format);
+        status = stdlib::string::get_string_length(format_length, format);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -308,11 +306,8 @@ namespace
             const char* file_name_ptr   = file_entry.file_name.data();
             const char* file_format_ptr = file_entry.file_format.data();
 
-            name_status = String_Manipulation::compare_strings(name, 
-                                                               file_name_ptr);
-
-            format_status = String_Manipulation::compare_strings(format, 
-                                                                 file_format_ptr);
+            name_status   = stdlib::string::compare_strings(name, file_name_ptr);
+            format_status = stdlib::string::compare_strings(format, file_format_ptr);
 
             if (name_status == status::EQUAL_TO && 
                 format_status == status::EQUAL_TO) [[unlikely]] {
@@ -516,14 +511,12 @@ namespace
         entry.name_hash           = name_hash;
         entry.format_hash         = format_hash;
 
-        status = String_Manipulation::copy_string(entry.file_name.data(), 
-                                                  name);
+        status = stdlib::string::copy_string(entry.file_name.data(), name);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        status = String_Manipulation::copy_string(entry.file_format.data(), 
-                                                  format);
+        status = stdlib::string::copy_string(entry.file_format.data(), format);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -1293,12 +1286,9 @@ namespace kernel::filesys
             goto cleanup;
         }
 
-        if (String_Manipulation::compare_strings(old_name, 
-                                                 new_name) 
-            == status::EQUAL_TO &&
-            String_Manipulation::compare_strings(old_format, 
-                                                 new_format)
-            == status::EQUAL_TO) [[unlikely]] {
+        if (stdlib::string::compare_strings(old_name, new_name) == status::EQUAL_TO &&
+            stdlib::string::compare_strings(old_format, new_format) == status::EQUAL_TO
+            ) [[unlikely]] {
             status = status::SUCCESS;
             goto cleanup;
         }
@@ -1325,14 +1315,12 @@ namespace kernel::filesys
             goto cleanup;
         }
 
-        status = String_Manipulation::copy_string(file_entry->file_name.data(), 
-                                                  new_name);
+        status = stdlib::string::copy_string(file_entry->file_name.data(), new_name);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        status = String_Manipulation::copy_string(file_entry->file_format.data(), 
-                                                  new_format);
+        status = stdlib::string::copy_string(file_entry->file_format.data(), new_format);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }

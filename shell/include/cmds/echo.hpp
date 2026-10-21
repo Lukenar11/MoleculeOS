@@ -23,7 +23,7 @@ NOTES:
 #include "../utils/cmds_helpers.hpp"
 #include <types.hpp>
 #include <array.hpp>
-#include <string_manip.hpp>
+#include <string.hpp>
 #include <kernel.hpp>
 #include <text_output.hpp>
 

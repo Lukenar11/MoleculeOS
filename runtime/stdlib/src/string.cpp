@@ -16,11 +16,14 @@ NOTES:
 */
 
 
-#include <string_manip.hpp>
+#include <string.hpp>
 
-
-namespace stdlib
+namespace
 {
+    using namespace stdlib;
+    using namespace string;
+
+
     /**
      * @brief Validates the parameters for the most class methods.
      * 
@@ -37,9 +40,8 @@ namespace stdlib
      *          If all pointer are valid.
      */
     status_t
-    String_Manipulation::validate_destination_ptr_and_source_ptr(_INOUT_ const char* const destination_ptr,
-                                                                 _IN_    const char* const source_ptr)
-                                                                 noexcept {
+    validate_destination_ptr_and_source_ptr(_INOUT_ const char* const destination_ptr,
+                                            _IN_    const char* const source_ptr) noexcept {
         status_t status;
 
         if (!destination_ptr) [[unlikely]] {
@@ -61,9 +63,12 @@ namespace stdlib
 
     cleanup:
         return status;
-    }
+    } 
+} // namespace
 
 
+namespace stdlib::string
+{
     /**
      * @brief Copys the content of a string part in another string.
      * 
@@ -87,10 +92,9 @@ namespace stdlib
      */
     _API_  
     status_t
-    String_Manipulation::copy_string_part(_INOUT_ char* const destination_ptr,
-                                          _IN_    const char* const source_ptr,
-                                          _IN_    const uint32_t byte_size) 
-                                          noexcept {
+    copy_string_part(_INOUT_ char* const destination_ptr,
+                     _IN_    const char* const source_ptr,
+                     _IN_    const uint32_t byte_size) noexcept {
         status_t status;
         uint32_t memory_index = 0;
         const char null_char  = '\0';
@@ -150,9 +154,8 @@ namespace stdlib
      */
     _API_  
     status_t 
-    String_Manipulation::copy_string(_INOUT_ char* destination_ptr, 
-                                     _IN_    const char* source_ptr) 
-                                     noexcept {
+    copy_string(_INOUT_ char* destination_ptr, 
+                _IN_    const char* source_ptr) noexcept {
         status_t status;
 
         status = validate_destination_ptr_and_source_ptr(destination_ptr, 
@@ -194,10 +197,9 @@ namespace stdlib
      */
     _API_  
     status_t 
-    String_Manipulation::find_char_in_string(_OUT_ const char*& found_char,
-                                             _IN_  const char* string, 
-                                             _IN_  const int32_t symbol) 
-                                             noexcept {
+    find_char_in_string(_OUT_ const char*& found_char,
+                        _IN_  const char* string, 
+                        _IN_  const int32_t symbol) noexcept {
         status_t status;
 
         if (!string) [[unlikely]] {
@@ -238,9 +240,8 @@ namespace stdlib
      */
     _API_  
     status_t 
-    String_Manipulation::get_string_length(_OUT_ uint32_t& length,
-                                           _IN_  const char* string) 
-                                           noexcept {
+    get_string_length(_OUT_ uint32_t& length,
+                      _IN_  const char* string) noexcept {
         status_t status;
         length = 0;
 
@@ -284,9 +285,8 @@ namespace stdlib
      */
     _API_  
     status_t 
-    String_Manipulation::compare_strings(_IN_ const char* a_ptr, 
-                                         _IN_ const char* b_ptr) 
-                                         noexcept {
+    compare_strings(_IN_ const char* a_ptr, 
+                    _IN_ const char* b_ptr) noexcept {
         status_t status;
 
         if (!a_ptr) [[unlikely]] {
@@ -350,9 +350,8 @@ namespace stdlib
      */
     _API_  
     status_t 
-    String_Manipulation::string_to_int(_OUT_ int32_t& value,
-                                       _IN_  const char* string) 
-                                       noexcept {
+    string_to_int(_OUT_ int32_t& value,
+                  _IN_  const char* string) noexcept {
         bool is_negative;
         status_t status;
         uint32_t digit;
@@ -423,4 +422,11 @@ namespace stdlib
     cleanup:
         return status;
     }
-} // namespace stdlib
+
+
+    _API_  
+    bool 
+    is_digit(_IN_ const int32_t symbol) noexcept {
+        return symbol >= '0' && symbol <= '9';
+    }
+} // namespace stdlib::string

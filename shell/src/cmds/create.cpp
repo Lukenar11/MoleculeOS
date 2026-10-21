@@ -28,7 +28,7 @@ static void split_file_name_and_size(const stdlib::Array<char, 64>& args,
 
     file_size = 1024;
 
-    String_Manipulation::copy_string(filename.data(), args.data());
+    stdlib::string::copy_string(filename.data(), args.data());
 
     char* filename_ptr = filename.data();
 
@@ -36,7 +36,7 @@ static void split_file_name_and_size(const stdlib::Array<char, 64>& args,
         ++filename_ptr;
 
     if (filename_ptr != filename.data())
-        String_Manipulation::copy_string(filename.data(), filename_ptr);
+        stdlib::string::copy_string(filename.data(), filename_ptr);
 
     char* last_space = nullptr;
 
@@ -52,11 +52,11 @@ static void split_file_name_and_size(const stdlib::Array<char, 64>& args,
         return;
 
     for (char* i_ptr = size_ptr; *i_ptr != '\0'; ++i_ptr)
-        if (!String_Manipulation::is_digit(*i_ptr))
+        if (!stdlib::string::is_digit(*i_ptr))
             return;
 
     int32_t temp;
-    String_Manipulation::string_to_int(temp, size_ptr);
+    stdlib::string::string_to_int(temp, size_ptr);
     file_size = static_cast<uint32_t>(temp);
 
     *last_space = '\0';

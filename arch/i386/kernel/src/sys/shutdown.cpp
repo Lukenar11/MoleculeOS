@@ -48,9 +48,7 @@ namespace kernel::sys
         uint32_t length;
         uint32_t x_pos  = 0;
         for (uint32_t i = 0; i < line_count; ++i) {
-             stdlib::
-             String_Manipulation::get_string_length(length,
-                                                    message_if_hardware_shutdown_not_success[i]);
+            stdlib::string::get_string_length(length, message_if_hardware_shutdown_not_success[i]);
             x_pos = (drivers::vga::TEXT_MODE_SCREEN_WIDTH - length) >> 1;
 
             stdlib::Text_Output::set_cursor(x_pos, start_y + i);

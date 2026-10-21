@@ -24,7 +24,7 @@ NOTES:
 #include <types.hpp>
 #include <array.hpp>
 #include <io.hpp>
-#include <string_manip.hpp>
+#include <string.hpp>
 #include <text_output.hpp>
 #include <kernel.hpp>
 
