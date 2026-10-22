@@ -56,7 +56,7 @@ static void split_file_name_and_size(const stdlib::Array<char, 64>& args,
             return;
 
     int32_t temp;
-    stdlib::string::string_to_int(temp, size_ptr);
+    stdlib::string::to_int(temp, size_ptr);
     file_size = static_cast<uint32_t>(temp);
 
     *last_space = '\0';

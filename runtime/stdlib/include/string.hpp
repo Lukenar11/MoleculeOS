@@ -170,8 +170,8 @@ namespace stdlib::string
      */
     _API_
     status_t 
-    string_to_int(_OUT_ int32_t& value,
-                  _IN_  const char* string) noexcept;
+    to_int(_OUT_ int32_t& value,
+           _IN_  const char* string) noexcept;
 
 
     /**
