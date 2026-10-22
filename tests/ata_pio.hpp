@@ -118,7 +118,7 @@ namespace tests
         stdlib::string::get_string_length(length, message_to_write);
         
         buffer.fill(0);
-        stdlib::memory::copy(buffer.begin(), message_to_write, length);
+        stdlib::memory::copy_block(buffer.begin(), message_to_write, length);
 
         uint16_t* buffer_ptr = buffer.begin();
         int32_t sectors = 1;

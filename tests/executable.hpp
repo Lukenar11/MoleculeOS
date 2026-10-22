@@ -31,7 +31,7 @@ namespace tests
         uint8_t* 
         program_start = reinterpret_cast<const uint8_t*>(&program_main);
 
-        stdlib::memory::copy(file_entry->file_data_ptr, program_start, 48);
+        stdlib::memory::copy_block(file_entry->file_data_ptr, program_start, 48);
 
         auto* run_program = reinterpret_cast<void(*)()>(file_entry->file_data_ptr);
         run_program();

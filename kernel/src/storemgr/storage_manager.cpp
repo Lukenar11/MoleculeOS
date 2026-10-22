@@ -190,7 +190,7 @@ namespace
 
         dest_ptr = reinterpret_cast<uint8_t*>(temp_buffer_ptr) + sector_offset;
 
-        status = stdlib::memory::copy(buffer_ptr, dest_ptr, byte_size);
+        status = stdlib::memory::copy_block(buffer_ptr, dest_ptr, byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -276,7 +276,7 @@ namespace
     
         dest_ptr = reinterpret_cast<uint8_t*>(temp_buffer_ptr) + sector_offset;
 
-        status = stdlib::memory::copy(dest_ptr, buffer_ptr, byte_size);
+        status = stdlib::memory::copy_block(dest_ptr, buffer_ptr, byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_A) {
                 status ^= status::flags::PARAM_A;
@@ -642,9 +642,9 @@ namespace
             goto cleanup;
         }
 
-        status = stdlib::memory::copy(file_entry.file_name.data(),
-                                      stored_file_entry.file_name.data(),
-                                      name_length);
+        status = stdlib::memory::copy_block(file_entry.file_name.data(),
+                                            stored_file_entry.file_name.data(),
+                                            name_length);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_A) {
                 status = status::FAIL;
@@ -653,9 +653,9 @@ namespace
             goto cleanup;
         }
 
-        status = stdlib::memory::copy(file_entry.file_format.data(),
-                                      stored_file_entry.file_format.data(),
-                                      format_length);
+        status = stdlib::memory::copy_block(file_entry.file_format.data(),
+                                            stored_file_entry.file_format.data(),
+                                            format_length);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_A) {
                 status = status::FAIL;
@@ -726,9 +726,9 @@ namespace
             goto cleanup;
         }
 
-        status = stdlib::memory::copy(stored_file_entry.file_name.data(),
-                                      file_entry.file_name.data(),
-                                      MAX_FILE_NAME_LENGTH + 1);
+        status = stdlib::memory::copy_block(stored_file_entry.file_name.data(),
+                                            file_entry.file_name.data(),
+                                            MAX_FILE_NAME_LENGTH + 1);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_A) {
                 status ^= status::flags::PARAM_A;
@@ -742,9 +742,9 @@ namespace
             goto cleanup;
         }
 
-        status = stdlib::memory::copy(stored_file_entry.file_format.data(),
-                                      file_entry.file_format.data(),
-                                      MAX_FILE_FORMAT_LENGTH + 1);
+        status = stdlib::memory::copy_block(stored_file_entry.file_format.data(),
+                                            file_entry.file_format.data(),
+                                            MAX_FILE_FORMAT_LENGTH + 1);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_A) {
                 status ^= status::flags::PARAM_A;
