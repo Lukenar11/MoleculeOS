@@ -1170,7 +1170,7 @@ namespace kernel::filesys
 
         file_byte_size = file_entry->file_byte_size;
 
-        status = stdlib::memory::set_memory_block(file_data_ptr, 0x00, file_byte_size);
+        status = stdlib::memory::set_block(file_data_ptr, 0x00, file_byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }

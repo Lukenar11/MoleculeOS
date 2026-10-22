@@ -89,9 +89,9 @@ namespace stdlib::memory
      */
     _API_  
     status_t 
-    set_memory_block(_IN_ void* const destination_ptr, 
-                     _IN_ const int32_t value, 
-                     _IN_ uint32_t byte_size) noexcept;
+    set_block(_IN_ void* const destination_ptr, 
+              _IN_ const int32_t value, 
+              _IN_ uint32_t byte_size) noexcept;
 
 
     /**
