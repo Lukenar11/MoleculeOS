@@ -181,12 +181,12 @@ namespace
             goto cleanup;
         }
 
-        status = stdlib::string::get_string_length(name_length, name);
+        status = stdlib::string::get_length(name_length, name);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        status = stdlib::string::get_string_length(format_length, format);
+        status = stdlib::string::get_length(format_length, format);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }

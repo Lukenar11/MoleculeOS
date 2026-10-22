@@ -113,8 +113,8 @@ namespace stdlib::string
      */
     _API_ 
     status_t 
-    get_string_length(_OUT_ uint32_t& length,
-                      _IN_  const char* string) noexcept;
+    get_length(_OUT_ uint32_t& length,
+               _IN_  const char* string) noexcept;
 
 
     /**

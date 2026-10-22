@@ -115,7 +115,7 @@ namespace tests
 
         const char* message_to_write = "Dawn of Ashes!";
         uint32_t length;
-        stdlib::string::get_string_length(length, message_to_write);
+        stdlib::string::get_length(length, message_to_write);
         
         buffer.fill(0);
         stdlib::memory::copy_block(buffer.begin(), message_to_write, length);

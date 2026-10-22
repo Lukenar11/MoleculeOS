@@ -148,7 +148,7 @@ namespace shell::commands
                                                   file_instream.size());
             
         uint32_t length;
-        stdlib::string::get_string_length(length, file_instream.data());
+        stdlib::string::get_length(length, file_instream.data());
         const auto& instream = reinterpret_cast<const uint8_t*>(file_instream.data());
         append_file(file_entry, instream, length);
     }

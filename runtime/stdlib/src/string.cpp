@@ -240,8 +240,8 @@ namespace stdlib::string
      */
     _API_  
     status_t 
-    get_string_length(_OUT_ uint32_t& length,
-                      _IN_  const char* string) noexcept {
+    get_length(_OUT_ uint32_t& length,
+               _IN_  const char* string) noexcept {
         status_t status;
         length = 0;
 
@@ -366,7 +366,7 @@ namespace stdlib::string
             goto cleanup;
         }
 
-        status = get_string_length(string_length, string);
+        status = get_length(string_length, string);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
