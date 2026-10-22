@@ -49,7 +49,7 @@ namespace shell::commands
             "\t- exists (checks if a file already exists) | exists [File]\n"
         };
 
-        stdlib::Text_Output::reset();
-        stdlib::Text_Output::put_string(help_message);
+        stdlib::console::reset();
+        stdlib::console::put_string(help_message);
     }
 } // namespace shell::commands

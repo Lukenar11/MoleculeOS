@@ -4,7 +4,7 @@
 # https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 # 
 
-OBJS += $(BUILD)/text_output.o \
+OBJS += $(BUILD)/console.o \
 		$(BUILD)/memory.o \
 		$(BUILD)/circular_buffer.o \
 		$(BUILD)/string.o \

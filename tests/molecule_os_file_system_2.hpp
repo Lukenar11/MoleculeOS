@@ -1,17 +1,17 @@
 #pragma once
 
-#include <text_output.hpp>
+#include <console.hpp>
 #include <types.hpp>
 #include <kernel.hpp>
 
 static void fs_print(bool ok, const char* message) noexcept {
     if (ok)
-        stdlib::Text_Output::put_string("[ OK ] ");
+        stdlib::console::put_string("[ OK ] ");
     else
-        stdlib::Text_Output::put_string("[FAIL] ");
+        stdlib::console::put_string("[FAIL] ");
 
-    stdlib::Text_Output::put_string(message);
-    stdlib::Text_Output::put_char('\n');
+    stdlib::console::put_string(message);
+    stdlib::console::put_char('\n');
 }
 
 namespace tests
@@ -19,7 +19,7 @@ namespace tests
     void create_file() noexcept {
         using namespace kernel::filesys;
 
-        stdlib::Text_Output::reset();
+        stdlib::console::reset();
 
         File_Header* a = create_file("test", "txt", 32);
 
@@ -150,7 +150,7 @@ namespace tests
     void resize_file_size() noexcept {
         using namespace kernel::filesys;
 
-        stdlib::Text_Output::reset();
+        stdlib::console::reset();
 
         File_Header* file_header = create_file("resize", "bin", 16);
         fs_print(file_header != nullptr, 

@@ -24,7 +24,7 @@ NOTES:
 #include "utils/utils.hpp"
 #include <types.hpp>
 #include <array.hpp>
-#include <text_output.hpp>
+#include <console.hpp>
 
 namespace
 {
@@ -69,13 +69,13 @@ namespace shell
         uint32_t args_index = 0;
 
         static inline void set_error_message_text_color() noexcept {
-            stdlib::Text_Output::set_text_color(drivers::vga::Text_Mode_Colors::LIGHT_MAGENTA,
-                                                drivers::vga::Text_Mode_Colors::BLACK);
+            stdlib::console::set_text_color(drivers::vga::Text_Mode_Colors::LIGHT_MAGENTA,
+                                            drivers::vga::Text_Mode_Colors::BLACK);
         }
 
         static inline void set_default_text_color() noexcept {
-            stdlib::Text_Output::set_text_color(drivers::vga::Text_Mode_Colors::LIGHT_GREY,
-                                                drivers::vga::Text_Mode_Colors::BLACK);
+            stdlib::console::set_text_color(drivers::vga::Text_Mode_Colors::LIGHT_GREY,
+                                            drivers::vga::Text_Mode_Colors::BLACK);
         }
 
         void print_overflow_error(const char* error_message_for, 

@@ -17,7 +17,7 @@ NOTES:
 
 #include "utils.hpp"
 #include <kernel.hpp>
-#include <text_output.hpp>
+#include <console.hpp>
 #include <types.hpp>
 #include <array.hpp>
 #include <string.hpp>
@@ -31,18 +31,18 @@ namespace shell::commands
     };
 
     inline void print_command_error(const char* error_message) noexcept {
-        stdlib::Text_Output::set_text_color(drivers::vga::Text_Mode_Colors::YELLOW,
-                                            drivers::vga::Text_Mode_Colors::BLACK);
+        stdlib::console::set_text_color(drivers::vga::Text_Mode_Colors::YELLOW,
+                                        drivers::vga::Text_Mode_Colors::BLACK);
 
-        stdlib::Text_Output::put_string(error_message);
+        stdlib::console::put_string(error_message);
 
-        stdlib::Text_Output::set_text_color(drivers::vga::Text_Mode_Colors::LIGHT_GREY,
-                                            drivers::vga::Text_Mode_Colors::BLACK);
+        stdlib::console::set_text_color(drivers::vga::Text_Mode_Colors::LIGHT_GREY,
+                                        drivers::vga::Text_Mode_Colors::BLACK);
     }
 
     inline void command_end() noexcept {
-        stdlib::Text_Output::put_char('\n');
-        stdlib::Text_Output::put_char('\n');
+        stdlib::console::put_char('\n');
+        stdlib::console::put_char('\n');
     }
 
     Parsed_File_Name& parse_filename(const stdlib::Array<char, 64>& args) noexcept;

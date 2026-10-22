@@ -37,7 +37,7 @@ namespace shell::commands
             "\n"
         };
 
-        stdlib::Text_Output::reset();
-        stdlib::Text_Output::put_string(info_message);
+        stdlib::console::reset();
+        stdlib::console::put_string(info_message);
     }
 } // namespace shell::commands

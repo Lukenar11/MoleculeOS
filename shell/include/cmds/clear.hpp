@@ -22,11 +22,11 @@ NOTES:
 
 #pragma once
 
-#include <text_output.hpp>
+#include <console.hpp>
 
 namespace shell::commands
 {
     inline void clear() noexcept { 
-        stdlib::Text_Output::reset(); 
+        stdlib::console::reset(); 
     }
 } // namespace shell::commands

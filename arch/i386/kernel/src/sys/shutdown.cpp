@@ -39,7 +39,7 @@ namespace kernel::sys
             restore_eflags(cpu_flags);
         }
 
-        stdlib::Text_Output::reset();
+        stdlib::console::reset();
 
         const uint32_t line_count = sizeof(message_if_hardware_shutdown_not_success) / 
                                     sizeof(message_if_hardware_shutdown_not_success[0]);
@@ -51,8 +51,8 @@ namespace kernel::sys
             stdlib::string::get_string_length(length, message_if_hardware_shutdown_not_success[i]);
             x_pos = (drivers::vga::TEXT_MODE_SCREEN_WIDTH - length) >> 1;
 
-            stdlib::Text_Output::set_cursor(x_pos, start_y + i);
-            stdlib::Text_Output::put_string(message_if_hardware_shutdown_not_success[i]);
+            stdlib::console::set_cursor(x_pos, start_y + i);
+            stdlib::console::put_string(message_if_hardware_shutdown_not_success[i]);
         }
 
         sys::hang();

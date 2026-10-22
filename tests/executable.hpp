@@ -1,7 +1,7 @@
 #pragma once
 
 #include <types.hpp>
-#include <text_output.hpp>
+#include <console.hpp>
 #include <kernel.hpp>
 #include <memory.hpp>
 
@@ -16,7 +16,7 @@ namespace tests
 
     void 
     program_main() {
-        stdlib::Text_Output::reset();
+        stdlib::console::reset();
     }
 
     void 

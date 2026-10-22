@@ -32,7 +32,7 @@ Examples:
 
 Examples:
 - `file_intstrem_redict_operator_pos`
-- `text_output`
+- `console`
 - `load_idt()`
 - `extract_file_instream_befor_redict_operator()`
 
@@ -54,7 +54,7 @@ Examples:
 
 Examples:
 - `main.cpp`
-- `text_output.hpp`
+- `console.hpp`
 - `sleep.asm`
 
 ---
@@ -949,7 +949,7 @@ Each driver is a **standalone block** that contains **various modules**:
 - Drivers must **not directly** call kernel subsyss  
 - Drivers should be as **simple** as possible and serve only as a **HAL (Hardware Abstraction Layer)**
 - Each new driver must be included in the file `runtime\apis\drivers.hpp`.
-- Even internal runtime components, such as “text_output,” must use the central APIs.
+- Even internal runtime components, such as “console,” must use the central APIs.
 
 ---
 
@@ -963,7 +963,7 @@ Each driver is a **standalone block** that contains **various modules**:
     │   |   # APIs (e.g. 'drivers.hpp')
     │   └── ... *.hpp
     |
-    |  # C++ Runtime (e.g. 'array.hpp', 'text_output.hpp')
+    |  # C++ Runtime (e.g. 'array.hpp', 'console.hpp')
     └─ cpp/
         |
         │   # public API

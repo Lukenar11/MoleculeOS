@@ -25,8 +25,8 @@ namespace shell::commands
     void list() noexcept {
         using namespace kernel::filesys;
 
-        stdlib::Text_Output::reset();
-        stdlib::Text_Output::put_string("Files:\n");
+        stdlib::console::reset();
+        stdlib::console::put_string("Files:\n");
 
         File_Entry file_entry;
         for (uint32_t i = 0; i < FILE_TABLE_ENTRYS; i++) [[likely]] {
@@ -38,23 +38,23 @@ namespace shell::commands
 
             if (file_entry.file_name[0] == '\0') [[unlikely]] {
                 static const char* error_message = "\t- [INVALID FILE]\n";
-                stdlib::Text_Output::put_string(error_message);
+                stdlib::console::put_string(error_message);
                 continue;
             }
 
-            stdlib::Text_Output::put_string("\t- ");
-            stdlib::Text_Output::put_string(file_entry.file_name.data());
+            stdlib::console::put_string("\t- ");
+            stdlib::console::put_string(file_entry.file_name.data());
 
             if (file_entry.file_format[0] != '\0') {
-                stdlib::Text_Output::put_char('.');
-                stdlib::Text_Output::put_string(file_entry.file_format.data());
+                stdlib::console::put_char('.');
+                stdlib::console::put_string(file_entry.file_format.data());
             }
 
-            stdlib::Text_Output::put_string(" (");
-            stdlib::Text_Output::put_uint(file_entry.file_byte_size);
-            stdlib::Text_Output::put_string(" Bytes)\n");
+            stdlib::console::put_string(" (");
+            stdlib::console::put_uint(file_entry.file_byte_size);
+            stdlib::console::put_string(" Bytes)\n");
         }
 
-        stdlib::Text_Output::put_char('\n');
+        stdlib::console::put_char('\n');
     }
 } // namespace shell::commands

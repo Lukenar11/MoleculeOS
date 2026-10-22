@@ -62,7 +62,7 @@ namespace shell::commands
             dest_filename[dest_index++] = args[i];
         }
 
-        stdlib::Text_Output::put_char('\n');
+        stdlib::console::put_char('\n');
 
         Parsed_File_Name src_parsed = parse_filename(src_filename);
         if (src_parsed.error.data()[0] != '\0') {

@@ -21,7 +21,7 @@ NOTES:
 #include <shell.hpp>
 #include <drivers.hpp>
 #include <types.hpp>
-#include <text_output.hpp>
+#include <console.hpp>
 
 namespace terminal
 {

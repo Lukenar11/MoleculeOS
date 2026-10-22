@@ -23,14 +23,14 @@ NOTES:
 #include "utils/regs.hpp"
 #include "sys/halt.hpp"
 #include "sys/panic.hpp"
-#include <text_output.hpp>
+#include <console.hpp>
 
 namespace
 {
     inline constexpr void print_reg_dump(const char* label, 
                                          const uint32_t value) noexcept {
-        stdlib::Text_Output::put_string(label);
-        stdlib::Text_Output::put_hex(value);
+        stdlib::console::put_string(label);
+        stdlib::console::put_hex(value);
     }
 }
 

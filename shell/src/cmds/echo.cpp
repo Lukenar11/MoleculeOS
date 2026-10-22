@@ -202,7 +202,7 @@ namespace shell::commands
         buffer[file_entry->used_data_byte_size] = '\0';
 
         for (uint32_t i = 0; buffer[i] != '\0'; i++)
-            stdlib::Text_Output::put_char(buffer[i]);
+            stdlib::console::put_char(buffer[i]);
 
         deallocate(buffer);
     }
@@ -275,7 +275,7 @@ namespace shell::commands
             return;
         }
 
-        stdlib::Text_Output::put_string(args.data());
+        stdlib::console::put_string(args.data());
 
         command_end();
     }

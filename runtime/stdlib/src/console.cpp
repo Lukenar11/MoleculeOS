@@ -23,11 +23,38 @@ NOTES:
 */
 
 
-#include <text_output.hpp>
+#include <console.hpp>
+#include <drivers.hpp>
 
 
-namespace stdlib
+namespace
 {
+    using namespace stdlib;
+    using namespace console;
+
+    uint32_t cursor_x = 0;
+    uint32_t cursor_y = 0;
+        
+    uint8_t 
+    cursor_color = drivers::vga::Text_Mode::make_color(drivers::vga::Text_Mode_Colors::LIGHT_GREY,
+                                                       drivers::vga::Text_Mode_Colors::BLACK,
+                                                       false);
+
+
+    /** 
+     * Makes a cursor Jump to the next line.
+     */
+    void 
+    new_line() noexcept {
+        cursor_x = 0;
+        cursor_y++;
+
+        if (cursor_y >= drivers::vga::TEXT_MODE_SCREEN_HEIGHT) [[unlikely]] {
+            reset();
+        }
+    }
+
+    
     /** 
      * @brief Casts a integer with 
      *        a specific base to a string (eg. base 10 -> Decimal).
@@ -56,10 +83,10 @@ namespace stdlib
      */
     [[nodiscard]]
     status_t 
-    Text_Output::convert_base_to_digits(_OUT_ stdlib::Array<char, 32>& buffer,
-                                        _OUT_ uint32_t& chars_written,
-                                        _IN_  uint32_t value,
-                                        _IN_  const uint32_t base) noexcept {
+    convert_base_to_digits(_OUT_ stdlib::Array<char, 32>& buffer,
+                           _OUT_ uint32_t& chars_written,
+                           _IN_  uint32_t value,
+                           _IN_  const uint32_t base) noexcept {
         status_t status;
         uint8_t converted_number = 0;
         const char null_char     = '0';
@@ -142,8 +169,8 @@ namespace stdlib
      */
     [[nodiscard]]
     status_t 
-    Text_Output::put_base(_IN_ const uint32_t value, 
-                          _IN_ const uint32_t base) noexcept {
+    put_base(_IN_ const uint32_t value, 
+             _IN_ const uint32_t base) noexcept {
         stdlib::Array<char, 32> buffer;
         uint32_t buffer_count;
         status_t status;
@@ -201,9 +228,9 @@ namespace stdlib
      */
     [[nodiscard]]
     status_t 
-    Text_Output::convert_uint_to_digits(_OUT_ stdlib::Array<char, 12>& buffer,
-                                        _OUT_ uint32_t& buffer_count,
-                                        _IN_  uint32_t value) noexcept {
+    convert_uint_to_digits(_OUT_ stdlib::Array<char, 12>& buffer,
+                           _OUT_ uint32_t& buffer_count,
+                           _IN_  uint32_t value) noexcept {
         status_t status;
         const char null_char  = '0';
         const uint32_t ten    = 10;
@@ -251,7 +278,7 @@ namespace stdlib
      */
     [[nodiscard]]
     status_t 
-    Text_Output::handle_backspace() noexcept {
+    handle_backspace() noexcept {
         status_t status;
 
         if (cursor_x > 0) [[likely]] {
@@ -286,7 +313,7 @@ namespace stdlib
      */
     [[nodiscard]]
     status_t 
-    Text_Output::handle_tab() noexcept {
+    handle_tab() noexcept {
         status_t status;
 
         for (uint32_t puted_spaces = 0; 
@@ -329,7 +356,7 @@ namespace stdlib
      */
     [[nodiscard]]
     status_t 
-    Text_Output::handle_normal_char(_IN_ const char symbol) noexcept {
+    handle_normal_char(_IN_ const char symbol) noexcept {
         status_t status = drivers::vga::Text_Mode::put_char_at(cursor_x,
                                                                cursor_y,
                                                                cursor_color,
@@ -371,9 +398,8 @@ namespace stdlib
      */
     [[nodiscard]]
     status_t 
-    Text_Output::calculate_needed_lines(_OUT_ uint32_t& needed_lines, 
-                                        _IN_  const char* const text) 
-                                        noexcept {
+    calculate_needed_lines(_OUT_ uint32_t& needed_lines, 
+                           _IN_  const char* const text) noexcept {
         const char new_line = '\n';
         uint32_t x          = cursor_x;
         char symbol;
@@ -420,19 +446,97 @@ namespace stdlib
     cleanup:
         return status;
     }
+} // namespace
+
+
+namespace stdlib::console
+{
+    /** 
+     * @brief Gets the X coordinate of the cursor
+     * 
+     * @return cursor X coordinate
+     */        
+    _API_ 
+    [[nodiscard]] 
+    uint32_t 
+    get_cursor_x() noexcept {
+        return cursor_x;
+    }
 
 
     /** 
-     * Makes a cursor Jump to the next line.
-     */
-    void 
-    Text_Output::new_line() noexcept {
-        cursor_x = 0;
-        cursor_y++;
+     * @brief Gets the Y coordinate of the cursor
+     * 
+     * @return cursor Y coordinate
+     */   
+    _API_ 
+    [[nodiscard]] 
+    uint32_t 
+    get_cursor_y() noexcept {
+        return cursor_y;
+    }
 
-        if (cursor_y >= drivers::vga::TEXT_MODE_SCREEN_HEIGHT) [[unlikely]] {
-            reset();
+
+    /**
+     * @brief Gets the current text color.
+     * 
+     * @return text color
+     */
+    _API_ 
+    [[nodiscard]] 
+    uint8_t 
+    get_text_color() noexcept {
+        return cursor_color;
+    }
+
+
+    /** 
+     * @brief Sets a new color for any other Terminal outputs.
+     * 
+     * @param color      color for symbols
+     * @param background background color for symbols
+     */
+    _API_ 
+    void 
+    set_text_color(_IN_ const drivers::vga::Text_Mode_Colors color,
+                   _IN_ const drivers::vga::Text_Mode_Colors background,
+                   _IN_ const bool does_blink) noexcept {
+        cursor_color = drivers::vga::Text_Mode::make_color(color, 
+                                                           background, 
+                                                           does_blink);
+    }
+
+
+    /** 
+     * @brief Sets a new cursor position.
+     * 
+     * @param x X coordinate
+     * @param y Y coordinate
+     */
+    _API_ 
+    void
+    set_cursor(_IN_ const uint32_t x, 
+               _IN_ const uint32_t y) noexcept {
+        if (x < drivers::vga::TEXT_MODE_SCREEN_WIDTH &&
+            y < drivers::vga::TEXT_MODE_SCREEN_HEIGHT) [[likely]] {
+            cursor_x = x;
+            cursor_y = y;
         }
+    }
+
+
+    /**
+     * @brief Clears the screen and resets the cursor.
+     */
+    _API_  
+    void 
+    reset() noexcept {
+        using namespace drivers;
+
+        cursor_x = 0;
+        cursor_y = 0;
+
+        vga::Text_Mode::clear_screen(vga::Text_Mode_Colors::BLACK);
     }
 
 
@@ -458,7 +562,7 @@ namespace stdlib
      */
     _API_ 
     status_t 
-    Text_Output::put_int(_IN_ int32_t value) const noexcept {
+    put_int(_IN_ int32_t value) noexcept {
         status_t status;
 
         if (value < 0) {
@@ -501,7 +605,7 @@ namespace stdlib
      */
     _API_
     status_t 
-    Text_Output::put_uint(_IN_ const uint32_t value) noexcept {
+    put_uint(_IN_ const uint32_t value) noexcept {
         uint32_t char_count;
         stdlib::Array<char, 12> buffer;
         status_t status;
@@ -519,6 +623,73 @@ namespace stdlib
         while (char_count--) [[likely]] {
             status = put_char(buffer[char_count]);
         }
+
+    cleanup:
+        return status;
+    }
+
+
+    /** 
+     * @brief Outputs a hexadecimal number to the terminal.
+     * 
+     * @param value number output
+     */
+    _API_  
+    status_t
+    put_hex(_IN_ const uint32_t value) noexcept {
+        status_t status;
+
+        status = put_string("0x");
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        status = put_base(value, 16);
+
+    cleanup:
+        return status;
+    }
+
+
+    /** 
+     * @brief Outputs a binary number to the terminal.
+     * 
+     * @param value number output
+     */
+    _API_   
+    status_t 
+    put_bin(_IN_ const uint32_t value) noexcept {
+        status_t status;
+
+        status = put_string("0b");
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        status = put_base(value, 2);
+
+    cleanup:
+        return status;
+    }
+
+
+    /** 
+     * @brief Outputs the address of pointer to the 
+     *        terminal in hexadecimal.
+     * 
+     * @param value address output
+     */
+    _API_  
+    status_t 
+    put_ptr(_IN_ const uint32_t value) noexcept {
+        status_t status;
+
+        status = put_string("0x");
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        status = put_base(value, 16);
 
     cleanup:
         return status;
@@ -548,7 +719,7 @@ namespace stdlib
      */
     _API_ 
     status_t 
-    Text_Output::put_char(_IN_ const char symbol) noexcept {
+    put_char(_IN_ const char symbol) noexcept {
         status_t status;
 
         switch (symbol) {
@@ -615,7 +786,7 @@ namespace stdlib
      */
     _API_ 
     status_t
-    Text_Output::put_string(_IN_ const char* const message) noexcept {
+    put_string(_IN_ const char* const message) noexcept {
         status_t status;
         uint32_t needed_lines;
 
@@ -648,4 +819,4 @@ namespace stdlib
     cleanup:
         return status;
     }
-} // namespace stdlib
+} // namespace stdlib::console

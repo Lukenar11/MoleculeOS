@@ -74,7 +74,7 @@ namespace shell::commands
             new_filename[new_filename_index++] = args[i];
         }
 
-        stdlib::Text_Output::put_char('\n');
+        stdlib::console::put_char('\n');
 
         old_parsed_filename = parse_filename(old_filename);
         if (old_parsed_filename.error.data()[0] != '\0') {

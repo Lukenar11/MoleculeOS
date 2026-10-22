@@ -25,7 +25,7 @@ NOTES:
 #include <array.hpp>
 #include <io.hpp>
 #include <string.hpp>
-#include <text_output.hpp>
+#include <console.hpp>
 #include <kernel.hpp>
 
 namespace
