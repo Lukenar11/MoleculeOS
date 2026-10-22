@@ -124,7 +124,7 @@ namespace stdlib::memory
      */
     _API_  
     status_t 
-    compare_memory_block(_IN_ const void* const a_ptr, 
-                         _IN_ const void* const b_ptr,
-                         _IN_ uint32_t byte_size) noexcept;
+    compare_block(_IN_ const void* const a_ptr, 
+                  _IN_ const void* const b_ptr,
+                  _IN_ uint32_t byte_size) noexcept;
 } // namespace stdlib::memory
