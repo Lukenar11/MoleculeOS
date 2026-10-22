@@ -306,8 +306,8 @@ namespace
             const char* file_name_ptr   = file_entry.file_name.data();
             const char* file_format_ptr = file_entry.file_format.data();
 
-            name_status   = stdlib::string::compare_strings(name, file_name_ptr);
-            format_status = stdlib::string::compare_strings(format, file_format_ptr);
+            name_status   = stdlib::string::compare(name, file_name_ptr);
+            format_status = stdlib::string::compare(format, file_format_ptr);
 
             if (name_status == status::EQUAL_TO && 
                 format_status == status::EQUAL_TO) [[unlikely]] {
@@ -1280,8 +1280,8 @@ namespace kernel::filesys
             goto cleanup;
         }
 
-        if (stdlib::string::compare_strings(old_name, new_name) == status::EQUAL_TO &&
-            stdlib::string::compare_strings(old_format, new_format) == status::EQUAL_TO
+        if (stdlib::string::compare(old_name, new_name) == status::EQUAL_TO &&
+            stdlib::string::compare(old_format, new_format) == status::EQUAL_TO
             ) [[unlikely]] {
             status = status::SUCCESS;
             goto cleanup;

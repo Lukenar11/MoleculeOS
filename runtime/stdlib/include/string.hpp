@@ -140,8 +140,8 @@ namespace stdlib::string
      */
     _API_ 
     status_t 
-    compare_strings(_IN_ const char* a_ptr, 
-                    _IN_ const char* b_ptr) noexcept;
+    compare(_IN_ const char* a_ptr, 
+            _IN_ const char* b_ptr) noexcept;
 
 
     /**

@@ -498,7 +498,7 @@ namespace
             goto cleanup;
         }
 
-        status = stdlib::string::compare_strings(header.magic.data(), MOFS_HEADER_MAGIC);
+        status = stdlib::string::compare(header.magic.data(), MOFS_HEADER_MAGIC);
         if (status != status::EQUAL_TO) [[unlikely]] {
             if (status & status::flags::PARAM_A) {
                 goto cleanup;
@@ -870,7 +870,7 @@ namespace kernel::storemgr
             goto cleanup;
         }
     
-        status = stdlib::string::compare_strings(header.magic.data(), MOFS_HEADER_MAGIC);
+        status = stdlib::string::compare(header.magic.data(), MOFS_HEADER_MAGIC);
         if (status != status::EQUAL_TO) [[unlikely]] {
             status = stdlib::string::copy(header.magic.data(), MOFS_HEADER_MAGIC);
             if (status != status::SUCCESS) [[unlikely]] {
