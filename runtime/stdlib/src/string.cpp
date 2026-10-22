@@ -92,9 +92,9 @@ namespace stdlib::string
      */
     _API_  
     status_t
-    copy_string_part(_INOUT_ char* const destination_ptr,
-                     _IN_    const char* const source_ptr,
-                     _IN_    const uint32_t byte_size) noexcept {
+    copy_part(_INOUT_ char* const destination_ptr,
+              _IN_    const char* const source_ptr,
+              _IN_    const uint32_t byte_size) noexcept {
         status_t status;
         uint32_t memory_index = 0;
         const char null_char  = '\0';
