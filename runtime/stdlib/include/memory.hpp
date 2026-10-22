@@ -44,8 +44,8 @@ namespace stdlib::memory
     _API_  
     status_t 
     copy(_IN_ void* const destination_ptr, 
-                      _IN_ const void* const source_ptr, 
-                      _IN_ uint32_t byte_size) noexcept;
+         _IN_ const void* const source_ptr, 
+         _IN_ uint32_t byte_size) noexcept;
 
 
     /**
@@ -67,9 +67,9 @@ namespace stdlib::memory
      */
     _API_  
     status_t 
-    move_memory_block(_IN_ void* const destination_ptr, 
-                      _IN_ const void* const source_ptr, 
-                      _IN_ uint32_t byte_size) noexcept;
+    move(_IN_ void* const destination_ptr, 
+         _IN_ const void* const source_ptr, 
+         _IN_ uint32_t byte_size) noexcept;
 
 
     /**
