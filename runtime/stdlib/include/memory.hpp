@@ -43,7 +43,7 @@ namespace stdlib::memory
      */
     _API_  
     status_t 
-    copy_memory_block(_IN_ void* const destination_ptr, 
+    copy(_IN_ void* const destination_ptr, 
                       _IN_ const void* const source_ptr, 
                       _IN_ uint32_t byte_size) noexcept;
 

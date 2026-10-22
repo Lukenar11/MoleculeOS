@@ -544,7 +544,7 @@ namespace
             memory_byte_size = new_byte_size;
         }
     
-        status = stdlib::memory::copy_memory_block(new_block_ptr, block_ptr, memory_byte_size);
+        status = stdlib::memory::copy(new_block_ptr, block_ptr, memory_byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_B) {
                 status ^= status::flags::PARAM_B;

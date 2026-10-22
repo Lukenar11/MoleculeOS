@@ -1049,7 +1049,7 @@ namespace kernel::filesys
         destination_ptr = static_cast<uint8_t*>(file_entry->file_data_ptr) + 
                           offset;
 
-        status = stdlib::memory::copy_memory_block(destination_ptr, data_ptr, length);
+        status = stdlib::memory::copy(destination_ptr, data_ptr, length);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -1118,7 +1118,7 @@ namespace kernel::filesys
         file_data_ptr   = static_cast<uint8_t*>(file_entry->file_data_ptr);
         destination_ptr = file_data_ptr + file_entry->used_data_byte_size;
 
-        status = stdlib::memory::copy_memory_block(destination_ptr, data_ptr, data_byte_size);
+        status = stdlib::memory::copy(destination_ptr, data_ptr, data_byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -1505,7 +1505,7 @@ namespace kernel::filesys
             goto cleanup;
         }
 
-        status = stdlib::memory::copy_memory_block(destination_ptr, source_ptr, source_byte_size);
+        status = stdlib::memory::copy(destination_ptr, source_ptr, source_byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
             status = remove_status_flag(status, status::flags::PARAM_A);
             status = remove_status_flag(status, status::flags::PARAM_B);
@@ -1600,7 +1600,7 @@ namespace kernel::filesys
             goto cleanup;
         }
 
-        status = stdlib::memory::copy_memory_block(buffer_ptr, source_ptr + offset, length);
+        status = stdlib::memory::copy(buffer_ptr, source_ptr + offset, length);
         if (status != status::SUCCESS) [[unlikely]] {
             status = remap_status(status,
                                   status::flags::PARAM_A, 
