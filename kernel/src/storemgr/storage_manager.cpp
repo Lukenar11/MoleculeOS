@@ -543,7 +543,7 @@ namespace
 
         status_t status;
 
-        status = stdlib::string::copy_string(header.magic.data(), MOFS_HEADER_MAGIC);
+        status = stdlib::string::copy(header.magic.data(), MOFS_HEADER_MAGIC);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_B) {
                 status = status::FAIL;
@@ -872,7 +872,7 @@ namespace kernel::storemgr
     
         status = stdlib::string::compare_strings(header.magic.data(), MOFS_HEADER_MAGIC);
         if (status != status::EQUAL_TO) [[unlikely]] {
-            status = stdlib::string::copy_string(header.magic.data(), MOFS_HEADER_MAGIC);
+            status = stdlib::string::copy(header.magic.data(), MOFS_HEADER_MAGIC);
             if (status != status::SUCCESS) [[unlikely]] {
                 goto cleanup;
             }

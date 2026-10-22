@@ -154,8 +154,8 @@ namespace stdlib::string
      */
     _API_  
     status_t 
-    copy_string(_INOUT_ char* destination_ptr, 
-                _IN_    const char* source_ptr) noexcept {
+    copy(_INOUT_ char* destination_ptr, 
+         _IN_    const char* source_ptr) noexcept {
         status_t status;
 
         status = validate_destination_ptr_and_source_ptr(destination_ptr, 

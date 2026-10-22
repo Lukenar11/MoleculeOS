@@ -511,12 +511,12 @@ namespace
         entry.name_hash           = name_hash;
         entry.format_hash         = format_hash;
 
-        status = stdlib::string::copy_string(entry.file_name.data(), name);
+        status = stdlib::string::copy(entry.file_name.data(), name);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        status = stdlib::string::copy_string(entry.file_format.data(), format);
+        status = stdlib::string::copy(entry.file_format.data(), format);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -1309,12 +1309,12 @@ namespace kernel::filesys
             goto cleanup;
         }
 
-        status = stdlib::string::copy_string(file_entry->file_name.data(), new_name);
+        status = stdlib::string::copy(file_entry->file_name.data(), new_name);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        status = stdlib::string::copy_string(file_entry->file_format.data(), new_format);
+        status = stdlib::string::copy(file_entry->file_format.data(), new_format);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }

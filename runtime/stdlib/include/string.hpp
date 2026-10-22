@@ -72,8 +72,8 @@ namespace stdlib::string
      */
     _API_ 
     status_t 
-    copy_string(_INOUT_ char* destination_ptr, 
-                _IN_    const char* source_ptr) noexcept;
+    copy(_INOUT_ char* destination_ptr, 
+         _IN_    const char* source_ptr) noexcept;
 
 
     /**
