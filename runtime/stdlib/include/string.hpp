@@ -94,9 +94,9 @@ namespace stdlib::string
      */
     _API_ 
     status_t 
-    find_char_in_string(_OUT_ const char*& found_char,
-                        _IN_  const char* string, 
-                        _IN_  const int32_t symbol) noexcept;
+    find_char(_OUT_ const char*& found_char,
+              _IN_  const char* string, 
+              _IN_  const int32_t symbol) noexcept;
 
 
     /**

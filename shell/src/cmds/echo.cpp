@@ -223,11 +223,11 @@ namespace shell::commands
         const char null_char = '\0';
 
         const char* file_outstrem_redict_operator_pos;
-        stdlib::string::find_char_in_string(file_outstrem_redict_operator_pos, args.begin(), '<');
+        stdlib::string::find_char(file_outstrem_redict_operator_pos, args.begin(), '<');
 
         if (file_outstrem_redict_operator_pos != nullptr) {
             const char* pos;
-            stdlib::string::find_char_in_string(pos, file_outstrem_redict_operator_pos + 1, '<');
+            stdlib::string::find_char(pos, file_outstrem_redict_operator_pos + 1, '<');
 
             if (pos != nullptr) [[unlikely]] {
                 print_command_error(command_name);
@@ -250,10 +250,10 @@ namespace shell::commands
         }
 
         const char* file_intstrem_redict_operator_pos;
-        stdlib::string::find_char_in_string(file_intstrem_redict_operator_pos, args.begin(), '>');
+        stdlib::string::find_char(file_intstrem_redict_operator_pos, args.begin(), '>');
         if (file_intstrem_redict_operator_pos != nullptr) {
             const char* pos;
-            stdlib::string::find_char_in_string(pos, file_intstrem_redict_operator_pos + 1, '>');
+            stdlib::string::find_char(pos, file_intstrem_redict_operator_pos + 1, '>');
             if (pos != nullptr) [[unlikely]] {
                 print_command_error(command_name);
                 print_command_error("multiple redirect operators\n");
