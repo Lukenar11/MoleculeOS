@@ -867,4 +867,17 @@ namespace drivers::ata
 
         return run(buffer, relative_lba, sector_count);
     }
+
+
+    /**
+     * @brief Gets the size of one hard drive sector.
+     * 
+     * @retval hard drive sector size
+     */
+    _API_
+    [[nodiscard]]
+    uint32_t
+    Programmable_IO::sector_size() const noexcept {
+        return SECTOR_SIZE;
+    }
 } // namespace drivers::ata

@@ -58,10 +58,11 @@ namespace
 
     constexpr uint32_t MOFS_VERSION            = 2;
     constexpr uint32_t MOFS_HEADER_OFFSET      = 0;
-    constexpr uint32_t FILE_ENTRY_TABLE_OFFSET = driver.sector_size();
-    constexpr uint32_t FILESYS_DATA_OFFSET     = FILE_ENTRY_TABLE_OFFSET + 
-                                                 filesys::FILE_TABLE_ENTRYS * 
-                                                 sizeof(Stored_File_Entry);
+
+    const uint32_t file_entry_table_offset = driver.sector_size();
+    const uint32_t filesys_data_offset     = file_entry_table_offset + 
+                                             filesys::FILE_TABLE_ENTRYS * 
+                                             sizeof(Stored_File_Entry);
 
 
     /**
@@ -561,8 +562,8 @@ namespace
 
         header.version                 = MOFS_VERSION;
         header.file_entry_count        = FILE_TABLE_ENTRYS;
-        header.file_entry_table_offset = FILE_ENTRY_TABLE_OFFSET;
-        header.data_offset             = FILESYS_DATA_OFFSET;
+        header.file_entry_table_offset = file_entry_table_offset;
+        header.data_offset             = filesys_data_offset;
 
         status = read_or_write_bytes(&header,
                                      sizeof(MOFS_Header),
@@ -885,8 +886,8 @@ namespace kernel::storemgr
 
             header.version                 = MOFS_VERSION;
             header.file_entry_count        = FILE_TABLE_ENTRYS;
-            header.file_entry_table_offset = FILE_ENTRY_TABLE_OFFSET;
-            header.data_offset             = FILESYS_DATA_OFFSET;
+            header.file_entry_table_offset = file_entry_table_offset;
+            header.data_offset             = filesys_data_offset;
 
             status = read_or_write_bytes(&header,
                                          sizeof(header),

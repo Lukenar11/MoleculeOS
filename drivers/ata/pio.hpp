@@ -28,14 +28,12 @@ NOTES:
 
 #pragma once
 
-#include <types.hpp>
-#include <status.hpp>
-#include <sal.hpp>
+#include "interface.hpp"
 
 
 namespace drivers::ata
 {
-    class Programmable_IO final {
+    class Programmable_IO : public Interface {
     private:
         static constexpr uint8_t ATA_BSY      = 0x80;
         static constexpr uint8_t ATA_DRQ      = 0x08;
@@ -404,7 +402,7 @@ namespace drivers::ata
          */
         _API_
         void
-        init() noexcept;
+        init() noexcept override;
 
 
         /**
@@ -441,7 +439,7 @@ namespace drivers::ata
         status_t
         load_sectors(_INOUT_ uint16_t* buffer,
                      _IN_    uint32_t relative_lba,
-                     _IN_    uint32_t sector_count) noexcept;
+                     _IN_    uint32_t sector_count) noexcept override;
 
 
         /**
@@ -478,21 +476,17 @@ namespace drivers::ata
         status_t
         store_sectors(_INOUT_ uint16_t* buffer,
                       _IN_    uint32_t relative_lba,
-                      _IN_    uint32_t sector_count) noexcept;
+                      _IN_    uint32_t sector_count) noexcept override;
 
 
         /**
-         * @brief Gets the of one hard drive sector.
+         * @brief Gets the size of one hard drive sector.
          * 
          * @retval hard drive sector size
          */
         _API_
         [[nodiscard]]
-        inline
-        constexpr
         uint32_t
-        sector_size() const noexcept {
-            return SECTOR_SIZE;
-        }
+        sector_size() const noexcept override;
     };
 } // namespace drivers::ata
