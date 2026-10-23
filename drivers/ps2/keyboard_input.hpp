@@ -20,13 +20,10 @@ NOTES:
 
 #pragma once
 
-#include "ps2_keyboard_in_helpers.hpp"
 #include <types.hpp>
-#include <circular_buffer.hpp>
-#include <io.hpp>
 #include <status.hpp>
 #include <sal.hpp>
-#include <kernel.hpp>
+#include <circular_buffer.hpp>
 
 
 namespace kernel 
@@ -37,6 +34,18 @@ namespace kernel
 
 namespace drivers::ps2 
 {
+    enum class Special_Keyboard_Keys : uint8_t {
+        LEFT_SHIFT          = 0x2A,
+        RIGHT_SHIFT         = 0x36,
+        KEYBOARD_RELEASE    = 0x80,
+        LEFT_SHIFT_RELEASE  = 0xAA,
+        RIGHT_SHIFT_RELEASE = 0xB6,
+        CAPS                = 0x3A,
+        CTRL                = 0x64,
+        REBOOT_COMMAND      = 0xFE,
+    };
+
+
     class Keyboard_Input final {
     private:
         static inline constexpr uint8_t LOWEST_BIT            = 0x01;
@@ -45,9 +54,16 @@ namespace drivers::ps2
 
         static inline constexpr uint16_t KEYBOARD_STATUS_PORT = 0x64;
         static inline constexpr uint16_t KEYBOARD_DATA_PORT   = 0x60;
-    
+
+        static const char qwerty_std_key_mapping[128];
+        static const char qwerty_shift_key_mapping[128];
+
         static inline bool shift_is_pressed = false;
         static inline bool caps_is_enabled  = false;
+
+        static 
+        inline 
+        stdlib::Circular_Buffer<char, ALLOWED_SCANCODE_SIZE> scancode_buffer;
 
         
         /** 
@@ -57,12 +73,10 @@ namespace drivers::ps2
          * @retval `true`  Keyboard has a pending scancode.
          * @retval `false` Keyboard has not a pending scancode.
          */
+        [[nodiscard]]
         static 
-        inline 
         bool 
-        has_pending_scancode() noexcept {
-            return stdlib::byte_input(KEYBOARD_STATUS_PORT) & LOWEST_BIT;
-        }
+        has_pending_scancode() noexcept;
 
 
         /**
@@ -96,29 +110,54 @@ namespace drivers::ps2
 
 
     public:
-        _API_ 
-        static 
-        inline 
-        stdlib::Circular_Buffer<char, ALLOWED_SCANCODE_SIZE> scancode_buffer;
+        /**
+         * @brief Initializes the VGA-textmode driver.
+         * 
+         * @note It's declared as default.
+         */
+        _API_
+        Keyboard_Input() noexcept = default;
+
         
+        /**
+         * @brief Uninitializes the VGA-textmode driver
+         * 
+         * @note It's declared as default.
+         */
+        _API_
+        ~Keyboard_Input() noexcept = default;
+
+
+        /**
+         * @brief Removes the entered keyboard key from the buffer.
+         *
+         * @param item The removed element.
+         * 
+         * @retval `status::BUFFER_UNDERFLOW | status::IS_EMPTY`
+         *          If the buffer is empty.
+         *
+         * @retval `status::SUCCESS`
+         *          Default case.
+         */
+        _API_
+        [[nodiscard]]
+        static
+        status_t
+        pop_scancode_key(_OUT_ char& item) noexcept;
+
 
         /** 
          * @brief Pushed the pressed keyboard key into the scancode_buffer,
-         *        if a  the interrupt descriptor event `IRQ 1` was triggered.
+         *        if a  the interrupt event was triggered.
          * 
          * @note Do not use this in the normal code because 
-         *       this method is only for the `IRQ`, 
-         *       use the keyboard scancode_buffer instead.
+         *       this method is only for the interrupts handling system.
          * 
-         * @param Registers dump of all CPU registers (not used).
+         * @param Registers dump of all CPU registers.
          */
         _API_ 
         static 
         void 
-        keyboard_irq_handler(_IN_ kernel::Registers* _) noexcept;
-    
-
-        Keyboard_Input() noexcept  = default;
-        ~Keyboard_Input() noexcept = default;
+        handle_keypress(_IN_ kernel::Registers* registers) noexcept;
     };
 } // namespace drivers::ps2

@@ -130,7 +130,6 @@ namespace drivers::vga
                              _IN_ const uint8_t color,
                              _IN_ const char symbol) noexcept {
         status_t status;
-        uint32_t buffer_index;
 
         if (x >= SCREEN_WIDTH) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_A;
@@ -142,9 +141,8 @@ namespace drivers::vga
             goto cleanup;
         }
 
-        buffer_index = y * SCREEN_WIDTH + x;
-
-        screen_buffer_ptr[buffer_index] = make_symbol_entry(symbol, color);
+        screen_buffer_ptr[y * SCREEN_WIDTH + x] = make_symbol_entry(symbol, 
+                                                                    color);
 
         status = status::SUCCESS;
 

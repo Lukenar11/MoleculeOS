@@ -19,10 +19,41 @@ NOTES:
 
 
 #include "keyboard_input.hpp"
+#include <io.hpp>
 
 
 namespace drivers::ps2
 {
+    const char Keyboard_Input::qwerty_std_key_mapping[128] = {
+        0, 27, '1','2','3','4','5','6','7','8','9','0', '-','=', '\b',
+        '\t','q','w','e','r','t','y','u','i','o','p','[',']','\n', 0,
+        'a','s','d','f','g','h','j','k','l',';','\'','`', 0, '\\',
+        'z','x','c','v','b','n','m',',','.','/', 0, '*', 0, ' ',
+    };
+
+    
+    const char Keyboard_Input::qwerty_shift_key_mapping[128] = {
+        0, 27, '!','@','#','$','%','^','&','*','(',')','_','+', '\b',
+        '\t','Q','W','E','R','T','Y','U','I','O','P','{','}','\n', 0,
+        'A','S','D','F','G','H','J','K','L',':','\"','~', 0, '|',
+        'Z','X','C','V','B','N','M','<','>','?', 0, '*', 0, ' ',
+    };
+
+
+    /** 
+     * @brief Checks whether the 
+     *        keyboard has a pressed but not handled scancode.
+     * 
+     * @retval `true`  Keyboard has a pending scancode.
+     * @retval `false` Keyboard has not a pending scancode.
+     */
+    [[nodiscard]]
+    bool 
+    Keyboard_Input::has_pending_scancode() noexcept {
+        return stdlib::byte_input(KEYBOARD_STATUS_PORT) & LOWEST_BIT;
+    }
+
+
     /**
      * @brief Reads and gets keyboard key activity.
      * 
@@ -121,28 +152,47 @@ namespace drivers::ps2
     }
 
 
+    /**
+     * @brief Removes the entered keyboard key from the buffer.
+     *
+     * @param item The removed element.
+     * 
+     * @retval `status::BUFFER_UNDERFLOW | status::IS_EMPTY`
+     *          If the buffer is empty.
+     *
+     * @retval `status::SUCCESS`
+     *          Default case.
+     */
+    _API_
+    [[nodiscard]]
+    status_t
+    Keyboard_Input::pop_scancode_key(_OUT_ char& item) noexcept {
+        return scancode_buffer.pop(item);
+    }
+
+    
     /** 
      * @brief Pushed the pressed keyboard key into the scancode_buffer,
-     *        if a  the interrupt descriptor event `IRQ 1` was triggered.
+     *        if a  the interrupt event was triggered.
      * 
      * @note Do not use this in the normal code because 
-     *       this method is only for the `IRQ`, 
-     *       use the keyboard scancode_buffer instead.
+     *       this method is only for the interrupts handling system.
      * 
-     * @param Registers dump of all CPU registers (not used).
+     * @param Registers dump of all CPU registers.
      */
     _API_ 
     void 
-    Keyboard_Input::keyboard_irq_handler(_IN_ kernel::Registers* _) noexcept {
-        char symbol;
-        status_t status;  
+    Keyboard_Input::handle_keypress(_IN_ kernel::Registers* registers) noexcept {
+        if (!registers) [[unlikely]] {
+            goto cleanup;
+        }
 
         if (!has_pending_scancode()) [[unlikely]] {
             goto cleanup;
         }
 
-        status = get_key(symbol);
-        if (status == status::SUCCESS) {
+        char symbol;
+        if (get_key(symbol) == status::SUCCESS) {
             scancode_buffer.push(symbol);
         }
 

@@ -45,7 +45,8 @@ namespace terminal
     void Terminal::step() noexcept {
         const char new_line = '\n';
         char key;
-        while (drivers::ps2::Keyboard_Input::scancode_buffer.pop(key) == status::SUCCESS) {
+        
+        while (drivers::ps2::Keyboard_Input::pop_scancode_key(key) == status::SUCCESS) {
             erase_user_cursor();
 
             stdlib::console::put_char(key);

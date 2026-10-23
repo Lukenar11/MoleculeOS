@@ -161,9 +161,7 @@ namespace
 namespace drivers::vga
 {
     template<typename Func, typename T>
-    class Interface : 
-        public Static_Interface<Func>, 
-        public Dynamic_Interface<T> {
+    class Interface : public Static_Interface<Func>, public Dynamic_Interface<T> {
     private:
         using Static_Interface<Func>::screen_width;
         using Static_Interface<Func>::screen_height;

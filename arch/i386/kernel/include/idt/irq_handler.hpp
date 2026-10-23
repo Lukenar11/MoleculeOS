@@ -28,7 +28,7 @@ namespace
 {
     inline constexpr kernel::idt::irq::IRQ_Handler_Entry irq_handler_table[] = {
         { 0, nullptr}, 
-        { 1, drivers::ps2::Keyboard_Input::keyboard_irq_handler},
+        { 1, drivers::ps2::Keyboard_Input::handle_keypress},
         { 2, nullptr}, 
         { 3, nullptr}, 
         { 4, nullptr},

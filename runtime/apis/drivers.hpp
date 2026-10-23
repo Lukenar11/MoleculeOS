@@ -13,8 +13,5 @@ NOTES:
 #pragma once
 
 #include "drivers/ata/pio.hpp"
-
 #include "drivers/vga/text_mode.hpp"
-
 #include "drivers/ps2/keyboard_input.hpp"
-#include "drivers/ps2/ps2_keyboard_in_helpers.hpp"

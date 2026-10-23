@@ -13,8 +13,7 @@ COMMON_FLAGS += -Idrivers/ata \
 OBJS += $(BUILD)/pio.o \
 		$(BUILD)/keyboard_input.o \
 		$(BUILD)/text_mode.o \
-		$(BUILD)/ps2_keyboard_in_helpers.o \
-
+		
 
 $(BUILD)/%.o: drivers/ata/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
