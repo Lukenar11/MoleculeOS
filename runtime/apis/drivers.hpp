@@ -13,7 +13,6 @@ NOTES:
 #pragma once
 
 #include "drivers/include/ata/pio.hpp"
-#include "drivers/include/utils/ata_pio_helpers.hpp"
 
 #include "drivers/include/vga/text_mode.hpp"
 

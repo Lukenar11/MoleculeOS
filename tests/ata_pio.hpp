@@ -21,9 +21,9 @@ namespace tests
         uint16_t* buffer_ptr = buffer.begin();
 
         stdlib::console::put_string("Status before read: ");
-        stdlib::console::put_hex(stdlib::byte_input(Programmable_Input_Output::status_port()));
+        stdlib::console::put_hex(stdlib::byte_input(Programmable_IO::status_port()));
 
-        if (Programmable_Input_Output::run(buffer_ptr,
+        if (Programmable_IO::run(buffer_ptr,
                                            lba, 
                                            sectors, 
                                            drivers::ata::Operations::READ) != status::SUCCESS)
@@ -37,7 +37,7 @@ namespace tests
         }
 
         stdlib::console::put_string("\n\nStatus after read: ");
-        stdlib::console::put_hex(stdlib::byte_input(Programmable_Input_Output::status_port()));
+        stdlib::console::put_hex(stdlib::byte_input(Programmable_IO::status_port()));
 
         kernel::sys::hang();
     }
@@ -59,9 +59,9 @@ namespace tests
             ptr[i] = 0;
 
         stdlib::console::put_string("Status before read: ");
-        stdlib::console::put_hex(stdlib::byte_input(Programmable_Input_Output::status_port()));
+        stdlib::console::put_hex(stdlib::byte_input(Programmable_IO::status_port()));
 
-        if (Programmable_Input_Output::run(ptr, 
+        if (Programmable_IO::run(ptr, 
                                            lba, 
                                            sectors, 
                                            drivers::ata::Operations::READ) != status::SUCCESS)
@@ -75,7 +75,7 @@ namespace tests
         }
 
         stdlib::console::put_string("\n\nStatus after read: ");
-        stdlib::console::put_hex(stdlib::byte_input(Programmable_Input_Output::status_port()));
+        stdlib::console::put_hex(stdlib::byte_input(Programmable_IO::status_port()));
                                       
         kernel::heap::deallocate(ptr);
         kernel::sys::hang();
@@ -91,10 +91,10 @@ namespace tests
         int32_t sectors = 1;
 
         stdlib::console::put_string("Status before read: ");
-        stdlib::console::put_hex(stdlib::byte_input(Programmable_Input_Output::status_port()));
+        stdlib::console::put_hex(stdlib::byte_input(Programmable_IO::status_port()));
 
         for (uint32_t lba = 0; lba < 16; ++lba)
-            if (Programmable_Input_Output::run(buffer_ptr, 
+            if (Programmable_IO::run(buffer_ptr, 
                                                lba, 
                                                sectors, 
                                                drivers::ata::Operations::READ) != status::SUCCESS)
@@ -103,7 +103,7 @@ namespace tests
                 stdlib::console::put_string("\nRead NOT Success\n\n");
 
         stdlib::console::put_string("\n\nStatus after read: ");
-        stdlib::console::put_hex(stdlib::byte_input(Programmable_Input_Output::status_port()));
+        stdlib::console::put_hex(stdlib::byte_input(Programmable_IO::status_port()));
 
         kernel::sys::hang();
     }
@@ -123,7 +123,7 @@ namespace tests
         uint16_t* buffer_ptr = buffer.begin();
         int32_t sectors = 1;
         uint32_t lba = 0;
-        Programmable_Input_Output::run(buffer_ptr, 
+        Programmable_IO::run(buffer_ptr, 
                                        lba, 
                                        sectors, 
                                        drivers::ata::Operations::WRITE);

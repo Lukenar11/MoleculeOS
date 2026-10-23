@@ -167,7 +167,7 @@ namespace
             goto cleanup;
         }
 
-        status = ata::Programmable_Input_Output::run(temp_buffer_ptr,
+        status = ata::Programmable_IO::run(temp_buffer_ptr,
                                                      start_sector,
                                                      sector_count,
                                                      ata::Operations::READ);
@@ -253,7 +253,7 @@ namespace
             goto cleanup;
         }
                              
-        status = ata::Programmable_Input_Output::run(temp_buffer_ptr,
+        status = ata::Programmable_IO::run(temp_buffer_ptr,
                                                      start_sector,
                                                      sector_count,
                                                      ata::Operations::READ);
@@ -290,7 +290,7 @@ namespace
             goto cleanup;
         }
     
-        status = ata::Programmable_Input_Output::run(temp_buffer_ptr,
+        status = ata::Programmable_IO::run(temp_buffer_ptr,
                                                      start_sector,
                                                      sector_count,
                                                      ata::Operations::WRITE);

@@ -28,31 +28,20 @@ NOTES:
 
 #pragma once
 
-#include "../utils/ata_pio_helpers.hpp"
 #include <types.hpp>
-#include <sal.hpp>
 #include <status.hpp>
-#include <port_io.hpp>
-#include <array.hpp>
-
-
-namespace kernel::sys
-{
-    void
-    panic(const char* message) noexcept;
-
-    _C_API_ {
-        void disable_interrupts();
-        
-        uint32_t save_eflags(void);
-        void restore_eflags(uint32_t);
-    }
-} // namespace kernel::sys
+#include <sal.hpp>
 
 
 namespace drivers::ata
 {
-    class Programmable_Input_Output final {
+    enum class Operations : uint32_t {
+        READ  = 0,
+        WRITE = 1
+    };
+
+
+    class Programmable_IO final {
     private:
         static constexpr uint8_t ATA_BSY         = 0x80;
         static constexpr uint8_t ATA_DRQ         = 0x08;
@@ -92,18 +81,26 @@ namespace drivers::ata
 
         static constexpr uint32_t MAX_ALLOWED_SECTOR_COUNT = 128;
         static constexpr uint32_t CHUNK_SECTORS            = 8;
-        static_assert(CHUNK_SECTORS <= MAX_ALLOWED_SECTOR_COUNT, 
-                      "CHUNK_SECTORS <= MAX_ALLOWED_SECTOR_COUNT");
 
         static constexpr uint32_t MAX_RETRYS = 4;
 
-        static inline uint32_t partition_length        = 0;
-        static inline uint32_t lba_start_address       = 0;
-        static inline uint16_t device_control_register = 0;
-        static inline uint16_t io_port_base            = 0;
-        static inline uint8_t drive_select_flags       = 0;
-        static inline uint8_t lba_flags                = 0;
-        static inline uint16_t status_port             = 0;
+        static constexpr uint32_t SECTOR_SIZE      = 512;                                
+        static constexpr uint32_t SECTOR_WORD_SIZE = SECTOR_SIZE / 
+                                                     sizeof(uint16_t);
+
+
+        static_assert(CHUNK_SECTORS <= MAX_ALLOWED_SECTOR_COUNT, 
+                      "CHUNK_SECTORS <= MAX_ALLOWED_SECTOR_COUNT");
+
+
+        uint32_t partition_length;
+        uint32_t lba_start_address;
+        uint16_t device_control_register;
+        uint16_t io_port_base;
+        uint8_t drive_select_flags;
+        uint8_t lba_flags;
+        uint16_t status_port;
+
 
         /**
          * @brief Checks whether a memory access operation is within the
@@ -136,7 +133,6 @@ namespace drivers::ata
          *         Default case.
          */
         [[nodiscard]] 
-        static
         status_t 
         validate_storage_access(_IN_ const uint16_t* const buffer,
                                 _IN_ const uint32_t relative_lba, 
@@ -160,7 +156,6 @@ namespace drivers::ata
          *       a 500 ns delay is executed as a precaution to 
          *       ensure a minimum delay of around 400 ns.
          */
-        static 
         void 
         delay() noexcept;
 
@@ -169,7 +164,6 @@ namespace drivers::ata
          * @brief Performs a software reset of the hard drive and waits
          *        until the controller is operational again.
          */
-        static 
         void 
         reset_driver() noexcept;
 
@@ -207,8 +201,7 @@ namespace drivers::ata
          * @retval `status::SUCCESS`
          *         Default case.
          */
-        [[nodiscard]]
-        static 
+        [[nodiscard]] 
         status_t 
         identify_drive(_OUT_ uint16_t* const identify_data,
                        _IN_  const uint16_t io_base,
@@ -246,7 +239,6 @@ namespace drivers::ata
          *         If a device was successfully detected and configured.
          */
         [[nodiscard]]
-        static 
         status_t 
         probe_and_configure_channel(_IN_ const uint16_t io_port,
                                     _IN_ const uint16_t control_register) 
@@ -270,7 +262,6 @@ namespace drivers::ata
          *         Default case.
          */
         [[nodiscard]] 
-        static 
         status_t 
         poll_until_drq_or_error() noexcept;
 
@@ -292,7 +283,6 @@ namespace drivers::ata
          *         Default case.
          */
         [[nodiscard]] 
-        static 
         status_t 
         poll_until_not_bsy_or_error() noexcept;
 
@@ -324,7 +314,6 @@ namespace drivers::ata
          *         Default case.
          */
         [[nodiscard]] 
-        static 
         status_t
         poll_and_read_or_write_disk(_INOUT_ uint16_t* buffer,
                                      _IN_   const Operations operation,
@@ -366,7 +355,6 @@ namespace drivers::ata
          *         Default case.
          */
         [[nodiscard]] 
-        static 
         status_t 
         start_pio_disk_read_or_write(_INOUT_ uint16_t* const buffer,
                                      _IN_    const uint32_t relative_lba,
@@ -379,10 +367,15 @@ namespace drivers::ata
         /**
          * @brief Initializes the ATA-PIO driver.
          */
-        _API_ 
-        static 
-        void 
-        init() noexcept;
+        Programmable_IO() noexcept;
+
+
+        /**
+         * @brief Uninitializes the ATA-PIO driver.
+         * 
+         * @note Is declared as default.
+         */
+        ~Programmable_IO() noexcept = default;
 
         
         /**
@@ -420,15 +413,10 @@ namespace drivers::ata
          */
         _API_ 
         [[nodiscard]]
-        static 
         status_t 
         run(_INOUT_ uint16_t* buffer,
             _IN_    uint32_t relative_lba,
             _IN_    uint32_t sector_count,
             _IN_    const Operations operation) noexcept;
-
-
-        Programmable_Input_Output() noexcept  = default;
-        ~Programmable_Input_Output() noexcept = default;
     };
 } // namespace drivers::ata

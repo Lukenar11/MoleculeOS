@@ -28,6 +28,8 @@ NOTES:
 
 #include "../ata/pio.hpp"
 
+#include <kernel.hpp>
+
 
 namespace drivers::ata
 {
@@ -64,11 +66,11 @@ namespace drivers::ata
      */
     [[nodiscard]] 
     status_t
-    Programmable_Input_Output::validate_storage_access(_IN_ const uint16_t* const buffer,
-                                                       _IN_ const uint32_t relative_lba,
-                                                       _IN_ const uint32_t to_transfer,
-                                                       _IN_ const Operations operation)
-                                                       noexcept {
+    Programmable_IO::validate_storage_access(_IN_ const uint16_t* const buffer,
+                                             _IN_ const uint32_t relative_lba,
+                                             _IN_ const uint32_t to_transfer,
+                                             _IN_ const Operations operation)
+                                             noexcept {
         status_t status;
 
         if (!buffer) [[unlikely]] {
@@ -123,7 +125,7 @@ namespace drivers::ata
      *       ensure a minimum delay of around 400 ns.
      */
     void 
-    Programmable_Input_Output::delay() noexcept {
+    Programmable_IO::delay() noexcept {
         for (uint32_t ns_delay = 0; ns_delay < 5; ns_delay++) [[likely]] {
             stdlib::byte_input(status_port);
         }
@@ -135,7 +137,7 @@ namespace drivers::ata
      *        until the controller is operational again.
      */
     void 
-    Programmable_Input_Output::reset_driver() noexcept {
+    Programmable_IO::reset_driver() noexcept {
         uint32_t timeout = 5'000'000;
         uint8_t status;
 
@@ -189,12 +191,12 @@ namespace drivers::ata
      */
     [[nodiscard]]
     status_t
-    Programmable_Input_Output::identify_drive(_OUT_ uint16_t* const identify_data,
-                                              _IN_  const uint16_t io_base,
-                                              _IN_  const uint16_t control_register,
-                                              _IN_  const uint8_t drive_select,
-                                              _IN_  const uint8_t lba_mode)
-                                              noexcept {
+    Programmable_IO::identify_drive(_OUT_ uint16_t* const identify_data,
+                                    _IN_  const uint16_t io_base,
+                                    _IN_  const uint16_t control_register,
+                                    _IN_  const uint8_t drive_select,
+                                    _IN_  const uint8_t lba_mode)
+                                    noexcept {
         status_t status;
 
         if (!identify_data) [[unlikely]] {
@@ -272,9 +274,9 @@ namespace drivers::ata
      */
     [[nodiscard]]
     status_t
-    Programmable_Input_Output::probe_and_configure_channel(_IN_ const uint16_t io_port,
-                                                           _IN_ const uint16_t control_register)
-                                                           noexcept {
+    Programmable_IO::probe_and_configure_channel(_IN_ const uint16_t io_port,
+                                                 _IN_ const uint16_t control_register)
+                                                 noexcept {
         status_t status;
         stdlib::Array<uint16_t, SECTOR_WORD_SIZE> identify_data;
         uint32_t storage_size;
@@ -361,7 +363,7 @@ namespace drivers::ata
      */
     [[nodiscard]] 
     status_t 
-    Programmable_Input_Output::poll_until_drq_or_error() noexcept {
+    Programmable_IO::poll_until_drq_or_error() noexcept {
         status_t status;
         uint8_t input;
         uint32_t timeout = 5'000'000;
@@ -410,7 +412,7 @@ namespace drivers::ata
      */
     [[nodiscard]]
     status_t 
-    Programmable_Input_Output::poll_until_not_bsy_or_error() noexcept {
+    Programmable_IO::poll_until_not_bsy_or_error() noexcept {
         status_t status;
         uint8_t input;
         uint32_t timeout = 5'000'000;
@@ -469,10 +471,10 @@ namespace drivers::ata
      */
     [[nodiscard]]
     status_t 
-    Programmable_Input_Output::poll_and_read_or_write_disk(_INOUT_ uint16_t* buffer,
-                                                           _IN_    const Operations operation,
-                                                           _IN_    const uint32_t sector_count) 
-                                                           noexcept { 
+    Programmable_IO::poll_and_read_or_write_disk(_INOUT_ uint16_t* buffer,
+                                                 _IN_    const Operations operation,
+                                                 _IN_    const uint32_t sector_count) 
+                                                 noexcept { 
         status_t status;
 
         if (!buffer) [[unlikely]] {
@@ -560,11 +562,11 @@ namespace drivers::ata
      */
     [[nodiscard]]
     status_t 
-    Programmable_Input_Output::start_pio_disk_read_or_write(_INOUT_ uint16_t* const buffer,
-                                                            _IN_    const uint32_t relative_lba,
-                                                            _IN_    const uint32_t sector_count,
-                                                            _IN_    const Operations operation) 
-                                                            noexcept {
+    Programmable_IO::start_pio_disk_read_or_write(_INOUT_ uint16_t* const buffer,
+                                                  _IN_    const uint32_t relative_lba,
+                                                  _IN_    const uint32_t sector_count,
+                                                  _IN_    const Operations operation) 
+                                                  noexcept {
         status_t status;
         uint32_t absolute_lba;
         uint8_t final_status;
@@ -634,9 +636,14 @@ namespace drivers::ata
     /**
      * @brief Initializes the ATA-PIO driver.
      */
-    _API_ 
-    void 
-    Programmable_Input_Output::init() noexcept {
+    Programmable_IO::Programmable_IO() noexcept :
+        partition_length(0),
+        lba_start_address(0),
+        device_control_register(0),
+        io_port_base(0),
+        drive_select_flags(0),
+        lba_flags(0),
+        status_port(0) {
         uint32_t eflags;
         struct Channel final { 
             uint16_t io_port; 
@@ -673,7 +680,6 @@ namespace drivers::ata
 
     cleanup:
         kernel::sys::restore_eflags(eflags);
-        return;
     }
 
     
@@ -713,11 +719,11 @@ namespace drivers::ata
     _API_ 
     [[nodiscard]]
     status_t 
-    Programmable_Input_Output::run(_INOUT_ uint16_t* buffer,
-                                   _IN_    uint32_t relative_lba,
-                                   _IN_    uint32_t sector_count,
-                                   _IN_    const Operations operation) 
-                                   noexcept {
+    Programmable_IO::run(_INOUT_ uint16_t* buffer,
+                         _IN_    uint32_t relative_lba,
+                         _IN_    uint32_t sector_count,
+                         _IN_    const Operations operation) 
+                         noexcept {
         status_t status;
         uint32_t chunk;
         uint32_t eflags;

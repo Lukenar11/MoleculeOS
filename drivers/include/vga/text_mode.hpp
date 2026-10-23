@@ -88,7 +88,7 @@ namespace drivers::vga
         /**
          * @brief Uninitializes the VGA-textmode driver
          * 
-         * @note Is declared as default.
+         * @note It's declared as default.
          */
         ~Text_Mode() noexcept = default;
 
@@ -121,6 +121,7 @@ namespace drivers::vga
         make_symbol_color(_IN_ const Text_Mode_Color foreground,
                           _IN_ const Text_Mode_Color background,
                           _IN_ const bool blink=false) noexcept;
+
 
         /**
          * @brief Outputs a character with a special fore and background color.

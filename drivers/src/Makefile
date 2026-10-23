@@ -7,7 +7,6 @@
 OBJS += $(BUILD)/pio.o \
 		$(BUILD)/keyboard_input.o \
 		$(BUILD)/text_mode.o \
-		$(BUILD)/ata_pio_helpers.o \
 		$(BUILD)/ps2_keyboard_in_helpers.o \
 
 $(BUILD)/%.o: drivers/src/ata/%.cpp

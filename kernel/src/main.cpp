@@ -40,7 +40,7 @@ namespace kernel
     void 
     main() noexcept {
         heap::init(&heap_start, &heap_end);
-        drivers::ata::Programmable_Input_Output::init();
+        drivers::ata::Programmable_IO::init();
         storemgr::init();
 
         if (storemgr::load_filesystem() != status::SUCCESS) [[unlikely]] {
