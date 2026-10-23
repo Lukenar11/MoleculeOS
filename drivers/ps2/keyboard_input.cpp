@@ -178,12 +178,12 @@ namespace drivers::ps2
      * @note Do not use this in the normal code because 
      *       this method is only for the interrupts handling system.
      * 
-     * @param Registers dump of all CPU registers.
+     * @param register_dump dump of all CPU registers.
      */
     _API_ 
     void 
-    Keyboard_Input::handle_keypress(_IN_ kernel::Registers* registers) noexcept {
-        if (!registers) [[unlikely]] {
+    Keyboard_Input::handle_keypress(_IN_ kernel::Registers* register_dump) noexcept {
+        if (!register_dump) [[unlikely]] {
             goto cleanup;
         }
 

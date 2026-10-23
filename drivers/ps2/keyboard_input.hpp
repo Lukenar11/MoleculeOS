@@ -20,16 +20,9 @@ NOTES:
 
 #pragma once
 
+#include "interface.hpp"
 #include <types.hpp>
-#include <status.hpp>
-#include <sal.hpp>
 #include <circular_buffer.hpp>
-
-
-namespace kernel 
-{
-    struct Registers;
-}
 
 
 namespace drivers::ps2 
@@ -46,7 +39,7 @@ namespace drivers::ps2
     };
 
 
-    class Keyboard_Input final {
+    class Keyboard_Input : public Interface<Keyboard_Input> {
     private:
         static inline constexpr uint8_t LOWEST_BIT            = 0x01;
         static inline constexpr uint8_t ALLOWED_SCANCODE_SIZE = 128;
@@ -153,11 +146,11 @@ namespace drivers::ps2
          * @note Do not use this in the normal code because 
          *       this method is only for the interrupts handling system.
          * 
-         * @param Registers dump of all CPU registers.
+         * @param register_dump dump of all CPU registers.
          */
         _API_ 
         static 
         void 
-        handle_keypress(_IN_ kernel::Registers* registers) noexcept;
+        handle_keypress(_IN_ kernel::Registers* register_dump) noexcept;
     };
 } // namespace drivers::ps2
