@@ -30,7 +30,7 @@ namespace drivers::vga
      * @brief Makes a symbol entry for the 
      *        VGA-buffer from a specific color layout and a character.
      * 
-     * @note Use `make_color()` to ensure the color layout is correct.
+     * @note Use `make_symbol_color()` to ensure the color layout is correct.
      * 
      * @param symbol symbol entry symbol
      * @param color  symbol entry color layout
@@ -66,11 +66,11 @@ namespace drivers::vga
     void 
     Text_Mode::clear_screen(_IN_ const Text_Mode_Color foreground,
                             _IN_ const Text_Mode_Color background) noexcept {
-        const uint8_t color  = make_color(foreground, background);
+        const uint8_t color  = make_symbol_color(foreground, background);
         const uint16_t entry = make_symbol_entry(' ', color);
 
         for (uint32_t buffer_index = 0; 
-             buffer_index < screen_width * screen_height; 
+             buffer_index < screen_char_width * screen_char_height; 
              buffer_index++) [[likely]] {
             screen_buffer_ptr[buffer_index] = entry;
         }
@@ -89,9 +89,9 @@ namespace drivers::vga
     _API_ 
     [[nodiscard]] 
     uint8_t
-    Text_Mode::make_color(_IN_ const Text_Mode_Color foreground,
-                          _IN_ const Text_Mode_Color background,
-                          _IN_ const bool blink) noexcept {
+    Text_Mode::make_symbol_color(_IN_ const Text_Mode_Color foreground,
+                                 _IN_ const Text_Mode_Color background,
+                                 _IN_ const bool blink) noexcept {
         uint8_t color = (static_cast<uint8_t>(background) << 4) | 
                          static_cast<uint8_t>(foreground);
 
@@ -107,7 +107,8 @@ namespace drivers::vga
      * @brief Outputs a character with a special fore and background color.
      * 
      * @note The color must match a specific layout, 
-     *       use `Text_Mode::make_color` to ensure the color layout is correct.
+     *       use `Text_Mode::make_symbol_color` to ensure the 
+     *       color layout is correct.
      * 
      * @param x      X coordinate for the output
      * @param y      Y coordinate for the output
@@ -125,25 +126,25 @@ namespace drivers::vga
      */
     _API_ 
     status_t 
-    Text_Mode::put_char_at(_IN_ const uint32_t x,
-                           _IN_ const uint32_t y,
-                           _IN_ const uint8_t color,
-                           _IN_ const char symbol) noexcept {
+    Text_Mode::set_symbol_at(_IN_ const uint32_t x,
+                             _IN_ const uint32_t y,
+                             _IN_ const uint8_t color,
+                             _IN_ const char symbol) noexcept {
         status_t status;
         uint32_t buffer_index;
 
-        if (x >= screen_width) [[unlikely]] {
+        if (x >= screen_char_width) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_A;
             goto cleanup;
         }
 
-        if (y >= screen_height) [[unlikely]] {
+        if (y >= screen_char_height) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_B;
             goto cleanup;
         }
 
-        buffer_index = y * screen_width + x;
-        
+        buffer_index = y * screen_char_width + x;
+
         screen_buffer_ptr[buffer_index] = make_symbol_entry(symbol, color);
 
         status = status::SUCCESS;
@@ -172,24 +173,24 @@ namespace drivers::vga
      */
     _API_
     status_t 
-    Text_Mode::get_char_from(_OUT_ char& symbol,
+    Text_Mode::get_symbol_at(_OUT_ char& symbol,
                              _OUT_ uint8_t& color,
                              _IN_  const uint32_t x,
                              _IN_  const uint32_t y) noexcept {
         status_t status;
         uint16_t buffer_symbol_entry;
 
-        if (x >= screen_width) [[unlikely]] {
+        if (x >= screen_char_width) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_C;
             goto cleanup;
         }
 
-        if (y >= screen_height) [[unlikely]] {
+        if (y >= screen_char_height) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_D;
             goto cleanup;
         }
 
-        buffer_symbol_entry = screen_buffer_ptr[y * screen_width + x];
+        buffer_symbol_entry = screen_buffer_ptr[y * screen_char_width + x];
 
         symbol = static_cast<char>(buffer_symbol_entry & byte_mask);
         color  = static_cast<uint8_t>((buffer_symbol_entry >> 8) & byte_mask);
@@ -211,8 +212,8 @@ namespace drivers::vga
      */
     _API_
     uint32_t
-    Text_Mode::get_screen_width() noexcept {
-        return screen_width;
+    Text_Mode::screen_width() noexcept {
+        return screen_char_width;
     }
 
 
@@ -226,7 +227,7 @@ namespace drivers::vga
      */
     _API_
     uint32_t
-    Text_Mode::get_screen_height() noexcept {
-        return screen_height;
+    Text_Mode::screen_height() noexcept {
+        return screen_char_height;
     }
 } // namespace drivers::vga

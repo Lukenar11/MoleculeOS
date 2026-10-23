@@ -29,17 +29,17 @@ namespace terminal
                                                const drivers::vga::Text_Mode_Color& background) 
                                                const noexcept {
         // uint32_t x = stdlib::console::get_cursor_x();
-        // if (x >= drivers::vga::Text_Mode::get_screen_width()) [[unlikely]]
-        //     x = drivers::vga::Text_Mode::get_screen_width() - 1;
+        // if (x >= drivers::vga::Text_Mode::screen_width()) [[unlikely]]
+        //     x = drivers::vga::Text_Mode::screen_width() - 1;
 
         // uint32_t y = stdlib::console::get_cursor_y();
-        // if (y >= drivers::vga::Text_Mode::get_screen_height()) [[unlikely]]
-        //     y = drivers::vga::Text_Mode::get_screen_height() - 1;
+        // if (y >= drivers::vga::Text_Mode::screen_height()) [[unlikely]]
+        //     y = drivers::vga::Text_Mode::screen_height() - 1;
 
         // stdlib::console::set_text_color(foreground, background);
         // 
         // const uint8_t color = stdlib::console::get_text_color();
-        // drivers::vga::Text_Mode::put_char_at(x, y, color, ' ');
+        // drivers::vga::Text_Mode::set_symbol_at(x, y, color, ' ');
     }
 
     void Terminal::step() noexcept {

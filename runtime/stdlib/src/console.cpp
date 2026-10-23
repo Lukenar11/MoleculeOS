@@ -38,8 +38,8 @@ namespace
     uint32_t cursor_x = 0;
     uint32_t cursor_y = 0;
         
-    uint8_t cursor_color = driver.make_color(drivers::vga::Text_Mode_Color::LIGHT_GREY, 
-                                             drivers::vga::Text_Mode_Color::BLACK);
+    uint8_t cursor_color = driver.make_symbol_color(drivers::vga::Text_Mode_Color::LIGHT_GREY, 
+                                                    drivers::vga::Text_Mode_Color::BLACK);
 
 
     /** 
@@ -50,7 +50,7 @@ namespace
         cursor_x = 0;
         cursor_y++;
 
-        if (cursor_y >= driver.get_screen_height()) [[unlikely]] {
+        if (cursor_y >= driver.screen_height()) [[unlikely]] {
             reset();
         }
     }
@@ -259,7 +259,10 @@ namespace
 
         if (cursor_x > 0) [[likely]] {
             cursor_x--;
-            status = driver.put_char_at(cursor_x, cursor_y, cursor_color, ' ');
+            status = driver.set_symbol_at(cursor_x, 
+                                          cursor_y, 
+                                          cursor_color, 
+                                          ' ');
             if (status != status::SUCCESS) [[unlikely]] {
                 status = status::FAIL;
             }
@@ -292,7 +295,10 @@ namespace
         for (uint32_t puted_spaces = 0; 
              puted_spaces < 4 - (cursor_x % 4);
              puted_spaces++) [[likely]] {
-            status = driver.put_char_at(cursor_x, cursor_y, cursor_color, ' ');
+            status = driver.set_symbol_at(cursor_x, 
+                                          cursor_y, 
+                                          cursor_color, 
+                                          ' ');
             if (status != status::SUCCESS) [[unlikely]] {
                 status = status::FAIL;
                 break;
@@ -300,7 +306,7 @@ namespace
 
             cursor_x++;
 
-            if (cursor_x >= driver.get_screen_width()) [[unlikely]] {
+            if (cursor_x >= driver.screen_width()) [[unlikely]] {
                 new_line();
             }
         }
@@ -324,10 +330,10 @@ namespace
     [[nodiscard]]
     status_t 
     handle_normal_char(_IN_ const char symbol) noexcept {
-        status_t status = driver.put_char_at(cursor_x, 
-                                             cursor_y, 
-                                             cursor_color, 
-                                             symbol);
+        status_t status = driver.set_symbol_at(cursor_x, 
+                                               cursor_y, 
+                                               cursor_color, 
+                                               symbol);
         if (status != status::SUCCESS) [[unlikely]] {
             status = status::FAIL;
             goto cleanup;
@@ -335,7 +341,7 @@ namespace
 
         cursor_x++;
 
-        if (cursor_x >= driver.get_screen_width()) [[unlikely]] {
+        if (cursor_x >= driver.screen_width()) [[unlikely]] {
             new_line();
         }
 
@@ -395,7 +401,7 @@ namespace
             }
 
             x++;
-            if (x >= driver.get_screen_width()) [[unlikely]] {
+            if (x >= driver.screen_width()) [[unlikely]] {
                 needed_lines++;
                 x ^= x;
             }
@@ -461,7 +467,7 @@ namespace stdlib::console
     set_text_color(_IN_ const drivers::vga::Text_Mode_Color color,
                    _IN_ const drivers::vga::Text_Mode_Color background,
                    _IN_ const bool does_blink) noexcept {
-        cursor_color = driver.make_color(color, background, does_blink);
+        cursor_color = driver.make_symbol_color(color, background, does_blink);
     }
 
 
@@ -475,8 +481,8 @@ namespace stdlib::console
     void
     set_cursor(_IN_ const uint32_t x, 
                _IN_ const uint32_t y) noexcept {
-        if (x < driver.get_screen_width() &&
-            y < driver.get_screen_height()) [[likely]] {
+        if (x < driver.screen_width() &&
+            y < driver.screen_height()) [[likely]] {
             cursor_x = x;
             cursor_y = y;
         }
@@ -772,7 +778,7 @@ namespace stdlib::console
             goto cleanup;
         }
         
-        if (needed_lines > driver.get_screen_height() - cursor_y) [[unlikely]] {
+        if (needed_lines > driver.screen_height() - cursor_y) [[unlikely]] {
             reset();
         }
 
