@@ -634,7 +634,7 @@ namespace drivers::ata
 
 
     /**
-     * @brief Initializes the ATA-PIO driver.
+     * @brief Nulls the ATA-PIO driver.
      */
     Programmable_IO::Programmable_IO() noexcept :
         partition_length(0),
@@ -644,6 +644,17 @@ namespace drivers::ata
         drive_select_flags(0),
         lba_flags(0),
         status_port(0) {
+        kernel::sys::disable_interrupts();
+        reset_driver();
+        kernel::sys::enable_interrupts();
+    }
+
+
+    /**
+     * @brief Initializes the ATA-PIO driver.
+     */
+    void 
+    Programmable_IO::init() noexcept {
         uint32_t eflags;
         struct Channel final { 
             uint16_t io_port; 

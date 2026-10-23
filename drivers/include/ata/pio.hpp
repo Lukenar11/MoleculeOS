@@ -365,7 +365,7 @@ namespace drivers::ata
 
     public:
         /**
-         * @brief Initializes the ATA-PIO driver.
+         * @brief Nulls the ATA-PIO driver.
          */
         Programmable_IO() noexcept;
 
@@ -376,6 +376,13 @@ namespace drivers::ata
          * @note Is declared as default.
          */
         ~Programmable_IO() noexcept = default;
+
+
+        /**
+         * @brief Initializes the ATA-PIO driver.
+         */
+        void
+        init() noexcept;
 
         
         /**
@@ -418,5 +425,20 @@ namespace drivers::ata
             _IN_    uint32_t relative_lba,
             _IN_    uint32_t sector_count,
             _IN_    const Operations operation) noexcept;
+
+
+        /**
+         * @brief Gets the of one hard drive sector.
+         * 
+         * @retval hard drive sector size
+         */
+        _API_
+        [[nodiscard]]
+        inline
+        constexpr
+        uint32_t
+        sector_size() const noexcept {
+            return SECTOR_SIZE;
+        }
     };
 } // namespace drivers::ata

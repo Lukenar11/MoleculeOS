@@ -47,12 +47,14 @@ namespace
     };
 
 
+    drivers::ata::Programmable_IO driver;
+
+
     constexpr const char* MOFS_HEADER_MAGIC = "MOFS";
 
     constexpr uint32_t MOFS_VERSION            = 2;
     constexpr uint32_t MOFS_HEADER_OFFSET      = 0;
-    constexpr uint32_t SECTOR_SIZE             = drivers::ata::SECTOR_SIZE;
-    constexpr uint32_t FILE_ENTRY_TABLE_OFFSET = SECTOR_SIZE;
+    constexpr uint32_t FILE_ENTRY_TABLE_OFFSET = driver.sector_size();
     constexpr uint32_t FILESYS_DATA_OFFSET     = FILE_ENTRY_TABLE_OFFSET + 
                                                  filesys::FILE_TABLE_ENTRYS * 
                                                  sizeof(Stored_File_Entry);
@@ -167,10 +169,10 @@ namespace
             goto cleanup;
         }
 
-        status = ata::Programmable_IO::run(temp_buffer_ptr,
-                                                     start_sector,
-                                                     sector_count,
-                                                     ata::Operations::READ);
+        status = driver.run(temp_buffer_ptr,
+                            start_sector,
+                            sector_count,
+                            ata::Operations::READ);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_A) {
                 status ^= status::flags::PARAM_A;
@@ -253,10 +255,10 @@ namespace
             goto cleanup;
         }
                              
-        status = ata::Programmable_IO::run(temp_buffer_ptr,
-                                                     start_sector,
-                                                     sector_count,
-                                                     ata::Operations::READ);
+        status = driver.run(temp_buffer_ptr,
+                            start_sector,
+                            sector_count,
+                            ata::Operations::READ);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_A) {
                 status ^= status::flags::PARAM_A;
@@ -290,10 +292,10 @@ namespace
             goto cleanup;
         }
     
-        status = ata::Programmable_IO::run(temp_buffer_ptr,
-                                                     start_sector,
-                                                     sector_count,
-                                                     ata::Operations::WRITE);
+        status = driver.run(temp_buffer_ptr,
+                            start_sector,
+                            sector_count,
+                            ata::Operations::WRITE);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_A) {
                 status ^= status::flags::PARAM_A;
@@ -371,8 +373,8 @@ namespace
             goto cleanup;
         }
 
-        start_sector  = offset / drivers::ata::SECTOR_SIZE;
-        sector_offset = offset % drivers::ata::SECTOR_SIZE;
+        start_sector  = offset / driver.sector_size();
+        sector_offset = offset % driver.sector_size();
 
         if (byte_size > (UINT32_MAX - sector_offset)) [[unlikely]] {
             status = status::BUFFER_OVERFLOW;
@@ -380,17 +382,18 @@ namespace
         }
 
         end_offset   = sector_offset + byte_size;
-        sector_count = (end_offset + drivers::ata::SECTOR_SIZE - 1) / 
-                        drivers::ata::SECTOR_SIZE;
+        sector_count = (end_offset + driver.sector_size() - 1) / 
+                        driver.sector_size();
 
         if (sector_count == 0) [[unlikely]] {
             status = status::FAIL;
             goto cleanup;
         }
 
-        allocation_size = sector_count * ata::SECTOR_SIZE;
+        allocation_size = sector_count * driver.sector_size();
 
-        if (allocation_size / ata::SECTOR_SIZE != sector_count) [[unlikely]] {
+        if (allocation_size / driver.sector_size() != 
+            sector_count) [[unlikely]] {
             status = status::BUFFER_OVERFLOW;
             goto cleanup;
         }
@@ -861,6 +864,8 @@ namespace kernel::storemgr
         status_t status;
     
         sys::disable_interrupts();
+
+        driver.init();
     
         status = read_or_write_bytes(&header,
                                      sizeof(header),
