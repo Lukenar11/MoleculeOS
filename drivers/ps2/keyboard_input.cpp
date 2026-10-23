@@ -18,7 +18,7 @@ NOTES:
 */
 
 
-#include "../ps2/keyboard_input.hpp"
+#include "keyboard_input.hpp"
 
 
 namespace drivers::ps2

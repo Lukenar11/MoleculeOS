@@ -21,7 +21,7 @@ NOTES:
 */
 
 
-#include "../vga/text_mode.hpp"
+#include "text_mode.hpp"
 
 
 namespace drivers::vga 
