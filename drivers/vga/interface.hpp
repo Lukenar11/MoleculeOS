@@ -165,8 +165,6 @@ namespace drivers::vga
         public Static_Interface<Func>, 
         public Dynamic_Interface<T> {
     private:
-        using color_t = T;
-
         using Static_Interface<Func>::screen_width;
         using Static_Interface<Func>::screen_height;
 
