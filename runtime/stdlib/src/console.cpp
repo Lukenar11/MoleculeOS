@@ -72,10 +72,7 @@ namespace
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
      *          If `buffer` is a `nullptr`
-     * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_C`
-     *          If `value` is a `nullptr`
-     * 
+     *
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D`
      *          If `base is not` between 2 and 16.
      * 
@@ -104,18 +101,13 @@ namespace
             goto cleanup;
         }
 
-        if (!value) [[unlikely]] {
-            status = status::NULL_POINTER | status::flags::PARAM_C;
-            goto cleanup;
-        }
-
         if (base < 2 || base > 16) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_D;
             goto cleanup;
         }
 
         if (value == 0) [[unlikely]] {
-            status = put_char('0');
+            status = status::SUCCESS;
             goto cleanup;
         }
 
@@ -174,8 +166,7 @@ namespace
         }
 
         if (value == 0) [[unlikely]] {
-            put_char('0');
-            status = status::SUCCESS;
+            status = put_char('0');
             goto cleanup;
         }
 
@@ -212,10 +203,7 @@ namespace
      * @param value        integer for casting
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If the budder is a `nullptr`.
-     * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_C`
-     *          If `value` is a `nullptr`
+     *          If the buffer is a `nullptr`.
      * 
      * @retval `status::SUCCESS`
      *          Default case.
@@ -229,13 +217,10 @@ namespace
         const char null_char  = '0';
         const uint32_t ten    = 10;
 
+        buffer_count = 0;
+
         if (!buffer.data()) [[unlikely]] {
             status = status::NULL_POINTER | status::flags::PARAM_A;
-            goto cleanup;
-        }
-
-        if (!value) [[unlikely]] {
-            status = status::NULL_POINTER | status::flags::PARAM_C;
             goto cleanup;
         }
 
@@ -308,7 +293,7 @@ namespace
         status_t status;
 
         for (uint32_t puted_spaces = 0; 
-             puted_spaces < 4 - (cursor_y % 4);
+             puted_spaces < 4 - (cursor_x % 4);
              puted_spaces++) [[likely]] {
             status = drivers::vga::Text_Mode::put_char_at(cursor_x,
                                                           cursor_y,
@@ -805,6 +790,10 @@ namespace stdlib::console
              message[current_char] != '\0';
              current_char++) [[likely]] {
             status = put_char(message[current_char]);
+
+            if (status != status::SUCCESS) {
+                break;
+            }
         }
 
     cleanup:
