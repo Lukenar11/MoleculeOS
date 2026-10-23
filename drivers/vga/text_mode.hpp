@@ -50,6 +50,8 @@ namespace drivers::vga
 
     class Text_Mode : public Interface<Text_Mode, Text_Mode_Color> {
     private:
+        using color_t = Text_Mode_Color;
+
         static constexpr uint32_t SCREEN_WIDTH  = 80;
         static constexpr uint32_t SCREEN_HEIGHT = 25;
 
@@ -79,9 +81,6 @@ namespace drivers::vga
 
 
     public:
-        using color_t = Text_Mode_Color;
-        
-
         /**
          * @brief Initializes the VGA-textmode driver.
          */
@@ -106,8 +105,8 @@ namespace drivers::vga
          */
         _API_ 
         void 
-        clear_screen(_IN_ const color_t foreground,
-                     _IN_ const color_t background) noexcept override;
+        clear_screen(_IN_ const Text_Mode_Color foreground,
+                     _IN_ const Text_Mode_Color background) noexcept override;
 
 
         /** 
@@ -122,8 +121,8 @@ namespace drivers::vga
         _API_ 
         [[nodiscard]] 
         uint8_t
-        make_symbol_color(_IN_ const color_t foreground,
-                          _IN_ const color_t background,
+        make_symbol_color(_IN_ const Text_Mode_Color foreground,
+                          _IN_ const Text_Mode_Color background,
                           _IN_ const bool blink=false) noexcept override;
 
 

@@ -65,10 +65,11 @@ namespace
 
     template<typename Derived_Color>
     class Dynamic_Interface {
-    public:
+    private:
         using color_t = Derived_Color;
 
 
+    public:
         /**
          * @brief Initializes the driver.
          */
@@ -106,8 +107,8 @@ namespace
         /** 
          * @brief Clears the screen and sets a special screen color.
          * 
-         * @param foreground screen text color (default case `BLACK`)
-         * @param background screen color (default case `BLACK`)
+         * @param foreground screen text color
+         * @param background screen color
          */
         _API_ 
         virtual
@@ -167,13 +168,14 @@ namespace drivers::vga
     class Interface : 
         public Static_Interface<Static_Derived>, 
         public Dynamic_Interface<Derived_Color> {
-    public:
+    private:
         using color_t = Derived_Color;
 
         using Static_Interface<Static_Derived>::screen_width;
         using Static_Interface<Static_Derived>::screen_height;
 
 
+    public:
         /**
          * @brief Initializes the driver.
          * 

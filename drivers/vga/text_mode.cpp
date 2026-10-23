@@ -58,13 +58,13 @@ namespace drivers::vga
     /** 
      * @brief Clears the screen and sets a special screen color.
      * 
-     * @param foreground screen text color (default case `BLACK`)
-     * @param background screen color (default case `BLACK`)
+     * @param foreground screen text color
+     * @param background screen color
      */
     _API_ 
     void 
-    Text_Mode::clear_screen(_IN_ const color_t foreground,
-                            _IN_ const color_t background) noexcept {
+    Text_Mode::clear_screen(_IN_ const Text_Mode_Color foreground,
+                            _IN_ const Text_Mode_Color background) noexcept {
         const uint8_t color  = make_symbol_color(foreground, background);
         const uint16_t entry = make_symbol_entry(' ', color);
 
@@ -88,8 +88,8 @@ namespace drivers::vga
     _API_ 
     [[nodiscard]] 
     uint8_t
-    Text_Mode::make_symbol_color(_IN_ const color_t foreground,
-                                 _IN_ const color_t background,
+    Text_Mode::make_symbol_color(_IN_ const Text_Mode_Color foreground,
+                                 _IN_ const Text_Mode_Color background,
                                  _IN_ const bool blink) noexcept {
         uint8_t color = (static_cast<uint8_t>(background) << 4) | 
                          static_cast<uint8_t>(foreground);
