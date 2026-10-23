@@ -33,7 +33,7 @@ namespace drivers::ata
         _API_
         virtual
         void
-        init() noexcept;
+        init() noexcept = 0;
 
 
         /**
@@ -50,7 +50,7 @@ namespace drivers::ata
         status_t
         load_sectors(_INOUT_ uint16_t* buffer,
                      _IN_    uint32_t relative_lba,
-                     _IN_    uint32_t sector_count) noexcept;
+                     _IN_    uint32_t sector_count) noexcept = 0;
 
 
         /**
@@ -67,7 +67,7 @@ namespace drivers::ata
         status_t
         store_sectors(_INOUT_ uint16_t* buffer,
                       _IN_    uint32_t relative_lba,
-                      _IN_    uint32_t sector_count) noexcept;
+                      _IN_    uint32_t sector_count) noexcept = 0;
 
 
         /**
@@ -79,6 +79,6 @@ namespace drivers::ata
         [[nodiscard]]
         virtual
         uint32_t
-        sector_size() const noexcept;
+        sector_size() const noexcept = 0;
     };
 } // namespace drivers::ata
