@@ -33,6 +33,13 @@ NOTES:
 
 namespace drivers::ata
 {
+    enum class Programmable_IO::Driver_Operation : uint8_t {
+        NONE  = 0x00,
+        READ  = 0x01,
+        WRITE = 0x02
+    };
+
+
     /**
      * @brief Checks whether a memory access operation is within the
      *        allowed LBA range.
@@ -41,7 +48,6 @@ namespace drivers::ata
      * @param partition_length Total number of sectors.
      * @param relative_lba     Starting LBA address.
      * @param to_transfer      Number of sectors to read or write.
-     * @param operation        Operation witch sets the driver working path.
      *
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
      *         If `buffer` is a `nullptr`.
@@ -57,9 +63,6 @@ namespace drivers::ata
      *
      * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
      *         If `to_transfer` is `0` or exceeds the `partition_length`.
-     * 
-     * @retval `status::UNSUPPORTED_OPERATION | status::flags::PARAM_D`
-     *         If `operation` is not `READ` or `WRITE`.
      *
      * @retval `status::SUCCESS`
      *         Default case.
@@ -68,8 +71,7 @@ namespace drivers::ata
     status_t
     Programmable_IO::validate_storage_access(_IN_ const uint16_t* const buffer,
                                              _IN_ const uint32_t relative_lba,
-                                             _IN_ const uint32_t to_transfer,
-                                             _IN_ const Operations operation)
+                                             _IN_ const uint32_t to_transfer)
                                              noexcept {
         status_t status;
 
@@ -93,12 +95,6 @@ namespace drivers::ata
         if (relative_lba >= partition_length ||
             relative_lba > (partition_length - to_transfer)) [[unlikely]] {
             status = status::ATA_INVALID_LBA | status::flags::PARAM_B;
-            goto cleanup;
-        }
-
-        if (operation != Operations::READ && 
-            operation != Operations::WRITE) [[unlikely]] {
-            status = status::UNSUPPORTED_OPERATION | status::flags::PARAM_D;
             goto cleanup;
         }
 
@@ -448,7 +444,6 @@ namespace drivers::ata
      *        for a given number of sectors.
      *
      * @param buffer       I/O buffer for sector data.
-     * @param operation    Operation (`READ` or `WRITE`).
      * @param sector_count Number of sectors to transfer.
      *
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
@@ -472,7 +467,6 @@ namespace drivers::ata
     [[nodiscard]]
     status_t 
     Programmable_IO::poll_and_read_or_write_disk(_INOUT_ uint16_t* buffer,
-                                                 _IN_    const Operations operation,
                                                  _IN_    const uint32_t sector_count) 
                                                  noexcept { 
         status_t status;
@@ -482,8 +476,8 @@ namespace drivers::ata
             goto cleanup;
         }
 
-        if (operation != Operations::READ && 
-            operation != Operations::WRITE) [[unlikely]] {
+        if (operation != Driver_Operation::READ && 
+            operation != Driver_Operation::WRITE) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_B;
             goto cleanup;
         }
@@ -503,7 +497,7 @@ namespace drivers::ata
                 goto cleanup;
             }
 
-            if (operation == Operations::READ) {
+            if (operation == Driver_Operation::READ) {
                 stdlib::word_input_stream(io_port_base,
                                           SECTOR_WORD_SIZE,
                                           buffer);
@@ -534,7 +528,6 @@ namespace drivers::ata
      * @param buffer       I/O buffer for sector data.
      * @param relative_lba Starting LBA address.
      * @param sector_count Number of sectors to transfer.
-     * @param operation    Operation type (READ or WRITE).
      *
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
      *         If `buffer` is a `nullptr`.
@@ -544,9 +537,6 @@ namespace drivers::ata
      *
      * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
      *         If `sector_count` is invalid.
-     * 
-     * @retval `status::UNSUPPORTED_OPERATION | status::flags::PARAM_D`
-     *         If `operation` is not `READ` or `WRITE`.
      *
      * @retval `status::ATA_ERROR`
      *         If the hard drive reports an error.
@@ -564,14 +554,13 @@ namespace drivers::ata
     status_t 
     Programmable_IO::start_pio_disk_read_or_write(_INOUT_ uint16_t* const buffer,
                                                   _IN_    const uint32_t relative_lba,
-                                                  _IN_    const uint32_t sector_count,
-                                                  _IN_    const Operations operation) 
+                                                  _IN_    const uint32_t sector_count) 
                                                   noexcept {
         status_t status;
         uint32_t absolute_lba;
         uint8_t final_status;
 
-        status = validate_storage_access(buffer, relative_lba, sector_count, operation);
+        status = validate_storage_access(buffer, relative_lba, sector_count);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -593,19 +582,19 @@ namespace drivers::ata
         stdlib::byte_output(io_port_base + 6,
                             ((absolute_lba >> 24) & NIBBLE_MASK) | lba_flags);
                            
-        if (operation == Operations::READ) {
+        if (operation == Driver_Operation::READ) {
             stdlib::byte_output(status_port, READ_SECTORS);
         }
         else {
             stdlib::byte_output(status_port, WRITE_SECTORS);
         }
 
-        status = poll_and_read_or_write_disk(buffer, operation, sector_count);
+        status = poll_and_read_or_write_disk(buffer, sector_count);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        if (operation == Operations::WRITE) {
+        if (operation == Driver_Operation::WRITE) {
             stdlib::byte_output(status_port, FLUSH_CACHE);
 
             status = poll_until_not_bsy_or_error();
@@ -634,8 +623,111 @@ namespace drivers::ata
 
 
     /**
+     * @brief ATA-PIO main method performing chunked read/write
+     *        operations over a specific sector range.
+     *
+     * @param buffer       I/O buffer for sector data
+     * @param relative_lba Starting LBA address
+     * @param sector_count Number of sectors to transfer
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *         If `buffer` is a `nullptr`.
+     *
+     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B`
+     *         If the sector count is zero or exceeds the allowed maximum.
+     *
+     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
+     *         If the LBA range is invalid.
+     *
+     * @retval `status::ATA_ERROR`
+     *         If the hard drive reports an error.
+     *
+     * @retval `status::ATA_DEVICE_FAULT`
+     *         If the hard drive sets the `DF` bit.
+     *
+     * @retval `status::ATA_TIMEOUT`
+     *         If no response is received in the timeout period.
+     *
+     * @retval `status::SUCCESS`
+     *         Default case.
+     */ 
+    [[nodiscard]]
+    status_t 
+    Programmable_IO::run(_INOUT_ uint16_t* buffer,
+                         _IN_    uint32_t relative_lba,
+                         _IN_    uint32_t sector_count) noexcept {
+        status_t status;
+        uint32_t chunk;
+        uint32_t eflags;
+        bool transfer_ok;
+        
+        eflags = kernel::sys::save_eflags();
+        kernel::sys::disable_interrupts();
+        
+        if (sector_count == 0) [[unlikely]] {
+            sector_count = 256;
+        }
+
+        status = validate_storage_access(buffer, 
+                                         relative_lba,
+                                         sector_count);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        status = poll_until_not_bsy_or_error();
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        while (sector_count > 0) [[likely]] {
+            if (sector_count > CHUNK_SECTORS) {
+                chunk = CHUNK_SECTORS;
+            }
+            else {
+                chunk = sector_count;
+            }
+
+            transfer_ok = false;
+
+            for (int32_t retry = MAX_RETRYS; retry >= 0; --retry) [[likely]] {
+                status = start_pio_disk_read_or_write(buffer,
+                                                      relative_lba,
+                                                      chunk);
+
+                if (status == status::SUCCESS) {
+                    transfer_ok = true;
+                    break;
+                }
+
+                reset_driver();
+                delay();
+            }
+
+            if (!transfer_ok) [[unlikely]] {
+                goto cleanup;
+            }
+
+            buffer       += chunk * SECTOR_WORD_SIZE;
+            relative_lba += chunk;
+            sector_count -= chunk;
+        }
+
+        status = status::SUCCESS;
+
+    cleanup:
+        reset_driver();
+
+        kernel::sys::restore_eflags(eflags);
+
+        return status;
+    }
+
+
+    /**
      * @brief Nulls the ATA-PIO driver.
      */
+    _API_
     Programmable_IO::Programmable_IO() noexcept :
         partition_length(0),
         lba_start_address(0),
@@ -643,7 +735,8 @@ namespace drivers::ata
         io_port_base(0),
         drive_select_flags(0),
         lba_flags(0),
-        status_port(0) {
+        status_port(0),
+        operation(Driver_Operation::NONE) {
         kernel::sys::disable_interrupts();
         reset_driver();
         kernel::sys::enable_interrupts();
@@ -653,6 +746,7 @@ namespace drivers::ata
     /**
      * @brief Initializes the ATA-PIO driver.
      */
+    _API_
     void 
     Programmable_IO::init() noexcept {
         uint32_t eflags;
@@ -693,15 +787,14 @@ namespace drivers::ata
         kernel::sys::restore_eflags(eflags);
     }
 
-    
+
     /**
-     * @brief ATA-PIO interface performing chunked read/write
+     * @brief ATA-PIO interface performing chunked read
      *        operations over a specific sector range.
      *
      * @param buffer       I/O buffer for sector data
      * @param relative_lba Starting LBA address
      * @param sector_count Number of sectors to transfer
-     * @param operation    Operation (`READ` or `WRITE`)
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
      *         If `buffer` is a `nullptr`.
@@ -711,9 +804,6 @@ namespace drivers::ata
      *
      * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
      *         If the LBA range is invalid.
-     * 
-     * @retval `status::UNSUPPORTED_OPERATION | status::flags::PARAM_D`
-     *         If `operation` is not `READ` or `WRITE`.
      *
      * @retval `status::ATA_ERROR`
      *         If the hard drive reports an error.
@@ -726,81 +816,56 @@ namespace drivers::ata
      *
      * @retval `status::SUCCESS`
      *         Default case.
-     */
-    _API_ 
+     */ 
+    _API_
     [[nodiscard]]
-    status_t 
-    Programmable_IO::run(_INOUT_ uint16_t* buffer,
-                         _IN_    uint32_t relative_lba,
-                         _IN_    uint32_t sector_count,
-                         _IN_    const Operations operation) 
-                         noexcept {
-        status_t status;
-        uint32_t chunk;
-        uint32_t eflags;
-        bool transfer_ok;
-        
-        eflags = kernel::sys::save_eflags();
-        kernel::sys::disable_interrupts();
-        
-        if (sector_count == 0) [[unlikely]] {
-            sector_count = 256;
-        }
+    status_t
+    Programmable_IO::load_sectors(_INOUT_ uint16_t* buffer,
+                                  _IN_    uint32_t relative_lba,
+                                  _IN_    uint32_t sector_count) noexcept {
+        operation = Driver_Operation::READ;
 
-        status = validate_storage_access(buffer, 
-                                         relative_lba,
-                                         sector_count,
-                                         operation);
-        if (status != status::SUCCESS) [[unlikely]] {
-            goto cleanup;
-        }
+        return run(buffer, relative_lba, sector_count);
+    }
 
-        status = poll_until_not_bsy_or_error();
-        if (status != status::SUCCESS) [[unlikely]] {
-            goto cleanup;
-        }
 
-        while (sector_count > 0) [[likely]] {
-            if (sector_count > CHUNK_SECTORS) {
-                chunk = CHUNK_SECTORS;
-            }
-            else {
-                chunk = sector_count;
-            }
+    /**
+     * @brief ATA-PIO interface performing chunked write
+     *        operations over a specific sector range.
+     *
+     * @param buffer       I/O buffer for sector data
+     * @param relative_lba Starting LBA address
+     * @param sector_count Number of sectors to transfer
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *         If `buffer` is a `nullptr`.
+     *
+     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B`
+     *         If the sector count is zero or exceeds the allowed maximum.
+     *
+     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
+     *         If the LBA range is invalid.
+     *
+     * @retval `status::ATA_ERROR`
+     *         If the hard drive reports an error.
+     *
+     * @retval `status::ATA_DEVICE_FAULT`
+     *         If the hard drive sets the `DF` bit.
+     *
+     * @retval `status::ATA_TIMEOUT`
+     *         If no response is received in the timeout period.
+     *
+     * @retval `status::SUCCESS`
+     *         Default case.
+     */ 
+    _API_
+    [[nodiscard]]
+    status_t
+    Programmable_IO::store_sectors(_INOUT_ uint16_t* buffer,
+                                   _IN_    uint32_t relative_lba,
+                                   _IN_    uint32_t sector_count) noexcept {
+        operation = Driver_Operation::WRITE;
 
-            transfer_ok = false;
-
-            for (int32_t retry = MAX_RETRYS; retry >= 0; --retry) [[likely]] {
-                status = start_pio_disk_read_or_write(buffer,
-                                                      relative_lba,
-                                                      chunk,
-                                                      operation);
-
-                if (status == status::SUCCESS) {
-                    transfer_ok = true;
-                    break;
-                }
-
-                reset_driver();
-                delay();
-            }
-
-            if (!transfer_ok) [[unlikely]] {
-                goto cleanup;
-            }
-
-            buffer       += chunk * SECTOR_WORD_SIZE;
-            relative_lba += chunk;
-            sector_count -= chunk;
-        }
-
-        status = status::SUCCESS;
-
-    cleanup:
-        reset_driver();
-
-        kernel::sys::restore_eflags(eflags);
-
-        return status;
+        return run(buffer, relative_lba, sector_count);
     }
 } // namespace drivers::ata

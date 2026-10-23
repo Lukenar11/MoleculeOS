@@ -84,6 +84,7 @@ namespace drivers::vga
         /**
          * @brief Initializes the VGA-textmode driver.
          */
+        _API_
         Text_Mode() noexcept;
 
 
@@ -92,6 +93,7 @@ namespace drivers::vga
          * 
          * @note It's declared as default.
          */
+        _API_
         ~Text_Mode() noexcept = default;
 
 

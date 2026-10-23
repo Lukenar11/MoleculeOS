@@ -49,6 +49,7 @@ namespace drivers::vga
     /**
      * @brief Initializes the VGA-textmode driver.
      */
+    _API_
     Text_Mode::Text_Mode() noexcept :
         screen_buffer_ptr(reinterpret_cast<volatile uint16_t*>(0xB8000)) {
     }

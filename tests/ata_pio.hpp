@@ -26,7 +26,7 @@ namespace tests
         if (Programmable_IO::run(buffer_ptr,
                                            lba, 
                                            sectors, 
-                                           drivers::ata::Operations::READ) != status::SUCCESS)
+                                           drivers::ata::Driver_Operations::READ) != status::SUCCESS)
             stdlib::console::put_string("\nRead Success\n\n");
         else
             stdlib::console::put_string("\nRead NOT Success\n\n");
@@ -64,7 +64,7 @@ namespace tests
         if (Programmable_IO::run(ptr, 
                                            lba, 
                                            sectors, 
-                                           drivers::ata::Operations::READ) != status::SUCCESS)
+                                           drivers::ata::Driver_Operations::READ) != status::SUCCESS)
             stdlib::console::put_string("\nRead Success\n\n");
         else
             stdlib::console::put_string("\nRead NOT Success\n\n");
@@ -97,7 +97,7 @@ namespace tests
             if (Programmable_IO::run(buffer_ptr, 
                                                lba, 
                                                sectors, 
-                                               drivers::ata::Operations::READ) != status::SUCCESS)
+                                               drivers::ata::Driver_Operations::READ) != status::SUCCESS)
                 stdlib::console::put_string("\nRead Success\n\n");
             else
                 stdlib::console::put_string("\nRead NOT Success\n\n");
@@ -126,7 +126,7 @@ namespace tests
         Programmable_IO::run(buffer_ptr, 
                                        lba, 
                                        sectors, 
-                                       drivers::ata::Operations::WRITE);
+                                       drivers::ata::Driver_Operations::WRITE);
         read_sector();
     }
 } // namespace tests

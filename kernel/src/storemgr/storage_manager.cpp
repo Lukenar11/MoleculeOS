@@ -46,9 +46,13 @@ namespace
         uint32_t file_data_offset    = 0;
     };
 
-
     drivers::ata::Programmable_IO driver;
 
+    enum class Storage_Operation : uint8_t {
+        NONE  = 0x00,
+        READ  = 0x01,
+        WRITE = 0x02
+    };
 
     constexpr const char* MOFS_HEADER_MAGIC = "MOFS";
 
@@ -169,10 +173,9 @@ namespace
             goto cleanup;
         }
 
-        status = driver.run(temp_buffer_ptr,
-                            start_sector,
-                            sector_count,
-                            ata::Operations::READ);
+        status = driver.load_sectors(temp_buffer_ptr,
+                                     start_sector,
+                                     sector_count);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_A) {
                 status ^= status::flags::PARAM_A;
@@ -255,10 +258,9 @@ namespace
             goto cleanup;
         }
                              
-        status = driver.run(temp_buffer_ptr,
-                            start_sector,
-                            sector_count,
-                            ata::Operations::READ);
+        status = driver.store_sectors(temp_buffer_ptr,
+                                      start_sector,
+                                      sector_count);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_A) {
                 status ^= status::flags::PARAM_A;
@@ -292,10 +294,9 @@ namespace
             goto cleanup;
         }
     
-        status = driver.run(temp_buffer_ptr,
-                            start_sector,
-                            sector_count,
-                            ata::Operations::WRITE);
+        status = driver.store_sectors(temp_buffer_ptr,
+                                      start_sector,
+                                      sector_count);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_A) {
                 status ^= status::flags::PARAM_A;
@@ -351,7 +352,7 @@ namespace
     read_or_write_bytes(_INOUT_ void* const buffer_ptr,
                         _IN_    const uint32_t byte_size,
                         _IN_    const uint32_t offset,
-                        _IN_    const drivers::ata::Operations operation) noexcept {
+                        _IN_    const Storage_Operation operation) noexcept {
         using namespace drivers;
 
         status_t status;
@@ -407,7 +408,7 @@ namespace
 
         sector_buffer = reinterpret_cast<uint16_t*>(ptr);
 
-        if (operation == ata::Operations::READ) {
+        if (operation == Storage_Operation::READ) {
             status = read_bytes(reinterpret_cast<uint16_t*>(buffer_ptr),
                                 sector_buffer,
                                 byte_size,
@@ -485,7 +486,7 @@ namespace
         status = read_or_write_bytes(&header,
                                      sizeof(MOFS_Header),
                                      MOFS_HEADER_OFFSET,
-                                     ata::Operations::READ);
+                                     Storage_Operation::READ);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status != (status::NULL_POINTER | status::flags::PARAM_A) &&
                 status != status::FAIL &&
@@ -566,7 +567,7 @@ namespace
         status = read_or_write_bytes(&header,
                                      sizeof(MOFS_Header),
                                      MOFS_HEADER_OFFSET,
-                                     ata::Operations::WRITE);
+                                     Storage_Operation::WRITE);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status != (status::NULL_POINTER | status::flags::PARAM_A) &&
                 status != status::FAIL &&
@@ -636,7 +637,7 @@ namespace
         status = read_or_write_bytes(data_ptr,
                                      stored_file_entry.file_byte_size,
                                      file_offset,
-                                     ata::Operations::READ);
+                                     Storage_Operation::READ);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_A) {
                 status = status::FAIL;
@@ -770,7 +771,7 @@ namespace
         status = read_or_write_bytes(file_entry.file_data_ptr,
                                      file_entry.file_byte_size,
                                      header.data_offset + current_data_offset,
-                                     ata::Operations::WRITE);
+                                     Storage_Operation::WRITE);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_A ||
                 status & status::flags::PARAM_B) {
@@ -827,7 +828,7 @@ namespace
         status = read_or_write_bytes(entry_table_ptr,
                                      file_entry_table_size,
                                      header.file_entry_table_offset,
-                                     ata::Operations::WRITE);
+                                     Storage_Operation::WRITE);
         if (status != status::SUCCESS) [[unlikely]] {
             if (!(status & status::BUFFER_OVERFLOW) && 
                 !(status & status::IO_ERROR) &&
@@ -870,7 +871,7 @@ namespace kernel::storemgr
         status = read_or_write_bytes(&header,
                                      sizeof(header),
                                      MOFS_HEADER_OFFSET,
-                                     ata::Operations::READ);
+                                     Storage_Operation::READ);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -890,7 +891,7 @@ namespace kernel::storemgr
             status = read_or_write_bytes(&header,
                                          sizeof(header),
                                          MOFS_HEADER_OFFSET,
-                                         ata::Operations::WRITE);
+                                         Storage_Operation::WRITE);
             if (status != status::SUCCESS) [[unlikely]] {
                 goto cleanup;
             }
@@ -1055,7 +1056,7 @@ namespace kernel::storemgr
         status = read_or_write_bytes(stored_file_entrys.data(),
                                      table_byte_size,
                                      header.file_entry_table_offset,
-                                     ata::Operations::READ);
+                                     Storage_Operation::READ);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_A || 
                 status & status::flags::PARAM_B) {
