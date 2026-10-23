@@ -43,7 +43,8 @@ namespace drivers::ata
          * @param sector_count Number of sectors to transfer
          */ 
         _API_
-        virtual
+        [[nodiscard]]
+        virtual 
         status_t
         load_sectors(_INOUT_ uint16_t* buffer,
                      _IN_    uint32_t relative_lba,
@@ -59,6 +60,7 @@ namespace drivers::ata
          * @param sector_count Number of sectors to transfer
          */ 
         _API_
+        [[nodiscard]]
         virtual
         status_t
         store_sectors(_INOUT_ uint16_t* buffer,
@@ -72,6 +74,7 @@ namespace drivers::ata
          * @retval sector size
          */
         _API_
+        [[nodiscard]]
         virtual
         uint32_t
         sector_size() const noexcept;
