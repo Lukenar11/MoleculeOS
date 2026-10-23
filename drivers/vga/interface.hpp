@@ -7,7 +7,7 @@
 
 namespace
 {
-    template<typename Static_Derived>
+    template<typename Func>
     class Static_Interface {
     public:
         /**
@@ -40,7 +40,7 @@ namespace
         constexpr 
         uint32_t 
         screen_width() noexcept {
-            return Static_Derived::screen_width();
+            return Func::screen_width();
         }
 
 
@@ -58,17 +58,13 @@ namespace
         constexpr 
         uint32_t 
         screen_height() noexcept {
-            return Static_Derived::screen_height();
+            return Func::screen_height();
         }
     };
 
 
-    template<typename Derived_Color>
+    template<typename T>
     class Dynamic_Interface {
-    private:
-        using color_t = Derived_Color;
-
-
     public:
         /**
          * @brief Initializes the driver.
@@ -99,8 +95,8 @@ namespace
         [[nodiscard]] 
         virtual
         uint8_t
-        make_symbol_color(_IN_ const color_t foreground,
-                          _IN_ const color_t background,
+        make_symbol_color(_IN_ const T foreground,
+                          _IN_ const T background,
                           _IN_ const bool blink=false) noexcept = 0;
 
 
@@ -113,8 +109,8 @@ namespace
         _API_ 
         virtual
         void 
-        clear_screen(_IN_ const color_t foreground,
-                     _IN_ const color_t background) noexcept = 0;
+        clear_screen(_IN_ const T foreground,
+                     _IN_ const T background) noexcept = 0;
 
 
         /**
@@ -164,15 +160,15 @@ namespace
 
 namespace drivers::vga
 {
-    template<typename Static_Derived, typename Derived_Color>
+    template<typename Func, typename T>
     class Interface : 
-        public Static_Interface<Static_Derived>, 
-        public Dynamic_Interface<Derived_Color> {
+        public Static_Interface<Func>, 
+        public Dynamic_Interface<T> {
     private:
-        using color_t = Derived_Color;
+        using color_t = T;
 
-        using Static_Interface<Static_Derived>::screen_width;
-        using Static_Interface<Static_Derived>::screen_height;
+        using Static_Interface<Func>::screen_width;
+        using Static_Interface<Func>::screen_height;
 
 
     public:

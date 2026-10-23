@@ -50,8 +50,6 @@ namespace drivers::vga
 
     class Text_Mode : public Interface<Text_Mode, Text_Mode_Color> {
     private:
-        using color_t = Text_Mode_Color;
-
         static constexpr uint32_t SCREEN_WIDTH  = 80;
         static constexpr uint32_t SCREEN_HEIGHT = 25;
 
