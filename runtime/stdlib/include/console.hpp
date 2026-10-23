@@ -156,6 +156,12 @@ namespace stdlib::console
     /** 
      * @brief Outputs a hexadecimal number to the terminal.
      * 
+     * @retval `status::FAIL`
+     *          Unknown error.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
+     * 
      * @param value number output
      */
     _API_ 
@@ -165,6 +171,12 @@ namespace stdlib::console
 
     /** 
      * @brief Outputs a binary number to the terminal.
+     * 
+     * @retval `status::FAIL`
+     *          Unknown error.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
      * 
      * @param value number output
      */
@@ -176,6 +188,12 @@ namespace stdlib::console
     /** 
      * @brief Outputs the address of pointer to the 
      *        terminal in hexadecimal.
+     * 
+     * @retval `status::FAIL`
+     *          Unknown error.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
      * 
      * @param value address output
      */
@@ -196,11 +214,8 @@ namespace stdlib::console
      * @note - `\n` -> Cursor jump to the next line.
      * @note - `\\"` -> Allows `"` as character output.
      * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
-     *          If x is greater then or equal to the screen width.
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
-     *          If y is greater then or equal to the screen height.
+     * @retval `status::FAIL`
+     *          If the char puting fails.
      * 
      * @retval `status::SUCCESS`
      *          Default case.
@@ -222,20 +237,14 @@ namespace stdlib::console
      * @note - `\n` -> Cursor jump to the next line.
      * @note - `\\"` -> allows `"` in the string output
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If `needed_lines` is a `nullptr`.
+     * @retval `status::NULL_POINTER` 
+     *          If `message` is a `nullptr`.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
-     *          If `text` is a `nullptr`.
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
-     *          If `text` is `empty`.
+     * @retval `status::INVALID_PARAMETER`
+     *          If `message` is empty.
      *
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
-     *          If x is greater then or equal to the screen width.
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
-     *          If y is greater then or equal to the screen height.
+     * @retval `status::FAIL` 
+     *          Unknown error.
      * 
      * @retval `status::SUCCESS`
      *          Default case.

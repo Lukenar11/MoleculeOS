@@ -32,6 +32,7 @@ namespace
     using namespace stdlib;
     using namespace console;
 
+
     uint32_t cursor_x = 0;
     uint32_t cursor_y = 0;
         
@@ -72,11 +73,14 @@ namespace
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
      *          If `buffer` is a `nullptr`
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
-     *          If `chars_written` is a `nullptr`
+     * @retval `status::NULL_POINTER | status::flags::PARAM_C`
+     *          If `value` is a `nullptr`
      * 
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D`
      *          If `base is not` between 2 and 16.
+     * 
+     * @retval `status::FAIL` 
+     *          Unknown error.
      * 
      * @retval `status::SUCCESS`
      *          Default case.
@@ -100,8 +104,8 @@ namespace
             goto cleanup;
         }
 
-        if (!chars_written) [[unlikely]] {
-            status = status::NULL_POINTER | status::flags::PARAM_B;
+        if (!value) [[unlikely]] {
+            status = status::NULL_POINTER | status::flags::PARAM_C;
             goto cleanup;
         }
 
@@ -111,9 +115,7 @@ namespace
         }
 
         if (value == 0) [[unlikely]] {
-            put_char('0');
-
-            status = status::SUCCESS;
+            status = put_char('0');
             goto cleanup;
         }
 
@@ -155,15 +157,6 @@ namespace
      * @retval `status::FAIL`
      *          Unknown Error.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `buffer` is a `nullptr`
-     * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
-     *          If `chars_written` is a `nullptr`
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D`
-     *          If `base is not` between 2 and 16.
-     * 
      * @retval `status::SUCCESS`
      *          Default case.
      */
@@ -188,6 +181,7 @@ namespace
 
         status = convert_base_to_digits(buffer, buffer_count, value, base);
         if (status != status::SUCCESS) [[unlikely]] {
+            status = status::FAIL;
             goto cleanup;
         }
 
@@ -220,8 +214,8 @@ namespace
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
      *          If the budder is a `nullptr`.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
-     *          If the `buffer_count` is a `nullptr`.
+     * @retval `status::NULL_POINTER | status::flags::PARAM_C`
+     *          If `value` is a `nullptr`
      * 
      * @retval `status::SUCCESS`
      *          Default case.
@@ -240,8 +234,8 @@ namespace
             goto cleanup;
         }
 
-        if (!buffer_count) [[unlikely]] {
-            status = status::NULL_POINTER | status::flags::PARAM_B;
+        if (!value) [[unlikely]] {
+            status = status::NULL_POINTER | status::flags::PARAM_C;
             goto cleanup;
         }
 
@@ -267,13 +261,10 @@ namespace
      * 
      * @param symbol character output
      * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
-     *          If x is greater then or equal to the screen width.
+     * @retval `status::FAIL`
+     *          If the char handling fails.
      * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
-     *          If y is greater then or equal to the screen height.
-     * 
-     * @retval `status::SUCCESS 
+     * @retval `status::SUCCESS`
      *          Default Case.
      */
     [[nodiscard]]
@@ -287,9 +278,12 @@ namespace
                                                           cursor_y,
                                                           cursor_color,
                                                           ' ');
+            if (status != status::SUCCESS) [[unlikely]] {
+                status = status::FAIL;
+            }
         }
         else {
-            status = status::FAIL;
+            status = status::SUCCESS;
         }
 
         return status;
@@ -302,11 +296,8 @@ namespace
      * 
      * @param symbol character output
      * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
-     *          If x is greater then or equal to the screen width.
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
-     *          If y is greater then or equal to the screen height.
+     * @retval `status::FAIL`
+     *          If the char handling fails.
      * 
      * @retval `status::SUCCESS`
      *          Default Case.
@@ -324,6 +315,7 @@ namespace
                                                           cursor_color,
                                                           ' ');
             if (status != status::SUCCESS) [[unlikely]] {
+                status = status::FAIL;
                 break;
             }
 
@@ -345,11 +337,8 @@ namespace
      * 
      * @param symbol character output
      * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
-     *          If x is greater then or equal to the screen width.
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
-     *          If y is greater then or equal to the screen height.
+     * @retval `status::FAIL`
+     *          If the char handling fails.
      * 
      * @retval `status::SUCCESS` 
      *          Default Case.
@@ -362,6 +351,7 @@ namespace
                                                                cursor_color,
                                                                symbol);
         if (status != status::SUCCESS) [[unlikely]] {
+            status = status::FAIL;
             goto cleanup;
         }
 
@@ -384,9 +374,6 @@ namespace
      * @param needed_lines count of needed lines
      * @param text         text for the line calculation
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `needed_lines` is a `nullptr`.
-     * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_B`
      *          If `text` is a `nullptr`.
      * 
@@ -406,11 +393,6 @@ namespace
         status_t status;
 
         needed_lines = 1;
-
-        if (!needed_lines) [[unlikely]] {
-            status = status::NULL_POINTER | status::flags::PARAM_A;
-            goto cleanup;
-        }
 
         if (!text) [[unlikely]] {
             needed_lines = 0;
@@ -545,17 +527,8 @@ namespace stdlib::console
      * 
      * @param value integer output
      *  
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
-     *          If x is greater then or equal to the screen width.
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
-     *          If y is greater then or equal to the screen height.
-     * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If the budder is a nullptr.
-     * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-     *          If the buffer_count is a nullptr.
+     * @retval `status::FAIL`
+     *          Unknown error.
      * 
      * @retval `status::SUCCESS`
      *          Default case.
@@ -588,17 +561,8 @@ namespace stdlib::console
      * 
      * @param value integer output
      * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
-     *          If x is greater then or equal to the screen width.
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
-     *          If y is greater then or equal to the screen height.
-     * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If the budder is a nullptr.
-     * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-     *          If the buffer_count is a nullptr.
+     * @retval `status::FAIL`
+     *          Unknown error.
      * 
      * @retval `status::SUCCESS`
      *          Default case.
@@ -617,11 +581,16 @@ namespace stdlib::console
 
         status = convert_uint_to_digits(buffer, char_count, value);
         if (status != status::SUCCESS) [[unlikely]] {
+            status = status::FAIL;
             goto cleanup;
         }
 
         while (char_count--) [[likely]] {
             status = put_char(buffer[char_count]);
+
+            if (status != status::SUCCESS) [[unlikely]] {
+                break;
+            }
         }
 
     cleanup:
@@ -632,6 +601,12 @@ namespace stdlib::console
     /** 
      * @brief Outputs a hexadecimal number to the terminal.
      * 
+     * @retval `status::FAIL`
+     *          Unknown error.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
+     * 
      * @param value number output
      */
     _API_  
@@ -641,18 +616,27 @@ namespace stdlib::console
 
         status = put_string("0x");
         if (status != status::SUCCESS) [[unlikely]] {
-            goto cleanup;
+            status = status::FAIL;
+        }
+        else {
+            status = put_base(value, 16);
+            if (status & status::flags::PARAM_B) {
+                status = status::FAIL;
+            }
         }
 
-        status = put_base(value, 16);
-
-    cleanup:
         return status;
     }
 
 
     /** 
      * @brief Outputs a binary number to the terminal.
+     * 
+     * @retval `status::FAIL`
+     *          Unknown error.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
      * 
      * @param value number output
      */
@@ -663,12 +647,15 @@ namespace stdlib::console
 
         status = put_string("0b");
         if (status != status::SUCCESS) [[unlikely]] {
-            goto cleanup;
+            status = status::FAIL;
+        }
+        else {
+            status = put_base(value, 2);
+            if (status & status::flags::PARAM_B) {
+                status = status::FAIL;
+            }
         }
 
-        status = put_base(value, 2);
-
-    cleanup:
         return status;
     }
 
@@ -676,6 +663,12 @@ namespace stdlib::console
     /** 
      * @brief Outputs the address of pointer to the 
      *        terminal in hexadecimal.
+     * 
+     * @retval `status::FAIL`
+     *          Unknown error.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
      * 
      * @param value address output
      */
@@ -686,12 +679,15 @@ namespace stdlib::console
 
         status = put_string("0x");
         if (status != status::SUCCESS) [[unlikely]] {
-            goto cleanup;
+            status = status::FAIL;
+        }
+        else {
+            status = put_base(value, 16);
+            if (status & status::flags::PARAM_B) {
+                status = status::FAIL;
+            }
         }
 
-        status = put_base(value, 16);
-
-    cleanup:
         return status;
     }
 
@@ -708,11 +704,8 @@ namespace stdlib::console
      * @note - `\n` -> Cursor jump to the next line.
      * @note - `\\"` -> Allows `"` as character output.
      * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
-     *          If x is greater then or equal to the screen width.
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
-     *          If y is greater then or equal to the screen height.
+     * @retval `status::FAIL`
+     *          If the char puting fails.
      * 
      * @retval `status::SUCCESS`
      *          Default case.
@@ -766,20 +759,14 @@ namespace stdlib::console
      * @note - `\n` -> Cursor jump to the next line.
      * @note - `\\"` -> allows `"` in the string output
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If `needed_lines` is a `nullptr`.
+     * @retval `status::NULL_POINTER` 
+     *          If `message` is a `nullptr`.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
-     *          If `text` is a `nullptr`.
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
-     *          If `text` is `empty`.
+     * @retval `status::INVALID_PARAMETER`
+     *          If `message` is empty.
      *
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A` 
-     *          If x is greater then or equal to the screen width.
-     * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
-     *          If y is greater then or equal to the screen height.
+     * @retval `status::FAIL` 
+     *          Unknown error.
      * 
      * @retval `status::SUCCESS`
      *          Default case.
@@ -802,6 +789,10 @@ namespace stdlib::console
 
         status = calculate_needed_lines(needed_lines, message);
         if (status != status::SUCCESS) [[unlikely]] {
+            if (status & status::flags::PARAM_B) {
+                status ^= status::flags::PARAM_B;
+            }
+
             goto cleanup;
         }
         
