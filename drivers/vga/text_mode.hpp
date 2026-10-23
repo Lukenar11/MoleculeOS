@@ -23,9 +23,7 @@ NOTES:
 
 #pragma once
 
-#include <types.hpp>
-#include <sal.hpp>
-#include <status.hpp>
+#include "interface.hpp"
 
 
 namespace drivers::vga 
@@ -50,10 +48,10 @@ namespace drivers::vga
     };
 
 
-    class Text_Mode final {
+    class Text_Mode : public Interface<Text_Mode, Text_Mode_Color> {
     private:
-        static constexpr uint32_t SCREEN_CHAR_WIDTH  = 80;
-        static constexpr uint32_t SCREEN_CHAR_HEIGHT = 25;
+        static constexpr uint32_t SCREEN_WIDTH  = 80;
+        static constexpr uint32_t SCREEN_HEIGHT = 25;
 
         static constexpr uint8_t BLINK_MODE_BIT = 0x80;
 
@@ -81,6 +79,9 @@ namespace drivers::vga
 
 
     public:
+        using color_t = Text_Mode_Color;
+        
+
         /**
          * @brief Initializes the VGA-textmode driver.
          */
@@ -105,9 +106,8 @@ namespace drivers::vga
          */
         _API_ 
         void 
-        clear_screen(_IN_ const Text_Mode_Color foreground=Text_Mode_Color::BLACK,
-                     _IN_ const Text_Mode_Color background=Text_Mode_Color::BLACK) 
-                     noexcept;
+        clear_screen(_IN_ const color_t foreground,
+                     _IN_ const color_t background) noexcept override;
 
 
         /** 
@@ -122,9 +122,9 @@ namespace drivers::vga
         _API_ 
         [[nodiscard]] 
         uint8_t
-        make_symbol_color(_IN_ const Text_Mode_Color foreground,
-                          _IN_ const Text_Mode_Color background,
-                          _IN_ const bool blink=false) noexcept;
+        make_symbol_color(_IN_ const color_t foreground,
+                          _IN_ const color_t background,
+                          _IN_ const bool blink=false) noexcept override;
 
 
         /**
@@ -149,11 +149,12 @@ namespace drivers::vga
          *          Default Case.
          */
         _API_ 
+        [[nodiscard]]
         status_t 
         set_symbol_at(_IN_ const uint32_t x,
                       _IN_ const uint32_t y,
                       _IN_ const uint8_t color,
-                      _IN_ const char symbol) noexcept;
+                      _IN_ const char symbol) noexcept override;
 
 
         /**
@@ -174,11 +175,12 @@ namespace drivers::vga
          * @retval `status::SUCCESS`
          */
         _API_
+        [[nodiscard]]
         status_t
         get_symbol_at(_OUT_ char& symbol,
                       _OUT_ uint8_t& color,
                       _IN_  const uint32_t x,
-                      _IN_  const uint32_t y) noexcept;
+                      _IN_  const uint32_t y) noexcept override;
 
 
         /**
@@ -190,9 +192,13 @@ namespace drivers::vga
          * @return width of the screen
          */
         _API_
-        static
-        uint32_t
-        screen_width() noexcept;
+        [[nodiscard]] 
+        static 
+        constexpr 
+        uint32_t 
+        screen_width() noexcept {
+            return SCREEN_WIDTH;
+        }
 
 
         /**
@@ -204,8 +210,12 @@ namespace drivers::vga
          * @return height of the screen
          */
         _API_
-        static
-        uint32_t
-        screen_height() noexcept;
+        [[nodiscard]] 
+        static 
+        constexpr 
+        uint32_t 
+        screen_height() noexcept {
+            return SCREEN_HEIGHT;
+        }
     };
 } // namespace drivers::vga

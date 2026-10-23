@@ -63,13 +63,13 @@ namespace drivers::vga
      */
     _API_ 
     void 
-    Text_Mode::clear_screen(_IN_ const Text_Mode_Color foreground,
-                            _IN_ const Text_Mode_Color background) noexcept {
+    Text_Mode::clear_screen(_IN_ const color_t foreground,
+                            _IN_ const color_t background) noexcept {
         const uint8_t color  = make_symbol_color(foreground, background);
         const uint16_t entry = make_symbol_entry(' ', color);
 
         for (uint32_t buffer_index = 0; 
-             buffer_index < SCREEN_CHAR_WIDTH * SCREEN_CHAR_HEIGHT; 
+             buffer_index < SCREEN_WIDTH * SCREEN_HEIGHT; 
              buffer_index++) [[likely]] {
             screen_buffer_ptr[buffer_index] = entry;
         }
@@ -88,8 +88,8 @@ namespace drivers::vga
     _API_ 
     [[nodiscard]] 
     uint8_t
-    Text_Mode::make_symbol_color(_IN_ const Text_Mode_Color foreground,
-                                 _IN_ const Text_Mode_Color background,
+    Text_Mode::make_symbol_color(_IN_ const color_t foreground,
+                                 _IN_ const color_t background,
                                  _IN_ const bool blink) noexcept {
         uint8_t color = (static_cast<uint8_t>(background) << 4) | 
                          static_cast<uint8_t>(foreground);
@@ -132,17 +132,17 @@ namespace drivers::vga
         status_t status;
         uint32_t buffer_index;
 
-        if (x >= SCREEN_CHAR_WIDTH) [[unlikely]] {
+        if (x >= SCREEN_WIDTH) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_A;
             goto cleanup;
         }
 
-        if (y >= SCREEN_CHAR_HEIGHT) [[unlikely]] {
+        if (y >= SCREEN_HEIGHT) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_B;
             goto cleanup;
         }
 
-        buffer_index = y * SCREEN_CHAR_WIDTH + x;
+        buffer_index = y * SCREEN_WIDTH + x;
 
         screen_buffer_ptr[buffer_index] = make_symbol_entry(symbol, color);
 
@@ -179,17 +179,17 @@ namespace drivers::vga
         status_t status;
         uint16_t buffer_symbol_entry;
 
-        if (x >= SCREEN_CHAR_WIDTH) [[unlikely]] {
+        if (x >= SCREEN_WIDTH) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_C;
             goto cleanup;
         }
 
-        if (y >= SCREEN_CHAR_HEIGHT) [[unlikely]] {
+        if (y >= SCREEN_HEIGHT) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_D;
             goto cleanup;
         }
 
-        buffer_symbol_entry = screen_buffer_ptr[y * SCREEN_CHAR_WIDTH + x];
+        buffer_symbol_entry = screen_buffer_ptr[y * SCREEN_WIDTH + x];
 
         symbol = static_cast<char>(buffer_symbol_entry & BYTE_MASK);
         color  = static_cast<uint8_t>((buffer_symbol_entry >> 8) & BYTE_MASK);
@@ -198,35 +198,5 @@ namespace drivers::vga
 
     cleanup:
         return status;
-    }
-
-
-    /**
-     * @brief Gets the screen width.
-     * 
-     * @note It's `static` and 
-     *       can be called without any driver initialisation.
-     * 
-     * @return width of the screen
-     */
-    _API_
-    uint32_t
-    Text_Mode::screen_width() noexcept {
-        return SCREEN_CHAR_WIDTH;
-    }
-
-
-    /**
-     * @brief Gets the screen height.
-     * 
-     * @note It's `static` and 
-     *       can be called without any driver initialisation.
-     * 
-     * @return height of the screen
-     */
-    _API_
-    uint32_t
-    Text_Mode::screen_height() noexcept {
-        return SCREEN_CHAR_HEIGHT;
     }
 } // namespace drivers::vga

@@ -14,6 +14,7 @@ namespace drivers::ata
          * 
          * @note Is declared as default.
          */
+        _API_
         Interface() noexcept = default;
 
 
@@ -22,6 +23,7 @@ namespace drivers::ata
          * 
          * @note Is declared as default.
          */
+        _API_
         ~Interface() noexcept = default;
 
 

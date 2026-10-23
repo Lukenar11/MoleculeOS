@@ -500,7 +500,8 @@ namespace stdlib::console
         cursor_x = 0;
         cursor_y = 0;
 
-        driver.clear_screen();
+        driver.clear_screen(drivers::vga::Text_Mode_Color::LIGHT_GREY,
+                            drivers::vga::Text_Mode_Color::BLACK);
     }
 
 
