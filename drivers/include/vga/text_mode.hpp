@@ -52,11 +52,13 @@ namespace drivers::vga
 
     class Text_Mode final {
     private:
-        static const uint32_t screen_char_width  = 80;
-        static const uint32_t screen_char_height = 25;
+        static constexpr uint32_t SCREEN_CHAR_WIDTH  = 80;
+        static constexpr uint32_t SCREEN_CHAR_HEIGHT = 25;
 
-        const uint8_t blink_mode_bit;
-        const uint16_t byte_mask;
+        static constexpr uint8_t BLINK_MODE_BIT = 0x80;
+
+        static constexpr uint16_t BYTE_MASK      = 0x00FF;
+        static constexpr uint32_t COLOR_POSITION = 8;
         
         volatile uint16_t* const screen_buffer_ptr;
 
