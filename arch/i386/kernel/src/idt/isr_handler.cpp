@@ -27,8 +27,8 @@ namespace kernel::idt::isr
     void isr_handler(const Registers* reg_dump) {
 
         stdlib::console::reset();
-        stdlib::console::set_text_color(drivers::vga::Text_Mode_Colors::RED,
-                                        drivers::vga::Text_Mode_Colors::BLACK);
+        stdlib::console::set_text_color(drivers::vga::Text_Mode_Color::RED,
+                                        drivers::vga::Text_Mode_Color::BLACK);
 
         const uint32_t all_available_expectations = 0x6A;
         const char* exception = (reg_dump->interrupt_number < all_available_expectations)

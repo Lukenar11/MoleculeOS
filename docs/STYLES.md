@@ -271,8 +271,8 @@ Examples:
 ```cpp
     namespace shell
     {
-        void Shell::draw_user_cursor_with_color(drivers::vga::Text_Mode_Colors& foreground,
-                                                drivers::vga::Text_Mode_Colors& background)
+        void Shell::draw_user_cursor_with_color(drivers::vga::Text_Mode_Color& foreground,
+                                                drivers::vga::Text_Mode_Color& background)
                                                 const noexcept {
             /* ... */
             /* ... */

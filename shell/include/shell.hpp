@@ -69,13 +69,13 @@ namespace shell
         uint32_t args_index = 0;
 
         static inline void set_error_message_text_color() noexcept {
-            stdlib::console::set_text_color(drivers::vga::Text_Mode_Colors::LIGHT_MAGENTA,
-                                            drivers::vga::Text_Mode_Colors::BLACK);
+            stdlib::console::set_text_color(drivers::vga::Text_Mode_Color::LIGHT_MAGENTA,
+                                            drivers::vga::Text_Mode_Color::BLACK);
         }
 
         static inline void set_default_text_color() noexcept {
-            stdlib::console::set_text_color(drivers::vga::Text_Mode_Colors::LIGHT_GREY,
-                                            drivers::vga::Text_Mode_Colors::BLACK);
+            stdlib::console::set_text_color(drivers::vga::Text_Mode_Color::LIGHT_GREY,
+                                            drivers::vga::Text_Mode_Color::BLACK);
         }
 
         void print_overflow_error(const char* error_message_for, 

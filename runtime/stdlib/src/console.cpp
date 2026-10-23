@@ -33,13 +33,13 @@ namespace
     using namespace console;
 
 
+    drivers::vga::Text_Mode driver;
+
     uint32_t cursor_x = 0;
     uint32_t cursor_y = 0;
         
-    uint8_t 
-    cursor_color = drivers::vga::Text_Mode::make_color(drivers::vga::Text_Mode_Colors::LIGHT_GREY,
-                                                       drivers::vga::Text_Mode_Colors::BLACK,
-                                                       false);
+    uint8_t cursor_color = driver.make_color(drivers::vga::Text_Mode_Color::LIGHT_GREY, 
+                                             drivers::vga::Text_Mode_Color::BLACK);
 
 
     /** 
@@ -50,7 +50,7 @@ namespace
         cursor_x = 0;
         cursor_y++;
 
-        if (cursor_y >= drivers::vga::TEXT_MODE_SCREEN_HEIGHT) [[unlikely]] {
+        if (cursor_y >= driver.get_screen_height()) [[unlikely]] {
             reset();
         }
     }
@@ -259,10 +259,7 @@ namespace
 
         if (cursor_x > 0) [[likely]] {
             cursor_x--;
-            status = drivers::vga::Text_Mode::put_char_at(cursor_x,
-                                                          cursor_y,
-                                                          cursor_color,
-                                                          ' ');
+            status = driver.put_char_at(cursor_x, cursor_y, cursor_color, ' ');
             if (status != status::SUCCESS) [[unlikely]] {
                 status = status::FAIL;
             }
@@ -295,10 +292,7 @@ namespace
         for (uint32_t puted_spaces = 0; 
              puted_spaces < 4 - (cursor_x % 4);
              puted_spaces++) [[likely]] {
-            status = drivers::vga::Text_Mode::put_char_at(cursor_x,
-                                                          cursor_y,
-                                                          cursor_color,
-                                                          ' ');
+            status = driver.put_char_at(cursor_x, cursor_y, cursor_color, ' ');
             if (status != status::SUCCESS) [[unlikely]] {
                 status = status::FAIL;
                 break;
@@ -306,8 +300,7 @@ namespace
 
             cursor_x++;
 
-            if (cursor_x >= 
-                drivers::vga::TEXT_MODE_SCREEN_WIDTH) [[unlikely]] {
+            if (cursor_x >= driver.get_screen_width()) [[unlikely]] {
                 new_line();
             }
         }
@@ -331,10 +324,10 @@ namespace
     [[nodiscard]]
     status_t 
     handle_normal_char(_IN_ const char symbol) noexcept {
-        status_t status = drivers::vga::Text_Mode::put_char_at(cursor_x,
-                                                               cursor_y,
-                                                               cursor_color,
-                                                               symbol);
+        status_t status = driver.put_char_at(cursor_x, 
+                                             cursor_y, 
+                                             cursor_color, 
+                                             symbol);
         if (status != status::SUCCESS) [[unlikely]] {
             status = status::FAIL;
             goto cleanup;
@@ -342,7 +335,7 @@ namespace
 
         cursor_x++;
 
-        if (cursor_x >= drivers::vga::TEXT_MODE_SCREEN_WIDTH) [[unlikely]] {
+        if (cursor_x >= driver.get_screen_width()) [[unlikely]] {
             new_line();
         }
 
@@ -402,7 +395,7 @@ namespace
             }
 
             x++;
-            if (x >= drivers::vga::TEXT_MODE_SCREEN_WIDTH) [[unlikely]] {
+            if (x >= driver.get_screen_width()) [[unlikely]] {
                 needed_lines++;
                 x ^= x;
             }
@@ -465,12 +458,10 @@ namespace stdlib::console
      */
     _API_ 
     void 
-    set_text_color(_IN_ const drivers::vga::Text_Mode_Colors color,
-                   _IN_ const drivers::vga::Text_Mode_Colors background,
+    set_text_color(_IN_ const drivers::vga::Text_Mode_Color color,
+                   _IN_ const drivers::vga::Text_Mode_Color background,
                    _IN_ const bool does_blink) noexcept {
-        cursor_color = drivers::vga::Text_Mode::make_color(color, 
-                                                           background, 
-                                                           does_blink);
+        cursor_color = driver.make_color(color, background, does_blink);
     }
 
 
@@ -484,8 +475,8 @@ namespace stdlib::console
     void
     set_cursor(_IN_ const uint32_t x, 
                _IN_ const uint32_t y) noexcept {
-        if (x < drivers::vga::TEXT_MODE_SCREEN_WIDTH &&
-            y < drivers::vga::TEXT_MODE_SCREEN_HEIGHT) [[likely]] {
+        if (x < driver.get_screen_width() &&
+            y < driver.get_screen_height()) [[likely]] {
             cursor_x = x;
             cursor_y = y;
         }
@@ -503,7 +494,7 @@ namespace stdlib::console
         cursor_x = 0;
         cursor_y = 0;
 
-        vga::Text_Mode::clear_screen(vga::Text_Mode_Colors::BLACK);
+        driver.clear_screen();
     }
 
 
@@ -781,8 +772,7 @@ namespace stdlib::console
             goto cleanup;
         }
         
-        if (needed_lines > 
-            drivers::vga::TEXT_MODE_SCREEN_HEIGHT - cursor_y) [[unlikely]] {
+        if (needed_lines > driver.get_screen_height() - cursor_y) [[unlikely]] {
             reset();
         }
 

@@ -32,7 +32,7 @@ NOTES:
 
 namespace drivers::vga
 {
-    enum class Text_Mode_Colors : uint8_t;
+    enum class Text_Mode_Color : uint8_t;
 } // namespace drivers::vga
 
 
@@ -78,8 +78,8 @@ namespace stdlib::console
      */
     _API_ 
     void 
-    set_text_color(_IN_ const drivers::vga::Text_Mode_Colors color,
-                   _IN_ const drivers::vga::Text_Mode_Colors background,
+    set_text_color(_IN_ const drivers::vga::Text_Mode_Color color,
+                   _IN_ const drivers::vga::Text_Mode_Color background,
                    _IN_ const bool does_blink=false) noexcept;
 
 

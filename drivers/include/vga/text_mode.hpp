@@ -23,7 +23,6 @@ NOTES:
 
 #pragma once
 
-#include "../utils/vga_text_mode_helpers.hpp"
 #include <types.hpp>
 #include <sal.hpp>
 #include <status.hpp>
@@ -31,17 +30,35 @@ NOTES:
 
 namespace drivers::vga 
 {
+    enum class Text_Mode_Color : uint8_t {
+        BLACK         = 0x00,
+        BLUE          = 0x01,
+        GREEN         = 0x02,
+        CYAN          = 0x03,
+        RED           = 0x04,
+        MAGENTA       = 0x05,
+        BROWN         = 0x06,
+        LIGHT_GREY    = 0x07,
+        DARK_GREY     = 0x08,
+        LIGHT_BLU     = 0x09,
+        LIGHT_GREEN   = 0x0A,
+        LIGHT_CYAN    = 0x0B,
+        LIGHT_RED     = 0x0C,
+        LIGHT_MAGENTA = 0x0D,
+        YELLOW        = 0x0E,
+        WHITE         = 0x0F
+    };
+
+
     class Text_Mode final {
     private:
-        static constexpr uint8_t BLINK_MODE_BIT = 0x80;
+        static const uint32_t screen_width = 80;
+        static const uint32_t screen_height = 25;
 
-        static 
-        inline 
-        volatile 
-        uint16_t* 
-        const SCREEN_BUFFER = reinterpret_cast<volatile uint16_t*>(0xB8000);
-
-        static inline constexpr uint16_t BYTE_MASK = 0x00FF;
+        const uint8_t blink_mode_bit;
+        const uint16_t byte_mask;
+        
+        volatile uint16_t* const screen_buffer_ptr;
 
 
         /** 
@@ -55,44 +72,55 @@ namespace drivers::vga
          * 
          * @return symbol entry
          */
-        _API_ 
         [[nodiscard]] 
-        static 
-        inline 
-        constexpr 
         uint16_t 
         make_symbol_entry(_IN_ const char symbol, 
-                          _IN_ const uint8_t color) noexcept {
-            return (static_cast<uint16_t>(color) << 8) | 
-                    static_cast<uint16_t>(symbol);
-        }
+                          _IN_ const uint8_t color) noexcept;
 
 
     public:
+        /**
+         * @brief Initializes the VGA-textmode driver.
+         */
+        Text_Mode() noexcept;
+
+
+        /**
+         * @brief Uninitializes the VGA-textmode driver
+         * 
+         * @note Is declared as default.
+         */
+        ~Text_Mode() noexcept = default;
+
+
+        /** 
+         * @brief Clears the screen and sets a special screen color.
+         * 
+         * @param foreground screen text color (default case `BLACK`)
+         * @param background screen color (default case `BLACK`)
+         */
+        _API_ 
+        void 
+        clear_screen(_IN_ const Text_Mode_Color foreground=Text_Mode_Color::BLACK,
+                     _IN_ const Text_Mode_Color background=Text_Mode_Color::BLACK) 
+                     noexcept;
+
+
         /** 
          * @brief Makes a specific symbol color layout for the VGA-buffer.
          * 
          * @param foreground symbol color foreground
          * @param background symbol color background
-         * @param does_blink symbol color blink mode (default case `false`)
+         * @param blink      symbol color blink mode (default case `false`)
          * 
          * @return symbol color layout
          */
         _API_ 
         [[nodiscard]] 
-        static 
-        inline 
-        constexpr 
         uint8_t
-        make_color(_IN_ const Text_Mode_Colors foreground,
-                   _IN_ const Text_Mode_Colors background,
-                   _IN_ const bool does_blink=false) noexcept {
-            const uint8_t color = (static_cast<uint8_t>(background) << 4) | 
-                                   static_cast<uint8_t>(foreground);
-
-            return (does_blink) ? (color | BLINK_MODE_BIT) : color;
-        }
-
+        make_color(_IN_ const Text_Mode_Color foreground,
+                   _IN_ const Text_Mode_Color background,
+                   _IN_ const bool blink=false) noexcept;
 
         /**
          * @brief Outputs a character with a special fore and background color.
@@ -116,16 +144,31 @@ namespace drivers::vga
          *          Default Case.
          */
         _API_ 
-        static 
         status_t 
         put_char_at(_IN_ const uint32_t x,
                     _IN_ const uint32_t y,
                     _IN_ const uint8_t color,
                     _IN_ const char symbol) noexcept;
 
-                    
+
+        /**
+         * @brief Get the char and his color that was output at the 
+         *        entered coordinate.
+         * 
+         * @param symbol outputted char
+         * @param color  color of the outputted char
+         * @param x      x coordinate of the outputted symbol
+         * @param y      y coordinate of the outputted symbol
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
+         *          If `x` is greater or equal to the screen width.
+         * 
+         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D`
+         *          If `y` is greater or equal to the screen height.
+         *          
+         * @retval `status::SUCCESS`
+         */
         _API_
-        static
         status_t
         get_char_from(_OUT_ char& symbol,
                       _OUT_ uint8_t& color,
@@ -133,18 +176,31 @@ namespace drivers::vga
                       _IN_  const uint32_t y) noexcept;
 
 
-        /** 
-         * @brief Clears the screen and sets a special screen color.
+        /**
+         * @brief Gets the screen width.
          * 
-         * @param background screen color
+         * @note It's `static` and 
+         *       can be called without any driver initialisation.
+         * 
+         * @return width of the screen
          */
-        _API_ 
-        static 
-        void 
-        clear_screen(_IN_ const Text_Mode_Colors color) noexcept;
+        _API_
+        static
+        uint32_t
+        get_screen_width() noexcept;
 
 
-        Text_Mode() noexcept  = default;
-        ~Text_Mode() noexcept = default;
+        /**
+         * @brief Gets the screen height.
+         * 
+         * @note It's `static` and 
+         *       can be called without any driver initialisation.
+         * 
+         * @return height of the screen
+         */
+        _API_
+        static
+        uint32_t
+        get_screen_height() noexcept;
     };
 } // namespace drivers::vga

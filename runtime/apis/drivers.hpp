@@ -16,7 +16,6 @@ NOTES:
 #include "drivers/include/utils/ata_pio_helpers.hpp"
 
 #include "drivers/include/vga/text_mode.hpp"
-#include "drivers/include/utils/vga_text_mode_helpers.hpp"
 
 #include "drivers/include/ps2/keyboard_input.hpp"
 #include "drivers/include/utils/ps2_keyboard_in_helpers.hpp"

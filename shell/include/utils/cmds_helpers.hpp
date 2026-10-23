@@ -31,13 +31,13 @@ namespace shell::commands
     };
 
     inline void print_command_error(const char* error_message) noexcept {
-        stdlib::console::set_text_color(drivers::vga::Text_Mode_Colors::YELLOW,
-                                        drivers::vga::Text_Mode_Colors::BLACK);
+        stdlib::console::set_text_color(drivers::vga::Text_Mode_Color::YELLOW,
+                                        drivers::vga::Text_Mode_Color::BLACK);
 
         stdlib::console::put_string(error_message);
 
-        stdlib::console::set_text_color(drivers::vga::Text_Mode_Colors::LIGHT_GREY,
-                                        drivers::vga::Text_Mode_Colors::BLACK);
+        stdlib::console::set_text_color(drivers::vga::Text_Mode_Color::LIGHT_GREY,
+                                        drivers::vga::Text_Mode_Color::BLACK);
     }
 
     inline void command_end() noexcept {

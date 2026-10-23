@@ -43,13 +43,13 @@ namespace kernel::sys
 
         const uint32_t line_count = sizeof(message_if_hardware_shutdown_not_success) / 
                                     sizeof(message_if_hardware_shutdown_not_success[0]);
-        const uint32_t start_y = (drivers::vga::TEXT_MODE_SCREEN_HEIGHT - line_count) >> 1;
+        const uint32_t start_y = (drivers::vga::Text_Mode::get_screen_height() - line_count) >> 1;
 
         uint32_t length;
         uint32_t x_pos  = 0;
         for (uint32_t i = 0; i < line_count; ++i) {
             stdlib::string::get_length(length, message_if_hardware_shutdown_not_success[i]);
-            x_pos = (drivers::vga::TEXT_MODE_SCREEN_WIDTH - length) >> 1;
+            x_pos = (drivers::vga::Text_Mode::get_screen_width() - length) >> 1;
 
             stdlib::console::set_cursor(x_pos, start_y + i);
             stdlib::console::put_string(message_if_hardware_shutdown_not_success[i]);

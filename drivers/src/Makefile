@@ -9,7 +9,6 @@ OBJS += $(BUILD)/pio.o \
 		$(BUILD)/text_mode.o \
 		$(BUILD)/ata_pio_helpers.o \
 		$(BUILD)/ps2_keyboard_in_helpers.o \
-		$(BUILD)/vga_text_mode_helpers.o \
 
 $(BUILD)/%.o: drivers/src/ata/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
