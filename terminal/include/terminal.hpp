@@ -29,19 +29,7 @@ namespace terminal
     private:
         shell::Shell shell;
 
-        void draw_user_cursor_with_color(const drivers::vga::Text_Mode_Color& foreground,
-                                         const drivers::vga::Text_Mode_Color& background) 
-                                         const noexcept;
-
-        inline constexpr void draw_user_cursor() const noexcept {
-            draw_user_cursor_with_color(drivers::vga::Text_Mode_Color::LIGHT_GREY,
-                                        drivers::vga::Text_Mode_Color::LIGHT_GREY);
-        }
-
-        inline constexpr void erase_user_cursor() const noexcept {
-            draw_user_cursor_with_color(drivers::vga::Text_Mode_Color::LIGHT_GREY,
-                                        drivers::vga::Text_Mode_Color::BLACK);
-        }
+        void draw_cursor() noexcept;
 
     public:
         void step() noexcept;

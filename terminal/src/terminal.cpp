@@ -22,24 +22,17 @@ namespace terminal
 {
     Terminal::Terminal() noexcept {
         shell::commands::info();
-        draw_user_cursor();
+        draw_cursor();
     }
 
-    void Terminal::draw_user_cursor_with_color(const drivers::vga::Text_Mode_Color& foreground,
-                                               const drivers::vga::Text_Mode_Color& background) 
-                                               const noexcept {
-        // uint32_t x = stdlib::console::get_cursor_x();
-        // if (x >= drivers::vga::Text_Mode::screen_width()) [[unlikely]]
-        //     x = drivers::vga::Text_Mode::screen_width() - 1;
+    void Terminal::draw_cursor() noexcept {
+        stdlib::console::set_text_color(drivers::vga::Text_Mode_Color::LIGHT_GREY, 
+                                        drivers::vga::Text_Mode_Color::LIGHT_GREY);
 
-        // uint32_t y = stdlib::console::get_cursor_y();
-        // if (y >= drivers::vga::Text_Mode::screen_height()) [[unlikely]]
-        //     y = drivers::vga::Text_Mode::screen_height() - 1;
+        stdlib::console::put_char(' ');
 
-        // stdlib::console::set_text_color(foreground, background);
-        // 
-        // const uint8_t color = stdlib::console::get_text_color();
-        // drivers::vga::Text_Mode::set_symbol_at(x, y, color, ' ');
+        stdlib::console::set_text_color(drivers::vga::Text_Mode_Color::LIGHT_GREY, 
+                                        drivers::vga::Text_Mode_Color::BLACK);
     }
 
     void Terminal::step() noexcept {
@@ -47,12 +40,12 @@ namespace terminal
         char key;
         
         while (drivers::ps2::Keyboard_Input::pop_scancode_key(key) == status::SUCCESS) {
-            erase_user_cursor();
-
+            stdlib::console::put_char('\b');
             stdlib::console::put_char(key);
-            shell.step(key);
 
-            draw_user_cursor();
+            draw_cursor();
+
+            shell.step(key);
 
             if (key == new_line) [[unlikely]]
                 break;
