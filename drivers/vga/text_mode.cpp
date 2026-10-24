@@ -26,6 +26,17 @@ NOTES:
 
 namespace drivers::vga 
 {
+    /**
+     * @brief Packs a text-mode character instance into a VGA buffer entry.
+     *
+     * @note This function converts the high-level character representation
+     *       into the low-level 16-bit VGA text-mode format.
+     *
+     * @param symbol Text-mode character representation with foreground color,
+     *               background color, blink mode and symbol.
+     *
+     * @return VGA buffer entry.
+     */
     uint16_t
     Text_Mode::assemble_buffer_entry(_IN_ const Text_Mode_Char& symbol) noexcept {
         uint16_t buffer_entry;
@@ -43,6 +54,17 @@ namespace drivers::vga
     }
 
 
+    /**
+     * @brief Unpacks a VGA buffer entry into a text-mode character instance.
+     *
+     * @note This function converts the low-level 16-bit VGA text-mode format
+     *       into a high-level character representation.
+     *
+     * @param symbol VGA buffer entry.
+     *
+     * @return Text-mode character representation with foreground color,
+     *         background color, blink mode and symbol.
+     */
     Text_Mode_Char
     Text_Mode::disassemble_buffer_entry(_IN_ const uint16_t symbol) noexcept {
         return {

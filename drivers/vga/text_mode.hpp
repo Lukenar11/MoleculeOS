@@ -64,10 +64,32 @@ namespace drivers::vga
         volatile uint16_t* const screen_buffer_ptr;
 
 
+        /**
+         * @brief Packs a text-mode character instance into a VGA buffer entry.
+         *
+         * @note This function converts the high-level character representation
+         *       into the low-level 16-bit VGA text-mode format.
+         *
+         * @param symbol Text-mode character representation with foreground color,
+         *               background color, blink mode and symbol.
+         *
+         * @return VGA buffer entry.
+         */
         uint16_t
         assemble_buffer_entry(_IN_ const Text_Mode_Char& symbol) noexcept;
 
 
+        /**
+         * @brief Unpacks a VGA buffer entry into a text-mode character instance.
+         *
+         * @note This function converts the low-level 16-bit VGA text-mode format
+         *       into a high-level character representation.
+         *
+         * @param symbol VGA buffer entry.
+         *
+         * @return Text-mode character representation with foreground color,
+         *         background color, blink mode and symbol.
+         */
         Text_Mode_Char
         disassemble_buffer_entry(_IN_ const uint16_t symbol) noexcept;
 
