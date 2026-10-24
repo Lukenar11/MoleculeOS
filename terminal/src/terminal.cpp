@@ -31,8 +31,8 @@ namespace terminal
 
         stdlib::console::put_char(' ');
 
-        stdlib::console::set_text_color(drivers::vga::Text_Mode_Color::LIGHT_GREY, 
-                                        drivers::vga::Text_Mode_Color::BLACK);
+        stdlib::console::set_text_color(drivers::vga::Text_Mode_Color::BLACK, 
+                                        drivers::vga::Text_Mode_Color::LIGHT_GREY);
     }
 
     void Terminal::step() noexcept {

@@ -48,34 +48,28 @@ namespace drivers::vga
     };
 
 
-    class Text_Mode : public Interface<Text_Mode, Text_Mode_Color> {
+    struct Text_Mode_Char final {
+        Text_Mode_Color background_color = Text_Mode_Color::BLACK;
+        Text_Mode_Color foreground_color = Text_Mode_Color::LIGHT_GREY;
+        bool blink_mode                  = false;
+        char symbol                      = ' ';
+    };
+
+
+    class Text_Mode : public Interface<Text_Mode, Text_Mode_Char> {
     private:
         static constexpr uint32_t SCREEN_WIDTH  = 80;
         static constexpr uint32_t SCREEN_HEIGHT = 25;
-
-        static constexpr uint8_t BLINK_MODE_BIT = 0x80;
-
-        static constexpr uint16_t BYTE_MASK      = 0x00FF;
-        static constexpr uint32_t COLOR_POSITION = 8;
         
         volatile uint16_t* const screen_buffer_ptr;
 
 
-        /** 
-         * @brief Makes a symbol entry for the 
-         *        VGA-buffer from a specific color layout and a character.
-         * 
-         * @note Use `make_symbol_color()` to ensure the color layout is correct.
-         * 
-         * @param symbol symbol entry symbol
-         * @param color  symbol entry color layout
-         * 
-         * @return symbol entry
-         */
-        [[nodiscard]] 
-        uint16_t 
-        make_symbol_entry(_IN_ const char symbol, 
-                          _IN_ const uint8_t color) noexcept;
+        uint16_t
+        assemble_buffer_entry(_IN_ const Text_Mode_Char& symbol) noexcept;
+
+
+        Text_Mode_Char
+        disassemble_buffer_entry(_IN_ const uint16_t symbol) noexcept;
 
 
     public:
@@ -97,44 +91,20 @@ namespace drivers::vga
 
         /** 
          * @brief Clears the screen and sets a special screen color.
-         * 
-         * @param foreground screen text color (default case `BLACK`)
-         * @param background screen color (default case `BLACK`)
+         *
+         * @param screen_color screen color
          */
         _API_ 
         void 
-        clear_screen(_IN_ const Text_Mode_Color foreground,
-                     _IN_ const Text_Mode_Color background) noexcept override;
-
-
-        /** 
-         * @brief Makes a specific symbol color layout for the VGA-buffer.
-         * 
-         * @param foreground symbol color foreground
-         * @param background symbol color background
-         * @param blink      symbol color blink mode (default case `false`)
-         * 
-         * @return symbol color layout
-         */
-        _API_ 
-        [[nodiscard]] 
-        uint8_t
-        make_symbol_color(_IN_ const Text_Mode_Color foreground,
-                          _IN_ const Text_Mode_Color background,
-                          _IN_ const bool blink=false) noexcept override;
+        clear_screen(_IN_ const Text_Mode_Char& screen_color) noexcept override;
 
 
         /**
          * @brief Outputs a character with a special fore and background color.
          * 
-         * @note The color must match a specific layout, 
-         *       use `Text_Mode::make_symbol_color` 
-         *       to ensure the color layout is correct.
-         * 
          * @param x      X coordinate for the output
          * @param y      Y coordinate for the output
-         * @param color  character color
-         * @param symbol character output
+         * @param symbol character output with the colors
          * 
          * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
          *          If `x` is greater then or equal to the screen width.
@@ -150,16 +120,14 @@ namespace drivers::vga
         status_t 
         set_symbol_at(_IN_ const uint32_t x,
                       _IN_ const uint32_t y,
-                      _IN_ const uint8_t color,
-                      _IN_ const char symbol) noexcept override;
+                      _IN_ const Text_Mode_Char& symbol) noexcept override;
 
 
         /**
          * @brief Get the char and his color that was output at the 
          *        entered coordinate.
          * 
-         * @param symbol outputted char
-         * @param color  color of the outputted char
+         * @param symbol outputted char with the color
          * @param x      x coordinate of the outputted symbol
          * @param y      y coordinate of the outputted symbol
          * 
@@ -174,8 +142,7 @@ namespace drivers::vga
         _API_
         [[nodiscard]]
         status_t
-        get_symbol_at(_OUT_ char& symbol,
-                      _OUT_ uint8_t& color,
+        get_symbol_at(_OUT_ Text_Mode_Char& symbol,
                       _IN_  const uint32_t x,
                       _IN_  const uint32_t y) noexcept override;
 

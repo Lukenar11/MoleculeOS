@@ -38,8 +38,7 @@ namespace
     uint32_t cursor_x = 0;
     uint32_t cursor_y = 0;
         
-    uint8_t cursor_color = driver.make_symbol_color(drivers::vga::Text_Mode_Color::LIGHT_GREY, 
-                                                    drivers::vga::Text_Mode_Color::BLACK);
+    drivers::vga::Text_Mode_Char cursor_cell;
 
 
     /** 
@@ -259,10 +258,12 @@ namespace
 
         if (cursor_x > 0) [[likely]] {
             cursor_x--;
+
+            cursor_cell.symbol = ' ';
+
             status = driver.set_symbol_at(cursor_x, 
                                           cursor_y, 
-                                          cursor_color, 
-                                          ' ');
+                                          cursor_cell);
             if (status != status::SUCCESS) [[unlikely]] {
                 status = status::FAIL;
             }
@@ -292,13 +293,14 @@ namespace
     handle_tab() noexcept {
         status_t status;
 
+        cursor_cell.symbol = ' ';
+
         for (uint32_t puted_spaces = 0; 
              puted_spaces < 4 - (cursor_x % 4);
              puted_spaces++) [[likely]] {
             status = driver.set_symbol_at(cursor_x, 
                                           cursor_y, 
-                                          cursor_color, 
-                                          ' ');
+                                          cursor_cell);
             if (status != status::SUCCESS) [[unlikely]] {
                 status = status::FAIL;
                 break;
@@ -330,10 +332,11 @@ namespace
     [[nodiscard]]
     status_t 
     handle_normal_char(_IN_ const char symbol) noexcept {
+        cursor_cell.symbol = symbol;
+
         status_t status = driver.set_symbol_at(cursor_x, 
                                                cursor_y, 
-                                               cursor_color, 
-                                               symbol);
+                                               cursor_cell);
         if (status != status::SUCCESS) [[unlikely]] {
             status = status::FAIL;
             goto cleanup;
@@ -442,32 +445,19 @@ namespace stdlib::console
         return cursor_y;
     }
 
-
-    /**
-     * @brief Gets the current text color.
-     * 
-     * @return text color
-     */
-    _API_ 
-    [[nodiscard]] 
-    uint8_t 
-    get_text_color() noexcept {
-        return cursor_color;
-    }
-
-
     /** 
      * @brief Sets a new color for any other Terminal outputs.
      * 
-     * @param color      color for symbols
-     * @param background background color for symbols
+     * @param background_color text background color (default black)
+     * @param foreground_color text color(default light gray)
      */
     _API_ 
     void 
-    set_text_color(_IN_ const drivers::vga::Text_Mode_Color color,
-                   _IN_ const drivers::vga::Text_Mode_Color background,
-                   _IN_ const bool does_blink) noexcept {
-        cursor_color = driver.make_symbol_color(color, background, does_blink);
+    set_text_color(_IN_ const drivers::vga::Text_Mode_Color background_color,
+                   _IN_ const drivers::vga::Text_Mode_Color foreground_color)
+                   noexcept {
+        cursor_cell.background_color = background_color;
+        cursor_cell.foreground_color = foreground_color;
     }
 
 
@@ -500,8 +490,7 @@ namespace stdlib::console
         cursor_x = 0;
         cursor_y = 0;
 
-        driver.clear_screen(drivers::vga::Text_Mode_Color::LIGHT_GREY,
-                            drivers::vga::Text_Mode_Color::BLACK);
+        driver.clear_screen({});
     }
 
 

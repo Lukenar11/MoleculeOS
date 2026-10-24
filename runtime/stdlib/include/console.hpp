@@ -33,6 +33,7 @@ NOTES:
 namespace drivers::vga
 {
     enum class Text_Mode_Color : uint8_t;
+    struct Text_Mode_Char;
 } // namespace drivers::vga
 
 
@@ -59,28 +60,17 @@ namespace stdlib::console
     get_cursor_y() noexcept;
 
 
-    /**
-     * @brief Gets the current text color.
-     * 
-     * @return text color
-     */
-    _API_ 
-    [[nodiscard]] 
-    uint8_t 
-    get_text_color() noexcept;
-
-
     /** 
      * @brief Sets a new color for any other Terminal outputs.
      * 
-     * @param color      color for symbols
-     * @param background background color for symbols
+     * @param background_color text background color (default black)
+     * @param foreground_color text color (default light gray)
      */
     _API_ 
     void 
-    set_text_color(_IN_ const drivers::vga::Text_Mode_Color color,
-                   _IN_ const drivers::vga::Text_Mode_Color background,
-                   _IN_ const bool does_blink=false) noexcept;
+    set_text_color(_IN_ const drivers::vga::Text_Mode_Color background_color,
+                   _IN_ const drivers::vga::Text_Mode_Color foreground_color)
+                   noexcept;
 
 
     /** 

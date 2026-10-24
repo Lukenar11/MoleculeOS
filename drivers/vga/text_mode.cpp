@@ -26,23 +26,31 @@ NOTES:
 
 namespace drivers::vga 
 {
-    /** 
-     * @brief Makes a symbol entry for the 
-     *        VGA-buffer from a specific color layout and a character.
-     * 
-     * @note Use `make_symbol_color()` to ensure the color layout is correct.
-     * 
-     * @param symbol symbol entry symbol
-     * @param color  symbol entry color layout
-     * 
-     * @return symbol entry
-     */ 
-    [[nodiscard]] 
-    uint16_t 
-    Text_Mode::make_symbol_entry(_IN_ const char symbol, 
-                                 _IN_ const uint8_t color) noexcept {
-        return (static_cast<uint16_t>(color) << COLOR_POSITION) | 
-                static_cast<uint16_t>(symbol);
+    uint16_t
+    Text_Mode::assemble_buffer_entry(_IN_ const Text_Mode_Char& symbol) noexcept {
+        uint16_t buffer_entry;
+
+        buffer_entry = (static_cast<uint16_t>(symbol.background_color) & 0x0007) << 12 | 
+                       (static_cast<uint16_t>(symbol.foreground_color) & 0x000F) << 8;
+
+        if (symbol.blink_mode) [[unlikely]] {
+            buffer_entry |= 0x8000;
+        }
+
+        buffer_entry |= static_cast<uint16_t>(static_cast<uint8_t>(symbol.symbol));
+
+        return buffer_entry;
+    }
+
+
+    Text_Mode_Char
+    Text_Mode::disassemble_buffer_entry(_IN_ const uint16_t symbol) noexcept {
+        return {
+            .background_color = static_cast<Text_Mode_Color>((symbol >> 12) & 0x0007),
+            .foreground_color = static_cast<Text_Mode_Color>((symbol >> 8) & 0x000F),
+            .blink_mode       = static_cast<bool>(symbol & 0x8000),
+            .symbol           = static_cast<char>(symbol & 0x00FF)
+        };
     }
 
 
@@ -58,61 +66,28 @@ namespace drivers::vga
     /** 
      * @brief Clears the screen and sets a special screen color.
      * 
-     * @param foreground screen text color
-     * @param background screen color
+     * @param screen_color screen color
      */
     _API_ 
     void 
-    Text_Mode::clear_screen(_IN_ const Text_Mode_Color foreground,
-                            _IN_ const Text_Mode_Color background) noexcept {
-        const uint8_t color  = make_symbol_color(foreground, background);
-        const uint16_t entry = make_symbol_entry(' ', color);
+    Text_Mode::clear_screen(_IN_ const Text_Mode_Char& screen_color) noexcept {
+        const uint16_t buffer_entry = assemble_buffer_entry(screen_color);
 
         for (uint32_t buffer_index = 0; 
              buffer_index < SCREEN_WIDTH * SCREEN_HEIGHT; 
              buffer_index++) [[likely]] {
-            screen_buffer_ptr[buffer_index] = entry;
+            screen_buffer_ptr[buffer_index] = buffer_entry;
         }
-    }
-
-
-    /** 
-     * @brief Makes a specific symbol color layout for the VGA-buffer.
-     * 
-     * @param foreground symbol color foreground
-     * @param background symbol color background
-     * @param blink      symbol color blink mode (default case `false`)
-     * 
-     * @return symbol color layout
-     */
-    _API_ 
-    [[nodiscard]] 
-    uint8_t
-    Text_Mode::make_symbol_color(_IN_ const Text_Mode_Color foreground,
-                                 _IN_ const Text_Mode_Color background,
-                                 _IN_ const bool blink) noexcept {
-        uint8_t color = (static_cast<uint8_t>(background) << 4) | 
-                         static_cast<uint8_t>(foreground);
-
-        if (blink) [[unlikely]] {
-            color |= BLINK_MODE_BIT;
-        }
-
-        return color;
     }
 
 
     /**
      * @brief Outputs a character with a special fore and background color.
      * 
-     * @note The color must match a specific layout, 
-     *       use `Text_Mode::make_symbol_color` to ensure the 
-     *       color layout is correct.
-     * 
      * @param x      X coordinate for the output
      * @param y      Y coordinate for the output
      * @param color  character color
-     * @param symbol character output
+     * @param symbol character output with the colors
      * 
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
      *          If `x` is greater then or equal to the screen width.
@@ -127,8 +102,7 @@ namespace drivers::vga
     status_t 
     Text_Mode::set_symbol_at(_IN_ const uint32_t x,
                              _IN_ const uint32_t y,
-                             _IN_ const uint8_t color,
-                             _IN_ const char symbol) noexcept {
+                             _IN_ const Text_Mode_Char& symbol) noexcept {
         status_t status;
 
         if (x >= SCREEN_WIDTH) [[unlikely]] {
@@ -141,8 +115,7 @@ namespace drivers::vga
             goto cleanup;
         }
 
-        screen_buffer_ptr[y * SCREEN_WIDTH + x] = make_symbol_entry(symbol, 
-                                                                    color);
+        screen_buffer_ptr[y * SCREEN_WIDTH + x] = assemble_buffer_entry(symbol);
 
         status = status::SUCCESS;
 
@@ -155,8 +128,7 @@ namespace drivers::vga
      * @brief Get the char and his color that was output at the 
      *        entered coordinate.
      * 
-     * @param symbol outputted char
-     * @param color  color of the outputted char
+     * @param symbol outputted char with the colors
      * @param x      x coordinate of the outputted symbol
      * @param y      y coordinate of the outputted symbol
      * 
@@ -170,12 +142,11 @@ namespace drivers::vga
      */
     _API_
     status_t 
-    Text_Mode::get_symbol_at(_OUT_ char& symbol,
-                             _OUT_ uint8_t& color,
+    Text_Mode::get_symbol_at(_OUT_ Text_Mode_Char& symbol,
                              _IN_  const uint32_t x,
                              _IN_  const uint32_t y) noexcept {
         status_t status;
-        uint16_t buffer_symbol_entry;
+        uint16_t buffer_entry;
 
         if (x >= SCREEN_WIDTH) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_C;
@@ -187,10 +158,8 @@ namespace drivers::vga
             goto cleanup;
         }
 
-        buffer_symbol_entry = screen_buffer_ptr[y * SCREEN_WIDTH + x];
-
-        symbol = static_cast<char>(buffer_symbol_entry & BYTE_MASK);
-        color  = static_cast<uint8_t>((buffer_symbol_entry >> 8) & BYTE_MASK);
+        buffer_entry = screen_buffer_ptr[y * SCREEN_WIDTH + x];
+        symbol       = disassemble_buffer_entry(buffer_entry);
 
         status = status::SUCCESS;
 

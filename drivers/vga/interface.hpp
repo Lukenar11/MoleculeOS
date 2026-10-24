@@ -83,75 +83,45 @@ namespace
 
 
         /** 
-         * @brief Makes a specific symbol color layout for the screen buffer.
-         * 
-         * @param foreground symbol color foreground
-         * @param background symbol color background
-         * @param blink      symbol color blink mode (default case `false`)
-         * 
-         * @return symbol color layout
-         */
-        _API_ 
-        [[nodiscard]] 
-        virtual
-        uint8_t
-        make_symbol_color(_IN_ const T foreground,
-                          _IN_ const T background,
-                          _IN_ const bool blink=false) noexcept = 0;
-
-
-        /** 
          * @brief Clears the screen and sets a special screen color.
-         * 
-         * @param foreground screen text color
-         * @param background screen color
+         *
+         * @param screen_color screen color
          */
         _API_ 
         virtual
         void 
-        clear_screen(_IN_ const T foreground,
-                     _IN_ const T background) noexcept = 0;
+        clear_screen(_IN_ const T& screen_color) noexcept = 0;
 
 
         /**
          * @brief Outputs a character with a special fore and background color.
          * 
-         * @note The color must match a specific layout, 
-         *       use `Text_Mode::make_symbol_color` 
-         *       to ensure the color layout is correct.
-         * 
          * @param x      X coordinate for the output
          * @param y      Y coordinate for the output
-         * @param color  character color
-         * @param symbol character output
+         * @param symbol character output with the colors
          */
         _API_ 
-        [[nodiscard]] 
+        [[nodiscard]]
         virtual
         status_t 
         set_symbol_at(_IN_ const uint32_t x,
                       _IN_ const uint32_t y,
-                      _IN_ const uint8_t color,
-                      _IN_ const char symbol) noexcept = 0;
+                      _IN_ const T& symbol) noexcept = 0;
 
 
         /**
          * @brief Get the char and his color that was output at the 
          *        entered coordinate.
          * 
-         * @param symbol outputted char
-         * @param color  color of the outputted char
+         * @param symbol outputted char with the color
          * @param x      x coordinate of the outputted symbol
          * @param y      y coordinate of the outputted symbol
-         *          
-         * @retval `status::SUCCESS`
          */
         _API_
-        [[nodiscard]] 
+        [[nodiscard]]
         virtual
         status_t
-        get_symbol_at(_OUT_ char& symbol,
-                      _OUT_ uint8_t& color,
+        get_symbol_at(_OUT_ T& symbol,
                       _IN_  const uint32_t x,
                       _IN_  const uint32_t y) noexcept = 0;
     };
