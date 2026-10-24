@@ -56,6 +56,7 @@ namespace kernel::heap
          *          Default case.
          */
         _API_ 
+        [[nodiscard]]
         status_t 
         allocate(_OUT_ void*& block_ptr, 
                  _IN_  const uint32_t byte_size) noexcept;
@@ -88,6 +89,7 @@ namespace kernel::heap
          *          Default case.
          */
         _API_ 
+        [[nodiscard]]
         status_t 
         clear_allocate(_OUT_ void*& block_ptr, 
                        _IN_  const uint32_t byte_size) noexcept;
@@ -132,6 +134,7 @@ namespace kernel::heap
          *          Default case. 
          */
         _API_ 
+        [[nodiscard]]
         status_t 
         reallocate(_INOUT_ void*& block_ptr, 
                    _IN_    const uint32_t new_byte_size) noexcept;
@@ -161,6 +164,7 @@ namespace kernel::heap
          *          Default case. 
          */
         _API_ 
+        [[nodiscard]]
         status_t 
         deallocate(_INOUT_ void* block_ptr) noexcept;
 } // namespace kernel::heap

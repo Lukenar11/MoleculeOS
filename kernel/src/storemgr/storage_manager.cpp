@@ -88,6 +88,7 @@ namespace
      * @retval `status::SUCCESS`
      *          Default case.
      */ 
+    [[nodiscard]]
     status_t
     validate_byte_reads_and_writes(_IN_ const uint16_t* const buffer_ptr,
                                    _IN_ const uint16_t* const temp_buffer_ptr,
@@ -153,6 +154,7 @@ namespace
      * @retval `status::SUCCESS` 
      *          Default case. 
      */
+    [[nodiscard]]
     status_t 
     read_bytes(_OUT_ uint16_t* const buffer_ptr,
                _IN_  uint16_t* const temp_buffer_ptr,
@@ -239,6 +241,7 @@ namespace
      * @retval `status::SUCCESS` 
      *          Default case. 
      */
+    [[nodiscard]]
     status_t 
     write_bytes(_IN_ uint16_t* const buffer_ptr,
                 _IN_ uint16_t* const temp_buffer_ptr,
@@ -349,6 +352,7 @@ namespace
      * @retval `status::SUCCESS`
      *          Default case.
      */
+    [[nodiscard]]
     status_t
     read_or_write_bytes(_INOUT_ void* const buffer_ptr,
                         _IN_    const uint32_t byte_size,
@@ -477,6 +481,7 @@ namespace
      * @retval `status::SUCCESS` 
      *          Default case. 
      */
+    [[nodiscard]]
     status_t 
     read_filesystem_header(_OUT_ MOFS_Header& header) noexcept {
         using namespace drivers;
@@ -541,6 +546,7 @@ namespace
      * @retval `status::SUCCESS` 
      *          Default case. 
      */
+    [[nodiscard]]
     status_t 
     write_filesystem_header(_IN_ MOFS_Header& header) noexcept {
         using namespace filesys;
@@ -603,6 +609,7 @@ namespace
      * @retval `status::SUCCESS` 
      *          Default case. 
      */
+    [[nodiscard]]
     status_t 
     load_single_file(_IN_ const MOFS_Header& header,
                      _IN_ const Stored_File_Entry& stored_file_entry,
@@ -715,6 +722,7 @@ namespace
      * @retval `status::SUCCESS` 
      *          Default case. 
      */
+    [[nodiscard]]
     status_t 
     store_single_file(_INOUT_ uint32_t& current_data_offset,
                       _OUT_   Stored_File_Entry& stored_file_entry,
@@ -816,6 +824,7 @@ namespace
      * @retval `status::SUCCESS` 
      *          Default case. 
      */ 
+    [[nodiscard]]
     status_t 
     write_file_entry_table(_OUT_ Stored_File_Entry* const entry_table_ptr,
                            _IN_  const MOFS_Header& header) noexcept {
@@ -931,6 +940,7 @@ namespace kernel::storemgr
      *          Default case.
      */
     _API_ 
+    [[nodiscard]]
     status_t 
     save_filesystem() noexcept {
         using namespace stdlib;
@@ -1023,6 +1033,7 @@ namespace kernel::storemgr
      *          Default case. 
      */
     _API_ 
+    [[nodiscard]]
     status_t 
     load_filesystem() noexcept {
         using namespace drivers;

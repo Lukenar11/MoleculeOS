@@ -48,6 +48,7 @@ namespace stdlib
          *
          * @return The incremented index, wrapped around the buffer size.
          */
+        [[nodiscard]]
         inline 
         constexpr 
         uint32_t 

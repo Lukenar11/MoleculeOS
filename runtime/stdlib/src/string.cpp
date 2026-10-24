@@ -39,6 +39,7 @@ namespace
      * @retval `status::SUCCESS`
      *          If all pointer are valid.
      */
+    [[nodiscard]]
     status_t
     validate_destination_ptr_and_source_ptr(_INOUT_ const char* const destination_ptr,
                                             _IN_    const char* const source_ptr) noexcept {
@@ -90,7 +91,8 @@ namespace stdlib::string
      * @retval `status::SUCCESS`
      *          Default case.
      */
-    _API_  
+    _API_ 
+    [[nodiscard]] 
     status_t
     copy_part(_INOUT_ char* const destination_ptr,
               _IN_    const char* const source_ptr,
@@ -153,6 +155,7 @@ namespace stdlib::string
      *          Default case.
      */
     _API_  
+    [[nodiscard]]
     status_t 
     copy(_INOUT_ char* destination_ptr, 
          _IN_    const char* source_ptr) noexcept {
@@ -195,7 +198,8 @@ namespace stdlib::string
      * @retval `status::SUCCESS` 
      *          Default case.
      */
-    _API_  
+    _API_ 
+    [[nodiscard]] 
     status_t 
     find_char(_OUT_ const char*& found_char,
               _IN_  const char* string, 
@@ -239,6 +243,7 @@ namespace stdlib::string
      *          Default case.
      */
     _API_  
+    [[nodiscard]]
     status_t 
     get_length(_OUT_ uint32_t& length,
                _IN_  const char* string) noexcept {
@@ -284,6 +289,7 @@ namespace stdlib::string
      *          If string-a and string-b are identical.
      */
     _API_  
+    [[nodiscard]]
     status_t 
     compare(_IN_ const char* a_ptr, 
             _IN_ const char* b_ptr) noexcept {
@@ -348,7 +354,8 @@ namespace stdlib::string
      * @retval `status::SUCCESS`
      *          Default case.
      */
-    _API_  
+    _API_ 
+    [[nodiscard]] 
     status_t 
     to_int(_OUT_ int32_t& value,
            _IN_  const char* string) noexcept {
@@ -424,7 +431,8 @@ namespace stdlib::string
     }
 
 
-    _API_  
+    _API_ 
+    [[nodiscard]] 
     bool 
     is_digit(_IN_ const int32_t symbol) noexcept {
         return symbol >= '0' && symbol <= '9';

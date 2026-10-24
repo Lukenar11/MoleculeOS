@@ -61,6 +61,7 @@ namespace kernel::filesys
      * @param file_index Index of the file entry to get.
      */
     _API_   
+    [[nodiscard]]
     File_Entry&
     get_file_entry(_IN_ const uint32_t file_index) noexcept;
     
@@ -108,6 +109,7 @@ namespace kernel::filesys
      *          Default case.
      */
     _API_ 
+    [[nodiscard]]
     status_t 
     create_file(_OUT_ File_Entry*& file_entry,
                 _IN_  const char* const name, 
@@ -158,6 +160,7 @@ namespace kernel::filesys
      *          Default case.
      */
     _API_ 
+    [[nodiscard]]
     status_t 
     delete_file(_IN_ const char* const name, 
                 _IN_ const char* const format) noexcept;
@@ -204,6 +207,7 @@ namespace kernel::filesys
      *          Default case.
      */
     _API_
+    [[nodiscard]]
     status_t 
     find_file(_OUT_ File_Entry*& file_entry,
               _IN_  const char* const name,
@@ -238,6 +242,7 @@ namespace kernel::filesys
      *          Default case.
      */
     _API_ 
+    [[nodiscard]]
     status_t 
     write_file(_IN_ const File_Entry* const file_entry,
                _IN_ const uint8_t* const data,
@@ -269,6 +274,7 @@ namespace kernel::filesys
      *          Default case.
      */
     _API_ 
+    [[nodiscard]]
     status_t 
     append_file(_IN_ File_Entry* file_entry,
                 _IN_ const uint8_t* const data,
@@ -290,6 +296,7 @@ namespace kernel::filesys
      *          Default case.
      */
     _API_ 
+    [[nodiscard]]
     status_t 
     clear_file(_IN_ File_Entry* const file_entry) noexcept;
 
@@ -360,6 +367,7 @@ namespace kernel::filesys
      *          Default case.
      */
     _API_ 
+    [[nodiscard]]
     status_t 
     rename_file(_IN_ const char* const new_name,
                 _IN_ const char* const new_format,
@@ -443,6 +451,7 @@ namespace kernel::filesys
      *          Default case. 
      */
     _API_ 
+    [[nodiscard]]
     status_t 
     copy_file(_IN_ const char* const destination_name,
               _IN_ const char* const destination_format,
@@ -481,6 +490,7 @@ namespace kernel::filesys
      *          Default case.
      */
     _API_ 
+    [[nodiscard]]
     status_t 
     read_file(_IN_ const File_Entry* const file_entry,
               _IN_ uint8_t* const buffer_ptr,
@@ -512,6 +522,7 @@ namespace kernel::filesys
       *          Default case.
       */
     _API_
+    [[nodiscard]]
     status_t 
     resize_file_size(_INOUT_ File_Entry* const file_entry, 
                      _IN_    const uint32_t new_byte_size) noexcept;
@@ -526,6 +537,7 @@ namespace kernel::filesys
      *         otherwise `false`.
      */
     _API_
+    [[nodiscard]]
     bool 
     is_valid_name_or_format_char(_IN_ const char symbol) noexcept;
 } // namespace kernel::filesys

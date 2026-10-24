@@ -41,6 +41,7 @@ namespace stdlib
          * @return reference to the element at the given index
          */
         _API_ 
+        [[nodiscard]]
         inline 
         constexpr 
         T& 
@@ -49,6 +50,7 @@ namespace stdlib
         }
 
         _API_ 
+        [[nodiscard]]
         inline 
         constexpr 
         const 
@@ -62,6 +64,7 @@ namespace stdlib
          * @brief Returns the count of all array elements.
          */
         _API_ 
+        [[nodiscard]]
         inline 
         constexpr 
         uint32_t 
@@ -74,16 +77,20 @@ namespace stdlib
          * @brief Returns a pointer to the first element.
          */
         _API_ 
+        [[nodiscard]]
         inline 
-        constexpr T* 
+        constexpr 
+        T* 
         begin() noexcept { 
             return buffer; 
         }
 
         _API_ 
+        [[nodiscard]]
         inline 
         constexpr 
-        const T* 
+        const 
+        T* 
         begin() const noexcept { 
             return buffer; 
         }
@@ -93,6 +100,7 @@ namespace stdlib
          * @brief Returns a pointer to the last element.
          */
         _API_ 
+        [[nodiscard]]
         inline 
         constexpr 
         T* 
@@ -101,6 +109,7 @@ namespace stdlib
         }
 
         _API_ 
+        [[nodiscard]]
         inline 
         constexpr 
         const 
@@ -116,6 +125,7 @@ namespace stdlib
          * @warning No bounds checking is performed.
          */
         _API_ 
+        [[nodiscard]]
         inline 
         constexpr 
         T& 
@@ -123,7 +133,8 @@ namespace stdlib
             return buffer[0]; 
         }
 
-        _API_ 
+        _API_
+        [[nodiscard]] 
         inline 
         constexpr 
         const 
@@ -139,6 +150,7 @@ namespace stdlib
          * @warning No bounds checking is performed.
          */
         _API_ 
+        [[nodiscard]]
         inline 
         constexpr 
         T& 
@@ -147,6 +159,7 @@ namespace stdlib
         }
 
         _API_ 
+        [[nodiscard]]
         inline 
         constexpr 
         const 
@@ -160,6 +173,7 @@ namespace stdlib
          * @brief Returns a pointer to the data buffer.
          */
         _API_ 
+        [[nodiscard]]
         inline 
         constexpr 
         T* 
@@ -168,6 +182,7 @@ namespace stdlib
         }
 
         _API_ 
+        [[nodiscard]]
         inline 
         constexpr 
         const 

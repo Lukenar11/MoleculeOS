@@ -52,6 +52,7 @@ namespace kernel::storemgr
      *          Default case.
      */
     _API_ 
+    [[nodiscard]]
     status_t 
     save_filesystem() noexcept;
 
@@ -79,6 +80,7 @@ namespace kernel::storemgr
      *          Default case. 
      */
     _API_  
+    [[nodiscard]]
     status_t 
     load_filesystem() noexcept;
 } // namespace kernel::storemgr

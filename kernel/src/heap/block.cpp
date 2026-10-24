@@ -86,6 +86,7 @@ namespace
      * @retval `false` 
      *          If the ,emory block is used. 
      */
+    [[nodiscard]]
     inline 
     bool 
     is_block_free(_IN_ const uint32_t block_index) noexcept {
@@ -104,6 +105,7 @@ namespace
      *
      * @return aligned value.
     */
+   [[nodiscard]]
     inline 
     constexpr
     uint32_t
@@ -121,6 +123,7 @@ namespace
      * 
      * @return Aligned value. 
      */
+    [[nodiscard]]
     inline 
     constexpr
     uint32_t
@@ -193,6 +196,7 @@ namespace
      * 
      * @param bitmap_word_count Count of available memory blocks in words. 
      */
+    [[nodiscard]]
     status_t
     clear_metadata(_IN_ const uint32_t bitmap_word_count) noexcept {
         using namespace stdlib;
@@ -269,6 +273,7 @@ namespace
      * @retval `true`  If enough free blocks were found.
      * @retval `false` If not enough free blocks were found.
      */
+    [[nodiscard]]
     bool 
     find_enough_free_blocks(_INOUT_ uint32_t& checked_memory_blocks,
                             _IN_    const uint32_t pool_index,
@@ -310,6 +315,7 @@ namespace
      * @retval `status::SUCCESS`
      *          Default case.
      */
+    [[nodiscard]]
     status_t 
     validate_allocate_size(_OUT_ uint32_t& needed_blocks,
                            _IN_  const uint32_t byte_size) noexcept {
@@ -352,6 +358,7 @@ namespace
      * @retval `status::SUCCESS`
      *            Default case.
      */
+    [[nodiscard]]
     status_t 
     find_free_memory_region(_OUT_ uint32_t& block_index,
                             _IN_  const uint32_t needed_blocks) noexcept {
@@ -413,6 +420,7 @@ namespace
      * @retval `status::SUCCESS`
      *          Default case.
      */
+    [[nodiscard]]
     status_t 
     get_allocation_info(_OUT_ uint32_t& pool_index,
                         _OUT_ uint32_t& pool_block_size,
@@ -498,6 +506,7 @@ namespace
      * @retval `status::SUCCESS`
      *          Default case.
      */
+    [[nodiscard]]
     status_t 
     perform_reallocate(_INOUT_ void*& block_ptr,
                        _IN_    const uint32_t new_byte_size) noexcept {
@@ -619,6 +628,7 @@ namespace kernel::heap
      *          Default case.
      */
     _API_ 
+    [[nodiscard]]
     status_t 
     allocate(_OUT_ void*& block_ptr, 
              _IN_  const uint32_t byte_size) noexcept {
@@ -685,6 +695,7 @@ namespace kernel::heap
      *          Default case.
      */
     _API_ 
+    [[nodiscard]]
     status_t
     clear_allocate(_OUT_ void*& block_ptr, 
                    _IN_  const uint32_t byte_size) noexcept {
@@ -764,6 +775,7 @@ namespace kernel::heap
      *          Default case. 
      */
     _API_ 
+    [[nodiscard]]
     status_t
     reallocate(_INOUT_ void*& block_ptr,
                _IN_    const uint32_t new_byte_size) noexcept {
@@ -816,6 +828,7 @@ namespace kernel::heap
      *          Default case. 
      */
     _API_
+    [[nodiscard]]
     status_t
     deallocate(_INOUT_ void* block_ptr) noexcept {
         status_t status;

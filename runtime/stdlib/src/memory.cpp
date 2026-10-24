@@ -81,6 +81,7 @@ namespace stdlib::memory
      *          Default case.
      */
     _API_ 
+    [[nodiscard]]
     status_t 
     copy_block(_IN_ void* const destination_ptr, 
                _IN_ const void* const source_ptr, 
@@ -136,6 +137,7 @@ namespace stdlib::memory
      *          Default case.
      */
     _API_ 
+    [[nodiscard]]
     status_t 
     move_block(_IN_ void* const destination_ptr, 
                _IN_ const void* const source_ptr, 
@@ -201,6 +203,7 @@ namespace stdlib::memory
      *          Default case.
      */
     _API_ 
+    [[nodiscard]]
     status_t 
     set_block(_IN_ void* const destination_ptr, 
               _IN_ const int32_t value, 
@@ -262,6 +265,7 @@ namespace stdlib::memory
      *          If the contents of both memory-blocks are identical.
      */
     _API_ 
+    [[nodiscard]]
     status_t 
     compare_block(_IN_ const void* const a_ptr, 
                   _IN_ const void* const b_ptr,
