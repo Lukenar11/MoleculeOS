@@ -26,8 +26,8 @@ namespace terminal
     }
 
     void Terminal::draw_cursor() noexcept {
-        stdlib::console::set_text_color(drivers::vga::Text_Mode_Color::LIGHT_GREY, 
-                                        drivers::vga::Text_Mode_Color::LIGHT_GREY);
+        stdlib::console::set_text_color(drivers::vga::Text_Mode_Color::CYAN, 
+                                        drivers::vga::Text_Mode_Color::CYAN);
 
         stdlib::console::put_char(' ');
 
@@ -43,12 +43,13 @@ namespace terminal
             stdlib::console::put_char('\b');
             stdlib::console::put_char(key);
 
-            draw_cursor();
-
             shell.step(key);
 
-            if (key == new_line) [[unlikely]]
+            draw_cursor();
+            
+            if (key == new_line) [[unlikely]] {
                 break;
+            }
         }
     }
 }
