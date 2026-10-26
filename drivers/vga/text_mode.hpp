@@ -224,8 +224,7 @@ namespace drivers::vga
         /**
          * @brief Gets the screen width.
          * 
-         * @note It's `static` and 
-         *       can be called without any driver initialisation.
+         * @note Can be called without any driver initialisation.
          * 
          * @return width of the screen
          */
@@ -243,8 +242,7 @@ namespace drivers::vga
         /**
          * @brief Gets the screen height.
          * 
-         * @note It's `static` and
-         *       can be called without any driver initialisation.
+         * @note Can be called without any driver initialisation.
          * 
          * @return height of the screen
          */

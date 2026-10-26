@@ -50,8 +50,7 @@ namespace
         /**
          * @brief Gets the screen width.
          * 
-         * @note It's `static` and 
-         *       can be called without any driver initialisation.
+         * @note Can be called without any driver initialisation.
          * 
          * @return width of the screen
          */
@@ -69,8 +68,7 @@ namespace
         /**
          * @brief Gets the screen height.
          * 
-         * @note It's `static` and 
-         *       can be called without any driver initialisation.
+         * @note Can be called without any driver initialisation.
          * 
          * @return height of the screen
          */
@@ -99,6 +97,8 @@ namespace
     public:
         /**
          * @brief Initializes the driver.
+         * 
+         * @note It's declared as default.
          */
         _API_
         Dynamic_Interface() noexcept = default;
