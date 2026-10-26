@@ -1,3 +1,15 @@
+/**
+ * @brief Defines the interface for VGA driver properties and 
+ *        character-based screen output.
+ *
+ * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
+ * @details   https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+ * @author    Lukenar11 (Luke Matthes)
+ *
+ * @note
+ */
+
+
 #pragma once
 
 #include <types.hpp>
@@ -7,6 +19,13 @@
 
 namespace
 {
+    /**
+     * @brief   Provides an interface for driver properties.
+     * 
+     * @details Provides driver properties that are accessible 
+     *          at compile time and do not depend on a specific instance — 
+     *          such as screen width and height.
+     */
     template<typename Func>
     class Static_Interface {
     public:
@@ -37,6 +56,7 @@ namespace
         _API_
         [[nodiscard]] 
         static 
+        inline
         constexpr 
         uint32_t 
         screen_width() noexcept {
@@ -55,6 +75,7 @@ namespace
         _API_
         [[nodiscard]] 
         static 
+        inline
         constexpr 
         uint32_t 
         screen_height() noexcept {
@@ -63,6 +84,14 @@ namespace
     };
 
 
+    /**
+     * @brief Provides an interface for character-based screen output.
+     * 
+     * @details Provides the 
+     *          runtime operations required for a character-output driver, 
+     *          such as writing a character to a specific position and 
+     *          reading a character from a specific position.
+     */
     template<typename T>
     class Dynamic_Interface {
     public:
@@ -82,15 +111,16 @@ namespace
         ~Dynamic_Interface() noexcept = default;
 
 
-        /** 
-         * @brief Clears the screen and sets a special screen color.
+        /**
+         * @brief Fills the screen with the specified symbol.
          *
-         * @param screen_color screen color
+         * @param filler_symbol Symbol used to fill the screen.
          */
         _API_ 
+        [[nodiscard]]
         virtual
-        void 
-        clear_screen(_IN_ const T& screen_color) noexcept = 0;
+        status_t 
+        fill_screen(_IN_ const T& filler_symbol) noexcept = 0;
 
 
         /**
@@ -130,8 +160,16 @@ namespace
 
 namespace drivers::vga
 {
+    /**
+     * @brief Links driver properties to screen operations for 
+     *        text-based drivers.
+     * 
+     * @details It serves as a common foundation for 
+     *          specific driver implementations.
+     */
     template<typename Func, typename T>
-    class Interface : public Static_Interface<Func>, public Dynamic_Interface<T> {
+    class Interface : public Static_Interface<Func>, 
+                      public Dynamic_Interface<T> {
     private:
         using Static_Interface<Func>::screen_width;
         using Static_Interface<Func>::screen_height;

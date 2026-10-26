@@ -107,4 +107,7 @@ namespace status::flags
     constexpr status_t IS_EMPTY    = 0x00'1000'00;
     constexpr status_t KEY_PRESS   = 0x00'2000'00;
     constexpr status_t KEY_RELEASE = 0x00'4000'00;
+
+    constexpr status_t BACKGROUND_COLOR = 0x10'0000'00;
+    constexpr status_t FOREGROUND_COLOR = 0x10'0000'00;
 } // namespace status::flags

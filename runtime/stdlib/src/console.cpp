@@ -490,7 +490,7 @@ namespace stdlib::console
         cursor_x = 0;
         cursor_y = 0;
 
-        driver.clear_screen({});
+        driver.fill_screen({});
     }
 
 

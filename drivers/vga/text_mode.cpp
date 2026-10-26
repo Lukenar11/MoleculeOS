@@ -1,24 +1,12 @@
 /**
-LICENSE:
-    Copyright (c) 2026 Lukenar11 (Luke Matthes)
-    MIT Licensed
-    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-
-DESCRIPTION:
-    This is a VGA text mode driver, which provides a
-    low‑level interface for writing characters and colors directly to
-    the VGA text buffer located at physical address '0xB8000'.
-
-    The driver offers utilities for constructing color attributes,
-    composing character entries, and writing text to specific screen
-    coordinates, as well as clearing the entire display.
-
-NOTES:
-    All writes must follow the VGA text mode layout of 80×25 characters.
-
-    Some methods are placed in the header 
-    because they are so small that the compiler can inline them.
-*/
+ * @brief Implements an driver for VGA text-mode outputs.
+ *
+ * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
+ * @details   https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+ * @author    Lukenar11 (Luke Matthes)
+ *
+ * @note
+ */
 
 
 #include "text_mode.hpp"
@@ -27,51 +15,76 @@ NOTES:
 namespace drivers::vga 
 {
     /**
-     * @brief Packs a text-mode character instance into a VGA buffer entry.
-     *
-     * @note This function converts the high-level character representation
-     *       into the low-level 16-bit VGA text-mode format.
-     *
-     * @param symbol Text-mode character representation with foreground color,
-     *               background color, blink mode and symbol.
-     *
-     * @return VGA buffer entry.
+     * @brief Converts the high-level character representation into the
+     *        low-level 16-bit VGA text-mode format.
+     * 
+     * @param buffer_entry Output VGA buffer entry.
+     * @param symbol       Text-mode character representation with
+     *                     foreground color, background color,
+     *                     blink mode and symbol.
+     * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
+     *          If the foreground or background color value is out of range.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
      */
-    uint16_t
-    Text_Mode::assemble_buffer_entry(_IN_ const Text_Mode_Char& symbol) noexcept {
-        uint16_t buffer_entry;
+    [[nodiscard]]
+    status_t
+    Text_Mode::assemble_buffer_entry(_OUT_ uint16_t& buffer_entry,
+                                     _IN_  const Text_Mode_Char& symbol)
+                                     noexcept {
+        status_t status = status::SUCCESS;
 
-        buffer_entry = (static_cast<uint16_t>(symbol.background_color) & 0x0007) << 12 | 
-                       (static_cast<uint16_t>(symbol.foreground_color) & 0x000F) << 8;
+        buffer_entry = 0;
 
-        if (symbol.blink_mode) [[unlikely]] {
-            buffer_entry |= 0x8000;
+        if (static_cast<uint16_t>(symbol.background_color) > 
+            BACKGROUND_MASK) [[unlikely]] {
+            status = status::INVALID_PARAMETER | status::flags::PARAM_B;
+            goto cleanup;
         }
 
-        buffer_entry |= static_cast<uint16_t>(static_cast<uint8_t>(symbol.symbol));
+        if (static_cast<uint16_t>(symbol.foreground_color) > 
+            FOREGROUND_MASK) [[unlikely]] {
+            status = status::INVALID_PARAMETER | status::flags::PARAM_B;
+            goto cleanup;
+        }
 
-        return buffer_entry;
+        buffer_entry = (static_cast<uint16_t>(symbol.blink_mode) << 
+                        BLINK_MODE_SHIFT) | 
+                       (static_cast<uint16_t>(symbol.background_color) << 
+                        BACKGROUND_SHIFT) |
+                       (static_cast<uint16_t>(symbol.foreground_color) << 
+                        FOREGROUND_SHIFT) | 
+                        static_cast<uint8_t>(symbol.symbol);
+ 
+    cleanup:
+        return status;
     }
 
 
     /**
-     * @brief Unpacks a VGA buffer entry into a text-mode character instance.
-     *
-     * @note This function converts the low-level 16-bit VGA text-mode format
-     *       into a high-level character representation.
+     * @brief Converts the low-level 16-bit VGA text-mode format into a 
+     *        high-level character representation.
      *
      * @param symbol VGA buffer entry.
      *
      * @return Text-mode character representation with foreground color,
      *         background color, blink mode and symbol.
      */
+    [[nodiscard]]
+    const
     Text_Mode_Char
     Text_Mode::disassemble_buffer_entry(_IN_ const uint16_t symbol) noexcept {
         return {
-            .background_color = static_cast<Text_Mode_Color>((symbol >> 12) & 0x0007),
-            .foreground_color = static_cast<Text_Mode_Color>((symbol >> 8) & 0x000F),
-            .blink_mode       = static_cast<bool>(symbol & 0x8000),
-            .symbol           = static_cast<char>(symbol & 0x00FF)
+            .background_color = static_cast<Text_Mode_Color>((symbol >> 
+                                                              BACKGROUND_SHIFT) & 
+                                                              BACKGROUND_MASK),
+            .foreground_color = static_cast<Text_Mode_Color>((symbol >> 
+                                                              FOREGROUND_SHIFT) & 
+                                                              FOREGROUND_MASK),
+            .blink_mode = static_cast<bool>(symbol & BLINK_MODE_MASK),
+            .symbol     = static_cast<char>(symbol & SYMBOL_MASK)
         };
     }
 
@@ -81,25 +94,47 @@ namespace drivers::vga
      */
     _API_
     Text_Mode::Text_Mode() noexcept :
-        screen_buffer_ptr(reinterpret_cast<volatile uint16_t*>(0xB8000)) {
+        screen_buffer_ptr(reinterpret_cast<volatile uint16_t*>(0xB8000)),
+        screen_buffer_size(SCREEN_HEIGHT * SCREEN_WIDTH) {
     }
 
 
-    /** 
-     * @brief Clears the screen and sets a special screen color.
+    /**
+     * @brief Fills the screen with the specified symbol.
+     *
+     * @param filler_symbol Symbol used to fill the screen.
      * 
-     * @param screen_color screen color
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+     *          If the foreground or background color value is out of range.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
      */
     _API_ 
-    void 
-    Text_Mode::clear_screen(_IN_ const Text_Mode_Char& screen_color) noexcept {
-        const uint16_t buffer_entry = assemble_buffer_entry(screen_color);
+    [[nodiscard]]
+    status_t 
+    Text_Mode::fill_screen(_IN_ const Text_Mode_Char& filler_symbol) noexcept {
+        uint16_t buffer_entry = 0;
+        status_t status       = assemble_buffer_entry(buffer_entry, 
+                                                      filler_symbol);
 
-        for (uint32_t buffer_index = 0; 
-             buffer_index < SCREEN_WIDTH * SCREEN_HEIGHT; 
-             buffer_index++) [[likely]] {
-            screen_buffer_ptr[buffer_index] = buffer_entry;
+        if (status != status::SUCCESS) [[unlikely]] {
+            // The `PARAM_B` flag is changed to `PARAM_A`, 
+            // so that the returned status code matches the method signature.
+            status ^= status::flags::PARAM_B;
+            status |= status::flags::PARAM_A;
+
+            goto cleanup;
         }
+
+        for (uint32_t entry_number = 0; 
+             entry_number < screen_buffer_size; 
+             entry_number++) [[likely]] {
+            screen_buffer_ptr[entry_number] = buffer_entry;
+        }
+
+    cleanup:
+        return status;
     }
 
 
@@ -117,15 +152,20 @@ namespace drivers::vga
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
      *          If `y` is greater then or equal to the screen height.
      * 
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
+     *          If the foreground or background color value is out of range.
+     * 
      * @retval `status::SUCCESS`
      *          Default Case.
      */
     _API_ 
+    [[nodiscard]]
     status_t 
     Text_Mode::set_symbol_at(_IN_ const uint32_t x,
                              _IN_ const uint32_t y,
                              _IN_ const Text_Mode_Char& symbol) noexcept {
-        status_t status;
+        status_t status       = status::SUCCESS;
+        uint16_t buffer_entry = 0;
 
         if (x >= SCREEN_WIDTH) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_A;
@@ -137,9 +177,17 @@ namespace drivers::vga
             goto cleanup;
         }
 
-        screen_buffer_ptr[y * SCREEN_WIDTH + x] = assemble_buffer_entry(symbol);
+        status = assemble_buffer_entry(buffer_entry, symbol);
+        if (status & status::flags::PARAM_B) [[unlikely]] {
+            // The `PARAM_B` flag is changed to `PARAM_C`, 
+            // so that the returned status code matches the method signature.
+            status ^= status::flags::PARAM_B;
+            status |= status::flags::PARAM_C;
 
-        status = status::SUCCESS;
+            goto cleanup;
+        }
+
+        screen_buffer_ptr[y * SCREEN_WIDTH + x] = buffer_entry;
 
     cleanup:
         return status;
@@ -154,36 +202,38 @@ namespace drivers::vga
      * @param x      x coordinate of the outputted symbol
      * @param y      y coordinate of the outputted symbol
      * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
      *          If `x` is greater or equal to the screen width.
      * 
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_D`
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
      *          If `y` is greater or equal to the screen height.
      *          
      * @retval `status::SUCCESS`
+     *          Default case.
      */
     _API_
+    [[nodiscard]]
     status_t 
     Text_Mode::get_symbol_at(_OUT_ Text_Mode_Char& symbol,
                              _IN_  const uint32_t x,
                              _IN_  const uint32_t y) noexcept {
-        status_t status;
-        uint16_t buffer_entry;
+        status_t status       = status::SUCCESS;
+        uint16_t buffer_entry = 0;
+
+        symbol = {};
 
         if (x >= SCREEN_WIDTH) [[unlikely]] {
-            status = status::INVALID_PARAMETER | status::flags::PARAM_C;
+            status = status::INVALID_PARAMETER | status::flags::PARAM_B;
             goto cleanup;
         }
 
         if (y >= SCREEN_HEIGHT) [[unlikely]] {
-            status = status::INVALID_PARAMETER | status::flags::PARAM_D;
+            status = status::INVALID_PARAMETER | status::flags::PARAM_C;
             goto cleanup;
         }
 
         buffer_entry = screen_buffer_ptr[y * SCREEN_WIDTH + x];
         symbol       = disassemble_buffer_entry(buffer_entry);
-
-        status = status::SUCCESS;
 
     cleanup:
         return status;
