@@ -31,6 +31,8 @@ namespace
     public:
         /**
          * @brief Initializes the driver.
+         * 
+         * @note It's declared as default.
          */
         _API_
         Static_Interface() noexcept = default;
