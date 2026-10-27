@@ -167,6 +167,7 @@ namespace
 
         status_t status;
         uint8_t* dest_ptr;
+        drivers::ata::Programmable_IO_Operation operation;
 
         status = validate_byte_reads_and_writes(buffer_ptr,
                                                 temp_buffer_ptr,
@@ -176,9 +177,11 @@ namespace
             goto cleanup;
         }
 
-        status = driver.load_sectors(temp_buffer_ptr,
-                                     start_sector,
-                                     sector_count);
+        operation.buffer_ptr   = temp_buffer_ptr;
+        operation.relative_lba = start_sector;
+        operation.sector_count = sector_count;
+
+        status = driver.load_sectors(operation);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_A) {
                 status ^= status::flags::PARAM_A;
@@ -253,6 +256,7 @@ namespace
                                         
         status_t status;
         uint8_t* dest_ptr;
+        drivers::ata::Programmable_IO_Operation operation;
 
         status = validate_byte_reads_and_writes(buffer_ptr,
                                                 temp_buffer_ptr,
@@ -261,10 +265,12 @@ namespace
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
-                             
-        status = driver.store_sectors(temp_buffer_ptr,
-                                      start_sector,
-                                      sector_count);
+
+        operation.buffer_ptr   = temp_buffer_ptr;
+        operation.relative_lba = start_sector;
+        operation.sector_count = sector_count;
+
+        status = driver.load_sectors(operation);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_A) {
                 status ^= status::flags::PARAM_A;
@@ -298,9 +304,7 @@ namespace
             goto cleanup;
         }
     
-        status = driver.store_sectors(temp_buffer_ptr,
-                                      start_sector,
-                                      sector_count);
+        status = driver.store_sectors(operation);
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_A) {
                 status ^= status::flags::PARAM_A;

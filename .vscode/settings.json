@@ -26,14 +26,17 @@
     "C_Cpp.errorSquiggles": "disabled",
     
     "cSpell.words": [
+        "ABRT",
         "ACPI",
         "allocinfo",
+        "AMNF",
         "Bochs",
         "DRDY",
         "eflags",
         "endmacro",
         "endrep",
         "filesys",
+        "IDNF",
         "INOUT",
         "insw",
         "intstrem",

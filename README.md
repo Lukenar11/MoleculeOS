@@ -44,15 +44,15 @@ The goal is to understand the *essence* of OS development without unnecessary co
 
 Below is the current state of MoleculeOS running in QEMU:
 
-![MoleculeOS boot screenshot](docs/Readme/images/std-srceen-v3.png)
+![MoleculeOS boot screenshot](docs/README/images/std-srceen-v3.png)
 
 Below is the current state of MoleculeOS running in QEMU (deliberately triggered panic with a division by 0):
 
-![MoleculeOS panic screenshot](docs/Readme/images/kernel-panic-v2.png)
+![MoleculeOS panic screenshot](docs/README/images/kernel-panic-v2.png)
 
 ## Demo Preview
 
-![Demo Preview](docs/Readme/videos/molecule-os-using-v3.gif)
+![Demo Preview](docs/README/videos/molecule-os-using-v3.gif)
 
 ---
 

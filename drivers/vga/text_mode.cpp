@@ -1,8 +1,9 @@
 /**
- * @brief Implements an driver for VGA text-mode outputs.
+ * @brief Implements an driver for VGA text-mode outputs 
+ *        (16 color 25x80 console).
  *
  * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
- * @details   https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+ * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
  * @author    Lukenar11 (Luke Matthes)
  *
  * @note

@@ -3,7 +3,7 @@
  *        character-based screen output.
  *
  * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
- * @details   https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+ * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
  * @author    Lukenar11 (Luke Matthes)
  *
  * @note
@@ -27,7 +27,7 @@ namespace
      *          such as screen width and height.
      */
     template<typename Func>
-    class Static_Interface {
+    class Static_VGA_Interface {
     public:
         /**
          * @brief Initializes the driver.
@@ -35,7 +35,7 @@ namespace
          * @note It's declared as default.
          */
         _API_
-        Static_Interface() noexcept = default;
+        Static_VGA_Interface() noexcept = default;
 
 
         /**
@@ -44,7 +44,7 @@ namespace
          * @note It's declared as default.
          */
         _API_
-        ~Static_Interface() noexcept = default;
+        ~Static_VGA_Interface() noexcept = default;
 
 
         /**
@@ -93,7 +93,7 @@ namespace
      *          reading a character from a specific position.
      */
     template<typename T>
-    class Dynamic_Interface {
+    class Dynamic_VGA_Interface {
     public:
         /**
          * @brief Initializes the driver.
@@ -101,7 +101,7 @@ namespace
          * @note It's declared as default.
          */
         _API_
-        Dynamic_Interface() noexcept = default;
+        Dynamic_VGA_Interface() noexcept = default;
 
 
         /**
@@ -110,7 +110,7 @@ namespace
          * @note It's declared as default.
          */
         _API_
-        ~Dynamic_Interface() noexcept = default;
+        ~Dynamic_VGA_Interface() noexcept = default;
 
 
         /**
@@ -170,11 +170,11 @@ namespace drivers::vga
      *          specific driver implementations.
      */
     template<typename Func, typename T>
-    class Interface : public Static_Interface<Func>, 
-                      public Dynamic_Interface<T> {
+    class Interface : public Static_VGA_Interface<Func>, 
+                      public Dynamic_VGA_Interface<T> {
     private:
-        using Static_Interface<Func>::screen_width;
-        using Static_Interface<Func>::screen_height;
+        using Static_VGA_Interface<Func>::screen_width;
+        using Static_VGA_Interface<Func>::screen_height;
 
 
     public:
