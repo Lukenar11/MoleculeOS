@@ -177,7 +177,7 @@ namespace
             goto cleanup;
         }
 
-        operation.buffer_ptr   = temp_buffer_ptr;
+        operation.buffer       = temp_buffer_ptr;
         operation.relative_lba = start_sector;
         operation.sector_count = sector_count;
 
@@ -266,7 +266,7 @@ namespace
             goto cleanup;
         }
 
-        operation.buffer_ptr   = temp_buffer_ptr;
+        operation.buffer       = temp_buffer_ptr;
         operation.relative_lba = start_sector;
         operation.sector_count = sector_count;
 
@@ -880,7 +880,11 @@ namespace kernel::storemgr
     
         sys::disable_interrupts();
 
-        driver.init();
+        status = driver.init();
+        if (status != status::SUCCESS) [[unlikely]] {
+            sys::hang();
+            sys::panic("ATA-Driver init fail!");
+        }
     
         status = read_or_write_bytes(&header,
                                      sizeof(header),

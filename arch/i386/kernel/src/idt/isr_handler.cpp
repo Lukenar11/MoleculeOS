@@ -28,7 +28,7 @@ namespace kernel::idt::isr
 
         stdlib::console::reset();
         stdlib::console::set_text_color(drivers::vga::Text_Mode_Color::BLACK,
-                                        drivers::vga::Text_Mode_Color::LIGHT_GREY);
+                                        drivers::vga::Text_Mode_Color::RED);
 
         const uint32_t all_available_expectations = 0x6A;
         const char* exception = (reg_dump->interrupt_number < all_available_expectations)

@@ -79,6 +79,8 @@ namespace
 
         /**
          * @brief Initializes the driver.
+         * 
+         * @brief Initializes the ATA-PIO driver.
          */
         _API_
         virtual
@@ -87,11 +89,14 @@ namespace
 
 
         /**
-         * @brief Main method performing read
-         *        operations over a specific range.
+         * @brief ATA-PIO main method performing chunked read
+         *        operations over a specific sector range.
          *
          * @param operation Operation struct with buffer pointer,
-         *                  start address and range.
+         *                  start LBA and sector count.
+         * 
+         * @note If `operation.sector_count` is `0`, 
+         *       the `operation.sector_count` isset to `256`.
          */ 
         _API_
         [[nodiscard]]
@@ -101,11 +106,14 @@ namespace
 
 
         /**
-         * @brief Main method performing write
-         *        operations over a specific range.
+         * @brief ATA-PIO main method performing chunked write
+         *        operations over a specific sector range.
          *
          * @param operation Operation struct with buffer pointer,
-         *                  start address and range.
+         *                  start LBA and sector count.
+         * 
+         * @note If `operation.sector_count` is `0`, 
+         *       the `operation.sector_count` isset to `256`.
          */ 
         _API_
         [[nodiscard]]

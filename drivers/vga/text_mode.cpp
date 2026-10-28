@@ -95,7 +95,7 @@ namespace drivers::vga
      */
     _API_
     Text_Mode::Text_Mode() noexcept :
-        screen_buffer_ptr(reinterpret_cast<volatile uint16_t*>(0xB8000)),
+        screen_buffer(reinterpret_cast<volatile uint16_t*>(0xB8000)),
         screen_buffer_size(SCREEN_HEIGHT * SCREEN_WIDTH) {
     }
 
@@ -119,19 +119,19 @@ namespace drivers::vga
         status_t status       = assemble_buffer_entry(buffer_entry, 
                                                       filler_symbol);
 
-        if (status != status::SUCCESS) [[unlikely]] {
+        if (status == (status::INVALID_PARAMETER | 
+                       status::flags::PARAM_B)) [[unlikely]] {
             // The `PARAM_B` flag is changed to `PARAM_A`, 
             // so that the returned status code matches the method signature.
-            status ^= status::flags::PARAM_B;
-            status |= status::flags::PARAM_A;
-
+            status = status::INVALID_PARAMETER | status::flags::PARAM_A;
+            
             goto cleanup;
         }
 
         for (uint32_t entry_number = 0; 
              entry_number < screen_buffer_size; 
              entry_number++) [[likely]] {
-            screen_buffer_ptr[entry_number] = buffer_entry;
+            screen_buffer[entry_number] = buffer_entry;
         }
 
     cleanup:
@@ -179,16 +179,16 @@ namespace drivers::vga
         }
 
         status = assemble_buffer_entry(buffer_entry, symbol);
-        if (status & status::flags::PARAM_B) [[unlikely]] {
+        if (status == (status::INVALID_PARAMETER | 
+                       status::flags::PARAM_B)) [[unlikely]] {
             // The `PARAM_B` flag is changed to `PARAM_C`, 
             // so that the returned status code matches the method signature.
-            status ^= status::flags::PARAM_B;
-            status |= status::flags::PARAM_C;
+            status = status::INVALID_PARAMETER | status::flags::PARAM_C;
 
             goto cleanup;
         }
 
-        screen_buffer_ptr[y * SCREEN_WIDTH + x] = buffer_entry;
+        screen_buffer[y * SCREEN_WIDTH + x] = buffer_entry;
 
     cleanup:
         return status;
@@ -233,7 +233,7 @@ namespace drivers::vga
             goto cleanup;
         }
 
-        buffer_entry = screen_buffer_ptr[y * SCREEN_WIDTH + x];
+        buffer_entry = screen_buffer[y * SCREEN_WIDTH + x];
         symbol       = disassemble_buffer_entry(buffer_entry);
 
     cleanup:

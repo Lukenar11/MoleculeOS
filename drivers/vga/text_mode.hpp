@@ -90,7 +90,7 @@ namespace drivers::vga
         static constexpr uint16_t FOREGROUND_MASK = 0x000F;
         static constexpr uint16_t SYMBOL_MASK     = 0x00FF;
 
-        volatile uint16_t* const screen_buffer_ptr;
+        volatile uint16_t* const screen_buffer;
         const uint32_t screen_buffer_size;
 
 
