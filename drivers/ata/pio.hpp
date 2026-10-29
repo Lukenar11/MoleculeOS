@@ -170,6 +170,20 @@ namespace drivers::ata
 
 
         /**
+         * @brief Handles retryable ATA errors and updates the retry counter.
+         * 
+         * @param retries 
+         *        Retry counter that may be adjusted for certain errors.
+         * 
+         * @return `true/false` 
+         *          If the ATA error is not retryable.
+         */
+        [[nodiscard]]
+        bool
+        handle_retryable_ata_error(_INOUT_ int32_t& retries) noexcept;
+
+
+        /**
          * @brief Tries to identify a single device on the 
          *        already configured ATA channel, 
          *        with retries and error handling.

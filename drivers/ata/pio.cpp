@@ -300,6 +300,41 @@ namespace drivers::ata
 
 
     /**
+     * @brief Handles retryable ATA errors and updates the retry counter.
+     * 
+     * @param retries 
+     *        Retry counter that may be adjusted for certain errors.
+     * 
+     * @return `true/false` 
+     *          If the ATA error is not retryable.
+     */
+    [[nodiscard]]
+    bool
+    Programmable_IO::handle_retryable_ata_error(_INOUT_ int32_t& retries) 
+                                                noexcept {
+        bool is_retryable = false;
+        const 
+        uint8_t error_register = stdlib::byte_input(identify_data.error_port);
+
+        reset_driver();
+
+        if (error_register & (static_cast<uint8_t>(ATA_Error::MC) |
+                              static_cast<uint8_t>(ATA_Error::MCR))) {
+            is_retryable = true;
+            goto cleanup;
+        }
+
+        if (error_register & static_cast<uint8_t>(ATA_Error::TK0NF)) {
+            retries       = 1;
+            is_retryable = true;
+        }
+
+    cleanup:
+        return is_retryable;
+    }
+
+
+    /**
      * @brief Tries to identify a single device on the 
      *        already configured ATA channel, 
      *        with retries and error handling.
@@ -356,18 +391,7 @@ namespace drivers::ata
             status = wait_until_ready_or_error();
             switch (status) {
             case status::ATA_ERROR:
-                error_register = stdlib::byte_input(identify_data.error_port);
-                reset_driver();
-
-                if (error_register & (static_cast<uint8_t>(ATA_Error::MC) |
-                                      static_cast<uint8_t>(ATA_Error::MCR))) {
-                    delay();
-                    issue_identify_command(drive_select);
-                    continue;
-                }
-
-                if (error_register & static_cast<uint8_t>(ATA_Error::TK0NF)) {
-                    retries = 1;
+                if (handle_retryable_ata_error(retries)) {
                     delay();
                     issue_identify_command(drive_select);
                     continue;
@@ -1037,21 +1061,10 @@ namespace drivers::ata
                 continue;
 
             case status::ATA_ERROR:
-                error_register = stdlib::byte_input(identify_data.error_port);
-                delay();
-
-                if (error_register & (static_cast<uint8_t>(ATA_Error::MC) | 
-                                      static_cast<uint8_t>(ATA_Error::MCR))) {
+                if (handle_retryable_ata_error(retries)) {
                     reset_driver();
                     delay();
-                    continue;
-                }
-                
-                if (error_register & static_cast<uint8_t>(ATA_Error::TK0NF)) {
-                    retries = 1;
 
-                    reset_driver();
-                    delay();
                     continue;
                 }
                 break;
