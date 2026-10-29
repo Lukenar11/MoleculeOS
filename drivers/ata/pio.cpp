@@ -1359,7 +1359,7 @@ namespace drivers::ata
 
 
     /**
-     * @brief ATA-PIO main method performing chunked read
+     * @brief Performs chunked read
      *        operations over a specific sector range.
      *
      * @param operation Operation struct with buffer pointer,
@@ -1427,7 +1427,7 @@ namespace drivers::ata
 
 
     /**
-     * @brief ATA-PIO main method performing chunked write
+     * @brief Performs chunked write
      *        operations over a specific sector range.
      *
      * @param operation Operation struct with buffer pointer,
