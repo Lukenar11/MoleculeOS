@@ -38,6 +38,7 @@ namespace drivers::ata
         uint32_t sector_count = 0;
     };
 
+
     /**
      * @brief Provides an ATA-PIO driver for storage access.
      * 
@@ -131,7 +132,7 @@ namespace drivers::ata
         validate_transfer_request(_IN_ const uint16_t* const buffer,
                                   _IN_ const uint32_t buffer_size,
                                   _IN_ const uint32_t relative_lba, 
-                                  _IN_ const uint32_t to_transfer) noexcept;
+                                  _IN_ const uint32_t to_transfer) const noexcept;
 
 
         /**
@@ -147,7 +148,7 @@ namespace drivers::ata
          *          a delay of 500 ns is introduced as a safety measure.
          */
         void 
-        delay() noexcept;
+        delay() const noexcept;
 
 
         /**
@@ -155,7 +156,7 @@ namespace drivers::ata
          *        until the controller is operational again.
          */
         void 
-        reset_driver() noexcept;
+        reset_driver() const noexcept;
 
 
         /**
@@ -166,7 +167,7 @@ namespace drivers::ata
          *                     selecting master or slave.
          */
         void
-        issue_identify_command(_IN_ uint8_t drive_select) noexcept;
+        issue_identify_command(_IN_ const uint8_t drive_select) const noexcept;
 
 
         /**
@@ -180,7 +181,7 @@ namespace drivers::ata
          */
         [[nodiscard]]
         bool
-        handle_retryable_ata_error(_INOUT_ int32_t& retries) noexcept;
+        handle_retryable_ata_error(_INOUT_ int32_t& retries) const noexcept;
 
 
         /**
@@ -214,7 +215,7 @@ namespace drivers::ata
         [[nodiscard]]
         status_t
         try_drive_identify(_OUT_ uint16_t* const id_command_buffer,
-                           _IN_  const uint8_t drive_select) noexcept;
+                           _IN_  const uint8_t drive_select) const noexcept;
 
 
         /**
@@ -316,7 +317,7 @@ namespace drivers::ata
          */
         [[nodiscard]] 
         status_t 
-        wait_until_ready_or_error() noexcept;
+        wait_until_ready_or_error() const noexcept;
 
 
         /**
@@ -337,7 +338,7 @@ namespace drivers::ata
          */
         [[nodiscard]] 
         status_t 
-        wait_until_unbusy_or_error() noexcept;
+        wait_until_unbusy_or_error() const noexcept;
 
 
         /**
@@ -367,9 +368,9 @@ namespace drivers::ata
          */
         [[nodiscard]]
         status_t
-        wait_until_sector_transfer_ready(_INOUT_ uint16_t* buffer, 
+        wait_until_sector_transfer_ready(_INOUT_ const uint16_t* const buffer, 
                                          _IN_    const uint32_t sector_count)
-                                         noexcept;
+                                         const noexcept;
 
 
         /**
@@ -400,7 +401,7 @@ namespace drivers::ata
         [[nodiscard]] 
         status_t
         transfer_sector_data(_INOUT_ uint16_t* buffer,
-                             _IN_   const uint32_t sector_count) noexcept;
+                             _IN_    const uint32_t sector_count) const noexcept;
 
 
         /**
@@ -446,7 +447,7 @@ namespace drivers::ata
         start_pio_transfer(_INOUT_ uint16_t* const buffer,
                            _IN_    const uint32_t buffer_size,
                            _IN_    const uint32_t relative_lba,
-                           _IN_    const uint32_t sector_count) noexcept;
+                           _IN_    const uint32_t sector_count) const noexcept;
 
 
 
@@ -490,14 +491,14 @@ namespace drivers::ata
          */
         [[nodiscard]]
         status_t
-        try_chunk_transfer(_INOUT_ uint16_t* buffer,
-                           _IN_    uint32_t buffer_size,
-                           _IN_    uint32_t relative_lba,
-                           _IN_    uint32_t chunk) noexcept;
+        try_chunk_transfer(_INOUT_ uint16_t* const buffer,
+                           _IN_    const uint32_t buffer_size,
+                           _IN_    const uint32_t relative_lba,
+                           _IN_    const uint32_t chunk) const noexcept;
 
 
         /**
-         * @brief ATA-PIO main method performing chunked read/write
+         * @brief Performins chunked read/write
          *        operations over a specific sector range.
          *
          * @param buffer       Pointer to a buffer for sector data.
@@ -533,8 +534,8 @@ namespace drivers::ata
          */ 
         [[nodiscard]]
         status_t 
-        execute_transfer_request(_INOUT_ uint16_t* buffer,
-                                 _IN_    uint32_t buffer_size,
+        execute_transfer_request(_INOUT_ uint16_t* const buffer,
+                                 _IN_    const uint32_t buffer_size,
                                  _IN_    uint32_t relative_lba,
                                  _IN_    uint32_t sector_count) noexcept;
 
@@ -618,7 +619,7 @@ namespace drivers::ata
 
 
         /**
-         * @brief ATA-PIO main method performing chunked read
+         * @brief Performings chunked read
          *        operations over a specific sector range.
          *
          * @param operation Operation struct with buffer pointer,
@@ -658,11 +659,11 @@ namespace drivers::ata
         [[nodiscard]]
         status_t
         load_sectors(_INOUT_ Programmable_IO_Operation& operation) 
-                    noexcept override;
+                     noexcept override;
 
 
         /**
-         * @brief ATA-PIO main method performing chunked write
+         * @brief Performings chunked write
          *        operations over a specific sector range.
          *
          * @param operation Operation struct with buffer pointer,

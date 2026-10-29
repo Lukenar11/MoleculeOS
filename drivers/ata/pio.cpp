@@ -195,7 +195,7 @@ namespace drivers::ata
                                                _IN_ const uint32_t buffer_size,
                                                _IN_ const uint32_t relative_lba,
                                                _IN_ const uint32_t to_transfer)
-                                               noexcept {
+                                               const noexcept {
         status_t status = status::SUCCESS;
 
         if (identify_data.partition_length == 0) [[unlikely]] {
@@ -245,7 +245,7 @@ namespace drivers::ata
      *          a delay of 500 ns is introduced as a safety measure.
      */
     void 
-    Programmable_IO::delay() noexcept {
+    Programmable_IO::delay() const noexcept {
         for (uint32_t ns_delay = 0; ns_delay < 5; ns_delay++) [[likely]] {
             stdlib::byte_input(identify_data.status_port);
         }
@@ -257,7 +257,7 @@ namespace drivers::ata
      *        until the controller is operational again.
      */
     void 
-    Programmable_IO::reset_driver() noexcept {
+    Programmable_IO::reset_driver() const noexcept {
         uint8_t ata_status = 0;
 
         stdlib::byte_output(identify_data.device_control_register, 
@@ -287,8 +287,8 @@ namespace drivers::ata
      *                     selecting master or slave.
      */
     void
-    Programmable_IO::issue_identify_command(_IN_ uint8_t drive_select) 
-                                            noexcept {
+    Programmable_IO::issue_identify_command(_IN_ const uint8_t drive_select) 
+                                            const noexcept {
         stdlib::byte_output(identify_data.io_port_base + 6, 
                             drive_select);
         delay();
@@ -311,7 +311,7 @@ namespace drivers::ata
     [[nodiscard]]
     bool
     Programmable_IO::handle_retryable_ata_error(_INOUT_ int32_t& retries) 
-                                                noexcept {
+                                                const noexcept {
         bool is_retryable = false;
         const 
         uint8_t error_register = stdlib::byte_input(identify_data.error_port);
@@ -325,7 +325,7 @@ namespace drivers::ata
         }
 
         if (error_register & static_cast<uint8_t>(ATA_Error::TK0NF)) {
-            retries       = 1;
+            retries      = 1;
             is_retryable = true;
         }
 
@@ -366,9 +366,8 @@ namespace drivers::ata
     status_t
     Programmable_IO::try_drive_identify(_OUT_ uint16_t* const id_command_buffer,
                                         _IN_  const uint8_t drive_select) 
-                                        noexcept {
-        status_t status        = status::SUCCESS;
-        uint8_t error_register = 0;
+                                        const noexcept {
+        status_t status = status::SUCCESS;
 
         if (!id_command_buffer) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_A;
@@ -660,7 +659,7 @@ namespace drivers::ata
      */
     [[nodiscard]] 
     status_t 
-    Programmable_IO::wait_until_ready_or_error() noexcept {
+    Programmable_IO::wait_until_ready_or_error() const noexcept {
         status_t status    = status::ATA_TIMEOUT;
         uint8_t ata_status = 0;
 
@@ -709,7 +708,7 @@ namespace drivers::ata
      */
     [[nodiscard]]
     status_t 
-    Programmable_IO::wait_until_unbusy_or_error() noexcept {
+    Programmable_IO::wait_until_unbusy_or_error() const noexcept {
         status_t status    = status::ATA_TIMEOUT;
         uint8_t ata_status = 0;
 
@@ -766,9 +765,9 @@ namespace drivers::ata
      */
     [[nodiscard]]
     status_t
-    Programmable_IO::wait_until_sector_transfer_ready(_INOUT_ uint16_t* buffer,
+    Programmable_IO::wait_until_sector_transfer_ready(_INOUT_ const uint16_t* buffer,
                                                       _IN_    const uint32_t sector_count) 
-                                                      noexcept { 
+                                                      const noexcept { 
         status_t status = status::SUCCESS;
 
         if (!buffer) [[unlikely]] {
@@ -826,7 +825,7 @@ namespace drivers::ata
     status_t 
     Programmable_IO::transfer_sector_data(_INOUT_ uint16_t* buffer,
                                           _IN_    const uint32_t sector_count) 
-                                          noexcept { 
+                                          const noexcept { 
         status_t status = status::SUCCESS;
 
         if (!buffer) [[unlikely]] {
@@ -913,7 +912,7 @@ namespace drivers::ata
                                         _IN_    const uint32_t buffer_size,
                                         _IN_    const uint32_t relative_lba,
                                         _IN_    const uint32_t sector_count) 
-                                        noexcept {
+                                        const noexcept {
         status_t status       = status::SUCCESS;
         uint32_t absolute_lba = 0;
 
@@ -1026,12 +1025,11 @@ namespace drivers::ata
      */
     [[nodiscard]]
     status_t
-    Programmable_IO::try_chunk_transfer(_INOUT_ uint16_t* buffer,
-                                        _IN_    uint32_t buffer_size,
-                                        _IN_    uint32_t relative_lba,
-                                        _IN_    uint32_t chunk) noexcept {
-        status_t status        = status::ATA_TIMEOUT;
-        uint8_t error_register = 0;
+    Programmable_IO::try_chunk_transfer(_INOUT_ uint16_t* const buffer,
+                                        _IN_    const uint32_t buffer_size,
+                                        _IN_    const uint32_t relative_lba,
+                                        _IN_    const uint32_t chunk) const noexcept {
+        status_t status = status::ATA_TIMEOUT;
 
         status = validate_transfer_request(buffer, 
                                            buffer_size, 
@@ -1079,7 +1077,7 @@ namespace drivers::ata
 
 
     /**
-     * @brief ATA-PIO main method performing chunked read/write
+     * @brief Performs chunked read/write
      *        operations over a specific sector range.
      *
      * @param buffer       Pointer to a buffer for sector data.
@@ -1120,7 +1118,7 @@ namespace drivers::ata
     [[nodiscard]]
     status_t
     Programmable_IO::execute_transfer_request(_INOUT_ uint16_t* buffer,
-                                              _IN_    uint32_t buffer_size,
+                                              _IN_    const uint32_t buffer_size,
                                               _IN_    uint32_t relative_lba,
                                               _IN_    uint32_t sector_count)
                                               noexcept {
@@ -1306,7 +1304,7 @@ namespace drivers::ata
     [[nodiscard]]
     status_t 
     Programmable_IO::init() noexcept {
-        status_t status = status::SUCCESS;
+        status_t status       = status::SUCCESS;
         const uint32_t eflags = kernel::sys::save_eflags();
 
         struct Channel final { 

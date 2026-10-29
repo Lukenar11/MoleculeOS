@@ -97,13 +97,14 @@ namespace
          * @brief Initializes the ATA-PIO driver.
          */
         _API_
+        [[nodiscard]]
         virtual
         status_t
         init() noexcept = 0;
 
 
         /**
-         * @brief ATA-PIO main method performing chunked read
+         * @brief Performs chunked read
          *        operations over a specific sector range.
          *
          * @param operation Operation struct with buffer pointer,
@@ -120,7 +121,7 @@ namespace
 
 
         /**
-         * @brief ATA-PIO main method performing chunked write
+         * @brief Performs chunked write
          *        operations over a specific sector range.
          *
          * @param operation Operation struct with buffer pointer,
