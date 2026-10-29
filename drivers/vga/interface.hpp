@@ -20,7 +20,7 @@
 namespace
 {
     /**
-     * @brief   Provides an interface for driver properties.
+     * @brief Provides an interface for driver properties.
      * 
      * @details Provides driver properties that are accessible 
      *          at compile time and do not depend on a specific instance — 

@@ -5,11 +5,12 @@
  * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
  * @author    Lukenar11 (Luke Matthes)
  *
- * @note The driver only supports LBA28, for the sake of simplicity.
+ * @note The driver only supports 28-Bit LBA's, for the sake of simplicity.
  */
 
 
 #include "pio.hpp"
+
 #include <array.hpp>
 
 
@@ -57,6 +58,13 @@ namespace stdlib
 
 namespace drivers::ata
 {
+    /**
+     * @brief Defines driver action states.
+     * 
+     * @note This is an abstract representation of the 
+     *       user requested driver operation and 
+     *       has nothing to do with the ATA protocol.
+     */
     enum class Programmable_IO::Driver_Action : uint8_t {
         NONE  = 0x00,
         READ  = 0x01,
@@ -64,6 +72,12 @@ namespace drivers::ata
     };
 
 
+    /**
+     * @brief Defines the available ATA status codes.
+     * 
+     * @details The values ​​correspond to the status codes from the 
+     *          ATA status register, defined by the ATA specification.
+     */
     enum class Programmable_IO::ATA_Status : uint8_t {
         ERR  = 0x01,
         DRQ  = 0x08,
@@ -73,6 +87,12 @@ namespace drivers::ata
     };
 
 
+    /**
+     * @brief Defines the available ATA error codes.
+     * 
+     * @details The values ​​correspond to the error codes from the 
+     *          ATA error register, defined by the ATA specification.
+     */
     enum class Programmable_IO::ATA_Error : uint8_t {
         AMNF  = 0x01,
         TK0NF = 0x02,
@@ -85,6 +105,12 @@ namespace drivers::ata
     };
 
 
+    /**
+     * @brief Defines the available ATA command codes.
+     * 
+     * @details The values correspond to the command register codes
+     *          defined by the ATA specification.
+     */
     enum class Programmable_IO::ATA_Command : uint8_t {
         READ_SECTORS    = 0x20,
         WRITE_SECTORS   = 0x30,
@@ -93,12 +119,24 @@ namespace drivers::ata
     };
 
 
+    /**
+     * @brief Defines the available ATA control register flags.
+     * 
+     * @details The values correspond to the control register bits,
+     *          defined by the ATA specification.
+     */
     enum class Programmable_IO::ATA_Control : uint8_t {
         DCR_DEFAULT = 0x00,
         RST         = 0x04
     };
 
 
+    /**
+     * @brief Defines the available ATA I/O and control port base addresses.
+     * 
+     * @details The values correspond to the standard primary and secondary
+     *          ATA channel base addresses for the data and control registers.
+     */
     enum class Programmable_IO::ATA_Port : uint16_t {
         IDE_SECONDARY_IO_BASE  = 0x0170,
         IDE_PRIMARY_IO_BASE    = 0x01F0,
@@ -107,6 +145,13 @@ namespace drivers::ata
     };
 
 
+    /**
+     * @brief Defines the available ATA device select values.
+     * 
+     * @details The values correspond to the Drive/Head register base values
+     *          used to select the master or slave device and to prepare the
+     *          Drive/Head register for ATA access.
+     */
     enum class Programmable_IO::ATA_Device : uint8_t {
         MASTER_SELECT = 0xA0,
         SLAVE_SELECT  = 0xB0,
@@ -120,17 +165,21 @@ namespace drivers::ata
      *        allowed LBA range.
      *
      * @param buffer       Pointer to a buffer for sector data.
+     * @param buffer_size  Buffer byte size.
      * @param relative_lba LBA start address.
      * @param to_transfer  Number of sectors to read or write.
      *
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
      *          If `buffer` is a `nullptr`.
+     * 
+     * @retval `status::BUFFER_TOO_SMALL | status::flags::PARAM_B`
+     *          If `buffer_size` is too small for the requested transfer.
      *
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_B`
+     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
      *          If `relative_lba` is outside the valid partition range or 
      *          the requested transfer range exceeds the partition length.
      *
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
+     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D`
      *          If `to_transfer` is `0` or exceeds the 
      *          allowed maximum sectorcount.
      * 
@@ -143,32 +192,38 @@ namespace drivers::ata
     [[nodiscard]] 
     status_t
     Programmable_IO::validate_transfer_request(_IN_ const uint16_t* const buffer,
+                                               _IN_ const uint32_t buffer_size,
                                                _IN_ const uint32_t relative_lba,
                                                _IN_ const uint32_t to_transfer)
                                                noexcept {
         status_t status = status::SUCCESS;
-
-        if (!buffer) [[unlikely]] {
-            status = status::NULL_POINTER | status::flags::PARAM_A;
-            goto cleanup;
-        }
 
         if (identify_data.partition_length == 0) [[unlikely]] {
             status = status::ATA_NO_DEVICE;
             goto cleanup;
         }
 
+        if (!buffer) [[unlikely]] {
+            status = status::NULL_POINTER | status::flags::PARAM_A;
+            goto cleanup;
+        }
+
         if (to_transfer == 0 ||
             to_transfer > identify_data.partition_length ||
             to_transfer > MAX_ALLOWED_SECTOR_COUNT) [[unlikely]] {
-            status = status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C;
+            status = status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D;
             goto cleanup;
         }
-        
+
+        if (to_transfer > (buffer_size / SECTOR_SIZE)) [[unlikely]] {
+            status = status::BUFFER_TOO_SMALL | status::flags::PARAM_B;
+            goto cleanup;
+        }
+
         if (relative_lba >= identify_data.partition_length ||
             to_transfer > 
             (identify_data.partition_length - relative_lba)) [[unlikely]] {
-            status = status::ATA_INVALID_LBA | status::flags::PARAM_B;
+            status = status::ATA_INVALID_LBA | status::flags::PARAM_C;
             goto cleanup;
         }
 
@@ -795,17 +850,21 @@ namespace drivers::ata
      *        at a specific LBA address.
      *
      * @param buffer       Pointer to a buffer for sector data.
+     * @param buffer_size  Buffer byte size.
      * @param relative_lba LBA start address.
      * @param sector_count Number of sectors to transfer.
      *
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
      *          If `buffer` is a `nullptr`.
+     * 
+     * @retval `status::BUFFER_TOO_SMALL | status::flags::PARAM_B` 
+     *          If `buffer_size` is too small for the requested transfer.
      *
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_B`
+     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
      *          If `relative_lba` is outside the valid partition range or 
      *          the requested transfer range exceeds the partition length.
      *
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
+     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D`
      *          If `to_transfer` is `0` or exceeds the 
      *          allowed maximum sectorcount.
      * 
@@ -827,13 +886,17 @@ namespace drivers::ata
     [[nodiscard]]
     status_t 
     Programmable_IO::start_pio_transfer(_INOUT_ uint16_t* const buffer,
+                                        _IN_    const uint32_t buffer_size,
                                         _IN_    const uint32_t relative_lba,
                                         _IN_    const uint32_t sector_count) 
                                         noexcept {
         status_t status       = status::SUCCESS;
         uint32_t absolute_lba = 0;
 
-        status = validate_transfer_request(buffer, relative_lba, sector_count);
+        status = validate_transfer_request(buffer, 
+                                           buffer_size, 
+                                           relative_lba, 
+                                           sector_count);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -872,7 +935,18 @@ namespace drivers::ata
         }
 
         status = transfer_sector_data(buffer, sector_count);
-        if  (status != status::SUCCESS) [[unlikely]] {
+        switch (status) {
+        case status::SUCCESS:
+            break;
+
+        case status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B:
+            // The status flag `PARAM_B` is changed to `PARAM_D`, 
+            // so that the returned status code matches the method signature.
+
+            status = status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D;
+            goto cleanup;
+
+        default:
             goto cleanup;
         }
 
@@ -893,17 +967,21 @@ namespace drivers::ata
      *        with error and retries handling.
      *
      * @param buffer       Pointer to a buffer for sector data.
+     * @param buffer_size  Buffer byte size.
      * @param relative_lba LBA start address.
      * @param chunk        Number of sectors in this transfer chunk.
      *
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
      *          If `buffer` is a `nullptr`.
+     * 
+     * @retval `status::BUFFER_TOO_SMALL | status::flags::PARAM_B` 
+     *          If buffer_size is too small for the requested transfer.
      *
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_B`
+     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
      *          If `relative_lba` is outside the valid partition range or 
      *          the requested transfer range exceeds the partition length.
      *
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
+     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D`
      *          If `to_transfer` is `0` or exceeds the 
      *          allowed maximum sectorcount.
      * 
@@ -925,12 +1003,16 @@ namespace drivers::ata
     [[nodiscard]]
     status_t
     Programmable_IO::try_chunk_transfer(_INOUT_ uint16_t* buffer,
+                                        _IN_    uint32_t buffer_size,
                                         _IN_    uint32_t relative_lba,
                                         _IN_    uint32_t chunk) noexcept {
         status_t status        = status::ATA_TIMEOUT;
         uint8_t error_register = 0;
 
-        status = validate_transfer_request(buffer, relative_lba, chunk);
+        status = validate_transfer_request(buffer, 
+                                           buffer_size, 
+                                           relative_lba, 
+                                           chunk);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -938,7 +1020,10 @@ namespace drivers::ata
         for (int32_t retries = MAX_RETRIES; 
              retries >= 0; 
              --retries) [[likely]] {
-            status = start_pio_transfer(buffer, relative_lba, chunk);
+            status = start_pio_transfer(buffer, 
+                                        buffer_size, 
+                                        relative_lba, 
+                                        chunk);
 
             switch (status) {
             case status::ATA_DEVICE_FAULT:
@@ -985,20 +1070,23 @@ namespace drivers::ata
      *        operations over a specific sector range.
      *
      * @param buffer       Pointer to a buffer for sector data.
+     * @param buffer_size  Buffer byte size.
      * @param relative_lba LBA start address.
      * @param sector_count Number of sectors to transfer.
      * 
-     * @note If `sector_count` is `0`, 
-     *       the `sector_count` is set to `256`.
+     * @note If `sector_count` is `0`, the `sector_count` is set to `256`.
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
      *          If `buffer` is a `nullptr`.
      *
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_B`
+     * @retval `status::BUFFER_TOO_SMALL | status::flags::PARAM_B`
+     *          If `buffer_size` is too small for the requested transfer.
+     * 
+     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
      *          If `relative_lba` is outside the valid partition range or 
      *          the requested transfer range exceeds the partition length.
      *
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
+     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D`
      *          If `sector_count` exceeds the allowed maximum sectorcount.
      * 
      * @retval `status::ATA_NO_DEVICE`
@@ -1017,22 +1105,28 @@ namespace drivers::ata
      *          Default case.
      */ 
     [[nodiscard]]
-    status_t 
+    status_t
     Programmable_IO::execute_transfer_request(_INOUT_ uint16_t* buffer,
+                                              _IN_    uint32_t buffer_size,
                                               _IN_    uint32_t relative_lba,
-                                              _IN_    uint32_t sector_count) 
+                                              _IN_    uint32_t sector_count)
                                               noexcept {
-        status_t status = status::SUCCESS;
-        uint32_t chunk  = 0;
-        const uint32_t eflags = kernel::sys::save_eflags();
+        status_t status           = status::SUCCESS;
+        uint32_t chunk            = 0;
+        uint32_t chunk_byte_size  = 0;
+        uint32_t used_buffer_size = 0;
+        const uint32_t eflags     = kernel::sys::save_eflags();
 
         kernel::sys::disable_interrupts();
-        
+
         if (sector_count == 0) [[unlikely]] {
             sector_count = MAX_ALLOWED_SECTOR_COUNT;
         }
 
-        status = validate_transfer_request(buffer, relative_lba, sector_count);
+        status = validate_transfer_request(buffer,
+                                           buffer_size,
+                                           relative_lba,
+                                           sector_count);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -1045,27 +1139,35 @@ namespace drivers::ata
         while (sector_count > 0) [[likely]] {
             if (sector_count > CHUNK_SECTORS) {
                 chunk = CHUNK_SECTORS;
-            }
+            } 
             else {
                 chunk = sector_count;
             }
 
-            if (relative_lba > UINT32_MAX - chunk) [[unlikely]] {
-                status = status::ATA_INVALID_LBA | status::flags::PARAM_B;
+            chunk_byte_size = chunk * SECTOR_SIZE;
+
+            if (chunk_byte_size > 
+                (buffer_size - used_buffer_size)) [[unlikely]] {
+                status = status::BUFFER_TOO_SMALL | status::flags::PARAM_B;
                 break;
             }
 
-            if (*buffer > 
-                (UINT16_MAX - (chunk * SECTOR_WORD_SIZE))) [[unlikely]] {
-                status = status::NULL_POINTER | status::flags::PARAM_A;
+            if (reinterpret_cast<uint32_t>(buffer) > 
+                (UINT32_MAX - chunk_byte_size)) [[unlikely]] {
+                status = status::BUFFER_TOO_SMALL | status::flags::PARAM_B;
                 break;
             }
 
-            status = try_chunk_transfer(buffer, relative_lba, chunk);
+            status = try_chunk_transfer(buffer,
+                                        buffer_size - used_buffer_size,
+                                        relative_lba,
+                                        chunk);
             if (status != status::SUCCESS) [[unlikely]] {
                 break;
             }
-    
+
+            used_buffer_size += chunk_byte_size;
+
             buffer       += chunk * SECTOR_WORD_SIZE;
             relative_lba += chunk;
             sector_count -= chunk;
@@ -1290,6 +1392,7 @@ namespace drivers::ata
         driver_action = Driver_Action::READ;
 
         status_t status = execute_transfer_request(operation.buffer, 
+                                                   operation.buffer_size,
                                                    operation.relative_lba, 
                                                    operation.sector_count);
         switch (status) {
@@ -1357,6 +1460,7 @@ namespace drivers::ata
         driver_action = Driver_Action::WRITE;
 
         status_t status = execute_transfer_request(operation.buffer, 
+                                                   operation.buffer_size,
                                                    operation.relative_lba, 
                                                    operation.sector_count);
         switch (status) {

@@ -18,6 +18,13 @@
 
 namespace
 {
+    /**
+     * @brief Provides an interface for driver properties.
+     * 
+     * @details Provides driver properties that are accessible at compile time
+     *          and do not depend on a specific instance, such as the ATA
+     *          protocol-specific configuration.
+     */
     template<typename Func>
     class Static_ATA_Interface {
     public:
@@ -56,6 +63,13 @@ namespace
     };
 
 
+    /**
+     * @brief Provides an interface for storage access.
+     * 
+     * @details Provides runtime operations required by a hard drive driver,
+     *          such as transferring data to and 
+     *          from a specific memory address.
+     */
     template <typename T>
     class Dynamic_ATA_Interface {
     public:
@@ -126,6 +140,12 @@ namespace
 
 namespace drivers::ata
 {
+    /**
+     * @brief Links driver properties to operations for storage drivers.
+     * 
+     * @details It serves as a common foundation for 
+     *          specific driver implementations.
+     */
     template<typename Func, typename T>
     class Interface : public Static_ATA_Interface<Func>,
                       public Dynamic_ATA_Interface<T> {

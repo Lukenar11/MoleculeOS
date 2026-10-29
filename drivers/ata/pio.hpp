@@ -5,7 +5,7 @@
  * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
  * @author    Lukenar11 (Luke Matthes)
  *
- * @note The driver only supports LBA28, for the sake of simplicity.
+ * @note The driver only supports 28-Bit LBA's, for the sake of simplicity.
  */
 
 
@@ -16,13 +16,39 @@
 
 namespace drivers::ata
 {
+    /**
+     * @brief Represents an ATA-PIO driver operation.
+     * 
+     * @note `buffer`
+     *        is set to `nullptr` by default.
+     * 
+     * @note `buffer_size` 
+     *        is set to `0` by default.
+     * 
+     * @note `relative_lba`
+     *        is set to `0` by default.
+     * 
+     * @note `sector_count`
+     *        is set to `0` by default.
+     */
     struct Programmable_IO_Operation final {
         uint16_t* buffer      = nullptr;
+        uint32_t buffer_size  = 0;
         uint32_t relative_lba = 0;
-        uint32_t sector_count = 1;
+        uint32_t sector_count = 0;
     };
 
-
+    /**
+     * @brief Provides an ATA-PIO driver for storage access.
+     * 
+     * @details Implements storage access to the 
+     *          classic PATA 40-Pin hard drives.
+     * 
+     * @details Supports data transfer from RAM to the hard drive and
+     *          data transfer from the hard drive to the RAM,
+     *          based on a starting LBA28 address and 
+     *          a number of sectors to be transferred.
+     */
     class Programmable_IO : public Interface<Programmable_IO, 
                                              Programmable_IO_Operation> {
     private:
@@ -37,7 +63,7 @@ namespace drivers::ata
 
         static constexpr uint32_t ATA_LBA28_OVERFLOW  = 0xFFFFFFFF;
         static constexpr uint32_t ATA_LBA28_MAX       = 0x0FFFFFFF;
-        static constexpr uint32_t ATA_LBA_SUPPORT_BIT = 0x0200;
+        static constexpr uint16_t ATA_LBA_SUPPORT_BIT = 0x0200;
 
         static constexpr uint8_t NIBBLE_MASK = 0x0F;
         static constexpr uint8_t BYTE_MASK   = 0xFF;
@@ -76,17 +102,21 @@ namespace drivers::ata
          *        allowed LBA range.
          *
          * @param buffer       Pointer to a buffer for sector data.
+         * @param buffer_size  Buffer byte size.
          * @param relative_lba LBA start address.
          * @param to_transfer  Number of sectors to read or write.
          *
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
          *          If `buffer` is a `nullptr`.
+         * 
+         * @retval `status::BUFFER_TOO_SMALL | status::flags::PARAM_B`
+         *          If `buffer_size` is too small for the requested transfer.
          *
-         * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_B`
+         * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
          *          If `relative_lba` is outside the valid partition range or 
          *          the requested transfer range exceeds the partition length.
          *
-         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
+         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D`
          *          If `to_transfer` is `0` or exceeds the 
          *          allowed maximum sectorcount.
          * 
@@ -99,6 +129,7 @@ namespace drivers::ata
         [[nodiscard]] 
         status_t 
         validate_transfer_request(_IN_ const uint16_t* const buffer,
+                                  _IN_ const uint32_t buffer_size,
                                   _IN_ const uint32_t relative_lba, 
                                   _IN_ const uint32_t to_transfer) noexcept;
 
@@ -363,17 +394,21 @@ namespace drivers::ata
          *        at a specific LBA address.
          *
          * @param buffer       Pointer to a buffer for sector data.
+         * @param buffer_size  Buffer byte size.
          * @param relative_lba LBA start address.
          * @param sector_count Number of sectors to transfer.
          *
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
          *          If `buffer` is a `nullptr`.
+         * 
+         * @retval `status::BUFFER_TOO_SMALL | status::flags::PARAM_B` 
+         *          If `buffer_size` is too small for the requested transfer.
          *
-         * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_B`
+         * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
          *          If `relative_lba` is outside the valid partition range or 
          *          the requested transfer range exceeds the partition length.
          *
-         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
+         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D`
          *          If `to_transfer` is `0` or exceeds the 
          *          allowed maximum sectorcount.
          * 
@@ -395,8 +430,10 @@ namespace drivers::ata
         [[nodiscard]] 
         status_t 
         start_pio_transfer(_INOUT_ uint16_t* const buffer,
+                           _IN_    const uint32_t buffer_size,
                            _IN_    const uint32_t relative_lba,
                            _IN_    const uint32_t sector_count) noexcept;
+
 
 
         /**
@@ -404,17 +441,21 @@ namespace drivers::ata
          *        with error and retries handling.
          *
          * @param buffer       Pointer to a buffer for sector data.
+         * @param buffer_size  Buffer byte size.
          * @param relative_lba LBA start address.
          * @param chunk        Number of sectors in this transfer chunk.
          *
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
          *          If `buffer` is a `nullptr`.
+         * 
+         * @retval `status::BUFFER_TOO_SMALL | status::flags::PARAM_B` 
+         *          If buffer_size is too small for the requested transfer.
          *
-         * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_B`
+         * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
          *          If `relative_lba` is outside the valid partition range or 
          *          the requested transfer range exceeds the partition length.
          *
-         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
+         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D`
          *          If `to_transfer` is `0` or exceeds the 
          *          allowed maximum sectorcount.
          * 
@@ -436,6 +477,7 @@ namespace drivers::ata
         [[nodiscard]]
         status_t
         try_chunk_transfer(_INOUT_ uint16_t* buffer,
+                           _IN_    uint32_t buffer_size,
                            _IN_    uint32_t relative_lba,
                            _IN_    uint32_t chunk) noexcept;
 
@@ -448,8 +490,7 @@ namespace drivers::ata
          * @param relative_lba LBA start address.
          * @param sector_count Number of sectors to transfer.
          * 
-         * @note If `sector_count` is `0`, 
-         *       the `sector_count` is set to `256`.
+         * @note If `sector_count` is `0`, the `sector_count` is set to `256`.
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
          *          If `buffer` is a `nullptr`.
@@ -479,6 +520,7 @@ namespace drivers::ata
         [[nodiscard]]
         status_t 
         execute_transfer_request(_INOUT_ uint16_t* buffer,
+                                 _IN_    uint32_t buffer_size,
                                  _IN_    uint32_t relative_lba,
                                  _IN_    uint32_t sector_count) noexcept;
 

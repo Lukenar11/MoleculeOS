@@ -178,10 +178,12 @@ namespace
         }
 
         operation.buffer       = temp_buffer_ptr;
+        operation.buffer_size  = 32768;
         operation.relative_lba = start_sector;
         operation.sector_count = sector_count;
 
         status = driver.load_sectors(operation);
+
         if (status != status::SUCCESS) [[unlikely]] {
             if (status & status::flags::PARAM_A) {
                 status ^= status::flags::PARAM_A;
@@ -267,6 +269,7 @@ namespace
         }
 
         operation.buffer       = temp_buffer_ptr;
+        operation.buffer_size  = 32768;
         operation.relative_lba = start_sector;
         operation.sector_count = sector_count;
 
@@ -411,7 +414,6 @@ namespace
         status = heap::allocate(ptr, allocation_size);
         if (status != status::SUCCESS) [[unlikely]] {
             status = status::FAIL;
-
             goto cleanup;
         }
 
@@ -882,7 +884,6 @@ namespace kernel::storemgr
 
         status = driver.init();
         if (status != status::SUCCESS) [[unlikely]] {
-            sys::hang();
             sys::panic("ATA-Driver init fail!");
         }
     

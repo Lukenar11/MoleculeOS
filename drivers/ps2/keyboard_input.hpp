@@ -21,6 +21,7 @@ NOTES:
 #pragma once
 
 #include "interface.hpp"
+
 #include <types.hpp>
 #include <circular_buffer.hpp>
 

@@ -123,8 +123,8 @@ namespace drivers::vga
                        status::flags::PARAM_B)) [[unlikely]] {
             // The `PARAM_B` flag is changed to `PARAM_A`, 
             // so that the returned status code matches the method signature.
-            status = status::INVALID_PARAMETER | status::flags::PARAM_A;
             
+            status = status::INVALID_PARAMETER | status::flags::PARAM_A;
             goto cleanup;
         }
 
@@ -183,8 +183,8 @@ namespace drivers::vga
                        status::flags::PARAM_B)) [[unlikely]] {
             // The `PARAM_B` flag is changed to `PARAM_C`, 
             // so that the returned status code matches the method signature.
-            status = status::INVALID_PARAMETER | status::flags::PARAM_C;
 
+            status = status::INVALID_PARAMETER | status::flags::PARAM_C;
             goto cleanup;
         }
 
