@@ -22,6 +22,9 @@ namespace drivers::ata
      * @note `buffer`
      *        is set to `nullptr` by default.
      * 
+     * @note `resume_cursor`
+     *        is set to `nullptr` by default.
+     * 
      * @note `buffer_size` 
      *        is set to `0` by default.
      * 
@@ -32,10 +35,11 @@ namespace drivers::ata
      *        is set to `0` by default.
      */
     struct Programmable_IO_Operation final {
-        uint16_t* buffer      = nullptr;
-        uint32_t buffer_size  = 0;
-        uint32_t relative_lba = 0;
-        uint32_t sector_count = 0;
+        uint16_t* buffer        = nullptr;
+        uint16_t* resume_cursor = nullptr;
+        uint32_t buffer_size    = 0;
+        uint32_t relative_lba   = 0;
+        uint32_t sector_count   = 0;
     };
 
 
@@ -368,7 +372,7 @@ namespace drivers::ata
          */
         [[nodiscard]]
         status_t
-        wait_until_sector_transfer_ready(_INOUT_ const uint16_t* const buffer, 
+        wait_until_sector_transfer_ready(_INOUT_ uint16_t*& buffer, 
                                          _IN_    const uint32_t sector_count)
                                          const noexcept;
 
@@ -400,7 +404,7 @@ namespace drivers::ata
          */
         [[nodiscard]] 
         status_t
-        transfer_sector_data(_INOUT_ uint16_t* buffer,
+        transfer_sector_data(_INOUT_ uint16_t*& buffer,
                              _IN_    const uint32_t sector_count) const noexcept;
 
 
@@ -444,7 +448,7 @@ namespace drivers::ata
          */
         [[nodiscard]] 
         status_t 
-        start_pio_transfer(_INOUT_ uint16_t* const buffer,
+        start_pio_transfer(_INOUT_ uint16_t*& buffer,
                            _IN_    const uint32_t buffer_size,
                            _IN_    const uint32_t relative_lba,
                            _IN_    const uint32_t sector_count) const noexcept;
@@ -491,7 +495,7 @@ namespace drivers::ata
          */
         [[nodiscard]]
         status_t
-        try_chunk_transfer(_INOUT_ uint16_t* const buffer,
+        try_chunk_transfer(_INOUT_ uint16_t*& buffer,
                            _IN_    const uint32_t buffer_size,
                            _IN_    const uint32_t relative_lba,
                            _IN_    const uint32_t chunk) const noexcept;
@@ -534,7 +538,7 @@ namespace drivers::ata
          */ 
         [[nodiscard]]
         status_t 
-        execute_transfer_request(_INOUT_ uint16_t* const buffer,
+        execute_transfer_request(_INOUT_ uint16_t*& buffer,
                                  _IN_    const uint32_t buffer_size,
                                  _IN_    uint32_t relative_lba,
                                  _IN_    uint32_t sector_count) noexcept;

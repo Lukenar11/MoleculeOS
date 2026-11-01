@@ -765,7 +765,7 @@ namespace drivers::ata
      */
     [[nodiscard]]
     status_t
-    Programmable_IO::wait_until_sector_transfer_ready(_INOUT_ const uint16_t* buffer,
+    Programmable_IO::wait_until_sector_transfer_ready(_INOUT_ uint16_t*& buffer,
                                                       _IN_    const uint32_t sector_count) 
                                                       const noexcept { 
         status_t status = status::SUCCESS;
@@ -823,7 +823,7 @@ namespace drivers::ata
      */
     [[nodiscard]]
     status_t 
-    Programmable_IO::transfer_sector_data(_INOUT_ uint16_t* buffer,
+    Programmable_IO::transfer_sector_data(_INOUT_ uint16_t*& buffer,
                                           _IN_    const uint32_t sector_count) 
                                           const noexcept { 
         status_t status = status::SUCCESS;
@@ -908,7 +908,7 @@ namespace drivers::ata
      */
     [[nodiscard]]
     status_t 
-    Programmable_IO::start_pio_transfer(_INOUT_ uint16_t* const buffer,
+    Programmable_IO::start_pio_transfer(_INOUT_ uint16_t*& buffer,
                                         _IN_    const uint32_t buffer_size,
                                         _IN_    const uint32_t relative_lba,
                                         _IN_    const uint32_t sector_count) 
@@ -1025,7 +1025,7 @@ namespace drivers::ata
      */
     [[nodiscard]]
     status_t
-    Programmable_IO::try_chunk_transfer(_INOUT_ uint16_t* const buffer,
+    Programmable_IO::try_chunk_transfer(_INOUT_ uint16_t*& buffer,
                                         _IN_    const uint32_t buffer_size,
                                         _IN_    const uint32_t relative_lba,
                                         _IN_    const uint32_t chunk) const noexcept {
@@ -1117,7 +1117,7 @@ namespace drivers::ata
      */ 
     [[nodiscard]]
     status_t
-    Programmable_IO::execute_transfer_request(_INOUT_ uint16_t* buffer,
+    Programmable_IO::execute_transfer_request(_INOUT_ uint16_t*& buffer,
                                               _IN_    const uint32_t buffer_size,
                                               _IN_    uint32_t relative_lba,
                                               _IN_    uint32_t sector_count)
@@ -1402,6 +1402,8 @@ namespace drivers::ata
                                   noexcept {
         driver_action = Driver_Action::READ;
 
+        uint16_t* buffer_begin = operation.buffer;
+
         status_t status = execute_transfer_request(operation.buffer, 
                                                    operation.buffer_size,
                                                    operation.relative_lba, 
@@ -1420,7 +1422,10 @@ namespace drivers::ata
 
             status = status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_A;
             break;
-        }   
+        }
+
+        operation.current_buffer_index = operation.buffer;
+        operation.buffer               = buffer_begin;
 
         return status;
     }
@@ -1470,6 +1475,8 @@ namespace drivers::ata
                                    noexcept {
         driver_action = Driver_Action::WRITE;
 
+        uint16_t* buffer_begin = operation.buffer;
+
         status_t status = execute_transfer_request(operation.buffer, 
                                                    operation.buffer_size,
                                                    operation.relative_lba, 
@@ -1489,6 +1496,9 @@ namespace drivers::ata
             status = status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_A;
             break;
         }
+
+        operation.current_buffer_index = operation.buffer;
+        operation.buffer               = buffer_begin;
 
         return status;
     }
