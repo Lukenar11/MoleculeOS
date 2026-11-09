@@ -166,5 +166,5 @@ namespace kernel::heap
         _API_ 
         [[nodiscard]]
         status_t 
-        deallocate(_INOUT_ void* block_ptr) noexcept;
+        deallocate(_INOUT_ void*& block_ptr) noexcept;
 } // namespace kernel::heap

@@ -28,32 +28,32 @@ namespace shell::commands
         stdlib::console::reset();
         stdlib::console::put_string("Files:\n");
 
-        File_Entry file_entry;
-        for (uint32_t i = 0; i < FILE_TABLE_ENTRYS; i++) [[likely]] {
-            file_entry = get_file_entry(i);
+        // File_Entry file_entry;
+        // for (uint32_t i = 0; i < FILE_TABLE_ENTRYS; i++) [[likely]] {
+        //     file_entry = get_file_entry(i);
 
-            if (!file_entry.file_data_ptr) {
-                continue;
-            }
+        //     if (!file_entry.file_data_ptr) {
+        //         continue;
+        //     }
 
-            if (file_entry.file_name[0] == '\0') [[unlikely]] {
-                static const char* error_message = "\t- [INVALID FILE]\n";
-                stdlib::console::put_string(error_message);
-                continue;
-            }
+        //     if (file_entry.file_name[0] == '\0') [[unlikely]] {
+        //         static const char* error_message = "\t- [INVALID FILE]\n";
+        //         stdlib::console::put_string(error_message);
+        //         continue;
+        //     }
 
-            stdlib::console::put_string("\t- ");
-            stdlib::console::put_string(file_entry.file_name.data());
+        //     stdlib::console::put_string("\t- ");
+        //     stdlib::console::put_string(file_entry.file_name.data());
 
-            if (file_entry.file_format[0] != '\0') {
-                stdlib::console::put_char('.');
-                stdlib::console::put_string(file_entry.file_format.data());
-            }
+        //     if (file_entry.file_format[0] != '\0') {
+        //         stdlib::console::put_char('.');
+        //         stdlib::console::put_string(file_entry.file_format.data());
+        //     }
 
-            stdlib::console::put_string(" (");
-            stdlib::console::put_uint(file_entry.file_byte_size);
-            stdlib::console::put_string(" Bytes)\n");
-        }
+        //     stdlib::console::put_string(" (");
+        //     stdlib::console::put_uint(file_entry.file_byte_size);
+        //     stdlib::console::put_string(" Bytes)\n");
+        // }
 
         stdlib::console::put_char('\n');
     }

@@ -80,16 +80,46 @@ namespace shell::commands
             return;
         }
 
-        if (copy_file(dest_parsed.name.data(),
-                                                dest_parsed.format.data(),
-                                                src_parsed.name.data(),
-                                                src_parsed.format.data()) != status::SUCCESS) {
+        kernel::filesys::Handle src_handle;
+        kernel::filesys::open_file(src_handle, 
+                                   src_parsed.name.data(), 
+                                   src_parsed.format.data(), 
+                                   kernel::filesys::Handle_Flags::READ);
+
+        kernel::filesys::Handle dest_handle;
+        kernel::filesys::open_file(dest_handle, 
+                                   dest_parsed.name.data(), 
+                                   dest_parsed.format.data(), 
+                                   kernel::filesys::Handle_Flags::WRITE | 
+                                   kernel::filesys::Handle_Flags::CREATE |
+                                   kernel::filesys::Handle_Flags::TRUNCATE);
+
+        uint32_t size;
+        void* buffer;
+
+        kernel::filesys::get_file_size(size, src_handle);
+        kernel::heap::allocate(buffer, size);
+
+        kernel::filesys::read_file(src_handle, 
+                                   reinterpret_cast<uint8_t*>(buffer), 
+                                   size, 
+                                   0, 
+                                   size - 1);
+
+        status_t status = kernel::filesys::write_file(dest_handle, 
+                                                      reinterpret_cast<const uint8_t*>(buffer), 
+                                                      size, 
+                                                      0, 
+                                                      size - 1);
+        if (status != status::SUCCESS) {
             print_command_error(command_name);
             print_command_error("copy failed");
             command_end();
             return;
         }
 
+        kernel::filesys::close_file(src_handle);
+        kernel::filesys::close_file(dest_handle);
         command_end();
     }
 }

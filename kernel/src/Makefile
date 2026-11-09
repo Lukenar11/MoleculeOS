@@ -4,9 +4,8 @@
 # https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 # 
 
-OBJS += $(BUILD)/mofs2.o \
+OBJS += $(BUILD)/mofs.o \
 		$(BUILD)/block.o \
-		$(BUILD)/storage_manager.o \
 		$(BUILD)/main.o \
 
 $(BUILD)/%.o: kernel/src/filesys/%.cpp

@@ -22,9 +22,9 @@ NOTES:
 namespace kernel::sys
 {
     void shutdown() noexcept {
-        if (storemgr::save_filesystem() != status::SUCCESS) [[unlikely]] {
-            sys::panic("save failed");
-        }
+        // if (storemgr::save_filesystem() != status::SUCCESS) [[unlikely]] {
+        //     sys::panic("save failed");
+        // }
         
         const uint32_t cpu_flags = save_eflags();
         for (const auto& entry : emulator_specific_shutdown_command_mappings) {

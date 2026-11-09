@@ -26,9 +26,9 @@ namespace kernel::sys
         const uint8_t input_buffer_full = 0x02;
         const uint8_t zero              = 0;
 
-        if (storemgr::save_filesystem() != status::SUCCESS) [[unlikely]] {
-            sys::panic("save failed");
-        }
+        // if (storemgr::save_filesystem() != status::SUCCESS) [[unlikely]] {
+        //     sys::panic("save failed");
+        // }
 
         uint32_t timeout = 100'000;
         while (timeout--) {

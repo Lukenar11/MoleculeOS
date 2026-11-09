@@ -46,7 +46,7 @@ namespace shell::commands
             if ((is_file_name && !append_char(parsed_filename.name, 
                                               file_name_index, 
                                               args[i])) ||
-                (file_name_index >= kernel::filesys::MAX_FILE_NAME_LENGTH)) {
+                (file_name_index >= kernel::filesys::max_name_length())) {
                 static const char* error_message = "filename too long";
                 stdlib::string::copy(parsed_filename.error.data(), error_message);
 
@@ -56,7 +56,7 @@ namespace shell::commands
             if (!(is_file_name || append_char(parsed_filename.format, 
                                               file_format_index, 
                                               args[i])) || 
-                (file_format_index >= kernel::filesys::MAX_FILE_FORMAT_LENGTH)) {
+                (file_format_index >= kernel::filesys::max_format_length())) {
                 static const char* error_message = "format too long";
                 stdlib::string::copy(parsed_filename.error.data(), error_message);
                 return parsed_filename;
@@ -79,20 +79,20 @@ namespace shell::commands
         }
 
         for (uint32_t i = 0; parsed_filename.name[i] != '\0'; i++)
-            if (!kernel::filesys::
-                 is_valid_name_or_format_char(parsed_filename.name[i])) {
-                static const char* error_message = "not a valid File Name";
-                stdlib::string::copy(parsed_filename.error.data(), error_message);
-                return parsed_filename;
-            }
+            // if (!kernel::filesys::
+            //      is_valid_name_or_format_char(parsed_filename.name[i])) {
+            //     static const char* error_message = "not a valid File Name";
+            //     stdlib::string::copy(parsed_filename.error.data(), error_message);
+            //     return parsed_filename;
+            // }
 
         for (uint32_t i = 0; parsed_filename.format[i] != '\0'; i++)
-            if (!kernel::filesys::
-                 is_valid_name_or_format_char(parsed_filename.format[i])) {
-                static const char* error_message = "not a valid File Format";
-                stdlib::string::copy(parsed_filename.error.data(), error_message);
-                return parsed_filename;
-            }
+            // if (!kernel::filesys::
+            //      is_valid_name_or_format_char(parsed_filename.format[i])) {
+            //     static const char* error_message = "not a valid File Format";
+            //     stdlib::string::copy(parsed_filename.error.data(), error_message);
+            //     return parsed_filename;
+            // }
 
         return parsed_filename;
     }

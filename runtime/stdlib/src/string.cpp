@@ -41,8 +41,8 @@ namespace
      */
     [[nodiscard]]
     status_t
-    validate_destination_ptr_and_source_ptr(_INOUT_ const char* const destination_ptr,
-                                            _IN_    const char* const source_ptr) noexcept {
+    validate_destination_ptr_and_source_ptr(_IN_ const char* const destination_ptr,
+                                            _IN_ const char* const source_ptr) noexcept {
         status_t status;
 
         if (!destination_ptr) [[unlikely]] {

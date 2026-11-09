@@ -137,20 +137,25 @@ namespace shell::commands
             return;
         }
 
-        File_Entry* file_entry;
-        find_file(file_entry,
-                                            parsed_filename.name.data(),
-                                            parsed_filename.format.data());
-        if (!file_entry)
-            create_file(file_entry,
-                                                  parsed_filename.name.data(),
-                                                  parsed_filename.format.data(),
-                                                  file_instream.size());
-            
+        kernel::filesys::Handle handle;
+        kernel::filesys::open_file(handle, 
+                                   parsed_filename.name.data(),
+                                   parsed_filename.format.data(),
+                                   kernel::filesys::Handle_Flags::WRITE |
+                                   kernel::filesys::Handle_Flags::CREATE |
+                                   kernel::filesys::Handle_Flags::APPEND);
+
         uint32_t length;
         stdlib::string::get_length(length, file_instream.data());
         const auto& instream = reinterpret_cast<const uint8_t*>(file_instream.data());
-        append_file(file_entry, instream, length);
+
+        kernel::filesys::write_file(handle, 
+                                    instream, 
+                                    sizeof(file_instream.data()) / sizeof(char), 
+                                    0, 
+                                    length - 1);
+
+        kernel::filesys::close_file(handle);
     }
 
     void handle_file_outstream(const stdlib::Array<char,64>& filename) noexcept {
@@ -166,18 +171,23 @@ namespace shell::commands
             return;
         }
 
-        File_Entry* file_entry;
-        find_file(file_entry,
-                                            parsed_filename.name.data(),
-                                            parsed_filename.format.data());
-        if (!file_entry) {
+        kernel::filesys::Handle handle;
+        status_t status = kernel::filesys::open_file(handle, 
+                                                     parsed_filename.name.data(),
+                                                     parsed_filename.format.data(),
+                                                     kernel::filesys::Handle_Flags::READ);
+        if (status != status::SUCCESS) {
             print_command_error(command_name);
             print_command_error("file not found\n");
             return;
         }
-
-        const uint32_t size = file_entry->used_data_byte_size + 1;
+    
+        uint32_t size;
         void* ptr;
+
+        kernel::filesys::get_file_size(size, handle);
+        size += 1;
+
         allocate(ptr, size);
         uint8_t* buffer = static_cast<uint8_t*>(ptr);
         if (!buffer) {
@@ -186,25 +196,23 @@ namespace shell::commands
             return;
         }
 
-        if (read_file(file_entry,
-                                                buffer,
-                                                size,
-                                                0,
-                                                file_entry->used_data_byte_size) 
-            != status::SUCCESS) {
+
+        status = kernel::filesys::read_file(handle, buffer, size, 0, size);
+        if (status != status::SUCCESS) [[unlikely]] {
             print_command_error(command_name);
             print_command_error("could not read file\n");
 
-            deallocate(buffer);
+            deallocate(ptr);
             return;
         }
 
-        buffer[file_entry->used_data_byte_size] = '\0';
+        buffer[size] = '\0';
 
         for (uint32_t i = 0; buffer[i] != '\0'; i++)
             stdlib::console::put_char(buffer[i]);
 
-        deallocate(buffer);
+        deallocate(ptr);
+        kernel::filesys::close_file(handle);
     }
 
     void echo(const stdlib::Array<char, 64>& args) noexcept {
@@ -276,7 +284,6 @@ namespace shell::commands
         }
 
         stdlib::console::put_string(args.data());
-
         command_end();
     }
 } // namespace shell::commands

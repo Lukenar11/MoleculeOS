@@ -34,20 +34,21 @@ namespace shell::commands
             return;
         }
 
-        kernel::filesys::File_Entry* file_entry;
-        kernel::filesys::find_file(file_entry,
-                                                             parsed_filename.name.data(), 
-                                                             parsed_filename.format.data());
-        if (!file_entry) {
-            print_command_error(command_name);
+        kernel::filesys::Handle handle;
+        status_t status = kernel::filesys::open_file(handle,
+                                                     parsed_filename.name.data(),
+                                                     parsed_filename.format.data(),
+                                                     kernel::filesys::Handle_Flags::READ);
+        if (status != status::SUCCESS) {
+            print_command_error(command_name);          
             print_command_error("File does not exist!");
-
         }
         else {
-            print_command_error(command_name);
-            print_command_error("File exists!");
+            print_command_error(command_name);  
+            print_command_error("File exists!");            
         }
 
+        kernel::filesys::close_file(handle);
         command_end();
     }
 } // namespace shell::commands

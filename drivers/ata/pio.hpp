@@ -25,7 +25,7 @@ namespace drivers::ata
      * @note `resume_cursor`
      *        is set to `nullptr` by default.
      * 
-     * @note `buffer_size` 
+     * @note `buffer_byte_size` 
      *        is set to `0` by default.
      * 
      * @note `relative_lba`
@@ -35,11 +35,11 @@ namespace drivers::ata
      *        is set to `0` by default.
      */
     struct Programmable_IO_Operation final {
-        uint16_t* buffer        = nullptr;
-        uint16_t* resume_cursor = nullptr;
-        uint32_t buffer_size    = 0;
-        uint32_t relative_lba   = 0;
-        uint32_t sector_count   = 0;
+        uint16_t* buffer          = nullptr;
+        uint16_t* resume_cursor   = nullptr;
+        uint32_t buffer_byte_size = 0;
+        uint32_t relative_lba     = 0;
+        uint32_t sector_count     = 0;
     };
 
 

@@ -25,8 +25,8 @@ NOTES:
 namespace shell::commands
 {
     struct Parsed_File_Name final {
-        stdlib::Array<char, kernel::filesys::MAX_FILE_NAME_LENGTH + 1> name;
-        stdlib::Array<char, kernel::filesys::MAX_FILE_FORMAT_LENGTH + 1> format;
+        stdlib::Array<char, kernel::filesys::max_name_length() + 1> name;
+        stdlib::Array<char, kernel::filesys::max_format_length() + 1> format;
         stdlib::Array<char, 32> error;
     };
 

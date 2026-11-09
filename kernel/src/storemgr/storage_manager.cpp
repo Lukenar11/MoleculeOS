@@ -178,7 +178,7 @@ namespace
         }
 
         operation.buffer       = temp_buffer_ptr;
-        operation.buffer_size  = 32768;
+        operation.buffer_byte_size  = 32768;
         operation.relative_lba = start_sector;
         operation.sector_count = sector_count;
 
@@ -269,7 +269,7 @@ namespace
         }
 
         operation.buffer       = temp_buffer_ptr;
-        operation.buffer_size  = 32768;
+        operation.buffer_byte_size  = 32768;
         operation.relative_lba = start_sector;
         operation.sector_count = sector_count;
 
@@ -922,7 +922,7 @@ namespace kernel::storemgr
     
     cleanup:
         sys::enable_interrupts();
-        sys::panic("Storage manager init failed!");
+        sys::panic("Storage-Manager init failed!");
     
     done:
         sys::enable_interrupts();

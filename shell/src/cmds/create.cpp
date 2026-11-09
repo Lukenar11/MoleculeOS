@@ -86,21 +86,20 @@ namespace shell::commands
             return;
         }
 
-        File_Entry* file_entry; 
-        create_file(file_entry, 
-                                              parsed_filename.name.data(),
-                                              parsed_filename.format.data(),
-                                              file_size);
-        if (!file_entry) [[unlikely]] {
-            static const char* error_message = "file could not be created";
-
+        kernel::filesys::Handle handle;
+        status_t status = kernel::filesys::open_file(handle, 
+                                                     parsed_filename.name.data(), 
+                                                     parsed_filename.format.data(), 
+                                                     kernel::filesys::Handle_Flags::CREATE);
+        if (status != status::SUCCESS) [[unlikely]] {
             print_command_error(command_name);
-            print_command_error(error_message);
+            print_command_error("file could not be created");
 
             command_end();
             return;
         }
 
+        kernel::filesys::close_file(handle);
         command_end();
     }
 } // namespace shell::commands

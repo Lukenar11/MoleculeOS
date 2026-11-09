@@ -36,10 +36,15 @@ namespace shell::commands
             return;
         }
 
-        if (delete_file(parsed_filename.name.data(),
-                                                  parsed_filename.format.data()) 
-            != status::SUCCESS) [[unlikely]] {
+        kernel::filesys::Handle handle;
+        kernel::filesys::open_file(handle, 
+                                   parsed_filename.name.data(), 
+                                   parsed_filename.format.data(),
+                                   kernel::filesys::Handle_Flags::WRITE);
+  
+        if (kernel::filesys::remove_file(handle) == status::NOT_FOUND) [[unlikely]] {
             static const char* error_message = "file does not exist";
+
             print_command_error(command_name);
             print_command_error(error_message);
 
@@ -47,6 +52,7 @@ namespace shell::commands
             return;
         }
 
+        kernel::filesys::close_file(handle);
         command_end();
     }
 } // namespace shell::commands

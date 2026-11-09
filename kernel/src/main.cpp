@@ -40,21 +40,12 @@ namespace kernel
     void 
     main() noexcept {
         heap::init(&heap_start, &heap_end);
-        storemgr::init();
 
-        if (storemgr::load_filesystem() != status::SUCCESS) [[unlikely]] {
-            sys::panic("load failed");
-        }
-        
         // schedule MoleculeOS
         static terminal::Terminal terminal;
         while (true) {
             sys::sleep();
             terminal.step();
-        }
-
-        if (storemgr::save_filesystem() != status::SUCCESS) [[unlikely]] {
-            sys::panic("save failed");
         }
 
         sys::panic("Unexpected return from the \"kernel::main\" scheduler main loop");

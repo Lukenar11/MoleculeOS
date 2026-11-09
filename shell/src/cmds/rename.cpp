@@ -94,18 +94,23 @@ namespace shell::commands
             return;
         }
 
-        if (rename_file(new_parsed_filename.name.data(),
-                                                  new_parsed_filename.format.data(),
-                                                  old_parsed_filename.name.data(),
-                                                  old_parsed_filename.format.data()) 
-                                                  != status::SUCCESS) {
-            print_command_error(command_name);
+        kernel::filesys::Handle handle;
+        kernel::filesys::open_file(handle, 
+                                   old_parsed_filename.name.data(),
+                                   old_parsed_filename.format.data(),
+                                   kernel::filesys::Handle_Flags::READ);
+
+        if (kernel::filesys::rename_file(new_parsed_filename.name.data(), 
+                                         new_parsed_filename.format.data(), 
+                                         handle)) {
+            print_command_error(command_name);          
             print_command_error("file renaming failed");
 
-            command_end();
+            command_end();                              
             return;
         }
 
+        kernel::filesys::close_file(handle);
         command_end();
     }
 } // namespace shell::commands

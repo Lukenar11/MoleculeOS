@@ -18,10 +18,8 @@ NOTES:
 
 #pragma once
 
-#include "kernel/include/filesys/mofs2.hpp"
-
+#include "kernel/include/filesys/mofs.hpp"
 #include "kernel/include/heap/block.hpp"
-#include "kernel/include/storemgr/storage_manager.hpp"
 
 #ifdef __I386__
 #   include "arch/i386/kernel/include/utils/regs.hpp"

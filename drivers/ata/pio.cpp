@@ -12,6 +12,7 @@
 #include "pio.hpp"
 
 #include <array.hpp>
+#include <io.hpp>
 
 
 namespace kernel::sys
@@ -30,30 +31,6 @@ namespace kernel::sys
     void 
     panic(const char* message) noexcept;
 } // namespace kernel::sys
-
-
-namespace stdlib
-{
-    _C_API_
-    uint8_t 
-    byte_input(uint16_t port);
-
-    _C_API_
-    void 
-    word_input_stream(uint16_t port, 
-                      uint32_t word_count,
-                      uint16_t* buffer);
-
-    _C_API_ 
-    void
-    byte_output(uint16_t port, uint8_t value);
-
-    _C_API_
-    void 
-    word_output_stream(uint16_t port, 
-                       uint32_t word_count,
-                       uint16_t* buffer);
-} // namespace stdlib
 
 
 namespace drivers::ata
@@ -1405,7 +1382,7 @@ namespace drivers::ata
         uint16_t* buffer_begin = operation.buffer;
 
         status_t status = execute_transfer_request(operation.buffer, 
-                                                   operation.buffer_size,
+                                                   operation.buffer_byte_size,
                                                    operation.relative_lba, 
                                                    operation.sector_count);
         switch (status) {
@@ -1424,8 +1401,8 @@ namespace drivers::ata
             break;
         }
 
-        operation.current_buffer_index = operation.buffer;
-        operation.buffer               = buffer_begin;
+        operation.resume_cursor = operation.buffer;
+        operation.buffer        = buffer_begin;
 
         return status;
     }
@@ -1478,7 +1455,7 @@ namespace drivers::ata
         uint16_t* buffer_begin = operation.buffer;
 
         status_t status = execute_transfer_request(operation.buffer, 
-                                                   operation.buffer_size,
+                                                   operation.buffer_byte_size,
                                                    operation.relative_lba, 
                                                    operation.sector_count);
         switch (status) {
@@ -1497,8 +1474,8 @@ namespace drivers::ata
             break;
         }
 
-        operation.current_buffer_index = operation.buffer;
-        operation.buffer               = buffer_begin;
+        operation.resume_cursor = operation.buffer;
+        operation.buffer        = buffer_begin;
 
         return status;
     }
