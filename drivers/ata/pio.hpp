@@ -103,40 +103,24 @@ namespace drivers::ata
 
 
         /**
-         * @brief Checks whether a memory access operation is within the
-         *        allowed LBA range.
+         * @brief Polls the ATA status register until device ready is set or 
+         *        an error appeared.
          *
-         * @param buffer       Pointer to a buffer for sector data.
-         * @param buffer_size  Buffer byte size.
-         * @param relative_lba LBA start address.
-         * @param to_transfer  Number of sectors to read or write.
+         * @retval `status::ATA_ERROR`
+         *          If an error is reported during the polls.
          *
-         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-         *          If `buffer` is a `nullptr`.
-         * 
-         * @retval `status::BUFFER_TOO_SMALL | status::flags::PARAM_B`
-         *          If `buffer_size` is too small for the requested transfer.
+         * @retval `status::ATA_DEVICE_FAULT`
+         *          If the device enters an error state.
          *
-         * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
-         *          If `relative_lba` is outside the valid partition range or 
-         *          the requested transfer range exceeds the partition length.
-         *
-         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D`
-         *          If `to_transfer` is `0` or exceeds the 
-         *          allowed maximum sectorcount.
-         * 
-         * @retval `status::ATA_NO_DEVICE`
-         *          If no device is configured.
+         * @retval `status::ATA_TIMEOUT`
+         *          If no response is received in the timeout period.
          *
          * @retval `status::SUCCESS`
          *          Default case.
          */
         [[nodiscard]] 
         status_t 
-        validate_transfer_request(_IN_ const uint16_t* const buffer,
-                                  _IN_ const uint32_t buffer_size,
-                                  _IN_ const uint32_t relative_lba, 
-                                  _IN_ const uint32_t to_transfer) const noexcept;
+        wait_until_unbusy_or_error() const noexcept;
 
 
         /**
@@ -164,17 +148,6 @@ namespace drivers::ata
 
 
         /**
-         * @brief Issues the ATA command `IDENTIFY` for the 
-         *        currently selected drive.
-         *
-         * @param drive_select Drive/Head register value, 
-         *                     selecting master or slave.
-         */
-        void
-        issue_identify_command(_IN_ const uint8_t drive_select) const noexcept;
-
-
-        /**
          * @brief Handles retryable ATA errors and updates the retry counter.
          * 
          * @param retries 
@@ -186,6 +159,38 @@ namespace drivers::ata
         [[nodiscard]]
         bool
         handle_retryable_ata_error(_INOUT_ int32_t& retries) const noexcept;
+
+
+        /**
+         * @brief Polls the ATA status register until device ready is set or 
+         *        an error appeared.
+         *
+         * @retval `status::ATA_ERROR`
+         *          If an error is reported during the polls.
+         *
+         * @retval `status::ATA_DEVICE_FAULT`
+         *          If the device enters an error state.
+         *
+         * @retval `status::ATA_TIMEOUT`
+         *          If no response is received in the timeout period.
+         *
+         * @retval `status::SUCCESS`
+         *          Default case.
+         */
+        [[nodiscard]] 
+        status_t 
+        wait_until_ready_or_error() const noexcept;
+
+
+        /**
+         * @brief Issues the ATA command `IDENTIFY` for the 
+         *        currently selected drive.
+         *
+         * @param drive_select Drive/Head register value, 
+         *                     selecting master or slave.
+         */
+        void
+        issue_identify_command(_IN_ const uint8_t drive_select) const noexcept;
 
 
         /**
@@ -275,12 +280,6 @@ namespace drivers::ata
          * @param io_port          Base I/O port of the ATA channel.
          * @param control_register Control register port of the ATA channel.
          *
-         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
-         *          If `io_port` is not a valid ATA channel.
-         *
-         * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
-         *          If the control register port is invalid.
-         * 
          * @retval `status::ATA_ERROR`
          *          If an error is reported during the `IDENTIFY` operation.
          *
@@ -301,247 +300,6 @@ namespace drivers::ata
         probe_and_configure_channel(_IN_ const uint16_t io_port,
                                     _IN_ const uint16_t control_register) 
                                     noexcept;
-
-
-        /**
-         * @brief Polls the ATA status register until device ready is set or 
-         *        an error appeared.
-         *
-         * @retval `status::ATA_ERROR`
-         *          If an error is reported during the polls.
-         *
-         * @retval `status::ATA_DEVICE_FAULT`
-         *          If the device enters an error state.
-         *
-         * @retval `status::ATA_TIMEOUT`
-         *          If no response is received in the timeout period.
-         *
-         * @retval `status::SUCCESS`
-         *          Default case.
-         */
-        [[nodiscard]] 
-        status_t 
-        wait_until_ready_or_error() const noexcept;
-
-
-        /**
-         * @brief Polls the ATA status register until device ready is set or 
-         *        an error appeared.
-         *
-         * @retval `status::ATA_ERROR`
-         *          If an error is reported during the polls.
-         *
-         * @retval `status::ATA_DEVICE_FAULT`
-         *          If the device enters an error state.
-         *
-         * @retval `status::ATA_TIMEOUT`
-         *          If no response is received in the timeout period.
-         *
-         * @retval `status::SUCCESS`
-         *          Default case.
-         */
-        [[nodiscard]] 
-        status_t 
-        wait_until_unbusy_or_error() const noexcept;
-
-
-        /**
-         * @brief Waits until the ATA status register indicates that a sector
-         *        transfer can proceed.
-         * 
-         * @param buffer       Pointer to a buffer for the sector data.
-         * @param sector_count Number of sectors to transfer.
-         * 
-         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-         *          If `buffer` is a `nullptr`.
-         * 
-         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B`
-         *          If `sector_count` is `0`.
-         *
-         * @retval `status::ATA_ERROR`
-         *          If an error is reported during the polls.
-         *
-         * @retval `status::ATA_DEVICE_FAULT`
-         *          If the device enters an error state.
-         *
-         * @retval `status::ATA_TIMEOUT`
-         *          If no response is received in the timeout period.
-         *
-         * @retval `status::SUCCESS`
-         *          Default case.
-         */
-        [[nodiscard]]
-        status_t
-        wait_until_sector_transfer_ready(_INOUT_ uint16_t*& buffer, 
-                                         _IN_    const uint32_t sector_count)
-                                         const noexcept;
-
-
-        /**
-         * @brief Performs a `PIO` read or write operation 
-         *        for a given number of sectors.
-         *
-         * @param buffer       Pointer to a buffer for the sector data.
-         * @param sector_count Number of sectors to transfer.
-         *
-         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-         *          If `buffer` is a `nullptr`.
-         * 
-         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B`
-         *          If `sector_count` is `0`.
-         * 
-         * @retval `status::ATA_ERROR`
-         *          If an error is reported during the transfer or polls.
-         *
-         * @retval `status::ATA_DEVICE_FAULT`
-         *          If the device enters an error state.
-         *
-         * @retval `status::ATA_TIMEOUT`
-         *          If no response is received in the timeout period.
-         *
-         * @retval `status::SUCCESS`
-         *          Default case.
-         */
-        [[nodiscard]] 
-        status_t
-        transfer_sector_data(_INOUT_ uint16_t*& buffer,
-                             _IN_    const uint32_t sector_count) const noexcept;
-
-
-        /**
-         * @brief Executes a complete ATA-PIO read or write operation starting 
-         *        at a specific LBA address.
-         *
-         * @param buffer       Pointer to a buffer for sector data.
-         * @param buffer_size  Buffer byte size.
-         * @param relative_lba LBA start address.
-         * @param sector_count Number of sectors to transfer.
-         *
-         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-         *          If `buffer` is a `nullptr`.
-         * 
-         * @retval `status::BUFFER_TOO_SMALL | status::flags::PARAM_B` 
-         *          If `buffer_size` is too small for the requested transfer.
-         *
-         * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
-         *          If `relative_lba` is outside the valid partition range or 
-         *          the requested transfer range exceeds the partition length.
-         *
-         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D`
-         *          If `to_transfer` is `0` or exceeds the 
-         *          allowed maximum sectorcount.
-         * 
-         * @retval `status::ATA_NO_DEVICE`
-         *          If no device is configured.
-         * 
-         * @retval `status::ATA_ERROR` 
-         *          If an error is reported during the polls.
-         *
-         * @retval `status::ATA_DEVICE_FAULT`
-         *          If the device enters an error state.
-         *
-         * @retval `status::ATA_TIMEOUT`
-         *          If no response is received in the timeout period.
-         *
-         * @retval `status::SUCCESS`
-         *          Default case.
-         */
-        [[nodiscard]] 
-        status_t 
-        start_pio_transfer(_INOUT_ uint16_t*& buffer,
-                           _IN_    const uint32_t buffer_size,
-                           _IN_    const uint32_t relative_lba,
-                           _IN_    const uint32_t sector_count) const noexcept;
-
-
-
-        /**
-         * @brief Tries to transfer one sector chunk, 
-         *        with error and retries handling.
-         *
-         * @param buffer       Pointer to a buffer for sector data.
-         * @param buffer_size  Buffer byte size.
-         * @param relative_lba LBA start address.
-         * @param chunk        Number of sectors in this transfer chunk.
-         *
-         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-         *          If `buffer` is a `nullptr`.
-         * 
-         * @retval `status::BUFFER_TOO_SMALL | status::flags::PARAM_B` 
-         *          If buffer_size is too small for the requested transfer.
-         *
-         * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
-         *          If `relative_lba` is outside the valid partition range or 
-         *          the requested transfer range exceeds the partition length.
-         *
-         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D`
-         *          If `to_transfer` is `0` or exceeds the 
-         *          allowed maximum sectorcount.
-         * 
-         * @retval `status::ATA_NO_DEVICE`
-         *          If no device is configured.
-         * 
-         * @retval `status::ATA_ERROR` 
-         *          If an error is reported during the polls.
-         *
-         * @retval `status::ATA_DEVICE_FAULT`
-         *          If the device enters an error state.
-         *
-         * @retval `status::ATA_TIMEOUT`
-         *          If no response is received in the timeout period.
-         *
-         * @retval `status::SUCCESS`
-         *          Default case.
-         */
-        [[nodiscard]]
-        status_t
-        try_chunk_transfer(_INOUT_ uint16_t*& buffer,
-                           _IN_    const uint32_t buffer_size,
-                           _IN_    const uint32_t relative_lba,
-                           _IN_    const uint32_t chunk) const noexcept;
-
-
-        /**
-         * @brief Performins chunked read/write
-         *        operations over a specific sector range.
-         *
-         * @param buffer       Pointer to a buffer for sector data.
-         * @param relative_lba LBA start address.
-         * @param sector_count Number of sectors to transfer.
-         * 
-         * @note If `sector_count` is `0`, the `sector_count` is set to `256`.
-         * 
-         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-         *          If `buffer` is a `nullptr`.
-         *
-         * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_B`
-         *          If `relative_lba` is outside the valid partition range or 
-         *          the requested transfer range exceeds the partition length.
-         *
-         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
-         *          If `sector_count` exceeds the allowed maximum sectorcount.
-         * 
-         * @retval `status::ATA_NO_DEVICE`
-         *          If no device is configured.
-         *
-         * @retval `status::ATA_ERROR`
-         *          If an error is reported during the transfer.
-         *
-         * @retval `status::ATA_DEVICE_FAULT`
-         *          If the device enters an error state.
-         *
-         * @retval `status::ATA_TIMEOUT`
-         *          If no response is received in the timeout period.
-         *
-         * @retval `status::SUCCESS`
-         *          Default case.
-         */ 
-        [[nodiscard]]
-        status_t 
-        execute_transfer_request(_INOUT_ uint16_t*& buffer,
-                                 _IN_    const uint32_t buffer_size,
-                                 _IN_    uint32_t relative_lba,
-                                 _IN_    uint32_t sector_count) noexcept;
 
 
         /**
@@ -578,6 +336,216 @@ namespace drivers::ata
                      _IN_ const uint16_t control_register) noexcept;
 
 
+        /**
+         * @brief Waits until the ATA status register indicates that a sector
+         *        transfer can proceed.
+         * 
+         * @param buffer       Pointer to a buffer for the sector data.
+         * @param sector_count Number of sectors to transfer.
+         * 
+         * @retval `status::ATA_ERROR`
+         *          If an error is reported during the polls.
+         *
+         * @retval `status::ATA_DEVICE_FAULT`
+         *          If the device enters an error state.
+         *
+         * @retval `status::ATA_TIMEOUT`
+         *          If no response is received in the timeout period.
+         *
+         * @retval `status::SUCCESS`
+         *          Default case.
+         */
+        [[nodiscard]]
+        status_t
+        wait_until_sector_transfer_ready() const noexcept;
+
+
+        /**
+         * @brief Performs a `PIO` read or write operation 
+         *        for a given number of sectors.
+         *
+         * @param buffer       Pointer to a buffer for the sector data.
+         * @param sector_count Number of sectors to transfer.
+         *
+         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+         *          If `buffer` is a `nullptr`.
+         * 
+         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B`
+         *          If `sector_count` is `0`.
+         * 
+         * @retval `status::ATA_ERROR`
+         *          If an error is reported during the transfer or polls.
+         *
+         * @retval `status::ATA_DEVICE_FAULT`
+         *          If the device enters an error state.
+         *
+         * @retval `status::ATA_TIMEOUT`
+         *          If no response is received in the timeout period.
+         *
+         * @retval `status::SUCCESS`
+         *          Default case.
+         */
+        [[nodiscard]] 
+        status_t
+        transfer_sector_data(_INOUT_ uint16_t*& buffer,
+                             _IN_    const uint32_t sector_count) const noexcept;
+
+
+        /**
+         * @brief Executes a complete ATA-PIO read or write operation starting
+         *        at a specific LBA address.
+         *
+         * @param buffer       Pointer to a buffer for sector data.
+         * @param relative_lba LBA start address.
+         * @param sector_count Number of sectors to transfer.
+         *
+         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+         *          If `buffer` is a `nullptr`.
+         *
+         * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_B`
+         *          If `relative_lba` is outside the valid partition range.
+         *
+         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
+         *          If `sector_count` is `0`.
+         *
+         * @retval `status::ATA_ERROR`
+         *          If an error is reported during the polls.
+         *
+         * @retval `status::ATA_DEVICE_FAULT`
+         *          If the device enters an error state.
+         *
+         * @retval `status::ATA_TIMEOUT`
+         *          If no response is received in the timeout period.
+         *
+         * @retval `status::SUCCESS`
+         *          Default case.
+         */
+        [[nodiscard]] 
+        status_t 
+        start_pio_transfer(_INOUT_ uint16_t*& buffer,
+                           _IN_    const uint32_t relative_lba,
+                           _IN_    const uint32_t sector_count) const noexcept;
+
+
+        /**
+         * @brief Tries to transfer one sector chunk, 
+         *        with error and retries handling.
+         *
+         * @param buffer       Pointer to a buffer for sector data.
+         * @param relative_lba LBA start address.
+         * @param chunk        Number of sectors in this transfer chunk.
+         * 
+         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+         *          If `buffer` is a `nullptr`.
+         *
+         * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_B`
+         *          If `relative_lba` is outside the valid partition range.
+         *
+         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
+         *          If `chunk` is `0`.
+         *
+         * @retval `status::ATA_ERROR`
+         *          If an error is reported during the polls.
+         *
+         * @retval `status::ATA_DEVICE_FAULT`
+         *          If the device enters an error state.
+         *
+         * @retval `status::ATA_TIMEOUT`
+         *          If no response is received in the timeout period.
+         *
+         * @retval `status::SUCCESS`
+         *          Default case.
+         */
+        [[nodiscard]]
+        status_t
+        try_chunk_transfer(_INOUT_ uint16_t*& buffer,
+                           _IN_    const uint32_t relative_lba,
+                           _IN_    const uint32_t chunk) const noexcept;
+
+    
+        /**
+         * @brief Checks whether a memory access operation is within the
+         *        allowed LBA range.
+         *
+         * @param buffer       Pointer to a buffer for sector data.
+         * @param buffer_size  Buffer byte size.
+         * @param relative_lba LBA start address.
+         * @param to_transfer  Number of sectors to read or write.
+         *
+         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+         *          If `buffer` is a `nullptr`.
+         * 
+         * @retval `status::BUFFER_TOO_SMALL | status::flags::PARAM_B`
+         *          If `buffer_size` is too small for the requested transfer.
+         *
+         * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
+         *          If `relative_lba` is outside the valid partition range or 
+         *          the requested transfer range exceeds the partition length.
+         *
+         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D`
+         *          If `to_transfer` is `0` or exceeds the 
+         *          allowed maximum sectorcount.
+         * 
+         * @retval `status::ATA_NO_DEVICE`
+         *          If no device is configured.
+         *
+         * @retval `status::SUCCESS`
+         *          Default case.
+         */
+        [[nodiscard]] 
+        status_t 
+        validate_transfer_request(_IN_ const uint16_t* const buffer,
+                                  _IN_ const uint32_t buffer_size,
+                                  _IN_ const uint32_t relative_lba, 
+                                  _IN_ const uint32_t to_transfer) const noexcept;
+
+
+        /**
+         * @brief Performs chunked read/write
+         *        operations over a specific sector range.
+         *
+         * @param buffer       Pointer to a buffer for sector data.
+         * @param buffer_size  Buffer byte size.
+         * @param relative_lba LBA start address.
+         * @param sector_count Number of sectors to transfer.
+         * 
+         * @note If `sector_count` is `0`, the `sector_count` is set to `256`.
+         * 
+         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+         *          If `buffer` is a `nullptr`.
+         *
+         * @retval `status::BUFFER_TOO_SMALL | status::flags::PARAM_B`
+         *          If `buffer_size` is too small for the requested transfer.
+         * 
+         * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
+         *          If `relative_lba` is outside the valid partition range or 
+         *          the requested transfer range exceeds the partition length.
+         *
+         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D`
+         *          If `sector_count` exceeds the allowed maximum sectorcount.
+         * 
+         * @retval `status::ATA_NO_DEVICE`
+         *          If no device is configured.
+         *
+         * @retval `status::ATA_ERROR`
+         *          If an error is reported during the transfer.
+         *
+         * @retval `status::ATA_DEVICE_FAULT`
+         *          If the device enters an error state.
+         *
+         * @retval `status::ATA_TIMEOUT`
+         *          If no response is received in the timeout period.
+         *
+         * @retval `status::SUCCESS`
+         *          Default case.
+         */   
+        [[nodiscard]]
+        status_t 
+        execute_transfer_request(_INOUT_ uint16_t*& buffer,
+                                 _IN_    const uint32_t buffer_size,
+                                 _IN_    uint32_t relative_lba,
+                                 _IN_    uint32_t sector_count) noexcept;
+    
     public:
         /**
          * @brief Nulls the ATA-PIO driver.
@@ -632,23 +600,24 @@ namespace drivers::ata
          * @note If `operation.sector_count` is `0`, 
          *       the `operation.sector_count` isset to `256`.
          * 
-         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-         *          If `operation.buffer` is a `nullptr`.
+         * @retval `status::NULL_POINTER`
+         *          If `buffer` is a `nullptr`.
          *
-         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_A`
-         *          If `operation.sector_count` exceeds the 
-         *          allowed maximum sectorcount.
-         *
-         * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_A`
-         *          If `operation.relative_lba` is outside the 
-         *          valid partition range or the 
-         *          requested transfer range exceeds the partition length.
-         *
-         * @retval `status::ATA_NO_DEVICE` 
-         *          If no device is configured.
+         * @retval `status::BUFFER_TOO_SMALL`
+         *          If `buffer_size` is too small for the requested transfer.
          * 
+         * @retval `status::ATA_INVALID_LBA`
+         *          If `relative_lba` is outside the valid partition range or 
+         *          the requested transfer range exceeds the partition length.
+         *
+         * @retval `status::ATA_INVALID_SECTOR_COUNT`
+         *          If `sector_count` exceeds the allowed maximum sectorcount.
+         * 
+         * @retval `status::ATA_NO_DEVICE`
+         *          If no device is configured.
+         *
          * @retval `status::ATA_ERROR`
-         *          If an error is reported during the read.
+         *          If an error is reported during the transfer.
          *
          * @retval `status::ATA_DEVICE_FAULT`
          *          If the device enters an error state.
@@ -676,23 +645,24 @@ namespace drivers::ata
          * @note If `operation.sector_count` is `0`, 
          *       the `operation.sector_count` isset to `256`.
          * 
-         * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-         *          If `operation.buffer` is a `nullptr`.
+         * @retval `status::NULL_POINTER`
+         *          If `buffer` is a `nullptr`.
          *
-         * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_A`
-         *          If `operation.sector_count` exceeds the 
-         *          allowed maximum sectorcount.
-         *
-         * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_A`
-         *          If `operation.relative_lba` is outside the 
-         *          valid partition range or the 
-         *          requested transfer range exceeds the partition length.
-         *
-         * @retval `status::ATA_NO_DEVICE` 
-         *          If no device is configured.
+         * @retval `status::BUFFER_TOO_SMALL`
+         *          If `buffer_size` is too small for the requested transfer.
          * 
+         * @retval `status::ATA_INVALID_LBA`
+         *          If `relative_lba` is outside the valid partition range or 
+         *          the requested transfer range exceeds the partition length.
+         *
+         * @retval `status::ATA_INVALID_SECTOR_COUNT`
+         *          If `sector_count` exceeds the allowed maximum sectorcount.
+         * 
+         * @retval `status::ATA_NO_DEVICE`
+         *          If no device is configured.
+         *
          * @retval `status::ATA_ERROR`
-         *          If an error is reported during the read.
+         *          If an error is reported during the transfer.
          *
          * @retval `status::ATA_DEVICE_FAULT`
          *          If the device enters an error state.

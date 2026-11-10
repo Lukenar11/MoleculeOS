@@ -18,15 +18,14 @@
 namespace kernel::sys
 {
     _C_API_ 
-    uint32_t 
-    save_eflags();
-
-    _C_API_ 
-    void disable_interrupts();
-
-    _C_API_ 
     void 
-    restore_eflags(uint32_t);
+    disable_interrupts();
+
+
+    _C_API_
+    void 
+    enable_interrupts();
+
 
     void 
     panic(const char* message) noexcept;
@@ -138,73 +137,49 @@ namespace drivers::ata
 
 
     /**
-     * @brief Checks whether a memory access operation is within the
-     *        allowed LBA range.
+     * @brief Polls the ATA status register until busy clears or 
+     *        an error appeared.
      *
-     * @param buffer       Pointer to a buffer for sector data.
-     * @param buffer_size  Buffer byte size.
-     * @param relative_lba LBA start address.
-     * @param to_transfer  Number of sectors to read or write.
+     * @retval `status::ATA_ERROR`
+     *          If an error is reported during the polls.
      *
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `buffer` is a `nullptr`.
-     * 
-     * @retval `status::BUFFER_TOO_SMALL | status::flags::PARAM_B`
-     *          If `buffer_size` is too small for the requested transfer.
+     * @retval `status::ATA_DEVICE_FAULT`
+     *          If the device enters an error state.
      *
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
-     *          If `relative_lba` is outside the valid partition range or 
-     *          the requested transfer range exceeds the partition length.
-     *
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D`
-     *          If `to_transfer` is `0` or exceeds the 
-     *          allowed maximum sectorcount.
-     * 
-     * @retval `status::ATA_NO_DEVICE`
-     *          If no device is configured.
+     * @retval `status::ATA_TIMEOUT`
+     *          If no response is received in the timeout period.
      *
      * @retval `status::SUCCESS`
      *          Default case.
      */
-    [[nodiscard]] 
-    status_t
-    Programmable_IO::validate_transfer_request(_IN_ const uint16_t* const buffer,
-                                               _IN_ const uint32_t buffer_size,
-                                               _IN_ const uint32_t relative_lba,
-                                               _IN_ const uint32_t to_transfer)
-                                               const noexcept {
-        status_t status = status::SUCCESS;
+    [[nodiscard]]
+    status_t 
+    Programmable_IO::wait_until_unbusy_or_error() const noexcept {
+        status_t status    = status::ATA_TIMEOUT;
+        uint8_t ata_status = 0;
 
-        if (identify_data.partition_length == 0) [[unlikely]] {
-            status = status::ATA_NO_DEVICE;
-            goto cleanup;
+        for (int32_t timeout = 5'000'000; timeout >= 0; --timeout) [[likely]] {
+            ata_status = stdlib::byte_input(identify_data.status_port);
+
+            if (ata_status & 
+                static_cast<uint8_t>(ATA_Status::ERR)) [[unlikely]] {
+                status = status::ATA_ERROR;
+                break;
+            }
+
+            if (ata_status & 
+                static_cast<uint8_t>(ATA_Status::DF)) [[unlikely]] {
+                status = status::ATA_DEVICE_FAULT;
+                break;
+            }
+
+            if (!(ata_status & 
+                static_cast<uint8_t>(ATA_Status::BSY))) {
+                status = status::SUCCESS;
+                break;
+            }
         }
 
-        if (!buffer) [[unlikely]] {
-            status = status::NULL_POINTER | status::flags::PARAM_A;
-            goto cleanup;
-        }
-
-        if (to_transfer == 0 ||
-            to_transfer > identify_data.partition_length ||
-            to_transfer > MAX_ALLOWED_SECTOR_COUNT) [[unlikely]] {
-            status = status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D;
-            goto cleanup;
-        }
-
-        if (to_transfer > (buffer_size / SECTOR_SIZE)) [[unlikely]] {
-            status = status::BUFFER_TOO_SMALL | status::flags::PARAM_B;
-            goto cleanup;
-        }
-
-        if (relative_lba >= identify_data.partition_length ||
-            to_transfer > 
-            (identify_data.partition_length - relative_lba)) [[unlikely]] {
-            status = status::ATA_INVALID_LBA | status::flags::PARAM_C;
-            goto cleanup;
-        }
-
-    cleanup:
         return status;
     }
 
@@ -257,26 +232,6 @@ namespace drivers::ata
 
 
     /**
-     * @brief Issues the ATA command `IDENTIFY` for the 
-     *        currently selected drive.
-     *
-     * @param drive_select Drive/Head register value, 
-     *                     selecting master or slave.
-     */
-    void
-    Programmable_IO::issue_identify_command(_IN_ const uint8_t drive_select) 
-                                            const noexcept {
-        stdlib::byte_output(identify_data.io_port_base + 6, 
-                            drive_select);
-        delay();
-
-        stdlib::byte_output(identify_data.io_port_base + 7, 
-                            static_cast<uint8_t>(ATA_Command::IDENTIFY_DEVICE));
-        delay();
-    };
-
-
-    /**
      * @brief Handles retryable ATA errors and updates the retry counter.
      * 
      * @param retries 
@@ -309,6 +264,75 @@ namespace drivers::ata
     cleanup:
         return is_retryable;
     }
+
+
+    /**
+     * @brief Polls the ATA status register until device ready is set or 
+     *        an error appeared.
+     *
+     * @retval `status::ATA_ERROR`
+     *          If an error is reported during the polls.
+     *
+     * @retval `status::ATA_DEVICE_FAULT`
+     *          If the device enters an error state.
+     *
+     * @retval `status::ATA_TIMEOUT`
+     *          If no response is received in the timeout period.
+     *
+     * @retval `status::SUCCESS`
+     *          Default case.
+     */
+    [[nodiscard]] 
+    status_t 
+    Programmable_IO::wait_until_ready_or_error() const noexcept {
+        status_t status    = status::ATA_TIMEOUT;
+        uint8_t ata_status = 0;
+
+        for (int32_t timeout = 5'000'000; timeout >= 0; --timeout) [[likely]] {
+            ata_status = stdlib::byte_input(identify_data.status_port);
+
+            if (ata_status & 
+                static_cast<uint8_t>(ATA_Status::ERR)) [[unlikely]] {
+                status = status::ATA_ERROR;
+                goto cleanup;
+            }
+
+            if (ata_status & 
+                static_cast<uint8_t>(ATA_Status::DF)) [[unlikely]] {
+                status = status::ATA_DEVICE_FAULT;
+                goto cleanup;
+            }
+
+            if (!(ata_status & static_cast<uint8_t>(ATA_Status::BSY)) && 
+                 (ata_status & static_cast<uint8_t>(ATA_Status::DRQ))) {
+                status = status::SUCCESS;
+                goto cleanup;
+            }
+        }
+
+    cleanup:
+        return status;
+    }
+
+
+    /**
+     * @brief Issues the ATA command `IDENTIFY` for the 
+     *        currently selected drive.
+     *
+     * @param drive_select Drive/Head register value, 
+     *                     selecting master or slave.
+     */
+    void
+    Programmable_IO::issue_identify_command(_IN_ const uint8_t drive_select) 
+                                            const noexcept {
+        stdlib::byte_output(identify_data.io_port_base + 6, 
+                            drive_select);
+        delay();
+
+        stdlib::byte_output(identify_data.io_port_base + 7, 
+                            static_cast<uint8_t>(ATA_Command::IDENTIFY_DEVICE));
+        delay();
+    };
 
 
     /**
@@ -494,12 +518,6 @@ namespace drivers::ata
      *
      * @param io_port          Base I/O port of the ATA channel.
      * @param control_register Control register port of the ATA channel.
-     *
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
-     *          If `io_port` is not a valid ATA channel.
-     *
-     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
-     *          If the control register port is invalid.
      * 
      * @retval `status::ATA_ERROR`
      *          If an error is reported during the `IDENTIFY` operation.
@@ -541,22 +559,6 @@ namespace drivers::ata
             static_cast<uint8_t>(ATA_Device::SLAVE_SELECT),  
             static_cast<uint8_t>(ATA_Device::SLAVE)
         };
-
-        if (io_port != static_cast<uint16_t>(ATA_Port::IDE_PRIMARY_IO_BASE) &&
-            io_port != static_cast<uint16_t>(ATA_Port::IDE_SECONDARY_IO_BASE)) 
-            [[unlikely]] {
-            status = status::INVALID_PARAMETER | status::flags::PARAM_A;
-            goto cleanup;
-        }
-
-        if (control_register != 
-            static_cast<uint16_t>(ATA_Port::IDE_PRIMARY_DCR_BASE) &&
-            control_register != 
-            static_cast<uint16_t>(ATA_Port::IDE_SECONDARY_DCR_BASE)) 
-            [[unlikely]] {
-            status = status::INVALID_PARAMETER | status::flags::PARAM_B;
-            goto cleanup;
-        }
 
         for (const auto& device : devices) [[likely]] {
             status = identify_drive(id_command_buffer.data(),
@@ -612,560 +614,6 @@ namespace drivers::ata
 
             break;
         }
-
-    cleanup:
-        return status;
-    }
-
-
-    /**
-     * @brief Polls the ATA status register until device ready is set or 
-     *        an error appeared.
-     *
-     * @retval `status::ATA_ERROR`
-     *          If an error is reported during the polls.
-     *
-     * @retval `status::ATA_DEVICE_FAULT`
-     *          If the device enters an error state.
-     *
-     * @retval `status::ATA_TIMEOUT`
-     *          If no response is received in the timeout period.
-     *
-     * @retval `status::SUCCESS`
-     *          Default case.
-     */
-    [[nodiscard]] 
-    status_t 
-    Programmable_IO::wait_until_ready_or_error() const noexcept {
-        status_t status    = status::ATA_TIMEOUT;
-        uint8_t ata_status = 0;
-
-        for (int32_t timeout = 5'000'000; timeout >= 0; --timeout) [[likely]] {
-            ata_status = stdlib::byte_input(identify_data.status_port);
-
-            if (ata_status & 
-                static_cast<uint8_t>(ATA_Status::ERR)) [[unlikely]] {
-                status = status::ATA_ERROR;
-                goto cleanup;
-            }
-
-            if (ata_status & 
-                static_cast<uint8_t>(ATA_Status::DF)) [[unlikely]] {
-                status = status::ATA_DEVICE_FAULT;
-                goto cleanup;
-            }
-
-            if (!(ata_status & static_cast<uint8_t>(ATA_Status::BSY)) && 
-                 (ata_status & static_cast<uint8_t>(ATA_Status::DRQ))) {
-                status = status::SUCCESS;
-                goto cleanup;
-            }
-        }
-
-    cleanup:
-        return status;
-    }
-
-
-    /**
-     * @brief Polls the ATA status register until busy clears or 
-     *        an error appeared.
-     *
-     * @retval `status::ATA_ERROR`
-     *          If an error is reported during the polls.
-     *
-     * @retval `status::ATA_DEVICE_FAULT`
-     *          If the device enters an error state.
-     *
-     * @retval `status::ATA_TIMEOUT`
-     *          If no response is received in the timeout period.
-     *
-     * @retval `status::SUCCESS`
-     *          Default case.
-     */
-    [[nodiscard]]
-    status_t 
-    Programmable_IO::wait_until_unbusy_or_error() const noexcept {
-        status_t status    = status::ATA_TIMEOUT;
-        uint8_t ata_status = 0;
-
-        for (int32_t timeout = 5'000'000; timeout >= 0; --timeout) [[likely]] {
-            ata_status = stdlib::byte_input(identify_data.status_port);
-
-            if (ata_status & 
-                static_cast<uint8_t>(ATA_Status::ERR)) [[unlikely]] {
-                status = status::ATA_ERROR;
-                break;
-            }
-
-            if (ata_status & 
-                static_cast<uint8_t>(ATA_Status::DF)) [[unlikely]] {
-                status = status::ATA_DEVICE_FAULT;
-                break;
-            }
-
-            if (!(ata_status & 
-                static_cast<uint8_t>(ATA_Status::BSY))) {
-                status = status::SUCCESS;
-                break;
-            }
-        }
-
-        return status;
-    }
-
-
-    /**
-     * @brief Waits until the ATA status register indicates that a sector
-     *        transfer can proceed.
-     * 
-     * @param buffer       Pointer to a buffer for the sector data.
-     * @param sector_count Number of sectors to transfer.
-     * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `buffer` is a `nullptr`.
-     * 
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B`
-     *          If `sector_count` is `0`.
-     *
-     * @retval `status::ATA_ERROR`
-     *          If an error is reported during the polls.
-     *
-     * @retval `status::ATA_DEVICE_FAULT`
-     *          If the device enters an error state.
-     *
-     * @retval `status::ATA_TIMEOUT`
-     *          If no response is received in the timeout period.
-     *
-     * @retval `status::SUCCESS`
-     *          Default case.
-     */
-    [[nodiscard]]
-    status_t
-    Programmable_IO::wait_until_sector_transfer_ready(_INOUT_ uint16_t*& buffer,
-                                                      _IN_    const uint32_t sector_count) 
-                                                      const noexcept { 
-        status_t status = status::SUCCESS;
-
-        if (!buffer) [[unlikely]] {
-            status = status::INVALID_PARAMETER | status::flags::PARAM_A;
-            goto cleanup;
-        }
-
-        if (sector_count == 0) [[unlikely]] {
-            status = status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B;
-            goto cleanup;
-        }
-
-        for (int32_t retries = MAX_RETRIES; 
-             retries >= 0; 
-             --retries) [[likely]] {
-            status = wait_until_ready_or_error();
-            if (status != status::SUCCESS) [[unlikely]] {
-                continue;
-            }
-
-            break;
-        }
-
-    cleanup:
-        return status;
-    }
-
-
-    /**
-     * @brief Performs a `PIO` read or write operation 
-     *        for a given number of sectors.
-     *
-     * @param buffer       Pointer to a buffer for the sector data.
-     * @param sector_count Number of sectors to transfer.
-     *
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `buffer` is a `nullptr`.
-     * 
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B`
-     *          If `sector_count` is `0`.
-     * 
-     * @retval `status::ATA_ERROR`
-     *          If an error is reported during the transfer or polls.
-     *
-     * @retval `status::ATA_DEVICE_FAULT`
-     *          If the device enters an error state.
-     *
-     * @retval `status::ATA_TIMEOUT`
-     *          If no response is received in the timeout period.
-     *
-     * @retval `status::SUCCESS`
-     *          Default case.
-     */
-    [[nodiscard]]
-    status_t 
-    Programmable_IO::transfer_sector_data(_INOUT_ uint16_t*& buffer,
-                                          _IN_    const uint32_t sector_count) 
-                                          const noexcept { 
-        status_t status = status::SUCCESS;
-
-        if (!buffer) [[unlikely]] {
-            status = status::INVALID_PARAMETER | status::flags::PARAM_A;
-            goto cleanup;
-        }
-
-        if (sector_count == 0) [[unlikely]] {
-            status = status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B;
-            goto cleanup;
-        }
-
-        for (uint32_t sector = 0; sector < sector_count; sector++) [[likely]] {
-            delay();
-
-            status = wait_until_sector_transfer_ready(buffer, sector_count);
-            if (status != status::SUCCESS) [[unlikely]] {
-                goto cleanup;
-            }
-
-            if (driver_action == Driver_Action::READ) {
-                stdlib::word_input_stream(identify_data.io_port_base,
-                                          SECTOR_WORD_SIZE,
-                                          buffer);
-
-            } 
-            else {
-                stdlib::word_output_stream(identify_data.io_port_base,
-                                           SECTOR_WORD_SIZE,
-                                           buffer);
-            }
-
-            buffer += SECTOR_WORD_SIZE;
-            delay();
-        }
-
-    cleanup:
-        return status;
-    }
-
-
-
-    /**
-     * @brief Executes a complete ATA-PIO read or write operation starting 
-     *        at a specific LBA address.
-     *
-     * @param buffer       Pointer to a buffer for sector data.
-     * @param buffer_size  Buffer byte size.
-     * @param relative_lba LBA start address.
-     * @param sector_count Number of sectors to transfer.
-     *
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `buffer` is a `nullptr`.
-     * 
-     * @retval `status::BUFFER_TOO_SMALL | status::flags::PARAM_B` 
-     *          If `buffer_size` is too small for the requested transfer.
-     *
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
-     *          If `relative_lba` is outside the valid partition range or 
-     *          the requested transfer range exceeds the partition length.
-     *
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D`
-     *          If `to_transfer` is `0` or exceeds the 
-     *          allowed maximum sectorcount.
-     * 
-     * @retval `status::ATA_NO_DEVICE`
-     *          If no device is configured.
-     * 
-     * @retval `status::ATA_ERROR` 
-     *          If an error is reported during the polls.
-     *
-     * @retval `status::ATA_DEVICE_FAULT`
-     *          If the device enters an error state.
-     *
-     * @retval `status::ATA_TIMEOUT`
-     *          If no response is received in the timeout period.
-     *
-     * @retval `status::SUCCESS`
-     *          Default case.
-     */
-    [[nodiscard]]
-    status_t 
-    Programmable_IO::start_pio_transfer(_INOUT_ uint16_t*& buffer,
-                                        _IN_    const uint32_t buffer_size,
-                                        _IN_    const uint32_t relative_lba,
-                                        _IN_    const uint32_t sector_count) 
-                                        const noexcept {
-        status_t status       = status::SUCCESS;
-        uint32_t absolute_lba = 0;
-
-        status = validate_transfer_request(buffer, 
-                                           buffer_size, 
-                                           relative_lba, 
-                                           sector_count);
-        if (status != status::SUCCESS) [[unlikely]] {
-            goto cleanup;
-        }
-
-        if (relative_lba > 
-            (UINT32_MAX - identify_data.lba_start_address)) [[unlikely]] {
-            status = status::ATA_INVALID_LBA | status::flags::PARAM_B;
-            goto cleanup;
-        }
-
-        absolute_lba = relative_lba + identify_data.lba_start_address;
-
-        stdlib::byte_output(identify_data.io_port_base + 2, 
-                            static_cast<uint8_t>(sector_count));
-
-        stdlib::byte_output(identify_data.io_port_base + 3, 
-                            (absolute_lba >> 0) & BYTE_MASK);
-
-        stdlib::byte_output(identify_data.io_port_base + 4, 
-                            (absolute_lba >> 8) & BYTE_MASK);
-
-        stdlib::byte_output(identify_data.io_port_base + 5, 
-                            (absolute_lba >> 16) & BYTE_MASK);
-
-        stdlib::byte_output(identify_data.io_port_base + 6,
-                            ((absolute_lba >> 24) & NIBBLE_MASK) | 
-                            identify_data.lba_flags);
-                           
-        if (driver_action == Driver_Action::READ) {
-            stdlib::byte_output(identify_data.status_port, 
-                                static_cast<uint8_t>(ATA_Command::READ_SECTORS));
-        }
-        else {
-            stdlib::byte_output(identify_data.status_port, 
-                                static_cast<uint8_t>(ATA_Command::WRITE_SECTORS));
-        }
-
-        status = transfer_sector_data(buffer, sector_count);
-        switch (status) {
-        case status::SUCCESS:
-            break;
-
-        case status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B:
-            // The status flag `PARAM_B` is changed to `PARAM_D`, 
-            // so that the returned status code matches the method signature.
-
-            status = status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D;
-            goto cleanup;
-
-        default:
-            goto cleanup;
-        }
-
-        if (driver_action == Driver_Action::WRITE) {
-            stdlib::byte_output(identify_data.status_port, 
-                                static_cast<uint8_t>(ATA_Command::FLUSH_CACHE));
-
-            status = wait_until_unbusy_or_error();
-        }
-
-    cleanup:
-        return status;
-    }
-
-
-    /**
-     * @brief Tries to transfer one sector chunk, 
-     *        with error and retries handling.
-     *
-     * @param buffer       Pointer to a buffer for sector data.
-     * @param buffer_size  Buffer byte size.
-     * @param relative_lba LBA start address.
-     * @param chunk        Number of sectors in this transfer chunk.
-     *
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `buffer` is a `nullptr`.
-     * 
-     * @retval `status::BUFFER_TOO_SMALL | status::flags::PARAM_B` 
-     *          If buffer_size is too small for the requested transfer.
-     *
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
-     *          If `relative_lba` is outside the valid partition range or 
-     *          the requested transfer range exceeds the partition length.
-     *
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D`
-     *          If `to_transfer` is `0` or exceeds the 
-     *          allowed maximum sectorcount.
-     * 
-     * @retval `status::ATA_NO_DEVICE`
-     *          If no device is configured.
-     * 
-     * @retval `status::ATA_ERROR` 
-     *          If an error is reported during the polls.
-     *
-     * @retval `status::ATA_DEVICE_FAULT`
-     *          If the device enters an error state.
-     *
-     * @retval `status::ATA_TIMEOUT`
-     *          If no response is received in the timeout period.
-     *
-     * @retval `status::SUCCESS`
-     *          Default case.
-     */
-    [[nodiscard]]
-    status_t
-    Programmable_IO::try_chunk_transfer(_INOUT_ uint16_t*& buffer,
-                                        _IN_    const uint32_t buffer_size,
-                                        _IN_    const uint32_t relative_lba,
-                                        _IN_    const uint32_t chunk) const noexcept {
-        status_t status = status::ATA_TIMEOUT;
-
-        status = validate_transfer_request(buffer, 
-                                           buffer_size, 
-                                           relative_lba, 
-                                           chunk);
-        if (status != status::SUCCESS) [[unlikely]] {
-            goto cleanup;
-        }
-
-        for (int32_t retries = MAX_RETRIES; 
-             retries >= 0; 
-             --retries) [[likely]] {
-            status = start_pio_transfer(buffer, 
-                                        buffer_size, 
-                                        relative_lba, 
-                                        chunk);
-
-            switch (status) {
-            case status::ATA_DEVICE_FAULT:
-                reset_driver();
-                delay();
-                continue;
-
-            case status::ATA_TIMEOUT:
-                reset_driver();
-                delay();
-                continue;
-
-            case status::ATA_ERROR:
-                if (handle_retryable_ata_error(retries)) {
-                    reset_driver();
-                    delay();
-
-                    continue;
-                }
-                break;
-            }
-            
-            break;
-        }
-
-    cleanup:
-        return status;
-    }
-
-
-    /**
-     * @brief Performs chunked read/write
-     *        operations over a specific sector range.
-     *
-     * @param buffer       Pointer to a buffer for sector data.
-     * @param buffer_size  Buffer byte size.
-     * @param relative_lba LBA start address.
-     * @param sector_count Number of sectors to transfer.
-     * 
-     * @note If `sector_count` is `0`, the `sector_count` is set to `256`.
-     * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `buffer` is a `nullptr`.
-     *
-     * @retval `status::BUFFER_TOO_SMALL | status::flags::PARAM_B`
-     *          If `buffer_size` is too small for the requested transfer.
-     * 
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
-     *          If `relative_lba` is outside the valid partition range or 
-     *          the requested transfer range exceeds the partition length.
-     *
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D`
-     *          If `sector_count` exceeds the allowed maximum sectorcount.
-     * 
-     * @retval `status::ATA_NO_DEVICE`
-     *          If no device is configured.
-     *
-     * @retval `status::ATA_ERROR`
-     *          If an error is reported during the transfer.
-     *
-     * @retval `status::ATA_DEVICE_FAULT`
-     *          If the device enters an error state.
-     *
-     * @retval `status::ATA_TIMEOUT`
-     *          If no response is received in the timeout period.
-     *
-     * @retval `status::SUCCESS`
-     *          Default case.
-     */ 
-    [[nodiscard]]
-    status_t
-    Programmable_IO::execute_transfer_request(_INOUT_ uint16_t*& buffer,
-                                              _IN_    const uint32_t buffer_size,
-                                              _IN_    uint32_t relative_lba,
-                                              _IN_    uint32_t sector_count)
-                                              noexcept {
-        status_t status           = status::SUCCESS;
-        uint32_t chunk            = 0;
-        uint32_t chunk_byte_size  = 0;
-        uint32_t used_buffer_size = 0;
-        const uint32_t eflags     = kernel::sys::save_eflags();
-
-        kernel::sys::disable_interrupts();
-
-        if (sector_count == 0) [[unlikely]] {
-            sector_count = MAX_ALLOWED_SECTOR_COUNT;
-        }
-
-        status = validate_transfer_request(buffer,
-                                           buffer_size,
-                                           relative_lba,
-                                           sector_count);
-        if (status != status::SUCCESS) [[unlikely]] {
-            goto cleanup;
-        }
-
-        status = wait_until_unbusy_or_error();
-        if (status != status::SUCCESS) [[unlikely]] {
-            goto cleanup;
-        }
-
-        while (sector_count > 0) [[likely]] {
-            if (sector_count > CHUNK_SECTORS) {
-                chunk = CHUNK_SECTORS;
-            } 
-            else {
-                chunk = sector_count;
-            }
-
-            chunk_byte_size = chunk * SECTOR_SIZE;
-
-            if (chunk_byte_size > 
-                (buffer_size - used_buffer_size)) [[unlikely]] {
-                status = status::BUFFER_TOO_SMALL | status::flags::PARAM_B;
-                break;
-            }
-
-            if (reinterpret_cast<uint32_t>(buffer) > 
-                (UINT32_MAX - chunk_byte_size)) [[unlikely]] {
-                status = status::BUFFER_TOO_SMALL | status::flags::PARAM_B;
-                break;
-            }
-
-            status = try_chunk_transfer(buffer,
-                                        buffer_size - used_buffer_size,
-                                        relative_lba,
-                                        chunk);
-            if (status != status::SUCCESS) [[unlikely]] {
-                break;
-            }
-
-            used_buffer_size += chunk_byte_size;
-
-            buffer       += chunk * SECTOR_WORD_SIZE;
-            relative_lba += chunk;
-            sector_count -= chunk;
-        }
-
-    cleanup:
-        reset_driver();
-        delay();
-
-        kernel::sys::restore_eflags(eflags);
 
         return status;
     }
@@ -1226,22 +674,486 @@ namespace drivers::ata
              retries >= 0; 
              --retries) [[unlikely]] {
             status = probe_and_configure_channel(io_port, control_register);
+            if (status == status::ATA_NO_DEVICE || status == status::SUCCESS) {
+                break;
+            }
 
-            switch (status) {
-            case status::ATA_ERROR:
-                continue;
+            continue;
+        }
 
-            case status::ATA_DEVICE_FAULT:
-                continue;
+    cleanup:
+        return status;
+    }
 
-            case status::ATA_TIMEOUT:
+
+    /**
+     * @brief Waits until the ATA status register indicates that a sector
+     *        transfer can proceed.
+     * 
+     * @retval `status::ATA_ERROR`
+     *          If an error is reported during the polls.
+     *
+     * @retval `status::ATA_DEVICE_FAULT`
+     *          If the device enters an error state.
+     *
+     * @retval `status::ATA_TIMEOUT`
+     *          If no response is received in the timeout period.
+     *
+     * @retval `status::SUCCESS`
+     *          Default case.
+     */
+    [[nodiscard]]
+    status_t
+    Programmable_IO::wait_until_sector_transfer_ready() const noexcept { 
+        status_t status = status::SUCCESS;
+
+        for (int32_t retries = MAX_RETRIES; 
+             retries >= 0; 
+             --retries) [[likely]] {
+            status = wait_until_ready_or_error();
+            if (status != status::SUCCESS) [[unlikely]] {
                 continue;
             }
 
             break;
         }
 
+        return status;
+    }
+
+
+    /**
+     * @brief Performs a `PIO` read or write operation 
+     *        for a given number of sectors.
+     *
+     * @param buffer       Pointer to a buffer for the sector data.
+     * @param sector_count Number of sectors to transfer.
+     *
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *          If `buffer` is a `nullptr`.
+     * 
+     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B`
+     *          If `sector_count` is `0`.
+     * 
+     * @retval `status::ATA_ERROR`
+     *          If an error is reported during the transfer or polls.
+     *
+     * @retval `status::ATA_DEVICE_FAULT`
+     *          If the device enters an error state.
+     *
+     * @retval `status::ATA_TIMEOUT`
+     *          If no response is received in the timeout period.
+     *
+     * @retval `status::SUCCESS`
+     *          Default case.
+     */
+    [[nodiscard]]
+    status_t 
+    Programmable_IO::transfer_sector_data(_INOUT_ uint16_t*& buffer,
+                                          _IN_    const uint32_t sector_count) 
+                                          const noexcept { 
+        status_t status = status::SUCCESS;
+
+        if (!buffer) [[unlikely]] {
+            status = status::INVALID_PARAMETER | status::flags::PARAM_A;
+            goto cleanup;
+        }
+
+        if (sector_count == 0) [[unlikely]] {
+            status = status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B;
+            goto cleanup;
+        }
+
+        for (uint32_t sector = 0; sector < sector_count; sector++) [[likely]] {
+            delay();
+
+            status = wait_until_sector_transfer_ready();
+            if (status != status::SUCCESS) [[unlikely]] {
+                goto cleanup;
+            }
+
+            if (driver_action == Driver_Action::READ) {
+                stdlib::word_input_stream(identify_data.io_port_base,
+                                          SECTOR_WORD_SIZE,
+                                          buffer);
+
+            } 
+            else {
+                stdlib::word_output_stream(identify_data.io_port_base,
+                                           SECTOR_WORD_SIZE,
+                                           buffer);
+            }
+
+            buffer += SECTOR_WORD_SIZE;
+            delay();
+        }
+
     cleanup:
+        return status;
+    }
+
+
+    /**
+     * @brief Executes a complete ATA-PIO read or write operation starting
+     *        at a specific LBA address.
+     *
+     * @param buffer       Pointer to a buffer for sector data.
+     * @param relative_lba LBA start address.
+     * @param sector_count Number of sectors to transfer.
+     *
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *          If `buffer` is a `nullptr`.
+     *
+     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_B`
+     *          If `relative_lba` is outside the valid partition range.
+     *
+     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
+     *          If `sector_count` is `0`.
+     *
+     * @retval `status::ATA_ERROR`
+     *          If an error is reported during the polls.
+     *
+     * @retval `status::ATA_DEVICE_FAULT`
+     *          If the device enters an error state.
+     *
+     * @retval `status::ATA_TIMEOUT`
+     *          If no response is received in the timeout period.
+     *
+     * @retval `status::SUCCESS`
+     *          Default case.
+     */
+    [[nodiscard]]
+    status_t 
+    Programmable_IO::start_pio_transfer(_INOUT_ uint16_t*& buffer,
+                                        _IN_    const uint32_t relative_lba,
+                                        _IN_    const uint32_t sector_count) 
+                                        const noexcept {
+        status_t status       = status::SUCCESS;
+        uint32_t absolute_lba = 0;
+
+        if (relative_lba > 
+            (UINT32_MAX - identify_data.lba_start_address)) [[unlikely]] {
+            status = status::ATA_INVALID_LBA | status::flags::PARAM_B;
+            goto cleanup;
+        }
+
+        absolute_lba = relative_lba + identify_data.lba_start_address;
+
+        stdlib::byte_output(identify_data.io_port_base + 2, 
+                            static_cast<uint8_t>(sector_count));
+
+        stdlib::byte_output(identify_data.io_port_base + 3, 
+                            (absolute_lba >> 0) & BYTE_MASK);
+
+        stdlib::byte_output(identify_data.io_port_base + 4, 
+                            (absolute_lba >> 8) & BYTE_MASK);
+
+        stdlib::byte_output(identify_data.io_port_base + 5, 
+                            (absolute_lba >> 16) & BYTE_MASK);
+
+        stdlib::byte_output(identify_data.io_port_base + 6,
+                            ((absolute_lba >> 24) & NIBBLE_MASK) | 
+                            identify_data.lba_flags);
+                           
+        if (driver_action == Driver_Action::READ) {
+            stdlib::byte_output(identify_data.status_port, 
+                                static_cast<uint8_t>(ATA_Command::READ_SECTORS));
+        }
+        else {
+            stdlib::byte_output(identify_data.status_port, 
+                                static_cast<uint8_t>(ATA_Command::WRITE_SECTORS));
+        }
+
+        status = transfer_sector_data(buffer, sector_count);
+        switch (status) {
+        case status::SUCCESS:
+            break;
+
+        default:
+            // The status flag `PARAM_B` is changed to `PARAM_C`, 
+            // so that the returned status code matches the method signature.
+            if (status == 
+                (status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_B)) {
+                status = status::ATA_INVALID_SECTOR_COUNT | 
+                         status::flags::PARAM_C;
+            }
+            goto cleanup;
+        }
+
+        if (driver_action == Driver_Action::WRITE) {
+            stdlib::byte_output(identify_data.status_port, 
+                                static_cast<uint8_t>(ATA_Command::FLUSH_CACHE));
+
+            status = wait_until_unbusy_or_error();
+        }
+
+    cleanup:
+        return status;
+    }
+
+
+    /**
+     * @brief Tries to transfer one sector chunk, 
+     *        with error and retries handling.
+     *
+     * @param buffer       Pointer to a buffer for sector data.
+     * @param relative_lba LBA start address.
+     * @param chunk        Number of sectors in this transfer chunk.
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *          If `buffer` is a `nullptr`.
+     *
+     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_B`
+     *          If `relative_lba` is outside the valid partition range.
+     *
+     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C`
+     *          If `chunk` is `0`.
+     *
+     * @retval `status::ATA_ERROR`
+     *          If an error is reported during the polls.
+     *
+     * @retval `status::ATA_DEVICE_FAULT`
+     *          If the device enters an error state.
+     *
+     * @retval `status::ATA_TIMEOUT`
+     *          If no response is received in the timeout period.
+     *
+     * @retval `status::SUCCESS`
+     *          Default case.
+     */
+    [[nodiscard]]
+    status_t
+    Programmable_IO::try_chunk_transfer(_INOUT_ uint16_t*& buffer,
+                                        _IN_    const uint32_t relative_lba,
+                                        _IN_    const uint32_t chunk) const noexcept {
+        status_t status = status::ATA_TIMEOUT;
+
+        for (int32_t retries = MAX_RETRIES; 
+             retries >= 0; 
+             --retries) [[likely]] {
+            status = start_pio_transfer(buffer, 
+                                        relative_lba, 
+                                        chunk);
+
+            switch (status) {
+            case status::ATA_DEVICE_FAULT:
+                reset_driver();
+                delay();
+                continue;
+
+            case status::ATA_TIMEOUT:
+                reset_driver();
+                delay();
+                continue;
+
+            case status::ATA_ERROR:
+                if (handle_retryable_ata_error(retries)) {
+                    reset_driver();
+                    delay();
+
+                    continue;
+                }
+                break;
+            }
+            
+            break;
+        }
+
+        return status;
+    }
+
+
+    /**
+     * @brief Checks whether a memory access operation is within the
+     *        allowed LBA range.
+     *
+     * @param buffer       Pointer to a buffer for sector data.
+     * @param buffer_size  Buffer byte size.
+     * @param relative_lba LBA start address.
+     * @param to_transfer  Number of sectors to read or write.
+     *
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *          If `buffer` is a `nullptr`.
+     * 
+     * @retval `status::BUFFER_TOO_SMALL | status::flags::PARAM_B`
+     *          If `buffer_size` is too small for the requested transfer.
+     *
+     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
+     *          If `relative_lba` is outside the valid partition range or 
+     *          the requested transfer range exceeds the partition length.
+     *
+     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D`
+     *          If `to_transfer` is `0` or exceeds the 
+     *          allowed maximum sectorcount.
+     * 
+     * @retval `status::ATA_NO_DEVICE`
+     *          If no device is configured.
+     *
+     * @retval `status::SUCCESS`
+     *          Default case.
+     */
+    [[nodiscard]] 
+    status_t
+    Programmable_IO::validate_transfer_request(_IN_ const uint16_t* const buffer,
+                                               _IN_ const uint32_t buffer_size,
+                                               _IN_ const uint32_t relative_lba,
+                                               _IN_ const uint32_t to_transfer)
+                                               const noexcept {
+        status_t status = status::SUCCESS;
+
+        if (identify_data.partition_length == 0) [[unlikely]] {
+            status = status::ATA_NO_DEVICE;
+            goto cleanup;
+        }
+
+        if (!buffer) [[unlikely]] {
+            status = status::NULL_POINTER | status::flags::PARAM_A;
+            goto cleanup;
+        }
+
+        if (to_transfer == 0 ||
+            to_transfer > identify_data.partition_length ||
+            to_transfer > MAX_ALLOWED_SECTOR_COUNT) [[unlikely]] {
+            status = status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D;
+            goto cleanup;
+        }
+
+        if (to_transfer > (buffer_size / SECTOR_SIZE)) [[unlikely]] {
+            status = status::BUFFER_TOO_SMALL | status::flags::PARAM_B;
+            goto cleanup;
+        }
+
+        if (relative_lba >= identify_data.partition_length ||
+            to_transfer > 
+            (identify_data.partition_length - relative_lba)) [[unlikely]] {
+            status = status::ATA_INVALID_LBA | status::flags::PARAM_C;
+            goto cleanup;
+        }
+
+    cleanup:
+        return status;
+    }
+
+
+    /**
+     * @brief Performs chunked read/write
+     *        operations over a specific sector range.
+     *
+     * @param buffer       Pointer to a buffer for sector data.
+     * @param buffer_size  Buffer byte size.
+     * @param relative_lba LBA start address.
+     * @param sector_count Number of sectors to transfer.
+     * 
+     * @note If `sector_count` is `0`, the `sector_count` is set to `256`.
+     * 
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *          If `buffer` is a `nullptr`.
+     *
+     * @retval `status::BUFFER_TOO_SMALL | status::flags::PARAM_B`
+     *          If `buffer_size` is too small for the requested transfer.
+     * 
+     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_C`
+     *          If `relative_lba` is outside the valid partition range or 
+     *          the requested transfer range exceeds the partition length.
+     *
+     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D`
+     *          If `sector_count` exceeds the allowed maximum sectorcount.
+     * 
+     * @retval `status::ATA_NO_DEVICE`
+     *          If no device is configured.
+     *
+     * @retval `status::ATA_ERROR`
+     *          If an error is reported during the transfer.
+     *
+     * @retval `status::ATA_DEVICE_FAULT`
+     *          If the device enters an error state.
+     *
+     * @retval `status::ATA_TIMEOUT`
+     *          If no response is received in the timeout period.
+     *
+     * @retval `status::SUCCESS`
+     *          Default case.
+     */ 
+    [[nodiscard]]
+    status_t
+    Programmable_IO::execute_transfer_request(_INOUT_ uint16_t*& buffer,
+                                              _IN_    const uint32_t buffer_size,
+                                              _IN_    uint32_t relative_lba,
+                                              _IN_    uint32_t sector_count)
+                                              noexcept {
+        status_t status           = status::SUCCESS;
+        uint32_t chunk            = 0;
+        uint32_t chunk_byte_size  = 0;
+        uint32_t used_buffer_size = 0;
+
+        kernel::sys::disable_interrupts();
+
+        if (sector_count == 0) [[unlikely]] {
+            sector_count = MAX_ALLOWED_SECTOR_COUNT;
+        }
+
+        status = validate_transfer_request(buffer,
+                                           buffer_size,
+                                           relative_lba,
+                                           sector_count);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        status = wait_until_unbusy_or_error();
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        while (sector_count > 0) [[likely]] {
+            if (sector_count > CHUNK_SECTORS) {
+                chunk = CHUNK_SECTORS;
+            } 
+            else {
+                chunk = sector_count;
+            }
+
+            chunk_byte_size = chunk * SECTOR_SIZE;
+
+            if (chunk_byte_size > 
+                (buffer_size - used_buffer_size)) [[unlikely]] {
+                status = status::BUFFER_TOO_SMALL | status::flags::PARAM_B;
+                break;
+            }
+
+            if (reinterpret_cast<uint32_t>(buffer) > 
+                (UINT32_MAX - chunk_byte_size)) [[unlikely]] {
+                status = status::BUFFER_TOO_SMALL | status::flags::PARAM_B;
+                break;
+            }
+
+            status = try_chunk_transfer(buffer, relative_lba, chunk);
+            if (status == (status::ATA_INVALID_LBA | status::flags::PARAM_B)) 
+                [[unlikely]] {
+                // The status flag `PARAM_B` is changed to `PARAM_C`, 
+                // so that the returned status code matches the 
+                // method signature.
+
+                status = status::ATA_INVALID_LBA | status::flags::PARAM_C;
+                break;
+            }
+            else if (status != status::SUCCESS) [[unlikely]] {
+                break;
+            }
+
+            used_buffer_size += chunk_byte_size;
+
+            buffer       += chunk * SECTOR_WORD_SIZE;
+            relative_lba += chunk;
+            sector_count -= chunk;
+        }
+
+    cleanup:
+        reset_driver();
+        delay();
+
+        kernel::sys::enable_interrupts();
+
         return status;
     }
 
@@ -1281,8 +1193,7 @@ namespace drivers::ata
     [[nodiscard]]
     status_t 
     Programmable_IO::init() noexcept {
-        status_t status       = status::SUCCESS;
-        const uint32_t eflags = kernel::sys::save_eflags();
+        status_t status = status::SUCCESS;
 
         struct Channel final { 
             uint16_t io_port          = 0;
@@ -1324,7 +1235,7 @@ namespace drivers::ata
             break;
         }
 
-        kernel::sys::restore_eflags(eflags);
+        kernel::sys::enable_interrupts();
 
         if (status == status::SUCCESS && 
             !identify_data.lba_supported) [[unlikely]] {
@@ -1345,23 +1256,24 @@ namespace drivers::ata
      * @note If `operation.sector_count` is `0`, 
      *       the `operation.sector_count` isset to `256`.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `operation.buffer` is a `nullptr`.
+     * @retval `status::NULL_POINTER`
+     *          If `buffer` is a `nullptr`.
      *
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_A`
-     *          If `operation.sector_count` exceeds the 
-     *          allowed maximum sectorcount.
-     *
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_A`
-     *          If `operation.relative_lba` is outside the 
-     *          valid partition range or the 
-     *          requested transfer range exceeds the partition length.
-     *
-     * @retval `status::ATA_NO_DEVICE` 
-     *          If no device is configured.
+     * @retval `status::BUFFER_TOO_SMALL`
+     *          If `buffer_size` is too small for the requested transfer.
      * 
+     * @retval `status::ATA_INVALID_LBA`
+     *          If `relative_lba` is outside the valid partition range or 
+     *          the requested transfer range exceeds the partition length.
+     *
+     * @retval `status::ATA_INVALID_SECTOR_COUNT`
+     *          If `sector_count` exceeds the allowed maximum sectorcount.
+     * 
+     * @retval `status::ATA_NO_DEVICE`
+     *          If no device is configured.
+     *
      * @retval `status::ATA_ERROR`
-     *          If an error is reported during the read.
+     *          If an error is reported during the transfer.
      *
      * @retval `status::ATA_DEVICE_FAULT`
      *          If the device enters an error state.
@@ -1385,19 +1297,23 @@ namespace drivers::ata
                                                    operation.buffer_byte_size,
                                                    operation.relative_lba, 
                                                    operation.sector_count);
+        // Flags are removed from the status codes so that it matches the 
+        // signature of the method.
         switch (status) {
-        case status::ATA_INVALID_LBA | status::flags::PARAM_B:
-            // The status flag `PARAM_B` is changed to `PARAM_A`, 
-            // so that the returned status code matches the method signature.
-
-            status = status::ATA_INVALID_LBA | status::flags::PARAM_A;
+        case status::NULL_POINTER | status::flags::PARAM_A:
+            status = status::NULL_POINTER;
             break;
 
-        case status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C:
-            // The status flag `PARAM_C` is changed to `PARAM_A`, 
-            // so that the returned status code matches the method signature.
+        case status::BUFFER_TOO_SMALL | status::flags::PARAM_B:
+            status = status::BUFFER_TOO_SMALL;
+            break;
 
-            status = status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_A;
+        case status::ATA_INVALID_LBA | status::flags::PARAM_C:
+            status = status::ATA_INVALID_LBA;
+            break;
+
+        case status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D:
+            status = status::ATA_INVALID_SECTOR_COUNT;
             break;
         }
 
@@ -1418,23 +1334,24 @@ namespace drivers::ata
      * @note If `operation.sector_count` is `0`, 
      *       the `operation.sector_count` isset to `256`.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `operation.buffer` is a `nullptr`.
+     * @retval `status::NULL_POINTER`
+     *          If `buffer` is a `nullptr`.
      *
-     * @retval `status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_A`
-     *          If `operation.sector_count` exceeds the 
-     *          allowed maximum sectorcount.
-     *
-     * @retval `status::ATA_INVALID_LBA | status::flags::PARAM_A`
-     *          If `operation.relative_lba` is outside the 
-     *          valid partition range or the 
-     *          requested transfer range exceeds the partition length.
-     *
-     * @retval `status::ATA_NO_DEVICE` 
-     *          If no device is configured.
+     * @retval `status::BUFFER_TOO_SMALL`
+     *          If `buffer_size` is too small for the requested transfer.
      * 
+     * @retval `status::ATA_INVALID_LBA`
+     *          If `relative_lba` is outside the valid partition range or 
+     *          the requested transfer range exceeds the partition length.
+     *
+     * @retval `status::ATA_INVALID_SECTOR_COUNT`
+     *          If `sector_count` exceeds the allowed maximum sectorcount.
+     * 
+     * @retval `status::ATA_NO_DEVICE`
+     *          If no device is configured.
+     *
      * @retval `status::ATA_ERROR`
-     *          If an error is reported during the read.
+     *          If an error is reported during the transfer.
      *
      * @retval `status::ATA_DEVICE_FAULT`
      *          If the device enters an error state.
@@ -1458,19 +1375,23 @@ namespace drivers::ata
                                                    operation.buffer_byte_size,
                                                    operation.relative_lba, 
                                                    operation.sector_count);
+        // Flags are removed from the status codes so that it matches the 
+        // signature of the method.
         switch (status) {
-        case status::ATA_INVALID_LBA | status::flags::PARAM_B:
-            // The status flag `PARAM_B` is changed to `PARAM_A`, 
-            // so that the returned status code matches the method signature.
-
-            status = status::ATA_INVALID_LBA | status::flags::PARAM_A;
+        case status::NULL_POINTER | status::flags::PARAM_A:
+            status = status::NULL_POINTER;
             break;
 
-        case status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_C:
-            // The status flag `PARAM_C` is changed to `PARAM_A`, 
-            // so that the returned status code matches the method signature.
+        case status::BUFFER_TOO_SMALL | status::flags::PARAM_B:
+            status = status::BUFFER_TOO_SMALL;
+            break;
 
-            status = status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_A;
+        case status::ATA_INVALID_LBA | status::flags::PARAM_C:
+            status = status::ATA_INVALID_LBA;
+            break;
+
+        case status::ATA_INVALID_SECTOR_COUNT | status::flags::PARAM_D:
+            status = status::ATA_INVALID_SECTOR_COUNT;
             break;
         }
 
