@@ -1,19 +1,12 @@
 /**
-LICENSE:
-    Copyright (c) 2026 Lukenar11 (Luke Matthes)
-    Under the MIT License
-    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-
-DESCRIPTION:
-    This library defines basic routines for string manipulation
-    that can be used system-wide.
-
-    The routines include copying, shifting, comparing, and filling strings
-
-NOTES:
-    Some methods are defined in the header so that the 
-    compiler can better inline them.
-*/
+ * @brief Defines a library for basic string manipulation.
+ *
+ * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
+ * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+ * @author    Lukenar11 (Luke Matthes)
+ *
+ * @note
+ */
 
 
 #pragma once
@@ -27,20 +20,24 @@ namespace stdlib::string
 {
     /**
      * @brief Copys the content of a string part in another string.
+     * 
      * @note The destination buffer must be at least `byte_size` bytes long.
      * 
-     * @param destination_ptr pointer to destination-string
-     * @param source_ptr      pointer to source-string
-     * @param byte_size       string part char size
+     * @param destination pointer to destination string
+     * @param source      pointer to source string
+     * @param byte_size   string part char size
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If `destination_ptr` is a `nullptr`.
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *          If `destination` is `nullptr`.
+     *
+     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+     *          If `source` is `nullptr` or empty.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-     *          If `source_ptr` is a `nullptr`.
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
+     *          If `byte_size` is `0` or `1`.
      * 
-     * @retval `status::SUCCESS | status::flags::SIZE_ZERO`
-     *          If `byte_size` is a `0` or `1`.
+     * @retval `status::BUFFER_OVERFLOW`
+     *          If `source` does not fit into the destination buffer.
      * 
      * @retval `status::SUCCESS`
      *          Default case.
@@ -48,9 +45,9 @@ namespace stdlib::string
     _API_ 
     [[nodiscard]]
     status_t
-    copy_part(_INOUT_ char* const destination_ptr,
-              _IN_    const char* const source_ptr,
-              _IN_    const uint32_t byte_size) noexcept;
+    copy_part(_IN_ char* const destination_ptr,
+              _IN_ const char* const source_ptr,
+              _IN_ const uint32_t byte_size) noexcept;
 
 
     /**
@@ -59,14 +56,14 @@ namespace stdlib::string
      * @note The destination buffer must be large enough for the 
      *       full string.
      * 
-     * @param destination_ptr pointer to the destination-string
-     * @param source_ptr      pointer to the source-string
+     * @param destination_ptr pointer to destination string
+     * @param source_ptr      pointer to source string
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If `destination_ptr` is a `nullptr`.
-     * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-     *          If `source_ptr` is a `nullptr`.
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *          If `destination` is `nullptr`.
+     *
+     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+     *          If `source` is `nullptr` or empty.
      * 
      * @retval `status::SUCCESS`
      *          Default case.
@@ -74,8 +71,8 @@ namespace stdlib::string
     _API_ 
     [[nodiscard]]
     status_t 
-    copy(_INOUT_ char* destination_ptr, 
-         _IN_    const char* source_ptr) noexcept;
+    copy(_IN_ char* const destination_ptr, 
+         _IN_ const char* const source_ptr) noexcept;
 
 
     /**
@@ -98,7 +95,7 @@ namespace stdlib::string
     [[nodiscard]]
     status_t 
     find_char(_OUT_ const char*& found_char,
-              _IN_  const char* string, 
+              _IN_  const char* const string, 
               _IN_  const int32_t symbol) noexcept;
 
 
@@ -118,35 +115,35 @@ namespace stdlib::string
     [[nodiscard]]
     status_t 
     get_length(_OUT_ uint32_t& length,
-               _IN_  const char* string) noexcept;
+               _IN_  const char* const string) noexcept;
 
 
     /**
      * @brief Compares 2 different strings.
      * 
-     * @param a_ptr pointer to string-a.
-     * @param b_ptr pointer to string-b.
+     * @param string_a pointer to string a.
+     * @param string_b pointer to string b.
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `a_ptr` is `nullptr`.
+     *          If `string_a` is `nullptr`.
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_B`
-     *          If `b_ptr` is `nullptr`.
+     *          If `string_b` is `nullptr`.
      * 
      * @retval `status::LESS_THAN` 
-     *          If `string-a` is less then `string-b`.
+     *          If `string_a` is less then `string_b`.
      * 
      * @retval `status::GREATER_THAN` 
-     *          If `string-a` is greater then `string-b`.
+     *          If `string_a` is greater then `string_b`.
      * 
      * @retval `status::EQUAL_TO`
-     *          If string-a and string-b are identical.
+     *          If `string_a` and `string_b` are identical.
      */
     _API_ 
     [[nodiscard]]
     status_t 
-    compare(_IN_ const char* a_ptr, 
-            _IN_ const char* b_ptr) noexcept;
+    compare(_IN_ const char* const string_a, 
+            _IN_ const char* const string_b) noexcept;
 
 
     /**
@@ -162,7 +159,7 @@ namespace stdlib::string
      *          If one or more char/chars in `string` is not a value.
      * 
      * @retval `status::EMPTY`
-     *          If the length of `string` is to short.
+     *          If the length of `string` is empty.
      * 
      * @retval `status::BUFFER_OVERFLOW`
      *          If `string` triggers an overflow.

@@ -1,22 +1,16 @@
 /**
-LICENSE:
-    Copyright (c) 2026 Lukenar11 (Luke Matthes)
-    MIT Licensed
-    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-
-DESCRIPTION:
-    This library defines basic routines for string manipulation
-    that can be used sys-wide.
-
-    The routines include copying, shifting, comparing, and filling strings
-
-NOTES:
-    Some methods are defined in the header so that the 
-    compiler can better inline them.
-*/
+ * @brief Implements a library for basic string manipulation.
+ *
+ * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
+ * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+ * @author    Lukenar11 (Luke Matthes)
+ *
+ * @note
+ */
 
 
 #include <string.hpp>
+
 
 namespace
 {
@@ -27,40 +21,37 @@ namespace
     /**
      * @brief Validates the parameters for the most class methods.
      * 
-     * @param destination_ptr pointer to validate
-     * @param source_ptr      pointer to validate
+     * @param destination pointer to validate
+     * @param source      pointer to validate
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `destination_ptr` is `nullptr` or to short.
+     *          If `destination` is `nullptr`
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_B`
-     *          If `source_ptr` is `nullptr` or empty or to short.
+     *          If `source` is `nullptr` or empty.
      * 
      * @retval `status::SUCCESS`
      *          If all pointer are valid.
      */
     [[nodiscard]]
     status_t
-    validate_destination_ptr_and_source_ptr(_IN_ const char* const destination_ptr,
-                                            _IN_ const char* const source_ptr) noexcept {
-        status_t status;
+    validate_destination_and_source(_IN_ const char* const destination,
+                                    _IN_ const char* const source) noexcept {
+        status_t status = status::SUCCESS;
 
-        if (!destination_ptr) [[unlikely]] {
+        if (!destination) [[unlikely]] {
             status = status::NULL_POINTER | status::flags::PARAM_A;
             goto cleanup;
         }
 
-        if (!source_ptr) [[unlikely]] {
+        if (!source) [[unlikely]] {
             status = status::NULL_POINTER | status::flags::PARAM_B;
             goto cleanup;
         }
         
-        if (source_ptr[0] == '\0') [[unlikely]] {
+        if (source[0] == '\0') [[unlikely]] {
             status = status::NULL_POINTER | status::flags::PARAM_B;
-            goto cleanup;
         }
-
-        status = status::SUCCESS;
 
     cleanup:
         return status;
@@ -75,18 +66,21 @@ namespace stdlib::string
      * 
      * @note The destination buffer must be at least `byte_size` bytes long.
      * 
-     * @param destination_ptr pointer to destination-string
-     * @param source_ptr      pointer to source-string
-     * @param byte_size       string part char size
+     * @param destination pointer to destination string
+     * @param source      pointer to source string
+     * @param byte_size   string part char size
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If `destination_ptr` is a `nullptr`.
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *          If `destination` is `nullptr`.
+     *
+     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+     *          If `source` is `nullptr` or empty.
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-     *          If `source_ptr` is a `nullptr`.
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
+     *          If `byte_size` is `0` or `1`.
      * 
-     * @retval `status::SUCCESS | status::flags::SIZE_ZERO`
-     *          If `byte_size` is a `0` or `1`.
+     * @retval `status::BUFFER_OVERFLOW`
+     *          If `source` does not fit into the destination buffer.
      * 
      * @retval `status::SUCCESS`
      *          Default case.
@@ -94,20 +88,18 @@ namespace stdlib::string
     _API_ 
     [[nodiscard]] 
     status_t
-    copy_part(_INOUT_ char* const destination_ptr,
-              _IN_    const char* const source_ptr,
-              _IN_    const uint32_t byte_size) noexcept {
-        status_t status;
-        uint32_t memory_index = 0;
-        const char null_char  = '\0';
+    copy_part(_IN_ char* const destination,
+              _IN_ const char* const source,
+              _IN_ const uint32_t byte_size) noexcept {
+        status_t status = status::SUCCESS;
+        uint32_t index  = 0;
 
-        status = validate_destination_ptr_and_source_ptr(destination_ptr, 
-                                                         source_ptr);
+        status = validate_destination_and_source(destination, source);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        if (destination_ptr == source_ptr) [[unlikely]] {
+        if (destination == source) [[unlikely]] {
             status = status::SUCCESS;
             goto cleanup;
         }
@@ -117,20 +109,17 @@ namespace stdlib::string
             goto cleanup;
         }
 
-        while (memory_index + 1 < 
-               byte_size && source_ptr[memory_index] != null_char) [[likely]] {
-            destination_ptr[memory_index] = source_ptr[memory_index];
-            ++memory_index;
+        while (index + 1 < byte_size && source[index] != '\0') [[likely]] {
+            destination[index] = source[index];
+            index++;
         }
 
-        if (source_ptr[memory_index] != null_char) [[unlikely]] {
+        if (source[index] != '\0') [[unlikely]] {
             status = status::BUFFER_OVERFLOW;
             goto cleanup;
         }
 
-        destination_ptr[memory_index] = null_char;
-
-        status = status::SUCCESS;
+        destination[index] = '\0';
 
     cleanup:
         return status;
@@ -142,14 +131,14 @@ namespace stdlib::string
      * 
      * @note The destination buffer must be large enough for the full string.
      * 
-     * @param destination_ptr pointer to the destination-string
-     * @param source_ptr      pointer to the source-string
+     * @param destination pointer to destination string
+     * @param source      pointer to source string
      * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_A` 
-     *          If `destination_ptr` is a `nullptr`.
-     * 
-     * @retval `status::NULL_POINTER | status::flags::PARAM_B` 
-     *          If `source_ptr` is a `nullptr`.
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *          If `destination` is `nullptr`.
+     *
+     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+     *          If `source` is `nullptr` or empty.
      * 
      * @retval `status::SUCCESS`
      *          Default case.
@@ -157,25 +146,27 @@ namespace stdlib::string
     _API_  
     [[nodiscard]]
     status_t 
-    copy(_INOUT_ char* destination_ptr, 
-         _IN_    const char* source_ptr) noexcept {
-        status_t status;
+    copy(_IN_ char* const destination, 
+         _IN_ const char* const source) noexcept {
+        status_t status = status::SUCCESS;
+        uint32_t index  = 0;
 
-        status = validate_destination_ptr_and_source_ptr(destination_ptr, 
-                                                         source_ptr);
+        status = validate_destination_and_source(destination, source);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        if (destination_ptr == source_ptr) [[unlikely]] {
+        if (destination == source) [[unlikely]] {
             status = status::SUCCESS;
             goto cleanup;
         }
 
-        while ((*destination_ptr++ = *source_ptr++)) [[likely]] {
+        while (source[index] != '\0') [[likely]] {
+            destination[index] = source[index];
+            index++;
         }
 
-        status = status::SUCCESS;
+        destination[index] = '\0';
 
     cleanup:
         return status;
@@ -202,28 +193,25 @@ namespace stdlib::string
     [[nodiscard]] 
     status_t 
     find_char(_OUT_ const char*& found_char,
-              _IN_  const char* string, 
+              _IN_  const char* const string, 
               _IN_  const int32_t symbol) noexcept {
-        status_t status;
+        status_t status = status::NOT_FOUND;
+
+        found_char = nullptr;
 
         if (!string) [[unlikely]] {
-            found_char = nullptr;
-            status     = status::NULL_POINTER | status::flags::PARAM_B;
-
+            status = status::NULL_POINTER | status::flags::PARAM_B;
             goto cleanup;
         }
 
-        while (*string != static_cast<char>(symbol)) [[likely]] {
-            if (!(*string++)) [[unlikely]] {
-                found_char = nullptr;
-                status     = status::NOT_FOUND;
+        for (uint32_t index = 0; string[index] != '\0'; index++) [[likely]] {
+            if (string[index] == static_cast<char>(symbol)) {
+                found_char = &string[index];
+                status     = status::SUCCESS;
 
-                goto cleanup;
+                break;
             }
         }
-
-        found_char = const_cast<char*>(string);
-        status     = status::SUCCESS;
 
     cleanup:
         return status;
@@ -246,8 +234,9 @@ namespace stdlib::string
     [[nodiscard]]
     status_t 
     get_length(_OUT_ uint32_t& length,
-               _IN_  const char* string) noexcept {
-        status_t status;
+               _IN_  const char* const string) noexcept {
+        status_t status = status::SUCCESS;
+
         length = 0;
 
         if (!string || string[0] == '\0') [[unlikely]] {
@@ -255,9 +244,8 @@ namespace stdlib::string
             goto cleanup;
         }
 
-        while (*string != '\0') [[likely]] {
-            ++string;
-            ++length;
+        while (string[length] != '\0') [[likely]] {
+            length++;
         }
 
         status = status::SUCCESS;
@@ -270,55 +258,56 @@ namespace stdlib::string
     /**
      * @brief Compares 2 different strings.
      * 
-     * @param a_ptr pointer to string-a.
-     * @param b_ptr pointer to string-b.
+     * @param string_a pointer to string a.
+     * @param string_b pointer to string b.
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `a_ptr` is `nullptr`.
+     *          If `string_a` is `nullptr`.
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_B`
-     *          If `b_ptr` is `nullptr`.
+     *          If `string_b` is `nullptr`.
      * 
      * @retval `status::LESS_THAN` 
-     *          If `string-a` is less then `string-b`.
+     *          If `string_a` is less then `string_b`.
      * 
      * @retval `status::GREATER_THAN` 
-     *          If `string-a` is greater then `string-b`.
+     *          If `string_a` is greater then `string_b`.
      * 
      * @retval `status::EQUAL_TO`
-     *          If string-a and string-b are identical.
+     *          If `string_a` and `string_b` are identical.
      */
     _API_  
     [[nodiscard]]
     status_t 
-    compare(_IN_ const char* a_ptr, 
-            _IN_ const char* b_ptr) noexcept {
-        status_t status;
+    compare(_IN_ const char* const string_a, 
+            _IN_ const char* const string_b) noexcept {
+        status_t status = status::EQUAL_TO;
+        uint32_t index  = 0;
 
-        if (!a_ptr) [[unlikely]] {
+        if (!string_a) [[unlikely]] {
             status = status::NULL_POINTER | status::flags::PARAM_A;
             goto cleanup;
         }
 
-        if (!b_ptr) [[unlikely]] {
+        if (!string_b) [[unlikely]] {
             status = status::NULL_POINTER | status::flags::PARAM_B;
             goto cleanup;
         }
 
-        if (a_ptr == b_ptr) [[unlikely]] {
+        if (string_a == string_b) [[unlikely]] {
             status = status::EQUAL_TO;
             goto cleanup;
         }
 
-        while (*a_ptr && (*a_ptr == *b_ptr)) [[likely]] {
-            ++a_ptr;
-            ++b_ptr;
+        while (string_a[index] != '\0' && 
+               string_a[index] == string_b[index]) [[likely]] {
+            index++;
         }
 
-        if (*a_ptr < *b_ptr) {
+        if (string_a[index] < string_b[index]) {
             status = status::LESS_THAN;
         } 
-        else if (*a_ptr > *b_ptr) {
+        else if (string_a[index] > string_b[index]) {
             status = status::GREATER_THAN;
         }
         else {
@@ -343,7 +332,7 @@ namespace stdlib::string
      *          If one or more char/chars in `string` is not a value.
      * 
      * @retval `status::EMPTY`
-     *          If the length of `string` is to short.
+     *          If the length of `string` is empty.
      * 
      * @retval `status::BUFFER_OVERFLOW`
      *          If `string` triggers an overflow.
@@ -354,19 +343,22 @@ namespace stdlib::string
      * @retval `status::SUCCESS`
      *          Default case.
      */
-    _API_ 
-    [[nodiscard]] 
-    status_t 
+    _API_
+    [[nodiscard]]
+    status_t
     to_int(_OUT_ int32_t& value,
            _IN_  const char* string) noexcept {
-        bool is_negative;
-        status_t status;
-        uint32_t digit;
-        uint32_t string_length = 0;
-        uint32_t limit         = 0;
-        uint32_t magnitude     = 0;
-        const uint32_t ten     = 10;
-        value                  = 0;
+        status_t status              = status::SUCCESS;
+        uint32_t string_length       = 0;
+        bool is_negative             = false;
+        uint32_t limit               = 0;
+        uint32_t digit               = 0;
+        uint32_t magnitude           = 0;
+        const uint32_t ten           = 10;
+        const uint32_t ascii_0       = '0';
+        const uint32_t int32_min_abs = INT32_MAX + 1u;
+
+        value = 0;
 
         if (!string) [[unlikely]] {
             status = status::NULL_POINTER | status::flags::PARAM_B;
@@ -392,45 +384,61 @@ namespace stdlib::string
                 goto cleanup;
             }
 
-            limit = INT32_MIN;
+            limit = int32_min_abs;
         }
         else {
             is_negative = false;
             limit       = INT32_MAX;
         }
 
-        while (*string) {
-            if (!is_digit(*string)) [[unlikely]] {
+        for (uint32_t index = 0; string[index] != '\0'; index++) [[likely]] {
+            if (!is_digit(string[index])) [[unlikely]] {
                 status = status::INVALID_PARAMETER | status::flags::PARAM_B;
                 goto cleanup;
             }
 
-            digit = static_cast<uint32_t>(*string - '0');
+            digit = static_cast<uint32_t>(string[index] - ascii_0);
 
-            if  (magnitude > limit / ten ||
-                 (digit > limit % ten &&
-                  magnitude == limit / ten)) [[unlikely]] {
-                status = (is_negative) 
-                         ? status::BUFFER_UNDERFLOW      
-                         : status::BUFFER_OVERFLOW;
+            if (magnitude > limit / ten ||
+                (magnitude == limit / ten && digit > limit % ten)) [[unlikely]] {
+                if (is_negative) {
+                    status = status::BUFFER_UNDERFLOW;
+                }
+                else {
+                    status = status::BUFFER_OVERFLOW;
+                }
+
                 goto cleanup;
             }
 
             magnitude = magnitude * ten + digit;
-            ++string;
         }
 
-        value = (is_negative) 
-                ? -static_cast<int32_t>(magnitude)
-                :  static_cast<int32_t>(magnitude);
-
-        status = status::SUCCESS;
+        if (is_negative) {
+            if (magnitude == int32_min_abs) {
+                value = INT32_MIN;
+            }
+            else {
+                value = -static_cast<int32_t>(magnitude);
+            }
+        }
+        else {
+            value = static_cast<int32_t>(magnitude);
+        }
 
     cleanup:
         return status;
     }
 
 
+    /**
+     * @brief Shows if a number is a digit.
+     * 
+     * @param symbol the symbol to check
+     * 
+     * @retval `true` if `symbol` is a digit.
+     * @retval `false` if `symbol` is not a digit.
+     */
     _API_ 
     [[nodiscard]] 
     bool 
