@@ -1,17 +1,12 @@
 /**
-LICENSE:
-    Copyright (c) 2026 Lukenar11 (Luke Matthes)
-    MIT Licensed
-    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-
-DESCRIPTION:
-    This header defines a minimal, fixed-size circular buffer template.
-
-NOTES:
-    The code is completely defined and declared in the header, 
-    because of the typical C++ template chaos 😂 and 
-    so that the compiler can inline certain methods.
-*/
+ * @brief Defines a minimal, fixed size circular buffer template.
+ *
+ * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
+ * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+ * @author    Lukenar11 (Luke Matthes)
+ *
+ * @note The complete code is in the header because it's generic.
+ */
 
 
 #pragma once
@@ -59,6 +54,31 @@ namespace stdlib
 
     public:
         /**
+         * @brief Initializes the circular buffer.
+         *
+         * @note `buffer_head` & `buffer_tail` starts at `0` and
+         *        buffer_is_full is `false`.
+         */
+        _API_ 
+        inline 
+        constexpr 
+        Circular_Buffer() noexcept : 
+            buffer_head(0), 
+            buffer_tail(0), 
+            buffer_is_full(false) {
+        }
+
+
+        /**
+         * @brief Uninitializes the circular buffer.
+         *
+         * @note `buffer_head` & `buffer_tail` starts at `0` and
+         *        buffer_is_full is `false`.
+         */
+        ~Circular_Buffer() noexcept = default;
+
+        
+        /**
          * @brief Inserts an item into the circular buffer.
          *
          * @param item                The element to insert.
@@ -68,9 +88,6 @@ namespace stdlib
          *
          * @retval `status::FULL`
          *          The buffer is full and `overwrite_last_item` is `false`.
-         *
-         * @retval `status::SUCCESS | status::flags::OVERWRITTEN`
-         *          The buffer was full, but the oldest item was overwritten.
          * 
          * @retval `status::SUCCESS`
          *          Default Case.
@@ -79,7 +96,8 @@ namespace stdlib
         status_t 
         push(_IN_ const T& item, 
              _IN_ const bool overwrite_last_item=false) noexcept {
-            status_t status;
+            status_t status = status::SUCCESS;
+
             if (buffer_is_full) [[unlikely]] {
                 if (!overwrite_last_item) [[unlikely]] {
                     status = status::FULL;
@@ -92,13 +110,6 @@ namespace stdlib
             buffer[buffer_head] = item;
             buffer_head         = increment_index(buffer_head);
             buffer_is_full      = (buffer_head == buffer_tail);
-
-            if (!overwrite_last_item) [[likely]] {
-                status = status::SUCCESS;
-            }
-            else [[unlikely]] {
-                status = status::SUCCESS | status::flags::OVERWRITTEN;
-            }
         
         cleanup:
             return status;
@@ -110,7 +121,7 @@ namespace stdlib
          *
          * @param item The removed element.
          * 
-         * @retval `status::BUFFER_UNDERFLOW | status::IS_EMPTY`
+         * @retval `status::BUFFER_UNDERFLOW`
          *          If the buffer is empty.
          *
          * @retval `status::SUCCESS`
@@ -119,18 +130,16 @@ namespace stdlib
         _API_ 
         status_t 
         pop(_OUT_ T& item) noexcept {
-            status_t status;
+            status_t status = status::SUCCESS;
 
             if (empty()) [[unlikely]] {
-                status = status::BUFFER_UNDERFLOW | status::flags::IS_EMPTY;
+                status = status::BUFFER_UNDERFLOW;
                 goto cleanup;
             }
 
             item           = buffer[buffer_tail];
             buffer_is_full = false;
             buffer_tail    = increment_index(buffer_tail);
-
-            status = status::SUCCESS;
         
         cleanup:
             return status;
@@ -142,7 +151,7 @@ namespace stdlib
          *
          * @param item The element at the buffer tail.
          *
-         * @retval `status::BUFFER_UNDERFLOW | status::IS_EMPTY`
+         * @retval `status::BUFFER_UNDERFLOW`
          *          If the buffer is empty.
          *
          * @retval `status::SUCCESS`
@@ -151,15 +160,14 @@ namespace stdlib
         _API_ 
         status_t 
         peek(_OUT_ const T& item) const noexcept {
-            status_t status;
+            status_t status = status::SUCCESS;
 
             if (empty()) [[unlikely]] {
-                status = status::BUFFER_UNDERFLOW | status::flags::IS_EMPTY;
+                status = status::BUFFER_UNDERFLOW;
                 goto cleanup;
             }
 
-            item   = buffer[buffer_tail];
-            status = status::SUCCESS;
+            item = buffer[buffer_tail];
         
         cleanup:
             return status;
@@ -255,24 +263,5 @@ namespace stdlib
         is_full() const noexcept {
             return buffer_is_full;
         }
-
-
-        /**
-         * @brief Initializes an empty circular buffer.
-         *
-         * @note `buffer_head` & `buffer_tail` starts at `0` and
-         *        buffer_is_full is `false`.
-         */
-        _API_ 
-        inline 
-        constexpr 
-        Circular_Buffer() noexcept : 
-            buffer_head(0), 
-            buffer_tail(0), 
-            buffer_is_full(false) {
-        }
-
-
-        ~Circular_Buffer() noexcept = default;
     };
 } // namespace stdlib

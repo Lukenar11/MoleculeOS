@@ -1,17 +1,12 @@
 /**
-LICENSE:
-    Copyright (c) 2026 Lukenar11 (Luke Matthes)
-    MIT Licensed
-    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-
-DESCRIPTION:
-    This header defines a minimal, fixed-size array template.
-
-    Unlike 'std::array', this implementation avoids dependencies on the
-    C++ standard library, which is unavailable in kernel mode.
-
-NOTES:
-*/
+ * @brief Defines a minimal, fixed size array template.
+ *
+ * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
+ * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+ * @author    Lukenar11 (Luke Matthes)
+ *
+ * @note The complete code is in the header because it's generic.
+ */
 
 
 #pragma once
@@ -22,7 +17,7 @@ NOTES:
 
 namespace stdlib 
 {
-    template<class T, uint32_t S>
+    template<typename T, uint32_t S>
     class Array final {
     private:
         static_assert(S > 0, "'Array' size must be greater than zero");
@@ -31,6 +26,22 @@ namespace stdlib
 
         
     public:
+        /**
+         * @brief Initializes the fixed size array.
+         * 
+         * @note It's declared as default.
+         */
+        Array() noexcept = default;
+
+
+        /**
+         * @brief Uninitializes the fixed size array.
+         * 
+         * @note It's declared as default.
+         */
+        ~Array() noexcept = default;
+
+
         /**
          * @brief Returns the element at the given index.
          * 
@@ -209,8 +220,5 @@ namespace stdlib
                 buffer[current_value] = value; 
             }
         }
-
-        Array() noexcept  = default;
-        ~Array() noexcept = default;
     };
 } // namespace stdlib

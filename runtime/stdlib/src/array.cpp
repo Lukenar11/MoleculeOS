@@ -1,17 +1,12 @@
 /**
-LICENSE:
-    Copyright (c) 2026 Lukenar11 (Luke Matthes)
-    MIT Licensed
-    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-
-DESCRIPTION:
-    This header defines a minimal, fixed-size array template.
-
-    Unlike 'std::array', this implementation avoids dependencies on the
-    C++ standard library, which is unavailable in kernel mode.
-
-NOTES:
-*/
+ * @brief Implements a minimal, fixed size array template.
+ *
+ * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
+ * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+ * @author    Lukenar11 (Luke Matthes)
+ *
+ * @note The complete code is in the header because it's generic.
+ */
 
 
 #include <array.hpp>
