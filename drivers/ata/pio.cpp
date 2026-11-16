@@ -832,7 +832,7 @@ namespace drivers::ata
         uint32_t absolute_lba = 0;
 
         if (relative_lba > 
-            (UINT32_MAX - identify_data.lba_start_address)) [[unlikely]] {
+            (stdlib::UINT32_MAX - identify_data.lba_start_address)) [[unlikely]] {
             status = status::ATA_INVALID_LBA | status::flags::PARAM_B;
             goto cleanup;
         }
@@ -1122,7 +1122,7 @@ namespace drivers::ata
             }
 
             if (reinterpret_cast<uint32_t>(buffer) > 
-                (UINT32_MAX - chunk_byte_size)) [[unlikely]] {
+                (stdlib::UINT32_MAX - chunk_byte_size)) [[unlikely]] {
                 status = status::BUFFER_TOO_SMALL | status::flags::PARAM_B;
                 break;
             }

@@ -241,7 +241,7 @@ namespace
         void* ptr;
 
         if (needed_blocks == 0 ||
-            needed_blocks > UINT16_MAX ||
+            needed_blocks > stdlib::UINT16_MAX ||
             pool_index >= all_memory_blocks ||
             needed_blocks > (all_memory_blocks - pool_index)) [[unlikely]] {
             ptr = nullptr;
@@ -329,7 +329,7 @@ namespace
         needed_blocks = (byte_size + MEMORY_BLOCK_SIZE - 1) / 
                          MEMORY_BLOCK_SIZE;
         if (needed_blocks > all_memory_blocks || 
-            needed_blocks > UINT16_MAX) [[unlikely]] {
+            needed_blocks > stdlib::UINT16_MAX) [[unlikely]] {
             status = status::HEAP_EXHAUSTED;
             goto cleanup;
         }
