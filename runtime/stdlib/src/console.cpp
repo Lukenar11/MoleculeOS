@@ -1,26 +1,12 @@
 /**
-LICENSE:
-    Copyright (c) 2026 Lukenar11 (Luke Matthes)
-    MIT Licensed
-    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-
-DESCRIPTION:
-    This file contains the high-level text output system, 
-    which provides formatted and unformatted print functions 
-    on the 'VGA text mode driver'.
-
-    It provides character output, string output, 
-    integer formatting, hexadecimal and binary print output, 
-    pointer formatting and supports setting various text and cursor colors.
-
-    The 'Text_Output' class manages its own cursor state, 
-    color configuration, and line management, 
-    allowing structured and readable output during runtime.
-    
-NOTES:
-    Some methods are placed in the header 
-    because they are so small that the compiler can inline them.
-*/
+ * @brief Implements a high-level console output system.
+ *
+ * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
+ * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+ * @author    Lukenar11 (Luke Matthes)
+ *
+ * @note 
+ */
 
 
 #include <console.hpp>
@@ -39,7 +25,7 @@ namespace
     uint32_t cursor_x = 0;
     uint32_t cursor_y = 0;
         
-    drivers::vga::Text_Mode_Char cursor_cell;
+    drivers::vga::Text_Mode_Char cursor_cell = {};
 
 
     /** 
@@ -88,7 +74,7 @@ namespace
                            _OUT_ uint32_t& chars_written,
                            _IN_  uint32_t value,
                            _IN_  const uint32_t base) noexcept {
-        status_t status;
+        status_t status          = status::SUCCESS;
         uint8_t converted_number = 0;
         const char null_char     = '0';
         const char a             = 'A';
@@ -127,8 +113,6 @@ namespace
             value /= base;
         }
 
-        status = status::SUCCESS;
-
     cleanup:
         return status;
     }
@@ -156,9 +140,9 @@ namespace
     status_t 
     put_base(_IN_ const uint32_t value, 
              _IN_ const uint32_t base) noexcept {
+        status_t status       = status::SUCCESS;
+        uint32_t buffer_count = 0;
         stdlib::Array<char, 32> buffer;
-        uint32_t buffer_count;
-        status_t status;
 
         if (base < 2 || base > 16) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_B;
@@ -182,8 +166,6 @@ namespace
                 goto cleanup;
             }
         }
-
-        status = status::SUCCESS;
 
     cleanup:
         return status;
@@ -213,7 +195,7 @@ namespace
     convert_uint_to_digits(_OUT_ stdlib::Array<char, 12>& buffer,
                            _OUT_ uint32_t& buffer_count,
                            _IN_  uint32_t value) noexcept {
-        status_t status;
+        status_t status       = status::SUCCESS;
         const char null_char  = '0';
         const uint32_t ten    = 10;
 
@@ -232,8 +214,6 @@ namespace
             buffer[buffer_count++] = null_char + (value % ten);
             value                 /= ten;
         }
-
-        status = status::SUCCESS;
 
     cleanup:
         return status;
@@ -255,7 +235,7 @@ namespace
     [[nodiscard]]
     status_t 
     handle_backspace() noexcept {
-        status_t status;
+        status_t status = status::SUCCESS;
 
         if (cursor_x > 0) [[likely]] {
             cursor_x--;
@@ -268,9 +248,6 @@ namespace
             if (status != status::SUCCESS) [[unlikely]] {
                 status = status::FAIL;
             }
-        }
-        else {
-            status = status::SUCCESS;
         }
 
         return status;
@@ -292,7 +269,7 @@ namespace
     [[nodiscard]]
     status_t 
     handle_tab() noexcept {
-        status_t status;
+        status_t status = status::SUCCESS;
 
         cursor_cell.symbol = ' ';
 
@@ -375,10 +352,10 @@ namespace
     status_t 
     calculate_needed_lines(_OUT_ uint32_t& needed_lines, 
                            _IN_  const char* const text) noexcept {
-        const char new_line = '\n';
+        status_t status     = status::SUCCESS;
         uint32_t x          = cursor_x;
-        char symbol;
-        status_t status;
+        char symbol         = '\0';
+        const char new_line = '\n';
 
         needed_lines = 1;
 
@@ -410,8 +387,6 @@ namespace
                 x ^= x;
             }
         }
-
-        status = status::SUCCESS;
 
     cleanup:
         return status;
@@ -482,16 +457,25 @@ namespace stdlib::console
 
     /**
      * @brief Clears the screen and resets the cursor.
+     * 
+     * @retval `status::FAIL`
+     *          Unknown error.
+     * 
+     * @retval `status::SUCCESS`
+     *          Default case.
      */
-    _API_  
-    void 
+    _API_
+    status_t 
     reset() noexcept {
-        using namespace drivers;
-
         cursor_x = 0;
         cursor_y = 0;
 
-        driver.fill_screen({});
+        status_t status = driver.fill_screen({});
+        if (status != status::SUCCESS) [[unlikely]] {
+            status = status::FAIL;
+        }
+
+        return status;
     }
 
 
@@ -509,7 +493,7 @@ namespace stdlib::console
     _API_ 
     status_t 
     put_int(_IN_ int32_t value) noexcept {
-        status_t status;
+        status_t status = status::SUCCESS;
 
         if (value < 0) {
             status = put_char('-');
@@ -543,9 +527,9 @@ namespace stdlib::console
     _API_
     status_t 
     put_uint(_IN_ const uint32_t value) noexcept {
-        uint32_t char_count;
+        status_t status     = status::SUCCESS;
+        uint32_t char_count = 0;
         stdlib::Array<char, 12> buffer;
-        status_t status;
         
         if (value == 0) [[unlikely]] {
             status = put_char('0');
@@ -585,7 +569,7 @@ namespace stdlib::console
     _API_  
     status_t
     put_hex(_IN_ const uint32_t value) noexcept {
-        status_t status;
+        status_t status = status::SUCCESS;
 
         status = put_string("0x");
         if (status != status::SUCCESS) [[unlikely]] {
@@ -593,7 +577,8 @@ namespace stdlib::console
         }
         else {
             status = put_base(value, 16);
-            if (status & status::flags::PARAM_B) {
+            if (status == (status::INVALID_PARAMETER | 
+                           status::flags::PARAM_B)) {
                 status = status::FAIL;
             }
         }
@@ -616,7 +601,7 @@ namespace stdlib::console
     _API_   
     status_t 
     put_bin(_IN_ const uint32_t value) noexcept {
-        status_t status;
+        status_t status = status::SUCCESS;
 
         status = put_string("0b");
         if (status != status::SUCCESS) [[unlikely]] {
@@ -624,7 +609,8 @@ namespace stdlib::console
         }
         else {
             status = put_base(value, 2);
-            if (status & status::flags::PARAM_B) {
+            if (status == (status::INVALID_PARAMETER | 
+                           status::flags::PARAM_B)) {
                 status = status::FAIL;
             }
         }
@@ -648,7 +634,7 @@ namespace stdlib::console
     _API_  
     status_t 
     put_ptr(_IN_ const uint32_t value) noexcept {
-        status_t status;
+        status_t status = status::SUCCESS;
 
         status = put_string("0x");
         if (status != status::SUCCESS) [[unlikely]] {
@@ -656,7 +642,8 @@ namespace stdlib::console
         }
         else {
             status = put_base(value, 16);
-            if (status & status::flags::PARAM_B) {
+            if (status == (status::INVALID_PARAMETER | 
+                           status::flags::PARAM_B)) {
                 status = status::FAIL;
             }
         }
@@ -686,11 +673,10 @@ namespace stdlib::console
     _API_ 
     status_t 
     put_char(_IN_ const char symbol) noexcept {
-        status_t status;
+        status_t status = status::SUCCESS;
 
         switch (symbol) {
         case '\r':
-            status   = status::SUCCESS;
             cursor_x = 0;
             break;
         
@@ -703,12 +689,10 @@ namespace stdlib::console
             break;
         
         case '\n':
-            status = status::SUCCESS;
             new_line();
             break;
 
         case '\0':
-            status = status::SUCCESS;
             break;
         
         default:
@@ -747,8 +731,8 @@ namespace stdlib::console
     _API_ 
     status_t
     put_string(_IN_ const char* const message) noexcept {
-        status_t status;
-        uint32_t needed_lines;
+        status_t status       = status::SUCCESS;
+        uint32_t needed_lines = 0;
 
         if (!message) [[unlikely]] {
             status = status::NULL_POINTER;
@@ -762,8 +746,16 @@ namespace stdlib::console
 
         status = calculate_needed_lines(needed_lines, message);
         if (status != status::SUCCESS) [[unlikely]] {
-            if (status & status::flags::PARAM_B) {
-                status ^= status::flags::PARAM_B;
+            // The `PARAM_B` flag is changed to `PARAM_A`, 
+            // so that the returned status code matches the method signature.
+            
+            if (status == (status::INVALID_PARAMETER | 
+                           status::flags::PARAM_B)) {
+                status = status::INVALID_PARAMETER;
+            }
+            else if (status == (status::NULL_POINTER | 
+                                status::flags::PARAM_B)) {
+                status = status::NULL_POINTER;
             }
 
             goto cleanup;
