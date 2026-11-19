@@ -5,7 +5,7 @@
 # 
 
 COMMON_FLAGS += -Iruntime/stdlib \
-				-Iruntime/stdlib/utils \
+				-Iruntime/stdlib/compcrtl \
 				-Iruntime/apis \
 				-Iruntime/types \
 

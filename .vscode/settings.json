@@ -31,6 +31,8 @@
         "allocinfo",
         "AMNF",
         "Bochs",
+        "compcptr",
+        "compcrtl",
         "DRDY",
         "eflags",
         "endmacro",

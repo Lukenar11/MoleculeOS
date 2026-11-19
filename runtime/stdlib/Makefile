@@ -7,10 +7,10 @@
 OBJS += $(BUILD)/console.o \
 		$(BUILD)/memory.o \
 		$(BUILD)/string.o \
-		$(BUILD)/compiler_c_api.o \
+		$(BUILD)/compiler_c_runtime.o \
 
 $(BUILD)/%.o: runtime/stdlib/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(BUILD)/%.o: runtime/stdlib/utils/%.c
+$(BUILD)/%.o: runtime/stdlib/compcrtl/%.c
 	$(CXX) $(CXXFLAGS) -c $< -o $@
