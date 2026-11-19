@@ -19,7 +19,7 @@ NOTES:
 
 #include "isr_handler.hpp"
 
-#include <drivers.hpp>
+#include <include/drivers.hpp>
 
 namespace kernel::idt::isr
 {

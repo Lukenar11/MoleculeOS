@@ -3,7 +3,7 @@
 #include <console.hpp>
 #include <status.hpp>
 #include <types.hpp>
-#include <kernel.hpp>
+#include <include/kernel.hpp>
 
 namespace tests
 {

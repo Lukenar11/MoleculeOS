@@ -16,7 +16,7 @@ NOTES:
 #pragma once
 
 #include "utils.hpp"
-#include <kernel.hpp>
+#include <include/kernel.hpp>
 #include <console.hpp>
 #include <types.hpp>
 #include <array.hpp>

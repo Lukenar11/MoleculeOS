@@ -73,12 +73,12 @@ namespace drivers::ata
         static constexpr uint8_t NIBBLE_MASK = 0x0F;
         static constexpr uint8_t BYTE_MASK   = 0xFF;
 
-        enum class ATA_Status : uint8_t;
-        enum class ATA_Error : uint8_t;
+        enum class ATA_Status  : uint8_t;
+        enum class ATA_Error   : uint8_t;
         enum class ATA_Command : uint8_t;
         enum class ATA_Control : uint8_t;
-        enum class ATA_Port : uint16_t;
-        enum class ATA_Device : uint8_t;
+        enum class ATA_Port    : uint16_t;
+        enum class ATA_Device  : uint8_t;
 
         enum class Driver_Action : uint8_t;
 

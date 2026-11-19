@@ -2,7 +2,7 @@
 
 #include <types.hpp>
 #include <console.hpp>
-#include <kernel.hpp>
+#include <include/kernel.hpp>
 #include <memory.hpp>
 
 namespace tests

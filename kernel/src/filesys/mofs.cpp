@@ -1,7 +1,7 @@
 #include "filesys/mofs.hpp"
 
 #include <array.hpp>
-#include <kernel.hpp>
+#include <include/kernel.hpp>
 #include <string.hpp>
 #include <memory.hpp>
 

@@ -16,8 +16,8 @@ NOTES:
 
 #include "storemgr/storage_manager.hpp"
 
-#include <drivers.hpp>
-#include <kernel.hpp>
+#include <include/drivers.hpp>
+#include <include/kernel.hpp>
 #include <memory.hpp>
 #include <string.hpp>
 

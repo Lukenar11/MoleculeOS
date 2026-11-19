@@ -23,10 +23,10 @@ NOTES:
 #include "eflags.hpp"
 #include <types.hpp>
 #include <array.hpp>
-#include <io.hpp>
+#include <include/io.hpp>
 #include <string.hpp>
 #include <console.hpp>
-#include <kernel.hpp>
+#include <include/kernel.hpp>
 
 namespace
 {

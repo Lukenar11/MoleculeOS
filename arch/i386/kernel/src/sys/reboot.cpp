@@ -14,7 +14,7 @@ NOTES:
 
 #include "sys/reboot.hpp"
 
-#include <kernel.hpp>
+#include <include/kernel.hpp>
 
 namespace kernel::sys
 {

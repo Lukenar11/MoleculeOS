@@ -21,7 +21,7 @@ NOTES:
 #pragma once
 
 #include "../utils/cmds_helpers.hpp"
-#include <kernel.hpp>
+#include <include/kernel.hpp>
 #include <console.hpp>
 
 namespace shell::commands

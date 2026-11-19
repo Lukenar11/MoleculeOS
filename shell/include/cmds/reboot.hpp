@@ -22,7 +22,7 @@ NOTES:
 
 #pragma once
 
-#include <kernel.hpp>
+#include <include/kernel.hpp>
 
 namespace shell::commands
 {

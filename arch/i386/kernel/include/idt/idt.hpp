@@ -26,7 +26,7 @@ NOTES:
 #include "idt/isr.hpp"
 #include "idt/irq.hpp"
 #include "load_idt.hpp"
-#include <kernel.hpp>
+#include <include/kernel.hpp>
 #include <types.hpp>
 #include <array.hpp>
 

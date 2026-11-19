@@ -21,10 +21,10 @@ NOTES:
 
 
 #include "main.hpp"
-#include <kernel.hpp>
+#include <include/kernel.hpp>
 #include <status.hpp>
-#include <terminal.hpp>
-#include <drivers.hpp>
+#include <include/terminal.hpp>
+#include <include/drivers.hpp>
 
 
 _C_API_ { 

@@ -24,7 +24,7 @@ NOTES:
 #include <types.hpp>
 #include <array.hpp>
 #include <string.hpp>
-#include <kernel.hpp>
+#include <include/kernel.hpp>
 #include <console.hpp>
 
 namespace shell::commands

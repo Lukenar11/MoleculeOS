@@ -3,8 +3,8 @@
 #include <types.hpp>
 #include <console.hpp>
 #include <array.hpp>
-#include <drivers.hpp>
-#include <kernel.hpp>
+#include <include/drivers.hpp>
+#include <include/kernel.hpp>
 #include <memory.hpp>
 #include <string.hpp>
 
