@@ -21,10 +21,7 @@ NOTES:
 
 #pragma once
 
-#include <include/kernel.hpp>
-#include <status.hpp>
-#include <include/terminal.hpp>
-#include <include/drivers.hpp>
+#include <sal.hpp>
 
 
 namespace kernel

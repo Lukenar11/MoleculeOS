@@ -19,6 +19,8 @@ NOTES:
 
 #include "sys/shutdown.hpp"
 
+#include <include/drivers/vga.hpp>
+
 namespace kernel::sys
 {
     void shutdown() noexcept {

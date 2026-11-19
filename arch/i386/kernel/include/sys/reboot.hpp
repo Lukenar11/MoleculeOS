@@ -16,7 +16,7 @@ NOTES:
 
 #include "sys/panic.hpp"
 #include <types.hpp>
-#include <include/drivers.hpp>
+#include <include/drivers/ps2.hpp>
 #include <include/io.hpp>
 
 namespace kernel::sys

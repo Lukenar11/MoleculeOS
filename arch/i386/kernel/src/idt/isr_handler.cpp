@@ -19,7 +19,7 @@ NOTES:
 
 #include "isr_handler.hpp"
 
-#include <include/drivers.hpp>
+#include <include/drivers/vga.hpp>
 
 namespace kernel::idt::isr
 {

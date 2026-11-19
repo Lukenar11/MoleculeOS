@@ -24,7 +24,8 @@ NOTES:
 
 
 #include <console.hpp>
-#include <include/drivers.hpp>
+#include <include/drivers/vga.hpp>
+#include <array.hpp>
 
 
 namespace

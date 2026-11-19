@@ -21,7 +21,7 @@ NOTES:
 #include "idt/utils/irq_helpers.hpp"
 #include "utils/regs.hpp"
 #include <types.hpp>
-#include <include/drivers.hpp>
+#include <include/drivers/ps2.hpp>
 #include <include/io.hpp>
 
 namespace

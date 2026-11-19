@@ -21,6 +21,7 @@ NOTES:
 #include <types.hpp>
 #include <array.hpp>
 #include <string.hpp>
+#include <include/drivers/vga.hpp>
 
 namespace shell::commands
 {

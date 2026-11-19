@@ -19,7 +19,6 @@ NOTES:
 #pragma once
 
 #include <include/shell.hpp>
-#include <include/drivers.hpp>
 #include <types.hpp>
 #include <console.hpp>
 

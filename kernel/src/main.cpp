@@ -24,7 +24,6 @@ NOTES:
 #include <include/kernel.hpp>
 #include <status.hpp>
 #include <include/terminal.hpp>
-#include <include/drivers.hpp>
 
 
 _C_API_ { 
