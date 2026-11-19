@@ -23,7 +23,7 @@ NOTES:
 #include "utils/regs.hpp"
 #include "sys/halt.hpp"
 #include "sys/panic.hpp"
-#include <console.hpp>
+#include <include/io/console.hpp>
 
 namespace
 {

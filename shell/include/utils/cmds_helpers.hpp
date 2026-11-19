@@ -16,9 +16,9 @@ NOTES:
 #pragma once
 
 #include "utils.hpp"
-#include <console.hpp>
+#include <include/io/console.hpp>
 #include <types.hpp>
-#include <array.hpp>
+#include <include/array.hpp>
 #include <string.hpp>
 #include <include/drivers/vga.hpp>
 #include <include/kernel/filesys.hpp>

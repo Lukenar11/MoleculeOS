@@ -20,7 +20,7 @@ NOTES:
 
 #pragma once
 
-#include <console.hpp>
+#include <include/io/console.hpp>
 
 namespace shell::commands
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <console.hpp>
+#include <include/io/console.hpp>
 #include <status.hpp>
 #include <types.hpp>
 #include <include/kernel/heap.hpp>

@@ -1,5 +1,5 @@
 /**
- * @brief Defines a high-level console output system.
+ * @brief Defines a high-level console output-system.
  *
  * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
  * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE

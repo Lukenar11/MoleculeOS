@@ -22,10 +22,10 @@ NOTES:
 #include "sys/panic.hpp"
 #include "eflags.hpp"
 #include <types.hpp>
-#include <array.hpp>
+#include <include/array.hpp>
 #include <include/io/platform.hpp>
 #include <string.hpp>
-#include <console.hpp>
+#include <include/io/console.hpp>
 
 namespace
 {

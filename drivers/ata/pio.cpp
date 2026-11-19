@@ -11,7 +11,7 @@
 
 #include "pio.hpp"
 
-#include <array.hpp>
+#include <include/array.hpp>
 #include <include/io/platform.hpp>
 
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <console.hpp>
+#include <include/io/console.hpp>
 #include <types.hpp>
 #include <include/kernel/filesys.hpp>
 

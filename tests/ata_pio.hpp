@@ -1,8 +1,8 @@
 #pragma once
 
 #include <types.hpp>
-#include <console.hpp>
-#include <array.hpp>
+#include <include/io/console.hpp>
+#include <include/array.hpp>
 #include <include/drivers/ata.hpp>
 #include <memory.hpp>
 #include <string.hpp>

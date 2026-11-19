@@ -20,7 +20,7 @@ NOTES:
 
 #include <include/shell/interpreter.hpp>
 #include <types.hpp>
-#include <console.hpp>
+#include <include/io/console.hpp>
 
 namespace terminal
 {

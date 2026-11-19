@@ -1,5 +1,5 @@
 /**
- * @brief Implements a high-level console output system.
+ * @brief Implements a high-level console output-system.
  *
  * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
  * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
@@ -9,9 +9,9 @@
  */
 
 
-#include <console.hpp>
+#include <include/io/console.hpp>
 #include <include/drivers/vga.hpp>
-#include <array.hpp>
+#include <include/array.hpp>
 
 
 namespace

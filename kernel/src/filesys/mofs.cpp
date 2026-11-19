@@ -1,6 +1,6 @@
 #include "filesys/mofs.hpp"
 
-#include <array.hpp>
+#include <include/array.hpp>
 #include <include/kernel/heap.hpp>
 #include <include/kernel/sys.hpp>
 #include <string.hpp>

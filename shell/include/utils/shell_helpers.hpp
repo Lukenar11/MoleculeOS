@@ -21,7 +21,7 @@ NOTES:
 #pragma once
 
 #include <types.hpp>
-#include <array.hpp>
+#include <include/array.hpp>
 
 namespace shell
 {

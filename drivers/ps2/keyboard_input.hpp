@@ -23,7 +23,7 @@ NOTES:
 #include "interface.hpp"
 
 #include <types.hpp>
-#include <circular_buffer.hpp>
+#include <include/circular_buffer.hpp>
 
 
 namespace drivers::ps2 

@@ -12,7 +12,7 @@
 #pragma once
 
 #include <types.hpp>
-#include <array.hpp>
+#include <include/array.hpp>
 #include <sal.hpp>
 #include <status.hpp>
 
