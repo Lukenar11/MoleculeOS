@@ -26,7 +26,6 @@ NOTES:
 #include <include/io/platform.hpp>
 #include <string.hpp>
 #include <console.hpp>
-#include <include/kernel.hpp>
 
 namespace
 {

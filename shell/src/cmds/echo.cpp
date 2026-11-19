@@ -20,6 +20,9 @@ NOTES:
 
 #include "cmds/echo.hpp"
 
+#include <include/kernel/filesys.hpp>
+#include <include/kernel/heap.hpp>
+
 namespace shell::commands
 {
     stdlib::Array<char,64>& extract_echo_text(const stdlib::Array<char,64>& args,

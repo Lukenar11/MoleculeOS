@@ -4,7 +4,6 @@
 #include <console.hpp>
 #include <array.hpp>
 #include <include/drivers/ata.hpp>
-#include <include/kernel.hpp>
 #include <memory.hpp>
 #include <string.hpp>
 

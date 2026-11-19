@@ -14,8 +14,6 @@ NOTES:
 
 #include "sys/reboot.hpp"
 
-#include <include/kernel.hpp>
-
 namespace kernel::sys
 {
     void reboot() noexcept {

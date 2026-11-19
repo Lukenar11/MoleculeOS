@@ -2,7 +2,7 @@
 
 #include <console.hpp>
 #include <types.hpp>
-#include <include/kernel.hpp>
+#include <include/kernel/filesys.hpp>
 
 static void fs_print(bool ok, const char* message) noexcept {
     if (ok)

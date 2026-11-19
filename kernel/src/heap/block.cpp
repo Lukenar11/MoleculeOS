@@ -17,7 +17,7 @@ NOTES:
 
 #include "heap/block.hpp"
 
-#include <include/kernel.hpp>
+#include <include/kernel/sys.hpp>
 #include <memory.hpp>
 
 

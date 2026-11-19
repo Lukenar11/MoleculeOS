@@ -17,7 +17,7 @@ NOTES:
 #include "storemgr/storage_manager.hpp"
 
 #include <include/drivers/ata.hpp>
-#include <include/kernel.hpp>
+#include <include/kernel/sys.hpp>
 #include <memory.hpp>
 #include <string.hpp>
 

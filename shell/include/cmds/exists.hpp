@@ -22,7 +22,6 @@ NOTES:
 
 #include "../utils/cmds_helpers.hpp"
 #include <array.hpp>
-#include <include/kernel.hpp>
 #include <types.hpp>
 
 namespace shell::commands

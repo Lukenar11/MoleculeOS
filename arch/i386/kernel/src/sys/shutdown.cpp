@@ -20,6 +20,7 @@ NOTES:
 #include "sys/shutdown.hpp"
 
 #include <include/drivers/vga.hpp>
+#include <include/kernel/sys.hpp>
 
 namespace kernel::sys
 {

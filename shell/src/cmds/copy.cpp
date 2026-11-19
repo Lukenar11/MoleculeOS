@@ -20,6 +20,8 @@ NOTES:
 
 #include "cmds/copy.hpp"
 
+#include <include/kernel/heap.hpp>
+
 namespace shell::commands
 {
     void copy(const stdlib::Array<char, 64>& args) noexcept {

@@ -2,7 +2,7 @@
 
 #include <types.hpp>
 #include <console.hpp>
-#include <include/kernel.hpp>
+#include <include/kernel/filesys.hpp>
 #include <memory.hpp>
 
 namespace tests
