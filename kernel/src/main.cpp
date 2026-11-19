@@ -24,7 +24,7 @@ NOTES:
 #include <include/kernel/sys.hpp>
 #include <include/kernel/heap.hpp>
 #include <status.hpp>
-#include <include/terminal.hpp>
+#include <include/terminal/user.hpp>
 
 
 _C_API_ { 
