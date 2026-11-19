@@ -17,7 +17,7 @@ NOTES:
 #include "sys/interrupts.hpp"
 #include <sal.hpp>
 #include <types.hpp>
-#include <include/io/platform.hpp>
+#include <include/stdlib/platform_io.hpp>
 
 
 namespace kernel

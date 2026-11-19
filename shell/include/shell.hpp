@@ -23,8 +23,8 @@ NOTES:
 #include "utils/shell_helpers.hpp"
 #include "utils/utils.hpp"
 #include <types.hpp>
-#include <include/array.hpp>
-#include <include/io/console.hpp>
+#include <include/stdlib/array.hpp>
+#include <include/stdlib/console.hpp>
 
 namespace
 {

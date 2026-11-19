@@ -18,8 +18,8 @@ NOTES:
 
 #include <include/drivers/ata.hpp>
 #include <include/kernel/sys.hpp>
-#include <memory.hpp>
-#include <string.hpp>
+#include <include/stdlib/string.hpp>
+#include <include/stdlib/memory.hpp>
 
 
 namespace

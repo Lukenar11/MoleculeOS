@@ -1,9 +1,9 @@
 #pragma once
 
 #include <types.hpp>
-#include <include/io/console.hpp>
+#include <include/stdlib/console.hpp>
 #include <include/kernel/filesys.hpp>
-#include <memory.hpp>
+#include <include/stdlib/memory.hpp>
 
 namespace tests
 {

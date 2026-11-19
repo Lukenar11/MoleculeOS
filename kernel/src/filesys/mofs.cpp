@@ -1,10 +1,10 @@
 #include "filesys/mofs.hpp"
 
-#include <include/array.hpp>
+#include <include/stdlib/array.hpp>
 #include <include/kernel/heap.hpp>
 #include <include/kernel/sys.hpp>
-#include <string.hpp>
-#include <memory.hpp>
+#include <include/stdlib/memory.hpp>
+#include <include/stdlib/string.hpp>
 
 
 namespace

@@ -9,9 +9,10 @@
  */
 
 
-#include <include/io/console.hpp>
+#include "console.hpp"
+
 #include <include/drivers/vga.hpp>
-#include <include/array.hpp>
+#include <include/stdlib/array.hpp>
 
 
 namespace

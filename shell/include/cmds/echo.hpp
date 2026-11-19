@@ -22,9 +22,9 @@ NOTES:
 
 #include "../utils/cmds_helpers.hpp"
 #include <types.hpp>
-#include <include/array.hpp>
-#include <string.hpp>
-#include <include/io/console.hpp>
+#include <include/stdlib/array.hpp>
+#include <include/stdlib/string.hpp>
+#include <include/stdlib/console.hpp>
 
 namespace shell::commands
 {

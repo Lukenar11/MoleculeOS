@@ -1,5 +1,5 @@
 /**
- * @brief Defines the public string-manipulation API.
+ * @brief Defines the public memory-manipulation API.
  *
  * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
  * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
@@ -11,4 +11,4 @@
 
 #pragma once
 
-#include "runtime/stdlib/src/string.hpp"
+#include "runtime/stdlib/include/memory.hpp"

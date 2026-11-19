@@ -21,8 +21,8 @@ NOTES:
 #pragma once
 
 #include "../utils/cmds_helpers.hpp"
-#include <include/array.hpp>
-#include <include/io/console.hpp>
+#include <include/stdlib/array.hpp>
+#include <include/stdlib/console.hpp>
 
 namespace shell::commands
 {

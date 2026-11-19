@@ -16,10 +16,10 @@ NOTES:
 #pragma once
 
 #include "utils.hpp"
-#include <include/io/console.hpp>
+#include <include/stdlib/console.hpp>
 #include <types.hpp>
-#include <include/array.hpp>
-#include <string.hpp>
+#include <include/stdlib/array.hpp>
+#include <include/stdlib/string.hpp>
 #include <include/drivers/vga.hpp>
 #include <include/kernel/filesys.hpp>
 

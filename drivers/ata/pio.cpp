@@ -11,8 +11,8 @@
 
 #include "pio.hpp"
 
-#include <include/array.hpp>
-#include <include/io/platform.hpp>
+#include <include/stdlib/array.hpp>
+#include <include/stdlib/platform_io.hpp>
 
 
 namespace kernel::sys
