@@ -9,8 +9,8 @@ OBJS += $(BUILD)/console.o \
 		$(BUILD)/string.o \
 		$(BUILD)/compiler_c_api.o \
 
-$(BUILD)/%.o: runtime/stdlib/src/%.cpp
+$(BUILD)/%.o: runtime/stdlib/%.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-$(BUILD)/%.o: runtime/stdlib/src/utils/%.c
+$(BUILD)/%.o: runtime/stdlib/utils/%.c
 	$(CXX) $(CXXFLAGS) -c $< -o $@
