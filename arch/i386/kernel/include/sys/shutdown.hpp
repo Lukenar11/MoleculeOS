@@ -23,7 +23,7 @@ NOTES:
 #include "eflags.hpp"
 #include <types.hpp>
 #include <array.hpp>
-#include <include/io.hpp>
+#include <include/io/platform.hpp>
 #include <string.hpp>
 #include <console.hpp>
 #include <include/kernel.hpp>

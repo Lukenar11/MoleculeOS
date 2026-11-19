@@ -20,7 +20,7 @@ NOTES:
 
 #include "keyboard_input.hpp"
 
-#include <include/io.hpp>
+#include <include/io/platform.hpp>
 
 
 namespace drivers::ps2

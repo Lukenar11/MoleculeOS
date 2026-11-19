@@ -12,7 +12,7 @@
 #include "pio.hpp"
 
 #include <array.hpp>
-#include <include/io.hpp>
+#include <include/io/platform.hpp>
 
 
 namespace kernel::sys

@@ -22,7 +22,7 @@ NOTES:
 #include "utils/regs.hpp"
 #include <types.hpp>
 #include <include/drivers/ps2.hpp>
-#include <include/io.hpp>
+#include <include/io/platform.hpp>
 
 namespace
 {
