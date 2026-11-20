@@ -11,4 +11,4 @@
 
 #pragma once
 
-#include "runtime/stdlib/string.hpp"
+#include "stdlib/string.hpp"

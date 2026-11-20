@@ -11,4 +11,4 @@
 
 #pragma once
 
-#include "runtime/stdlib/array.hpp"
+#include "stdlib/array.hpp"

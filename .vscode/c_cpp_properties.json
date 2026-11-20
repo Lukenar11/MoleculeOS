@@ -1,13 +1,3 @@
-// 
-// LICENSE:
-//     Copyright (c) 2026 Lukenar11 (Luke Matthes)
-//     MIT Licensed
-//     https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-// 
-// DESCRIPTION:
-//     This makes VS Code know under which paths the files are located
-//
-
 {
     "version": 4,
     "configurations": [
@@ -19,19 +9,59 @@
             "cppStandard":      "c++20",
             "includePath": [
                 "${workspaceFolder}",
-                "${workspaceFolder}/kernel/include",
-                "${workspaceFolder}/kernel/include/heap",
-                "${workspaceFolder}/kernel/include/filesys",
-                "${workspaceFolder}/kernel/include/storemgr",
-                "${workspaceFolder}/runtime/stdlib/include",
-                "${workspaceFolder}/runtime/apis",
-                "${workspaceFolder}/runtime/types",
+
+                "${workspaceFolder}/arch/i386/iso",
+                "${workspaceFolder}/arch/i386/iso/boot",
+                "${workspaceFolder}/arch/i386/iso/boot/grub",
+                "${workspaceFolder}/arch/i386/kernel",
                 "${workspaceFolder}/arch/i386/kernel/include/idt",
+                "${workspaceFolder}/arch/i386/kernel/include/idt/utils",
                 "${workspaceFolder}/arch/i386/kernel/include/sys",
-                "${workspaceFolder}/arch/i386/kernel/include",
+                "${workspaceFolder}/arch/i386/kernel/include/utils",
+                "${workspaceFolder}/arch/i386/kernel/src",
+                "${workspaceFolder}/arch/i386/kernel/src/idt",
+                "${workspaceFolder}/arch/i386/kernel/src/idt/utils",
+                "${workspaceFolder}/arch/i386/kernel/src/sys",
+                "${workspaceFolder}/arch/i386/kernel/src/utils",
+                "${workspaceFolder}/arch/i386/stdlib",
+                "${workspaceFolder}/arch/i386/stdlib/include",
+                "${workspaceFolder}/arch/i386/stdlib/src",
+
+                "${workspaceFolder}/drivers",
+                "${workspaceFolder}/drivers/ata",
+                "${workspaceFolder}/drivers/vga",
+                "${workspaceFolder}/drivers/ps2",
+
+                "${workspaceFolder}/include/drivers",
+                "${workspaceFolder}/include/kernel",
+                "${workspaceFolder}/include/shell",
+                "${workspaceFolder}/include/stdlib",
+                "${workspaceFolder}/include/terminal",
+
+                "${workspaceFolder}/kernel",
+                "${workspaceFolder}/kernel/include",
+                "${workspaceFolder}/kernel/include/filesys",
+                "${workspaceFolder}/kernel/include/heap",
+                "${workspaceFolder}/kernel/include/storemgr",
+                "${workspaceFolder}/kernel/src",
+                "${workspaceFolder}/kernel/src/filesys",
+                "${workspaceFolder}/kernel/src/heap",
+                "${workspaceFolder}/kernel/src/storemgr",
+
+                "${workspaceFolder}/shell",
                 "${workspaceFolder}/shell/include",
                 "${workspaceFolder}/shell/include/cmds",
-                "${workspaceFolder}/shell/include/utils"
+                "${workspaceFolder}/shell/include/utils",
+                "${workspaceFolder}/shell/src",
+                "${workspaceFolder}/shell/src/cmds",
+                "${workspaceFolder}/shell/src/utils",
+
+                "${workspaceFolder}/stdlib",
+                "${workspaceFolder}/stdlib/compcrtl",
+                
+                "${workspaceFolder}/terminal",
+                "${workspaceFolder}/terminal/include",
+                "${workspaceFolder}/terminal/src"
             ],
             "defines": [
                 "__I386__"

@@ -11,4 +11,4 @@
 
 #pragma once
 
-#include "runtime/stdlib/circular_buffer.hpp"
+#include "stdlib/circular_buffer.hpp"

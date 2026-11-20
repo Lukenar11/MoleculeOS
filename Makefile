@@ -49,7 +49,7 @@ include arch/i386/iso/boot/Makefile
 include arch/i386/stdlib/Makefile
 include arch/i386/kernel/Makefile
 include drivers/Makefile
-include runtime/Makefile
+include stdlib/Makefile
 include kernel/Makefile
 include terminal/Makefile
 include shell/Makefile
