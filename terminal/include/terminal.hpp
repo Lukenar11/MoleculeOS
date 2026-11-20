@@ -31,9 +31,10 @@ namespace terminal
         void draw_cursor() noexcept;
 
     public:
+        void init() noexcept;
         void step() noexcept;
 
-        Terminal() noexcept;
+        Terminal() noexcept = default;
         ~Terminal() noexcept = default;
     };
 } // namespace terminal

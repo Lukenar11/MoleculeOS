@@ -20,7 +20,7 @@ NOTES:
 
 namespace terminal 
 {
-    Terminal::Terminal() noexcept {
+    void Terminal::init() noexcept {
         shell::commands::info();
         draw_cursor();
     }

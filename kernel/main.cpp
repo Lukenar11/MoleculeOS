@@ -16,15 +16,16 @@
 #include <include/terminal/user.hpp>
 
 
-_C_API_
-extern "C" 
-{ 
-    extern uint8_t heap_start;
-    extern uint8_t heap_end;
-}
-
-
-terminal::Terminal terminal;
+namespace
+{
+    _C_API_
+    extern "C" { 
+        extern uint8_t heap_start;
+        extern uint8_t heap_end;
+    }
+    
+    terminal::Terminal user_terminal;
+} // namespace
 
 
 namespace kernel
@@ -35,9 +36,11 @@ namespace kernel
     main() noexcept {
         heap::init(&heap_start, &heap_end);
 
+        user_terminal.init();
+
         while (true) {
             sys::sleep();
-            terminal.step();
+            user_terminal.step();
         }
 
         sys::panic("Unexpected return from the kernel-main loop!");
