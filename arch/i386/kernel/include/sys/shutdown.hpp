@@ -21,7 +21,7 @@ NOTES:
 
 #include "sys/panic.hpp"
 #include "eflags.hpp"
-#include <types.hpp>
+#include <include/stdlib/types.hpp>
 #include <include/stdlib/array.hpp>
 #include <include/stdlib/platform_io.hpp>
 #include <include/stdlib/string.hpp>

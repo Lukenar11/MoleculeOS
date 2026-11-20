@@ -1,7 +1,7 @@
 #pragma once
 
 #include <include/stdlib/console.hpp>
-#include <types.hpp>
+#include <include/stdlib/types.hpp>
 #include <include/kernel/filesys.hpp>
 
 static void fs_print(bool ok, const char* message) noexcept {

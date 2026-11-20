@@ -1,8 +1,8 @@
 #pragma once
 
 #include <include/stdlib/console.hpp>
-#include <status.hpp>
-#include <types.hpp>
+#include <include/stdlib/status.hpp>
+#include <include/stdlib/types.hpp>
 #include <include/kernel/heap.hpp>
 
 namespace tests

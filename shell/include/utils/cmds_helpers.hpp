@@ -17,7 +17,7 @@ NOTES:
 
 #include "utils.hpp"
 #include <include/stdlib/console.hpp>
-#include <types.hpp>
+#include <include/stdlib/types.hpp>
 #include <include/stdlib/array.hpp>
 #include <include/stdlib/string.hpp>
 #include <include/drivers/vga.hpp>

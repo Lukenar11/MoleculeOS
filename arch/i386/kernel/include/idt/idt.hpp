@@ -26,7 +26,7 @@ NOTES:
 #include "idt/isr.hpp"
 #include "idt/irq.hpp"
 #include "load_idt.hpp"
-#include <types.hpp>
+#include <include/stdlib/types.hpp>
 #include <include/stdlib/array.hpp>
 
 namespace

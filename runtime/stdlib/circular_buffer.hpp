@@ -11,10 +11,10 @@
 
 #pragma once
 
-#include <types.hpp>
+#include <include/stdlib/types.hpp>
 #include <include/stdlib/array.hpp>
-#include <sal.hpp>
-#include <status.hpp>
+#include <include/stdlib/sal.hpp>
+#include <include/stdlib/status.hpp>
 
 
 namespace stdlib

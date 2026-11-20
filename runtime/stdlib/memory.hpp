@@ -11,9 +11,9 @@
 
 #pragma once
 
-#include <status.hpp>
-#include <sal.hpp>
-#include <types.hpp>
+#include <include/stdlib/status.hpp>
+#include <include/stdlib/sal.hpp>
+#include <include/stdlib/types.hpp>
 
 
 namespace stdlib::memory

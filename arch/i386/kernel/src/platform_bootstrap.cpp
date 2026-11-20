@@ -15,8 +15,8 @@ NOTES:
 #include "kernel/include/main.hpp"
 #include "idt/idt.hpp"
 #include "sys/interrupts.hpp"
-#include <sal.hpp>
-#include <types.hpp>
+#include <include/stdlib/sal.hpp>
+#include <include/stdlib/types.hpp>
 #include <include/stdlib/platform_io.hpp>
 
 
@@ -39,6 +39,7 @@ namespace kernel
     };
 
     _C_API_
+    extern "C"
     void 
     platform_bootstrap() noexcept {
         static idt::Interrupt_Descriptor_Table idt;

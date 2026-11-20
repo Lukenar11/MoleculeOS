@@ -19,7 +19,7 @@ NOTES:
 #pragma once
 
 #include <include/shell/interpreter.hpp>
-#include <types.hpp>
+#include <include/stdlib/types.hpp>
 #include <include/stdlib/console.hpp>
 
 namespace terminal

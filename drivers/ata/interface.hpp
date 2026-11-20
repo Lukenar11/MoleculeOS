@@ -11,9 +11,9 @@
 
 #pragma once
 
-#include <types.hpp>
-#include <status.hpp>
-#include <sal.hpp>
+#include <include/stdlib/types.hpp>
+#include <include/stdlib/status.hpp>
+#include <include/stdlib/sal.hpp>
 
 
 namespace

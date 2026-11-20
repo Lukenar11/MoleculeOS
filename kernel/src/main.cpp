@@ -23,11 +23,12 @@ NOTES:
 #include "main.hpp"
 #include <include/kernel/sys.hpp>
 #include <include/kernel/heap.hpp>
-#include <status.hpp>
+#include <include/stdlib/status.hpp>
 #include <include/terminal/user.hpp>
 
 
-_C_API_ { 
+_C_API_
+extern "C" { 
     extern uint8_t heap_start;
     extern uint8_t heap_end;
 }

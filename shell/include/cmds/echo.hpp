@@ -21,7 +21,7 @@ NOTES:
 #pragma once
 
 #include "../utils/cmds_helpers.hpp"
-#include <types.hpp>
+#include <include/stdlib/types.hpp>
 #include <include/stdlib/array.hpp>
 #include <include/stdlib/string.hpp>
 #include <include/stdlib/console.hpp>

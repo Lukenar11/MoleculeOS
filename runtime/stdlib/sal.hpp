@@ -1,16 +1,12 @@
 /**
-LICENSE:
-    Copyright (c) 2026 Lukenar11 (Luke Matthes)
-    MIT Licensed
-    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-
-DESCRIPTION:
-    This file defines a small 'Source Annotation Language' ('SAL')
-    to mark function/method parameters as input or output, 
-    since methods and functions return 'void' or 'status_t'.
-
-NOTES:
-*/
+ * @brief Defines a simple Source-Annotation-Language (SAL).
+ *
+ * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
+ * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+ * @author    Lukenar11 (Luke Matthes)
+ *
+ * @note It's only for documentation and don't chance anything.
+ */
 
 
 #pragma once
@@ -55,6 +51,7 @@ NOTES:
 /**
  * @brief Declares a function as public and C-API.
  * 
- * @note Always use this macro instead of `extern "C"`.
+ * @note This is only documentation for the developer and 
+ *       doesn't chance anything in the logic or mutability.
  */
-#define _C_API_ extern "C"
+#define _C_API_

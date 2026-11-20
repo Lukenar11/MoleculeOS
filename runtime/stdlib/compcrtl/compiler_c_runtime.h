@@ -12,10 +12,10 @@
 #ifndef COMPILER_C_API
 #define COMPILER_C_API
 
-#include <sal.hpp>
+#include <include/stdlib/sal.hpp>
 
 #ifdef __cplusplus
-#   include <types.hpp>
+#   include <include/stdlib/types.hpp>
 #else
 typedef uint32_t unsigned int;
 typedef int32_t  signed int;
@@ -23,6 +23,7 @@ typedef int32_t  signed int;
 
 #ifdef __cplusplus
 _C_API_
+extern "C"
 {
 #endif
 

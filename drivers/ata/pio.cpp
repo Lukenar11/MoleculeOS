@@ -17,12 +17,14 @@
 
 namespace kernel::sys
 {
-    _C_API_ 
+    _C_API_
+    extern "C" 
     void 
     disable_interrupts();
 
 
     _C_API_
+    extern "C"
     void 
     enable_interrupts();
 

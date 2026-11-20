@@ -1,32 +1,17 @@
 /**
-LICENSE:
-    Copyright (c) 2026 Lukenar11 (Luke Matthes)
-    MIT Licensed
-    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-
-DESCRIPTION:
-    This file implements status-codes for handling general events and
-    as an alternative for exceptions, 
-    because in bare metal environments exceptions don't exists.
-
-    The status-codes are grouped in a specific hex layout
-    (0x[Grub]'[Flags][Flags]'[Number])(Each [...] represents one byte.).
-
-    Grubs:
-        - 0x00: generic status-codes
-        - 0x01: comparison status-codes
-        - 0x02: pointer status-codes
-        - 0x03: heap status-codes
-        - 0x04: file system status-codes
-        - 0x05: ata status-codes
-
-NOTES:
-*/
+ * @brief Defines status-codes and a status type.
+ *
+ * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
+ * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+ * @author    Lukenar11 (Luke Matthes)
+ *
+ * @note It's a alternative for exceptions.
+ */
 
 
 #pragma once
 
-#include <types.hpp>
+#include <include/stdlib/types.hpp>
 
 
 using status_t = uint32_t;

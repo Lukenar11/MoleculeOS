@@ -17,9 +17,9 @@ NOTES:
 
 #pragma once
 
-#include <sal.hpp>
-#include <types.hpp>
-#include <status.hpp>
+#include <include/stdlib/sal.hpp>
+#include <include/stdlib/types.hpp>
+#include <include/stdlib/status.hpp>
 
 
 namespace kernel::heap

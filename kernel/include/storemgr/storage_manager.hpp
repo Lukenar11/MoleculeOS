@@ -16,8 +16,8 @@ NOTES:
 
 #pragma once
 
-#include <status.hpp>
-#include <sal.hpp>
+#include <include/stdlib/status.hpp>
+#include <include/stdlib/sal.hpp>
 
 
 namespace kernel::storemgr
