@@ -4,12 +4,25 @@
 # https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
 # 
 
-COMMON_FLAGS += -Ikernel/include \
-				-Ikernel/include/filesys \
-				-Ikernel/include/heap \
-				-Ikernel/include/storemgr \
+COMMON_FLAGS += -Ikernel \
+				-Ikernel/filesys \
+				-Ikernel/heap \
 
-include kernel/src/Makefile
+OBJS += $(BUILD)/mofs.o \
+		$(BUILD)/block.o \
+		$(BUILD)/main.o \
+
+$(BUILD)/%.o: kernel/filesys/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD)/%.o: kernel/heap/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD)/%.o: kernel/storemgr/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+$(BUILD)/%.o: kernel/%.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)

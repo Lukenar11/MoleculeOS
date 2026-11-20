@@ -11,4 +11,4 @@
 
 #pragma once
 
-#include "kernel/include/filesys/mofs.hpp"
+#include "kernel/filesys/mofs.hpp"

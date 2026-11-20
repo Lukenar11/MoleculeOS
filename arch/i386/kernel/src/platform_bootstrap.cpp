@@ -12,12 +12,20 @@ DESCRIPTION:
 NOTES:
 */
 
-#include "kernel/include/main.hpp"
 #include "idt/idt.hpp"
 #include "sys/interrupts.hpp"
 #include <include/stdlib/sal.hpp>
 #include <include/stdlib/types.hpp>
 #include <include/stdlib/platform_io.hpp>
+
+
+namespace kernel
+{                
+    _API_
+    [[noreturn]]
+    void 
+    main() noexcept;
+} // namespace kernel
 
 
 namespace kernel
