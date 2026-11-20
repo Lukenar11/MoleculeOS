@@ -46,12 +46,23 @@ using uint16_pref = uint16_t*&;
 using uint32_pref = uint32_t*&;
 
 
-using string_ptr = char*;
-using any_ptr    = void*;
+#ifdef __I386__
+using diff_t = signed int;
+using size_t = unsigned int;
+#else
+#   error Architecture is not supported!
+#endif
 
-using diff_t     = int32_t;
-using size_t     = uint32_t;
+
+using char_t    = char;
+using char_ptr  = char_t*;
+using char_ref  = char_t&;
+using char_pref = char_t*&;
+
+
+using string_ptr = char_ptr;
 using address_t  = size_t;
+using any_ptr    = void*;
 
 
 static_assert(sizeof(int8_t)  == 1, "byte size of 'int8_t' is not '1'!");

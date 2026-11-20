@@ -1,18 +1,13 @@
 /**
-LICENSE:
-    Copyright (c) 2026 Lukenar11 (Luke Matthes)
-    MIT Licensed
-    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-
-DESCRIPTION:
-    This class defines the entire system heap using a 'block allocator'.
-    The allocator uses linker-defined symbols (heap_start & heap_end)
-    to determine the valid heap area.
-
-NOTES:
-    Some methods are placed in the header 
-    because they are so small that the compiler can inline them.
-*/
+ * @brief Defines the system heap (block-allocator).
+ *
+ * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
+ * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+ * @author    Lukenar11 (Luke Matthes)
+ *
+ * @note The heap needed the linker defined symbols, 
+ *       `heap_start` and `heap_end` for the initialisation.
+ */
 
 
 #pragma once
@@ -42,8 +37,8 @@ namespace kernel::heap
          * @note Don't forget to free the allocated memory with `deallocate`,
          *       otherwise memory leaks will occur.
          * 
-         * @param block_ptr pointer to the allocated memory block
-         * @param byte_size memory block byte size
+         * @param memory_block pointer to the allocated memory block
+         * @param byte_size    memory block byte size
          * 
          * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
          *          If `byte_size` is `0`.
@@ -58,7 +53,7 @@ namespace kernel::heap
         _API_ 
         [[nodiscard]]
         status_t 
-        allocate(_OUT_ void*& block_ptr, 
+        allocate(_OUT_ void*& memory_block, 
                  _IN_  const uint32_t byte_size) noexcept;
 
 
@@ -69,8 +64,8 @@ namespace kernel::heap
          * @note Don't forget to free the allocated memory with `deallocate`,
          *       otherwise memory leaks will occur.
          * 
-         * @param block_ptr pointer to the allocated memory block
-         * @param byte_size memory block byte size
+         * @param memory_block pointer to the allocated memory block
+         * @param byte_size    memory block byte size
          * 
          * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
          *          If `byte_size` is `0`.
@@ -91,7 +86,7 @@ namespace kernel::heap
         _API_ 
         [[nodiscard]]
         status_t 
-        clear_allocate(_OUT_ void*& block_ptr, 
+        clear_allocate(_OUT_ void*& memory_block, 
                        _IN_  const uint32_t byte_size) noexcept;
 
 
@@ -102,24 +97,24 @@ namespace kernel::heap
          * @note Don't forget to free the allocated memory with `deallocate`, 
          *       otherwise memory leaks will occur. 
          * 
-         * @param block_ptr     Pointer to the allocated memory block. 
-         * @param new_byte_size New memory block byte size.
+         * @param memory_block Pointer to the allocated memory block. 
+         * @param byte_size    New memory block byte size.
          * 
          * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-         *          If `block_ptr` is a `nullptr`.
+         *          If `memory_block` is a `nullptr`.
          * 
          * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
-         *          If `new_byte_size` is 0. 
+         *          If `byte_size` is 0. 
          * 
          * @retval `status::NULL_POINTER` 
          *          If the memory pool pointer inside the heap is empty.
          * 
          * @retval `status::POINTER_OUT_OF_RANGE` 
-         *          If block_ptr is outside if the allocated memory block.
+         *          If `memory_block` is outside if the allocated memory block.
          * 
          * @retval `status::HEAP_EXHAUSTED` 
          *          If the memory pool does not have enough free space or
-         *          `new_byte_size` is too large. 
+         *          `byte_size` is too large. 
          * 
          * @retval `status::HEAP_CORRUPTED` 
          *          If the allocated memory block is not align.
@@ -136,23 +131,23 @@ namespace kernel::heap
         _API_ 
         [[nodiscard]]
         status_t 
-        reallocate(_INOUT_ void*& block_ptr, 
-                   _IN_    const uint32_t new_byte_size) noexcept;
+        reallocate(_INOUT_ void*& memory_block, 
+                   _IN_    const uint32_t byte_size) noexcept;
 
 
         /** 
          * @brief Deallocates a memory block. 
          * 
-         * @note If the deallocation was success, this nulls `block_ptr`.
+         * @note If the deallocation was success, this nulls `memory_block`.
          * 
-         * @param block_ptr Pointer to the memory block to be deallocated.
+         * @param memory_block Pointer to the memory block to be deallocated.
          * 
          * @retval `status::NULL_POINTER` 
-         *          If `block_ptr` is a `nullptr` or the 
+         *          If `memory_block` is a `nullptr` or the 
          *          memory pool pointer inside the heap is empty. 
          * 
          * @retval `status::POINTER_OUT_OF_RANGE`
-         *         If block_ptr is outside if the allocated memory block.
+         *         If memory_block is outside if the allocated memory block.
          * 
          * @retval `status::HEAP_CORRUPTED` 
          *          If a deallocation error has occurred. 
@@ -166,5 +161,5 @@ namespace kernel::heap
         _API_ 
         [[nodiscard]]
         status_t 
-        deallocate(_INOUT_ void*& block_ptr) noexcept;
+        deallocate(_INOUT_ void*& memory_block) noexcept;
 } // namespace kernel::heap

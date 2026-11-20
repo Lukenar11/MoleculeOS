@@ -1,18 +1,13 @@
 /**
-LICENSE:
-    Copyright (c) 2026 Lukenar11 (Luke Matthes)
-    MIT Licensed
-    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-
-DESCRIPTION:
-    This class defines the entire system heap using a 'block allocator'.
-    The allocator uses linker-defined symbols (heap_start & heap_end)
-    to determine the valid heap area.
-
-NOTES:
-    Some methods are placed in the header 
-    because they are so small that the compiler can inline them.
-*/
+ * @brief Implements the system heap (block-allocator).
+ *
+ * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
+ * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+ * @author    Lukenar11 (Luke Matthes)
+ *
+ * @note The heap needed the linker defined symbols, 
+ *       `heap_start` and `heap_end` for the initialisation.
+ */
 
 
 #include "heap/block.hpp"
@@ -40,7 +35,7 @@ namespace
     uint32_t all_memory_blocks = 0;
     uint32_t needed_pool_space = 0;
 
-    uint8_t* memory_pool_ptr   = nullptr;
+    uint8_t* memory_pool_begin = nullptr;
     uint16_t* allocation_sizes = nullptr;
     uint32_t* memory_bitmap    = nullptr;
 
@@ -104,8 +99,8 @@ namespace
      * @param alignment Alignment value. 
      *
      * @return aligned value.
-    */
-   [[nodiscard]]
+     */
+    [[nodiscard]]
     inline 
     constexpr
     uint32_t
@@ -142,6 +137,13 @@ namespace
     void 
     setup_metadata_layout(_IN_ uint32_t start_address,
                           _IN_ uint32_t end_address) noexcept {
+        uint32_t allocation_sizes_bytes = 0;
+        uint32_t bitmap_word_count      = 0;
+        uint32_t bitmap_byte_size       = 0;
+        uint32_t metadata_start         = 0;
+        uint32_t memory_bitmap_start    = 0;
+        uint32_t memory_pool_start      = 0;
+
         start_address = align_up(start_address, MEMORY_BLOCK_SIZE);
         end_address   = align_down(end_address, MEMORY_BLOCK_SIZE);
 
@@ -154,33 +156,29 @@ namespace
             sys::panic("Heap area too small");
         }
 
-        const uint32_t allocation_sizes_bytes = align_up(all_memory_blocks * 
-                                                         sizeof(uint16_t),
-                                                         MEMORY_BLOCK_SIZE);
+        allocation_sizes_bytes = align_up(all_memory_blocks * sizeof(uint16_t),
+                                          MEMORY_BLOCK_SIZE);
 
-        const uint32_t bitmap_word_count = (all_memory_blocks + 
-                                            BITMAP_WORD_MASK) / 
-                                            BITMAP_WORD_BITS;
-        const uint32_t bitmap_bytes      = align_up(bitmap_word_count * 
-                                                    sizeof(uint32_t),
-                                                    MEMORY_BLOCK_SIZE);
+        bitmap_word_count = (all_memory_blocks + BITMAP_WORD_MASK) / 
+                             BITMAP_WORD_BITS;
+    
+        bitmap_byte_size = align_up(bitmap_word_count * sizeof(uint32_t), 
+                                    MEMORY_BLOCK_SIZE);
 
-        const uint32_t metadata_start = start_address;
-        const uint32_t bitmap_start   = metadata_start + 
-                                        allocation_sizes_bytes;
-        const uint32_t pool_start     = align_up(bitmap_start + 
-                                                 bitmap_bytes,
-                                                 MEMORY_BLOCK_SIZE);
+        metadata_start      = start_address;
+        memory_bitmap_start = metadata_start + allocation_sizes_bytes;
+        memory_pool_start   = align_up(memory_bitmap_start + bitmap_byte_size, 
+                                       MEMORY_BLOCK_SIZE);
 
-        if (pool_start >= end_address) [[unlikely]] {
+        if (memory_pool_start >= end_address) [[unlikely]] {
             sys::panic("Heap metadata area too large");
         }
 
-        allocation_sizes = reinterpret_cast<uint16_t*>(metadata_start);
-        memory_bitmap    = reinterpret_cast<uint32_t*>(bitmap_start);
-        memory_pool_ptr  = reinterpret_cast<uint8_t*>(pool_start);
+        allocation_sizes  = reinterpret_cast<uint16_t*>(metadata_start);
+        memory_bitmap     = reinterpret_cast<uint32_t*>(memory_bitmap_start);
+        memory_pool_begin = reinterpret_cast<uint8_t*>(memory_pool_start);
 
-        needed_pool_space = end_address - pool_start;
+        needed_pool_space = end_address - memory_pool_start;
         needed_pool_space = align_down(needed_pool_space, MEMORY_BLOCK_SIZE);
 
         if (needed_pool_space == 0) [[unlikely]] {
@@ -194,32 +192,33 @@ namespace
     /** 
      * @brief Resets all heap metadata. 
      * 
-     * @param bitmap_word_count Count of available memory blocks in words. 
+     * @param available_memory_blocks 
+     *        Count of available memory blocks in words.
      */
     [[nodiscard]]
     status_t
-    clear_metadata(_IN_ const uint32_t bitmap_word_count) noexcept {
-        using namespace stdlib;
+    clear_metadata(_IN_ const uint32_t available_memory_blocks) noexcept {
+        status_t status                  = status::SUCCESS;
+        uint32_t allocable_bytes         = 0;
+        uint32_t memory_bitmap_byte_size = 0;
 
-        status_t status;
+        allocable_bytes = align_up(all_memory_blocks * sizeof(uint16_t), 
+                                   MEMORY_BLOCK_SIZE);
 
-        const uint32_t allocation_sizes_bytes = align_up(all_memory_blocks * 
-                                                         sizeof(uint16_t),
-                                                         MEMORY_BLOCK_SIZE);
-
-        const uint32_t memory_bitmap_bytes = align_up(bitmap_word_count * 
-                                                      sizeof(uint32_t),
-                                                      MEMORY_BLOCK_SIZE);
-
-        status = stdlib::memory::set_block(allocation_sizes, MEMORY_NULL, allocation_sizes_bytes);
+        status = stdlib::memory::set_block(allocation_sizes, 
+                                           MEMORY_NULL, 
+                                           allocable_bytes);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        status = stdlib::memory::set_block(memory_bitmap, ALL_BLOCKS_FREE, memory_bitmap_bytes);
-        if (status != status::SUCCESS) [[unlikely]] {
-            goto cleanup;
-        }
+        memory_bitmap_byte_size = align_up(available_memory_blocks * 
+                                           sizeof(uint32_t),
+                                           MEMORY_BLOCK_SIZE);
+
+        status = stdlib::memory::set_block(memory_bitmap, 
+                                           ALL_BLOCKS_FREE, 
+                                           memory_bitmap_byte_size);
 
     cleanup:
         return status;
@@ -230,59 +229,66 @@ namespace
      * @brief Marks memory blocks as used in the memory pool and 
      *        stores the memory block count.
      *
-     * @param needed_blocks Number of needed blocks.
-     * @param pool_index    Start index in the memory pool.
+     * @param needed_memory_blocks Number of needed blocks.
+     * @param memory_pool_index    Start index in the memory pool.
      *
      * @return Pointer to the first block.
      */ 
     void*
-    set_allocation_sizes_entry(_IN_ const uint32_t needed_blocks,
-                               _IN_ const uint32_t pool_index) noexcept {
-        void* ptr;
+    set_allocation_sizes_entry(_IN_ const uint32_t needed_memory_blocks,
+                               _IN_ const uint32_t memory_pool_index) 
+                               noexcept {
+        void* used_memory_marker = nullptr;
 
-        if (needed_blocks == 0 ||
-            needed_blocks > stdlib::UINT16_MAX ||
-            pool_index >= all_memory_blocks ||
-            needed_blocks > (all_memory_blocks - pool_index)) [[unlikely]] {
-            ptr = nullptr;
+        if (needed_memory_blocks == 0 ||
+            needed_memory_blocks > stdlib::UINT16_MAX ||
+            needed_memory_blocks > (all_memory_blocks - memory_pool_index) ||
+            memory_pool_index >= all_memory_blocks) [[unlikely]] {
             goto cleanup;
         }
 
         for (uint32_t pool_block  = 0; 
-             pool_block < needed_blocks; 
+             pool_block < needed_memory_blocks; 
              pool_block++) [[likely]] {
-            set_block_used(pool_index + pool_block );
+            set_block_used(memory_pool_index + pool_block );
         }
 
-        allocation_sizes[pool_index] = static_cast<uint16_t>(needed_blocks);
+        allocation_sizes [memory_pool_index] = 
+            static_cast<uint16_t>(needed_memory_blocks);
 
-        ptr = &memory_pool_ptr[pool_index * MEMORY_BLOCK_SIZE];
+        used_memory_marker = &memory_pool_begin[memory_pool_index * 
+                                                MEMORY_BLOCK_SIZE];
 
     cleanup:
-        return ptr;
+        return used_memory_marker;
     }
 
 
     /** 
      * @brief Checks free memory blocks in the memory pool from a start index.
      * 
-     * @param checked_blocks Number of blocks checked so far.
-     * @param start_index    Start index in the memory pool.
-     * @param needed_blocks  Number of blocks needed.
+     * @param checked_memory_blocks Number of blocks checked so far.
+     * @param memory_pool_index     Start index in the memory pool.
+     * @param needed_memory_blocks  Number of blocks needed.
      * 
-     * @retval `true`  If enough free blocks were found.
-     * @retval `false` If not enough free blocks were found.
+     * @retval `true`  
+     *          If enough free blocks were found.
+     * 
+     * @retval `false` 
+     *          If not enough free blocks were found.
      */
     [[nodiscard]]
     bool 
     find_enough_free_blocks(_INOUT_ uint32_t& checked_memory_blocks,
-                            _IN_    const uint32_t pool_index,
-                            _IN_    const uint32_t needed_blocks) noexcept {
-        bool status;
+                            _IN_    const uint32_t memory_pool_index,
+                            _IN_    const uint32_t needed_memory_blocks) 
+                            noexcept {
+        bool status = true;
 
         checked_memory_blocks = 0;
-        while (checked_memory_blocks < needed_blocks) [[likely]] {
-            if (!is_block_free(pool_index + 
+
+        while (checked_memory_blocks < needed_memory_blocks) [[likely]] {
+            if (!is_block_free(memory_pool_index + 
                                checked_memory_blocks)) [[unlikely]] {
                 status = false;
                 goto cleanup;
@@ -290,8 +296,6 @@ namespace
 
             checked_memory_blocks++;
         }
-
-        status = true;
 
     cleanup:
         return status;
@@ -317,24 +321,22 @@ namespace
      */
     [[nodiscard]]
     status_t 
-    validate_allocate_size(_OUT_ uint32_t& needed_blocks,
+    validate_allocate_size(_OUT_ uint32_t& needed_memory_blocks,
                            _IN_  const uint32_t byte_size) noexcept {
-        status_t status;
+        status_t status = status::SUCCESS;
         
         if (byte_size == 0) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_B;
             goto cleanup;
         }
 
-        needed_blocks = (byte_size + MEMORY_BLOCK_SIZE - 1) / 
-                         MEMORY_BLOCK_SIZE;
-        if (needed_blocks > all_memory_blocks || 
-            needed_blocks > stdlib::UINT16_MAX) [[unlikely]] {
+        needed_memory_blocks = (byte_size + MEMORY_BLOCK_SIZE - 1) / 
+                                MEMORY_BLOCK_SIZE;
+        if (needed_memory_blocks > all_memory_blocks || 
+            needed_memory_blocks > stdlib::UINT16_MAX) [[unlikely]] {
             status = status::HEAP_EXHAUSTED;
             goto cleanup;
         }
-
-        status = status::SUCCESS;
 
     cleanup:
         return status;
@@ -345,8 +347,8 @@ namespace
      * @brief Finds a free memory region with a specific size
      *        in the heap memory pool. 
      * 
-     * @param block_index   Index of the found memory region. 
-     * @param needed_blocks Count of all needed memory blocks. 
+     * @param memory_region_index  Index of the found memory region. 
+     * @param needed_memory_blocks Count of all needed memory blocks. 
      * 
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
      *          If `needed_blocks` is `0`. 
@@ -360,56 +362,56 @@ namespace
      */
     [[nodiscard]]
     status_t 
-    find_free_memory_region(_OUT_ uint32_t& block_index,
-                            _IN_  const uint32_t needed_blocks) noexcept {
-        status_t status;
-        uint32_t pool_index         = 0;
-        uint32_t memory_found_index = 0;
+    find_free_memory_region(_OUT_ uint32_t& memory_region_index,
+                            _IN_  const uint32_t needed_memory_blocks) 
+                            noexcept {
+        status_t status            = status::HEAP_EXHAUSTED;
+        uint32_t memory_pool_index = 0;
+        uint32_t found_free_memory = 0;
 
-        if (needed_blocks == 0 || 
-            needed_blocks > all_memory_blocks) [[unlikely]] {
+        memory_region_index = 0;
+
+        if (needed_memory_blocks == 0 || 
+            needed_memory_blocks > all_memory_blocks) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_B;
             goto cleanup;
         }
 
-        while (pool_index <= 
-               all_memory_blocks - needed_blocks) [[likely]] {
-            if (find_enough_free_blocks(memory_found_index, 
-                                        pool_index, 
-                                        needed_blocks)) {
-                block_index = pool_index;
-                
-                status = status::SUCCESS;
+        while (memory_pool_index <= 
+               all_memory_blocks - needed_memory_blocks) [[likely]] {
+            if (find_enough_free_blocks(found_free_memory, 
+                                        memory_pool_index, 
+                                        needed_memory_blocks)) {
+                memory_region_index = memory_pool_index;
+                status              = status::SUCCESS;
+
                 goto cleanup;
             }
 
-            pool_index += memory_found_index + 1;
+            memory_pool_index += found_free_memory + 1;
         }
 
-        status = status::HEAP_EXHAUSTED;
-
     cleanup:
-
         return status;
     }
 
 
-        /** 
+    /** 
      * @brief Gets the meta data of a allocated memory block.
      * 
-     * @param pool_index      Index of the allocated memory block in 
-     *                        the memory pool.
-     * @param pool_block_size Blocksize of the allocated memory block.
-     * @param block_ptr       Pointer to the allocated memory block.
+     * @param memory_poll_index  Index of the allocated memory block in 
+     *                           the memory pool.
+     * @param memory_block_count Blocksize of the allocated memory block.
+     * @param memory_block       Pointer to the allocated memory block.
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_C`
-     *          If `block_ptr` is a `nullptr`
+     *          If `memory_block` is a `nullptr`
      * 
      * @retval `status::NULL_POINTER`
      *          If the memory pool pointer inside the heap is empty.
      * 
      * @retval `status::POINTER_OUT_OF_RANGE`
-     *          If `block_ptr` is outside if the allocated memory block.
+     *          If `memory_block` is outside if the allocated memory block.
      * 
      * @retval `status::HEAP_CORRUPTED`
      *          If the allocated memory block is not align.
@@ -422,49 +424,51 @@ namespace
      */
     [[nodiscard]]
     status_t 
-    get_allocation_info(_OUT_ uint32_t& pool_index,
-                        _OUT_ uint32_t& pool_block_size,
-                        _IN_  void* block_ptr) noexcept {
-        status_t status;
-        uint8_t* new_block_ptr;
-        uint32_t offset;
+    get_allocation_info(_OUT_ uint32_t& memory_poll_index,
+                        _OUT_ uint32_t& memory_block_count,
+                        _IN_  void* memory_block) noexcept {
+        status_t status                  = status::SUCCESS;
+        uint8_t* allocated_memory_block  = nullptr;
+        uint32_t allocated_memory_offset = 0;
 
-        if (!block_ptr) [[unlikely]] {
+        memory_poll_index  = 0;
+        memory_block_count = 0;
+
+        if (!memory_block) [[unlikely]] {
             status = status::NULL_POINTER | status::flags::PARAM_C;
             goto cleanup;
         }
 
-        if (!memory_pool_ptr) [[unlikely]] {
+        if (!memory_pool_begin) [[unlikely]] {
             status = status::NULL_POINTER;
             goto cleanup;
         }
 
-        new_block_ptr = reinterpret_cast<uint8_t*>(block_ptr);
-        if (new_block_ptr < memory_pool_ptr ||
-            new_block_ptr >= memory_pool_ptr + needed_pool_space) [[unlikely]] {
+        allocated_memory_block = reinterpret_cast<uint8_t*>(memory_block);
+        if (allocated_memory_block < memory_pool_begin ||
+            allocated_memory_block >= memory_pool_begin + 
+                                      needed_pool_space) [[unlikely]] {
             status = status::POINTER_OUT_OF_RANGE;
             goto cleanup;
         }
 
-        offset = static_cast<uint32_t>(new_block_ptr - memory_pool_ptr);
-        if (offset % MEMORY_BLOCK_SIZE != 0) [[unlikely]] {
+        allocated_memory_offset = static_cast<uint32_t>(allocated_memory_block - 
+                                                        memory_pool_begin);
+        if (allocated_memory_offset % MEMORY_BLOCK_SIZE != 0) [[unlikely]] {
             status = status::HEAP_CORRUPTED;
             goto cleanup;
         }
 
-        pool_index = offset / MEMORY_BLOCK_SIZE;
-        if (pool_index >= all_memory_blocks) [[unlikely]] {
+        memory_poll_index = allocated_memory_offset / MEMORY_BLOCK_SIZE;
+        if (memory_poll_index >= all_memory_blocks) [[unlikely]] {
             status = status::HEAP_CORRUPTED;
             goto cleanup;
         }
 
-        pool_block_size = allocation_sizes[pool_index];
-        if (pool_block_size == 0) [[unlikely]] {
+        memory_block_count = allocation_sizes[memory_poll_index];
+        if (memory_block_count == 0) [[unlikely]] {
             status = status::FAIL;
-            goto cleanup;
         }
-
-        status = status::SUCCESS;
 
     cleanup:
         return status;
@@ -475,11 +479,11 @@ namespace
      * @brief Executes a allocation after the 
      *        parameter validation in `reallocate`.
      * 
-     * @param block_ptr     pointer to the allocated memory block
+     * @param memory_block  pointer to the allocated memory block
      * @param new_byte_size size of the memory block
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `block_ptr` is a `nullptr`.
+     *          If `memory_block` is a `nullptr`.
      * 
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
      *          If `new_byte_size` is `0`.
@@ -488,7 +492,7 @@ namespace
      *          If the memory pool pointer inside the heap is empty.
      * 
      * @retval `status::POINTER_OUT_OF_RANGE` 
-     *          If block_ptr is outside if the allocated memory block.
+     *          If memory_block is outside if the allocated memory block.
      *  
      * @retval `status::HEAP_EXHAUSTED`
      *          If the memory pool doesn't have enough free space
@@ -508,18 +512,18 @@ namespace
      */
     [[nodiscard]]
     status_t 
-    perform_reallocate(_INOUT_ void*& block_ptr,
+    perform_reallocate(_INOUT_ void*& memory_block,
                        _IN_    const uint32_t new_byte_size) noexcept {
         using namespace stdlib;
 
-        uint32_t block_index       = 0;
-        uint32_t old_memory_blocks = 0;
-        void* new_block_ptr        = nullptr;
-        status_t status;
-        uint32_t old_byte_size;
-        uint32_t memory_byte_size;
+        status_t status                 = status::SUCCESS;
+        uint32_t old_memory_block_index = 0;
+        uint32_t old_memory_block_size  = 0;
+        void* new_memory_block          = nullptr;
+        uint32_t old_block_byte_size    = 0;
+        uint32_t memory_block_byte_size = 0;
 
-        if (!block_ptr) [[unlikely]] {
+        if (!memory_block) [[unlikely]] {
             status = status::NULL_POINTER | status::flags::PARAM_A;
             goto cleanup;
         }
@@ -529,50 +533,47 @@ namespace
             goto cleanup;
         }
 
-        status = get_allocation_info(block_index, 
-                                     old_memory_blocks, 
-                                     block_ptr);
+        status = get_allocation_info(old_memory_block_index, 
+                                     old_memory_block_size, 
+                                     memory_block);
         if (status != status::SUCCESS) [[unlikely]] {
-            if (status & status::flags::PARAM_C) {
-                status ^= status::flags::PARAM_C;
+            if (status == (status::NULL_POINTER | status::flags::PARAM_C)) {
+                // The `PARAM_C` flag is removed, so that the 
+                // returned status code matches the function signature.
+
+                status = status::NULL_POINTER;
             }
 
             goto cleanup;
         }
 
-        status = allocate(new_block_ptr, new_byte_size);
+        status = allocate(new_memory_block, new_byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
     
-        old_byte_size = old_memory_blocks * MEMORY_BLOCK_SIZE;
-        if (old_byte_size < new_byte_size) {
-            memory_byte_size = old_byte_size;
+        old_block_byte_size = old_memory_block_size * MEMORY_BLOCK_SIZE;
+        if (old_block_byte_size < new_byte_size) {
+            memory_block_byte_size = old_block_byte_size;
         } 
         else {
-            memory_byte_size = new_byte_size;
+            memory_block_byte_size = new_byte_size;
         }
     
-        status = stdlib::memory::copy_block(new_block_ptr, block_ptr, memory_byte_size);
+        status = stdlib::memory::copy_block(new_memory_block, 
+                                            memory_block, 
+                                            memory_block_byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
-            if (status & status::flags::PARAM_B) {
-                status ^= status::flags::PARAM_B;
-            }
-            else if (status & status::flags::PARAM_C) {
-                status ^= status::flags::PARAM_C;
-            }
-
+            status = status::FAIL;
             goto cleanup;
         }
 
-        status = deallocate(block_ptr);
+        status = deallocate(memory_block);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
     
-        block_ptr = new_block_ptr;
-        
-        status = status::SUCCESS;
+        memory_block = new_memory_block;
     
     cleanup:
         return status;
@@ -600,7 +601,7 @@ namespace kernel::heap
             sys::panic("'Block_Allocator' init failed!");
         };
 
-        if (!memory_pool_ptr || 
+        if (!memory_pool_begin || 
             !allocation_sizes || 
             !memory_bitmap) [[unlikely]] {
             sys::panic("'Block_Allocator' not initialized!");
@@ -614,8 +615,8 @@ namespace kernel::heap
      * @note Don't forget to free the allocated memory with `deallocate`,
      *       otherwise memory leaks will occur.
      * 
-     * @param block_ptr pointer to the allocated memory block
-     * @param byte_size memory block byte size
+     * @param memory_block pointer to the allocated memory block
+     * @param byte_size    memory block byte size
      * 
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
      *          If `byte_size` is `0`.
@@ -630,38 +631,35 @@ namespace kernel::heap
     _API_ 
     [[nodiscard]]
     status_t 
-    allocate(_OUT_ void*& block_ptr, 
+    allocate(_OUT_ void*& memory_block, 
              _IN_  const uint32_t byte_size) noexcept {
-        status_t status;
-        uint32_t needed_blocks;
-        uint32_t block_index;
+        status_t status                  = status::SUCCESS;
+        uint32_t needed_memory_blocks    = 0;
+        uint32_t free_memory_block_index = 0;
 
         sys::disable_interrupts();
 
-        status = validate_allocate_size(needed_blocks, byte_size);
+        memory_block = nullptr;
+
+        status = validate_allocate_size(needed_memory_blocks, byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
     
-        status = find_free_memory_region(block_index, needed_blocks);
+        status = find_free_memory_region(free_memory_block_index, 
+                                         needed_memory_blocks);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
     
-        block_ptr = set_allocation_sizes_entry(needed_blocks, block_index);
-        if (!block_ptr) [[unlikely]] {
+        memory_block = set_allocation_sizes_entry(needed_memory_blocks, 
+                                                  free_memory_block_index);
+        if (!memory_block) [[unlikely]] {
             status = status::OUT_OF_MEMORY;
             goto cleanup;
         }
 
-        status = status::SUCCESS;
-    
-        goto done;
-    
     cleanup:
-        block_ptr = nullptr;
-    
-    done:
         sys::enable_interrupts();
 
         return status;
@@ -675,8 +673,8 @@ namespace kernel::heap
      * @note Don't forget to free the allocated memory with `deallocate`,
      *       otherwise memory leaks will occur.
      * 
-     * @param block_ptr pointer to the allocated memory block
-     * @param byte_size memory block byte size
+     * @param memory_block pointer to the allocated memory block
+     * @param byte_size    memory block byte size
      * 
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B`
      *          If `byte_size` is `0`.
@@ -697,41 +695,43 @@ namespace kernel::heap
     _API_ 
     [[nodiscard]]
     status_t
-    clear_allocate(_OUT_ void*& block_ptr, 
+    clear_allocate(_OUT_ void*& memory_block, 
                    _IN_  const uint32_t byte_size) noexcept {
-        const uint32_t memory_size = align_up(byte_size, MEMORY_BLOCK_SIZE);
-        status_t status;
+        status_t status                 = status::SUCCESS;
+        uint32_t memory_block_byte_size = 0; 
+
+        sys::disable_interrupts();
+
+        memory_block = nullptr;
 
         if (byte_size == 0) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_B;
             goto cleanup;
         }
 
-        status = allocate(block_ptr, byte_size);
+        sys::enable_interrupts();
+
+        status = allocate(memory_block, byte_size);
+
+        sys::disable_interrupts();
+
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        sys::disable_interrupts();
+        memory_block_byte_size = align_up(byte_size, MEMORY_BLOCK_SIZE);
 
-        status = stdlib::memory::set_block(block_ptr, MEMORY_NULL, memory_size);
+        status = stdlib::memory::set_block(memory_block, 
+                                           MEMORY_NULL, 
+                                           memory_block_byte_size);
         if (status != status::SUCCESS) [[unlikely]] {
-            sys::enable_interrupts();
-
             status = status::FAIL;
             goto cleanup;
         }
 
-        status = status::SUCCESS;
-
+    cleanup: 
         sys::enable_interrupts();
 
-        goto success;
-
-    cleanup: 
-        block_ptr = nullptr;
-
-    success: 
         return status;
     }
 
@@ -743,24 +743,24 @@ namespace kernel::heap
      * @note Don't forget to free the allocated memory with `deallocate`, 
      *       otherwise memory leaks will occur. 
      * 
-     * @param block_ptr     Pointer to the allocated memory block. 
-     * @param new_byte_size New memory block byte size.
+     * @param memory_block Pointer to the allocated memory block. 
+     * @param byte_size    New memory block byte size.
      * 
      * @retval `status::NULL_POINTER | status::flags::PARAM_A`
-     *          If `block_ptr` is a `nullptr`.
+     *          If `memory_block` is a `nullptr`.
      * 
      * @retval `status::INVALID_PARAMETER | status::flags::PARAM_B` 
-     *          If `new_byte_size` is 0. 
+     *          If `byte_size` is 0. 
      * 
      * @retval `status::NULL_POINTER` 
      *          If the memory pool pointer inside the heap is empty.
      * 
      * @retval `status::POINTER_OUT_OF_RANGE` 
-     *          If block_ptr is outside if the allocated memory block.
+     *          If `memory_block` is outside if the allocated memory block.
      * 
      * @retval `status::HEAP_EXHAUSTED` 
      *          If the memory pool does not have enough free space or
-     *          `new_byte_size` is too large. 
+     *          `byte_size` is too large. 
      * 
      * @retval `status::HEAP_CORRUPTED` 
      *          If the allocated memory block is not align.
@@ -777,29 +777,27 @@ namespace kernel::heap
     _API_ 
     [[nodiscard]]
     status_t
-    reallocate(_INOUT_ void*& block_ptr,
-               _IN_    const uint32_t new_byte_size) noexcept {
-        status_t status;
-
-        if (!block_ptr) [[unlikely]] {
-            status = allocate(block_ptr, new_byte_size);
-            goto cleanup;
-        }
+    reallocate(_INOUT_ void*& memory_block,
+               _IN_    const uint32_t byte_size) noexcept {
+        status_t status = status::SUCCESS;
 
         sys::disable_interrupts();
 
-        if (new_byte_size == 0) [[unlikely]] {
-            sys::enable_interrupts();
+        if (!memory_block) [[unlikely]] {
+            status = allocate(memory_block, byte_size);
+            goto cleanup;
+        }
 
+        if (byte_size == 0) [[unlikely]] {
             status = status::INVALID_PARAMETER | status::flags::PARAM_B;
             goto cleanup;
         }
 
-        status = perform_reallocate(block_ptr, new_byte_size);
-
-        sys::enable_interrupts();
+        status = perform_reallocate(memory_block, byte_size);
 
     cleanup:
+        sys::enable_interrupts();
+
         return status;
     }
 
@@ -807,16 +805,16 @@ namespace kernel::heap
     /** 
      * @brief Deallocates a memory block. 
      * 
-     * @note If the deallocation was success, this nulls `block_ptr`.
+     * @note If the deallocation was success, this nulls `memory_block`.
      * 
-     * @param block_ptr Pointer to the memory block to be deallocated.
+     * @param memory_block Pointer to the memory block to be deallocated.
      * 
      * @retval `status::NULL_POINTER` 
-     *          If `block_ptr` is a `nullptr` or the 
+     *          If `memory_block` is a `nullptr` or the 
      *          memory pool pointer inside the heap is empty. 
      * 
      * @retval `status::POINTER_OUT_OF_RANGE`
-     *         If block_ptr is outside if the allocated memory block.
+     *         If memory_block is outside if the allocated memory block.
      * 
      * @retval `status::HEAP_CORRUPTED` 
      *          If a deallocation error has occurred. 
@@ -830,43 +828,46 @@ namespace kernel::heap
     _API_
     [[nodiscard]]
     status_t
-    deallocate(_INOUT_ void*& block_ptr) noexcept {
-        status_t status;
-
-        uint32_t block_index   = 0;
-        uint32_t needed_blocks = 0;
+    deallocate(_INOUT_ void*& memory_block) noexcept {
+        status_t status               = status::SUCCESS;
+        uint32_t memory_block_index   = 0;
+        uint32_t needed_memory_blocks = 0;
 
         sys::disable_interrupts();
 
-        if (!block_ptr) [[unlikely]] {
+        if (!memory_block) [[unlikely]] {
             status = status::NULL_POINTER;
             goto cleanup;
         }
 
-        status = get_allocation_info(block_index, needed_blocks, block_ptr);
+        status = get_allocation_info(memory_block_index, 
+                                     needed_memory_blocks, 
+                                     memory_block);
         if (status != status::SUCCESS) [[unlikely]] {
-            if (status & status::flags::PARAM_C) {
-                status ^= status::flags::PARAM_C;
+            if (status == (status::NULL_POINTER | status::flags::PARAM_C)) {
+                // The `PARAM_C` flag is removed, so that the 
+                // returned status code matches the function signature.
+
+                status = status::NULL_POINTER;
             }
 
             goto cleanup;
         }
 
-        if (block_index + needed_blocks > all_memory_blocks) [[unlikely]] {
+        if (memory_block_index + needed_memory_blocks > 
+            all_memory_blocks) [[unlikely]] {
             status = status::HEAP_CORRUPTED;
             goto cleanup;
         }
 
-        for (uint32_t pool_block = 0; 
-             pool_block < needed_blocks; 
-             pool_block++) [[likely]] {
-            set_block_free(block_index + pool_block);
+        for (uint32_t block = 0; 
+             block < needed_memory_blocks; 
+             block++) [[likely]] {
+            set_block_free(memory_block_index + block);
         }
 
-        allocation_sizes[block_index] = 0;
-        block_ptr                     = nullptr;
-
-        status = status::SUCCESS;
+        allocation_sizes[memory_block_index] = 0;
+        memory_block                         = nullptr;
 
     cleanup:
         sys::enable_interrupts();
