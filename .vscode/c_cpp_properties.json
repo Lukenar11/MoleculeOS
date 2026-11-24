@@ -39,14 +39,8 @@
                 "${workspaceFolder}/include/terminal",
 
                 "${workspaceFolder}/kernel",
-                "${workspaceFolder}/kernel/include",
-                "${workspaceFolder}/kernel/include/filesys",
-                "${workspaceFolder}/kernel/include/heap",
-                "${workspaceFolder}/kernel/include/storemgr",
-                "${workspaceFolder}/kernel/src",
-                "${workspaceFolder}/kernel/src/filesys",
-                "${workspaceFolder}/kernel/src/heap",
-                "${workspaceFolder}/kernel/src/storemgr",
+                "${workspaceFolder}/kernel/filesys",
+                "${workspaceFolder}/kernel/heap",
 
                 "${workspaceFolder}/shell",
                 "${workspaceFolder}/shell/include",

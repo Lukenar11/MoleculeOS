@@ -1,3 +1,14 @@
+/**
+ * @brief Defines the file system.
+ *
+ * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
+ * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+ * @author    Lukenar11 (Luke Matthes)
+ *
+ * @note 
+ */
+
+
 #pragma once
 
 #include <include/stdlib/types.hpp>
@@ -162,7 +173,7 @@ namespace kernel::filesys
     /**
      * @brief Closes an opened file.
      *
-     * @param handle Handle for the file to close.
+     * @brief Closes an opened file and saves all file data changes.
      *
      * @retval `status::NOT_FOUND`
      *          If `handle` is not registered as open.
@@ -363,6 +374,34 @@ namespace kernel::filesys
     status_t
     flush_file(_IN_ const Handle& handle) noexcept;
 
+
+    /**
+     * @brief Moves the current file pointer position.
+     *
+     * @param handle   Handle for the file to seek.
+     * @param position New position relative to the beginning of the file.
+     * 
+     * @note A `position` of `0` resets the file position to the
+     *       beginning of the file.
+     *
+     * @retval `status::NOT_FOUND`
+     *          If `handle` is not registered as open.
+     *
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *          If internal `handle` pointers are invalid.
+     *
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+     *          If `handle` is invalid or `position` is outside the
+     *          file buffer.
+     *
+     * @retval `status::SUCCESS`
+     *          Default case.
+     */
+    _API_
+    [[nodiscard]]
+    status_t
+    seek_file(_INOUT_ Handle& handle,
+              _IN_    const uint32_t position) noexcept;
 
     /**
      * @brief Gets the file content.

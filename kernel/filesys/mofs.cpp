@@ -1,3 +1,14 @@
+/**
+ * @brief Implements the file system.
+ *
+ * @copyright Copyright (c) 2026 Lukenar11 (Luke Matthes)
+ * @license:  https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+ * @author    Lukenar11 (Luke Matthes)
+ *
+ * @note 
+ */
+
+
 #include "filesys/mofs.hpp"
 
 #include <include/stdlib/array.hpp>
@@ -376,11 +387,11 @@ namespace
         status_t status   = status::SUCCESS;
         void* header_data = reinterpret_cast<void*&>(current_header.data);
 
-        if (current_header.name.data()[0] == '\0' ||
+        if (!current_header.data || 
+            current_header.name.data()[0] == '\0' ||
             current_header.format.data()[0] == '\0' ||
             current_header.name_hash == 0 ||
             current_header.format_hash == 0 ||
-            !current_header.data || 
             current_header.byte_size == 0 ||
             current_header.used_byte_size > current_header.byte_size) {
             if (current_header.data) {
@@ -910,6 +921,153 @@ namespace
     cleanup:
         return status;
     }
+
+
+    /**
+     * @brief Prepares a file stream for read and write access.
+     *
+     * @param handle         Open file handle
+     * @param file_header    Pointer for the associated file header.
+     * @param cursor_offset  handle buffer cursor offset
+     * @param data           Pointer to a buffer for the data to write.
+     * @param data_byte_size Byte size of `buffer`.
+     * @param offset         Write offset.
+     * @param byte_length    Bytes to write.
+     *
+     * @retval `status::NOT_FOUND`
+     *          If `handle` is not registered as open.
+     *
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *          If internal `handle` pointers are invalid.
+     *
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+     *          If the handle is invalid.
+     *
+     * @retval `status::NULL_POINTER | status::flags::PARAM_B`
+     *          If `data` is a `nullptr`.
+     *
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_C`
+     *          If `data_byte_size` is to smal for `byte_length`.
+     *
+     * @retval `status::BUFFER_OVERFLOW`
+     *          If the requested range is outside the file buffer.
+     *
+     * @retval `status::FAIL`
+     *          Internal unexpected error.
+     *
+     * @retval `status::SUCCESS`
+     *          Default case.
+     */
+    [[nodiscard]]
+    status_t
+    prepare_file_stream(_INOUT_ Handle& handle,
+                        _OUT_   File_Header*& file_header,
+                        _OUT_   uint32_t& cursor_offset,
+                        _IN_    const uint8_t* data,
+                        _IN_    const uint32_t data_byte_size,
+                        _IN_    const uint32_t offset,
+                        _IN_    const uint32_t byte_length) noexcept {
+        status_t status                  = status::SUCCESS;
+        Handle_Metadata* handle_metadata = nullptr;
+        uint32_t target_size             = 0;
+
+        file_header   = nullptr;
+        cursor_offset = 0;
+
+        status = get_open_handle(handle_metadata, handle);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        if (!handle_metadata->header) [[unlikely]] {
+            sys::panic("File-System invalid handle metadata!");
+        }
+
+        file_header = handle_metadata->header;
+
+        if (!file_header->data || file_header->byte_size == 0) [[unlikely]] {
+            status = status::FAIL;
+            goto cleanup;
+        }
+
+        if (handle.buffer &&
+            handle.resume_cursor &&
+            handle.buffer_size > 0 &&
+            handle.resume_cursor >= handle.buffer &&
+            handle.resume_cursor <= handle.buffer + handle.buffer_size) {
+            cursor_offset = static_cast<uint32_t>(handle.resume_cursor -
+                                                  handle.buffer);
+        }
+        else {
+            handle.buffer        = nullptr;
+            handle.resume_cursor = nullptr;
+            handle.buffer_size   = 0;
+        }
+
+        if (!handle.buffer || handle.buffer_size == 0) {
+            target_size = file_header->byte_size;
+
+            status = heap::clear_allocate(reinterpret_cast<void*&>(handle.buffer),
+                                          target_size);
+            if (status != status::SUCCESS) [[unlikely]] {
+                target_size = file_header->used_byte_size;
+
+                status = heap::clear_allocate(reinterpret_cast<void*&>(handle.buffer),
+                                              target_size);
+                if (status != status::SUCCESS) [[unlikely]] {
+                    status = status::FAIL;
+                    goto cleanup;
+                }
+            }
+
+            handle.buffer_size   = target_size;
+            handle.resume_cursor = handle.buffer;
+
+            if (file_header->used_byte_size > 0) {
+                status = stdlib::memory::copy_block(handle.buffer,
+                                                    file_header->data,
+                                                    file_header->used_byte_size);
+                if (status != status::SUCCESS) [[unlikely]] {
+                    status = status::FAIL;
+                    goto cleanup;
+                }
+            }
+        }
+        else if (handle.buffer_size < file_header->byte_size) {
+            target_size = file_header->byte_size;
+
+            status = heap::reallocate(reinterpret_cast<void*&>(handle.buffer),
+                                      target_size);
+            if (status != status::SUCCESS) [[unlikely]] {
+                target_size = file_header->used_byte_size;
+
+                status = heap::reallocate(reinterpret_cast<void*&>(handle.buffer),
+                                          target_size);
+                if (status != status::SUCCESS) [[unlikely]] {
+                    status = status::FAIL;
+                    goto cleanup;
+                }
+            }
+
+            handle.buffer_size   = target_size;
+            handle.resume_cursor = handle.buffer + cursor_offset;
+        }
+
+        status = validate_file_stream_access(handle,
+                                             data,
+                                             data_byte_size,
+                                             offset,
+                                             byte_length);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        cursor_offset = static_cast<uint32_t>(handle.resume_cursor -
+                                              handle.buffer);
+
+    cleanup:
+        return status;
+    }
 } // namespace
 
 
@@ -1010,10 +1168,26 @@ namespace kernel::filesys
         status = heap::clear_allocate(reinterpret_cast<void*&>(handle.buffer),
                                       handle.buffer_size);
         if (status != status::SUCCESS) [[unlikely]] {
-            goto cleanup;
+            handle.buffer_size = file_header->used_byte_size;
+
+            status = heap::clear_allocate(reinterpret_cast<void*&>(handle.buffer),
+                                          handle.buffer_size);
+            if (status != status::SUCCESS) [[unlikely]] {
+                status = status::FAIL;
+                goto cleanup;
+            }
         }
 
         buffer_allocated = true;
+
+        if (file_header->used_byte_size > 0) {
+            status = stdlib::memory::copy_block(handle.buffer,
+                                                file_header->data,
+                                                file_header->used_byte_size);
+            if (status != status::SUCCESS) [[unlikely]] {
+                goto cleanup;
+            }
+        }
 
         handle.resume_cursor = handle.buffer;
 
@@ -1047,7 +1221,7 @@ namespace kernel::filesys
 
 
     /**
-     * @brief Closes an opened file.
+     * @brief Closes an opened file and saves all file data changes.
      *
      * @param handle Handle for the file to close.
      *
@@ -1070,6 +1244,11 @@ namespace kernel::filesys
         Handle_Metadata* _ = nullptr;
         status_t status    = get_open_handle(_, handle);
 
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+
+        status = flush_file(handle);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
@@ -1322,31 +1501,46 @@ namespace kernel::filesys
               _IN_    const uint32_t data_byte_size,
               _IN_    const uint32_t offset,
               _IN_    const uint32_t byte_length) noexcept {
-        status_t status = status::SUCCESS;
-        uint8_t* cursor = nullptr;
+        File_Header* file_header = nullptr;
+        uint32_t cursor_offset   = 0;
+        status_t status          = prepare_file_stream(handle,
+                                                       file_header, 
+                                                       cursor_offset, 
+                                                       data, 
+                                                       data_byte_size, 
+                                                       offset, 
+                                                       byte_length);
 
-        status = validate_file_stream_access(handle, 
-                                             data, 
-                                             data_byte_size, 
-                                             offset, 
-                                             byte_length);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        cursor = handle.resume_cursor;
-    
-        status = stdlib::memory::copy_block(data, 
-                                            cursor + offset, 
+        if (cursor_offset >= file_header->used_byte_size ||
+            offset > file_header->used_byte_size - cursor_offset ||
+            byte_length > file_header->used_byte_size - 
+                          cursor_offset - 
+                          offset) [[unlikely]] {
+            status = status::BUFFER_OVERFLOW;
+            goto cleanup;
+        }
+
+        status = stdlib::memory::copy_block(data,
+                                            handle.resume_cursor + offset,
                                             byte_length);
         if (status != status::SUCCESS) [[unlikely]] {
             status = status::FAIL;
             goto cleanup;
         }
-    
-        handle.resume_cursor = const_cast<uint8_t*>(cursor + 
-                                                    offset + byte_length);
-    
+
+        handle.resume_cursor = handle.resume_cursor + 
+                               offset + 
+                               byte_length;
+
+        file_header->resume_cursor = file_header->data + 
+                                     cursor_offset + 
+                                     offset + 
+                                     byte_length;
+
     cleanup:
         return status;
     }
@@ -1390,30 +1584,39 @@ namespace kernel::filesys
                _IN_    const uint32_t data_byte_size,
                _IN_    const uint32_t offset,
                _IN_    const uint32_t byte_length) noexcept {
-        status_t status = status::SUCCESS;
-        uint8_t* cursor = nullptr;
-
-        status = validate_file_stream_access(handle, 
-                                             data, 
-                                             data_byte_size, 
-                                             offset, 
-                                             byte_length);
+        File_Header* file_header = nullptr;
+        uint32_t cursor_offset   = 0;
+        status_t status          = prepare_file_stream(handle,
+                                                       file_header, 
+                                                       cursor_offset, 
+                                                       data, 
+                                                       data_byte_size, 
+                                                       offset, 
+                                                       byte_length);
+        
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        cursor = handle.resume_cursor;
-
-        status = stdlib::memory::copy_block(handle.resume_cursor + offset, 
-                                            data, 
+        status = stdlib::memory::copy_block(handle.resume_cursor + offset,
+                                            data,
                                             byte_length);
         if (status != status::SUCCESS) [[unlikely]] {
             status = status::FAIL;
             goto cleanup;
         }
 
-        handle.resume_cursor = const_cast<uint8_t*>(cursor + 
-                                                    offset + byte_length);
+        handle.resume_cursor = handle.resume_cursor + offset + byte_length;
+
+        if (cursor_offset + offset + byte_length > 
+            file_header->used_byte_size) {
+            file_header->used_byte_size = cursor_offset + offset + byte_length;
+        }
+
+        file_header->resume_cursor = file_header->data + 
+                                     cursor_offset + 
+                                     offset + 
+                                     byte_length;
 
     cleanup:
         return status;
@@ -1487,18 +1690,110 @@ namespace kernel::filesys
     [[nodiscard]]
     status_t
     flush_file(_IN_ const Handle& handle) noexcept {
+        status_t status                  = status::SUCCESS;
+        Handle_Metadata* handle_metadata = nullptr;
+        File_Header* file_header         = nullptr;
+        uint32_t cursor_offset           = 0;
+        uint32_t content_size            = 0;
+    
+        status = validate_flush_handling(handle_metadata, handle);
+        if (status != status::SUCCESS) [[unlikely]] {
+            goto cleanup;
+        }
+    
+        if (!handle_metadata->header) [[unlikely]] {
+            sys::panic("File-System flush, invalid handle metadata!");
+        }
+    
+        file_header  = handle_metadata->header;
+        content_size = file_header->used_byte_size;
+    
+        if (file_header->byte_size < content_size) {
+            status = heap::reallocate(reinterpret_cast<void*&>(file_header->data),
+                                      content_size);
+            if (status != status::SUCCESS) [[unlikely]] {
+                status = status::FAIL;
+                goto cleanup;
+            }
+        
+            file_header->byte_size = content_size;
+        }
+    
+        if (content_size > 0) {
+            status = stdlib::memory::copy_block(file_header->data,
+                                                handle.buffer,
+                                                content_size);
+            if (status != status::SUCCESS) [[unlikely]] {
+                status = status::FAIL;
+                goto cleanup;
+            }
+        }
+    
+        cursor_offset = static_cast<uint32_t>(handle.resume_cursor - 
+                                              handle.buffer);
+        
+        file_header->resume_cursor = file_header->data + cursor_offset;
+    
+    cleanup:
+        return status;
+    }
+
+
+    /**
+     * @brief Moves the current file pointer position.
+     *
+     * @param handle   Handle for the file to seek.
+     * @param position New position relative to the beginning of the file.
+     * 
+     * @note A `position` of `0` resets the file position to the
+     *       beginning of the file.
+     *
+     * @retval `status::NOT_FOUND`
+     *          If `handle` is not registered as open.
+     *
+     * @retval `status::NULL_POINTER | status::flags::PARAM_A`
+     *          If internal `handle` pointers are invalid.
+     *
+     * @retval `status::INVALID_PARAMETER | status::flags::PARAM_A`
+     *          If `handle` is invalid or `position` is outside the
+     *          file buffer.
+     *
+     * @retval `status::SUCCESS`
+     *          Default case.
+     */
+    _API_
+    [[nodiscard]]
+    status_t
+    seek_file(_INOUT_ Handle& handle,
+              _IN_    const uint32_t position) noexcept {
+        status_t status                  = status::SUCCESS;
         Handle_Metadata* handle_metadata = nullptr;
 
-        status_t status = validate_flush_handling(handle_metadata, handle);
+        status = get_open_handle(handle_metadata, handle);
         if (status != status::SUCCESS) [[unlikely]] {
             goto cleanup;
         }
 
-        status = stdlib::memory::copy_block(handle_metadata->header->data,
-                                            handle.buffer,
-                                            handle.buffer_size);
-        if (status != status::SUCCESS) [[unlikely]] {
-            status = status::FAIL;
+        if (!handle_metadata->header) [[unlikely]] {
+            sys::panic("File-System 'seek_file' invalid handle metadata!");
+        }
+
+        if (!handle.buffer || !handle.resume_cursor) [[unlikely]] {
+            status = status::NULL_POINTER | status::flags::PARAM_A;
+            goto cleanup;
+        }
+
+        if (handle.buffer_size == 0 ||
+            position > handle.buffer_size) [[unlikely]] {
+            status = status::INVALID_PARAMETER | status::flags::PARAM_A;
+            goto cleanup;
+        }
+
+        handle.resume_cursor = handle.buffer + position;
+
+        if (handle_metadata->header->data) {
+            handle_metadata->header->resume_cursor = handle_metadata->header->data + 
+                                                     position;
         }
 
     cleanup:
