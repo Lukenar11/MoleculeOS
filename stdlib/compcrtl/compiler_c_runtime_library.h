@@ -17,8 +17,9 @@
 #ifdef __cplusplus
 #   include <include/stdlib/types.hpp>
 #else
-typedef uint32_t unsigned int;
-typedef int32_t  signed int;
+typedef unsigned char uint8_t;
+typedef unsigned int  uint32_t;
+typedef signed int    int32_t;
 #endif
 
 #ifdef __cplusplus

@@ -1,10 +1,47 @@
-# 
-# Copyright (c) 2026 Lukenar11 (Luke Matthes)
-# MIT Licensed
-# https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-# 
+MODULE_NAME      := terminal
+MODULE_DIRECTORY := $(MODULE_NAME)
 
-OBJS += $(BUILD)/terminal.o \
+MODULE_SOURCE_FILES :=
+MODULE_SOURCE_FILES += src/terminal.cpp
 
-$(BUILD)/%.o: terminal/src/%.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+MODULE_BUILD_PATH := $(BUILD_DIRECTORY)/$(MODULE_DIRECTORY)
+
+MODULE_OBJECTS :=
+MODULE_OBJECTS += $(patsubst %.cpp,$(MODULE_BUILD_PATH)/%.obj,$(filter %.cpp,$(MODULE_SOURCE_FILES)))
+
+ALL_OBJECTS 	 += $(MODULE_OBJECTS)
+ALL_MODULE_PATHS += $(MODULE_DIRECTORY)
+
+
+$(MODULE_BUILD_PATH)/%.obj: $(MODULE_DIRECTORY)/%.cpp
+	@mkdir -p "$(dir $@)"
+	$(CPP_COMPILER) $(CPP_COMPILER_FLAGS) -c $< -o $@
+
+$(MODULE_BUILD_PATH)/%.obj: $(MODULE_DIRECTORY)/%.c
+	@mkdir -p "$(dir $@)"
+	$(C_COMPILER) $(C_COMPILER_FLAGS) -c $< -o $@
+
+
+.PHONY: $(MODULE_DIRECTORY)
+.PHONY: clean-$(MODULE_DIRECTORY)
+
+
+ifeq ($(filter clean,$(MAKECMDGOALS)),)
+
+$(MODULE_DIRECTORY): $(MODULE_OBJECTS) $(BUILD_TARGET)
+
+ifneq ($(filter $(MODULE_DIRECTORY),$(MAKECMDGOALS)),)
+
+$(MODULE_OBJECTS): FORCE
+
+endif
+else
+
+$(MODULE_DIRECTORY):
+
+endif
+
+clean-$(MODULE_DIRECTORY): MODULE_CLEAN_PATH := $(MODULE_BUILD_PATH)
+
+clean-$(MODULE_DIRECTORY):
+	rm -rf "$(MODULE_CLEAN_PATH)"

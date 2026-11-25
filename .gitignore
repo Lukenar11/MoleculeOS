@@ -5,5 +5,5 @@
 # 
 
 NOTES.md
-build/*
+build
 tools/bochsrc.bxrc

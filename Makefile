@@ -1,78 +1,131 @@
-# 
-# Copyright (c) 2026 Lukenar11 (Luke Matthes)
-# MIT Licensed
-# https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-# 
+.DEFAULT_GOAL := all
 
-$(shell mkdir -p build/bin)
+ARCHITECTURE	   := i386
+ARCHITECTURE_MACRO := __I386__
 
-CC = clang
-CXX = clang++
-ASM = nasm
-LD = ld.lld
+LINKER_SCRIPT    := tools/linker.ld
+GRUB_CONFIG_FILE := arch/i386/iso/boot/grub/grub.cfg
 
-BUILD = build/bin
-ISO = build/iso
+GENERAL_COMPILER_FLAGS :=
+GENERAL_COMPILER_FLAGS += -target $(ARCHITECTURE)-pc-none-elf
+GENERAL_COMPILER_FLAGS += -I.
+GENERAL_COMPILER_FLAGS += -march=$(ARCHITECTURE)
+GENERAL_COMPILER_FLAGS += -m32
+GENERAL_COMPILER_FLAGS += -Wlogical-op-parentheses
+GENERAL_COMPILER_FLAGS += -ffreestanding
+GENERAL_COMPILER_FLAGS += -fno-builtin
+GENERAL_COMPILER_FLAGS += -fno-stack-protector
+GENERAL_COMPILER_FLAGS += -fno-rtti
+GENERAL_COMPILER_FLAGS += -fno-exceptions
+GENERAL_COMPILER_FLAGS += -fno-pie
+GENERAL_COMPILER_FLAGS += -no-pie
+GENERAL_COMPILER_FLAGS += -fvisibility=hidden
+GENERAL_COMPILER_FLAGS += -fdata-sections
+GENERAL_COMPILER_FLAGS += -ffunction-sections
+GENERAL_COMPILER_FLAGS += -Wall
+GENERAL_COMPILER_FLAGS += -Wextra
+GENERAL_COMPILER_FLAGS += -Wignored-qualifiers
+GENERAL_COMPILER_FLAGS += -fno-threadsafe-statics
+GENERAL_COMPILER_FLAGS += -flto
+GENERAL_COMPILER_FLAGS += -Os
+GENERAL_COMPILER_FLAGS += -fno-omit-frame-pointer
 
-KERNEL = $(BUILD)/MoleculeOS.elf
+CPP_COMPILER       := clang++
+CPP_COMPILER_FLAGS := $(GENERAL_COMPILER_FLAGS) -std=c++20 -D$(ARCHITECTURE_MACRO)
 
-ISO_KERNEL = $(ISO)/boot/kernel.elf
-ISO_OUT = build/MoleculeOS.iso
-OS_HDD = build/HardDrive.img
+C_COMPILER       := clang
+C_COMPILER_FLAGS := $(GENERAL_COMPILER_FLAGS) -std=c17 -D$(ARCHITECTURE_MACRO)
 
-LINKER = tools/linker.ld
-TARGET = -target i386-pc-none-elf
+ASM_COMPILER       := nasm
+ASM_COMPILER_FLAGS := -f elf32
 
-COMMON_FLAGS = $(TARGET) \
-	-I. \
-	-march=i386 -m32 \
-	-Wlogical-op-parentheses \
-	-ffreestanding -fno-builtin \
-	-fno-stack-protector \
-	-fomit-frame-pointer \
-	-fno-rtti -fno-exceptions \
-	-fno-pie -no-pie \
-	-fvisibility=hidden \
-	-fdata-sections -ffunction-sections \
-	-Wall -Wextra -Wignored-qualifiers \
-	-fno-threadsafe-statics \
-	-flto \
-	-Os -fno-omit-frame-pointer
+LINKER       := ld.lld
+LINKER_FLAGS := -T $(LINKER_SCRIPT) -m elf_i386 -nostdlib -static
 
-CFLAGS = $(COMMON_FLAGS) -c -std=c17 -D__I386__
-CXXFLAGS = $(COMMON_FLAGS) -std=c++20 -D__I386__
-ASM_FLAGS = -f elf32
+BUILD_DIRECTORY := $(CURDIR)/build
+BUILD_TARGET    := $(BUILD_DIRECTORY)/MoleculeOS
 
-LDFLAGS  = -T $(LINKER) -m elf_i386 -nostdlib -static
+ISO_BUILD_FOLDER := $(BUILD_DIRECTORY)/iso
+ISO_IMAGE	     := $(BUILD_DIRECTORY)/MoleculeOS.iso
 
-include arch/i386/iso/boot/Makefile
-include arch/i386/stdlib/Makefile
-include arch/i386/kernel/Makefile
-include drivers/Makefile
-include stdlib/Makefile
-include kernel/Makefile
-include terminal/Makefile
-include shell/Makefile
+COMPILED_SYSTEM := $(ISO_BUILD_FOLDER)/boot/MoleculeOS
+ISO_CONFIG_PATH := $(ISO_BUILD_FOLDER)/boot/grub/grub.cfg
 
-$(BUILD):
-	mkdir -p $(BUILD)
+HDD_IMAGE			  := $(BUILD_DIRECTORY)/MoleculeOS.img
+HDD_IMAGE_SECTOR_SIZE := 2048
 
-$(KERNEL): $(OBJS)
-	$(LD) $(LDFLAGS) -o $@ $^
+MODULE_MAKEFILES :=
+MODULE_MAKEFILES += arch/$(ARCHITECTURE)/iso
+MODULE_MAKEFILES += arch/$(ARCHITECTURE)/kernel/src/idt
+MODULE_MAKEFILES += arch/$(ARCHITECTURE)/kernel/src/sys
+MODULE_MAKEFILES += arch/$(ARCHITECTURE)/kernel/src
+MODULE_MAKEFILES += arch/$(ARCHITECTURE)/stdlib/src
+MODULE_MAKEFILES += drivers/ata
+MODULE_MAKEFILES += drivers/ps2
+MODULE_MAKEFILES += drivers/vga
+MODULE_MAKEFILES += kernel/filesys
+MODULE_MAKEFILES += kernel/heap
+MODULE_MAKEFILES += kernel
+MODULE_MAKEFILES += shell/src
+MODULE_MAKEFILES += stdlib
+MODULE_MAKEFILES += terminal/src
 
-$(OS_HDD):
-	dd if=/dev/zero of=$(OS_HDD) bs=512 count=2048
+ALL_OBJECTS 	 :=
+ALL_MODULE_PATHS :=
 
-iso: $(KERNEL)
-	mkdir -p $(ISO)/boot/grub
-	cp $(KERNEL) $(ISO_KERNEL)
-	cp arch/i386/iso/boot/grub/grub.cfg $(ISO)/boot/grub/grub.cfg
-	grub-mkrescue -o $(ISO_OUT) $(ISO)
 
-run: iso $(OS_HDD)
-	qemu-system-i386 -hda $(OS_HDD) -cdrom $(ISO_OUT)
+.PHONY: FORCE
+.PHONY: all
+.PHONY: clean
+.PHONY: iso
+.PHONY: run
+
+
+FORCE:
+include $(addsuffix /Makefile,$(MODULE_MAKEFILES))
+
+all: $(BUILD_TARGET)
+
+
+ifneq ($(filter clean,$(MAKECMDGOALS)),)
+
+CLEAN_MODULE_PATHS := $(filter $(ALL_MODULE_PATHS),$(filter-out clean,$(MAKECMDGOALS)))
+
+ifneq ($(strip $(CLEAN_MODULE_PATHS)),)
+
+clean: $(addprefix clean-,$(CLEAN_MODULE_PATHS))
+
+else
 
 clean:
-	rm -rf build
+	rm -rf "$(BUILD_DIRECTORY)"
 
-.PHONY: all iso run clean dirs
+endif
+else
+
+clean:
+	rm -rf "$(BUILD_DIRECTORY)"
+
+endif
+
+
+$(BUILD_TARGET): $(ALL_OBJECTS) $(LINKER_SCRIPT)
+	@mkdir -p "$(dir $@)"
+	$(LINKER) $(LINKER_FLAGS) $(ALL_OBJECTS) -o $@
+
+$(HDD_IMAGE):
+	@mkdir -p "$(dir $@)"
+	dd if=/dev/zero of="$@" bs=512 count=$(HDD_IMAGE_SECTOR_SIZE)
+
+iso: $(BUILD_TARGET) $(GRUB_CONFIG_FILE)
+	rm -rf "$(ISO_BUILD_FOLDER)"
+	@mkdir -p "$(dir $(COMPILED_SYSTEM))"
+	@mkdir -p "$(dir $(ISO_CONFIG_PATH))"
+	cp "$(BUILD_TARGET)" "$(COMPILED_SYSTEM)"
+	cp "$(GRUB_CONFIG_FILE)" "$(ISO_CONFIG_PATH)"
+	grub-mkrescue -o "$(ISO_IMAGE)" "$(ISO_BUILD_FOLDER)"
+	rm -rf "$(ISO_BUILD_FOLDER)"
+
+run: iso $(HDD_IMAGE)
+	qemu-system-i386 -drive file="$(HDD_IMAGE)",format=raw -cdrom "$(ISO_IMAGE)" -boot order=d
+	

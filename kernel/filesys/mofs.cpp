@@ -9,13 +9,19 @@
  */
 
 
-#include "filesys/mofs.hpp"
+#include "mofs.hpp"
 
 #include <include/stdlib/array.hpp>
 #include <include/kernel/heap.hpp>
-#include <include/kernel/sys.hpp>
 #include <include/stdlib/memory.hpp>
 #include <include/stdlib/string.hpp>
+
+
+namespace kernel::sys
+{
+    void panic(const char* message) noexcept;
+} // namespace kernel::sys
+
 
 
 namespace

@@ -24,7 +24,7 @@ NOTES:
     exactly from 'Intel' defined byte layout.
 */
 
-#include "idt/utils/isr_helpers.hpp"
+#include "utils/isr_helpers.hpp"
 
 namespace kernel::idt::isr
 {

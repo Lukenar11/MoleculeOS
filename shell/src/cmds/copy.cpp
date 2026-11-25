@@ -102,17 +102,8 @@ namespace shell::commands
         kernel::filesys::get_file_size(size, src_handle);
         kernel::heap::allocate(buffer, size);
 
-        kernel::filesys::read_file(src_handle, 
-                                   reinterpret_cast<uint8_t*>(buffer), 
-                                   size, 
-                                   0, 
-                                   size - 1);
+        status_t status = kernel::filesys::copy_file_content(dest_handle, src_handle, 0, size);
 
-        status_t status = kernel::filesys::write_file(dest_handle, 
-                                                      reinterpret_cast<const uint8_t*>(buffer), 
-                                                      size, 
-                                                      0, 
-                                                      size - 1);
         if (status != status::SUCCESS) {
             print_command_error(command_name);
             print_command_error("copy failed");

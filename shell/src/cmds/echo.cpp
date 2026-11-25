@@ -199,6 +199,7 @@ namespace shell::commands
             return;
         }
 
+        kernel::filesys::seek_file(handle, 0);
 
         status = kernel::filesys::read_file(handle, buffer, size, 0, size);
         if (status != status::SUCCESS) [[unlikely]] {

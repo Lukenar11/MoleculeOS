@@ -16,7 +16,7 @@ DESCRIPTION:
 NOTES:
 */
 
-#include "irq_handler.hpp"
+#include "idt/irq_handler.hpp"
 
 namespace kernel::idt::irq
 {

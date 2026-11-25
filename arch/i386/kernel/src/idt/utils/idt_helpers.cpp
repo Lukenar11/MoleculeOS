@@ -24,4 +24,4 @@ NOTES:
     exactly from 'Intel' defined byte layout.
 */
 
-#include "idt/utils/idt_helpers.hpp"
+#include "utils/idt_helpers.hpp"

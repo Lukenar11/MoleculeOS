@@ -1,29 +1,67 @@
-# 
-# Copyright (c) 2026 Lukenar11 (Luke Matthes)
-# MIT Licensed
-# https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-# 
+include arch/i386/kernel/src/includes.mk
 
-OBJS += $(BUILD)/idt.o \
-		$(BUILD)/idt_helpers.o \
-		$(BUILD)/irq_handler.o \
-		$(BUILD)/irq_helpers.o \
-		$(BUILD)/irq_stub.o \
-		$(BUILD)/irq.o \
-		$(BUILD)/isr_handler.o \
-		$(BUILD)/isr_helpers.o \
-		$(BUILD)/isr_stub.o \
-		$(BUILD)/isr.o \
-		$(BUILD)/load_idt.o \
 
-$(BUILD)/%.o: arch/i386/kernel/src/idt/%.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+MODULE_NAME      := idt
+MODULE_DIRECTORY := arch/i386/kernel/src/$(MODULE_NAME)
 
-$(BUILD)/%.o: arch/i386/kernel/src/idt/utils/%.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+MODULE_INCLUDE_DIRECTORY :=
+MODULE_INCLUDE_DIRECTORY += $(ARCH_BASE_KERNEL_INCLUDE)
+MODULE_INCLUDE_DIRECTORY += arch/i386/kernel/include/$(MODULE_NAME)
 
-$(BUILD)/%.o: arch/i386/kernel/src/idt/%.asm
-	nasm $(ASM_FLAGS) $< -o $@
+MODULE_SOURCE_FILES :=
+MODULE_SOURCE_FILES += utils/idt_helpers.cpp
+MODULE_SOURCE_FILES += utils/irq_helpers.cpp
+MODULE_SOURCE_FILES += utils/isr_helpers.cpp
+MODULE_SOURCE_FILES += idt.cpp
+MODULE_SOURCE_FILES += irq_handler.cpp
+MODULE_SOURCE_FILES += isr_handler.cpp
+MODULE_SOURCE_FILES += load_idt.asm
+MODULE_SOURCE_FILES += irq_stub.asm
+MODULE_SOURCE_FILES += isr_stub.asm
+MODULE_SOURCE_FILES += irq.asm
+MODULE_SOURCE_FILES += isr.asm
 
-$(BUILD)/%.o: arch/i386/kernel/src/idt/utils/%.asm
-	nasm $(ASM_FLAGS) $< -o $@
+MODULE_BUILD_PATH := $(BUILD_DIRECTORY)/$(MODULE_DIRECTORY)
+
+MODULE_OBJECTS :=
+MODULE_OBJECTS += $(patsubst %.cpp,$(MODULE_BUILD_PATH)/%.obj,$(filter %.cpp,$(MODULE_SOURCE_FILES)))
+MODULE_OBJECTS += $(patsubst %.asm,$(MODULE_BUILD_PATH)/%.obj,$(filter %.asm,$(MODULE_SOURCE_FILES)))
+
+$(MODULE_OBJECTS): MODULE_INCLUDE_FLAGS := $(addprefix -I,$(MODULE_INCLUDE_DIRECTORY))
+
+ALL_OBJECTS 	 += $(MODULE_OBJECTS)
+ALL_MODULE_PATHS += $(MODULE_DIRECTORY)
+
+
+$(MODULE_BUILD_PATH)/%.obj: $(MODULE_DIRECTORY)/%.cpp
+	@mkdir -p "$(dir $@)"
+	$(CPP_COMPILER) $(CPP_COMPILER_FLAGS) $(MODULE_INCLUDE_FLAGS) -c $< -o $@
+
+$(MODULE_BUILD_PATH)/%.obj: $(MODULE_DIRECTORY)/%.asm
+	@mkdir -p "$(dir $@)"
+	$(ASM_COMPILER) $(ASM_COMPILER_FLAGS) $< -o $@
+
+
+.PHONY: $(MODULE_DIRECTORY)
+.PHONY: clean-$(MODULE_DIRECTORY)
+
+
+ifeq ($(filter clean,$(MAKECMDGOALS)),)
+
+$(MODULE_DIRECTORY): $(MODULE_OBJECTS) $(BUILD_TARGET)
+
+ifneq ($(filter $(MODULE_DIRECTORY),$(MAKECMDGOALS)),)
+
+$(MODULE_OBJECTS): FORCE
+
+endif
+else
+
+$(MODULE_DIRECTORY):
+
+endif
+
+clean-$(MODULE_DIRECTORY): MODULE_CLEAN_PATH := $(MODULE_BUILD_PATH)
+
+clean-$(MODULE_DIRECTORY):
+	rm -rf "$(MODULE_CLEAN_PATH)"

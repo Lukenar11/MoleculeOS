@@ -18,6 +18,9 @@ NOTES:
 
 #include "sys/panic.hpp"
 
+#include "idt/utils/isr_helpers.hpp"
+#include "sys/interrupts.hpp"
+
 namespace kernel::sys
 {
     void panic(const char* message) noexcept {

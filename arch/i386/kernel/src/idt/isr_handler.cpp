@@ -17,7 +17,7 @@ NOTES:
     because they are so small that the compiler can inline them.
 */
 
-#include "isr_handler.hpp"
+#include "idt/isr_handler.hpp"
 
 #include <include/drivers/vga.hpp>
 

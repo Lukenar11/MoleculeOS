@@ -10,7 +10,7 @@
  */
 
 
-#include "heap/block.hpp"
+#include "block.hpp"
 
 #include <include/kernel/sys.hpp>
 #include <include/stdlib/memory.hpp>

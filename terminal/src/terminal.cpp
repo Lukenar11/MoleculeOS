@@ -16,7 +16,7 @@ NOTES:
     because they are so small that the compiler can inline them.
 */
 
-#include "terminal.hpp"
+#include "terminal/include/terminal.hpp"
 
 namespace terminal 
 {

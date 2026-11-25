@@ -1,12 +1,44 @@
-# 
-# Copyright (c) 2026 Lukenar11 (Luke Matthes)
-# MIT Licensed
-# https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-# 
+MODULE_NAME      := boot
+MODULE_DIRECTORY := arch/i386/iso/$(MODULE_NAME)
 
-COMMON_FLAGS += -Iarch/i386/runtime/include \
+MODULE_SOURCE_FILES :=
+MODULE_SOURCE_FILES += _start.asm
+MODULE_SOURCE_FILES += multiboot.asm
 
-include arch/i386/iso/boot/Makefile
+MODULE_BUILD_PATH := $(BUILD_DIRECTORY)/$(MODULE_DIRECTORY)
 
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
+MODULE_OBJECTS :=
+MODULE_OBJECTS += $(patsubst %.asm,$(MODULE_BUILD_PATH)/%.obj,$(filter %.asm,$(MODULE_SOURCE_FILES)))
+
+ALL_OBJECTS 	 += $(MODULE_OBJECTS)
+ALL_MODULE_PATHS += $(MODULE_DIRECTORY)
+
+
+$(MODULE_BUILD_PATH)/%.obj: $(MODULE_DIRECTORY)/%.asm
+	@mkdir -p "$(dir $@)"
+	$(ASM_COMPILER) $(ASM_COMPILER_FLAGS) $< -o $@
+
+
+.PHONY: $(MODULE_DIRECTORY)
+.PHONY: clean-$(MODULE_DIRECTORY)
+
+
+ifeq ($(filter clean,$(MAKECMDGOALS)),)
+
+$(MODULE_DIRECTORY): $(MODULE_OBJECTS) $(BUILD_TARGET)
+
+ifneq ($(filter $(MODULE_DIRECTORY),$(MAKECMDGOALS)),)
+
+$(MODULE_OBJECTS): FORCE
+
+endif
+else
+
+$(MODULE_DIRECTORY):
+
+endif
+
+clean-$(MODULE_DIRECTORY): MODULE_CLEAN_PATH := $(MODULE_BUILD_PATH)
+
+clean-$(MODULE_DIRECTORY): 
+	rm -rf "$(MODULE_CLEAN_PATH)"

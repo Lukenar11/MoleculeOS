@@ -19,7 +19,7 @@ NOTES:
 
 #pragma once
 
-#include "sys/panic.hpp"
+#include "panic.hpp"
 #include "eflags.hpp"
 #include <include/stdlib/types.hpp>
 #include <include/stdlib/array.hpp>
