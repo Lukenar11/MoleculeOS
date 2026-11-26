@@ -1,3 +1,10 @@
+# 
+# copyright: Copyright (c) 2026 Lukenar11 (Luke Matthes)
+# license:   https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+# author:    Lukenar11 (Luke Matthes)
+# 
+
+
 include arch/i386/kernel/src/includes.mk
 
 
@@ -24,8 +31,12 @@ MODULE_SOURCE_FILES += isr.asm
 MODULE_BUILD_PATH := $(BUILD_DIRECTORY)/$(MODULE_DIRECTORY)
 
 MODULE_OBJECTS :=
-MODULE_OBJECTS += $(patsubst %.cpp,$(MODULE_BUILD_PATH)/%.obj,$(filter %.cpp,$(MODULE_SOURCE_FILES)))
-MODULE_OBJECTS += $(patsubst %.asm,$(MODULE_BUILD_PATH)/%.obj,$(filter %.asm,$(MODULE_SOURCE_FILES)))
+
+MODULE_OBJECTS += $(patsubst %.cpp,$(MODULE_BUILD_PATH)/%.obj, \
+				  $(filter %.cpp,$(MODULE_SOURCE_FILES)))
+
+MODULE_OBJECTS += $(patsubst %.asm,$(MODULE_BUILD_PATH)/%.obj, \
+				  $(filter %.asm,$(MODULE_SOURCE_FILES)))
 
 $(MODULE_OBJECTS): MODULE_INCLUDE_FLAGS := $(addprefix -I,$(MODULE_INCLUDE_DIRECTORY))
 
@@ -33,10 +44,12 @@ ALL_OBJECTS 	 += $(MODULE_OBJECTS)
 ALL_MODULE_PATHS += $(MODULE_DIRECTORY)
 
 
+# Compiles all C++ files in this module.
 $(MODULE_BUILD_PATH)/%.obj: $(MODULE_DIRECTORY)/%.cpp
 	@mkdir -p "$(dir $@)"
 	$(CPP_COMPILER) $(CPP_COMPILER_FLAGS) $(MODULE_INCLUDE_FLAGS) -c $< -o $@
 
+# Compiles all Assembly files in this module.
 $(MODULE_BUILD_PATH)/%.obj: $(MODULE_DIRECTORY)/%.asm
 	@mkdir -p "$(dir $@)"
 	$(ASM_COMPILER) $(ASM_COMPILER_FLAGS) $< -o $@
@@ -60,6 +73,8 @@ else
 $(MODULE_DIRECTORY):
 
 endif
+
+# Cleans the build directory for this module.
 
 clean-$(MODULE_DIRECTORY): MODULE_CLEAN_PATH := $(MODULE_BUILD_PATH)
 

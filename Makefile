@@ -1,3 +1,10 @@
+# 
+# copyright: Copyright (c) 2026 Lukenar11 (Luke Matthes)
+# license:   https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+# author:    Lukenar11 (Luke Matthes)
+# 
+
+
 .DEFAULT_GOAL := all
 
 ARCHITECTURE	   := i386
@@ -30,17 +37,30 @@ GENERAL_COMPILER_FLAGS += -flto
 GENERAL_COMPILER_FLAGS += -Os
 GENERAL_COMPILER_FLAGS += -fno-omit-frame-pointer
 
-CPP_COMPILER       := clang++
-CPP_COMPILER_FLAGS := $(GENERAL_COMPILER_FLAGS) -std=c++20 -D$(ARCHITECTURE_MACRO)
+CPP_COMPILER := clang++
 
-C_COMPILER       := clang
-C_COMPILER_FLAGS := $(GENERAL_COMPILER_FLAGS) -std=c17 -D$(ARCHITECTURE_MACRO)
+CPP_COMPILER_FLAGS :=
+CPP_COMPILER_FLAGS += $(GENERAL_COMPILER_FLAGS)
+CPP_COMPILER_FLAGS += -std=c++20
+CPP_COMPILER_FLAGS += -D$(ARCHITECTURE_MACRO)
+
+C_COMPILER := clang
+
+C_COMPILER_FLAGS :=
+C_COMPILER_FLAGS += $(GENERAL_COMPILER_FLAGS)
+C_COMPILER_FLAGS += -std=c17
+C_COMPILER_FLAGS += -D$(ARCHITECTURE_MACRO)
 
 ASM_COMPILER       := nasm
 ASM_COMPILER_FLAGS := -f elf32
 
-LINKER       := ld.lld
-LINKER_FLAGS := -T $(LINKER_SCRIPT) -m elf_i386 -nostdlib -static
+LINKER := ld.lld
+
+LINKER_FLAGS :=
+LINKER_FLAGS += -T $(LINKER_SCRIPT)
+LINKER_FLAGS += -m elf_i386
+LINKER_FLAGS += -nostdlib
+LINKER_FLAGS += -static
 
 BUILD_DIRECTORY := $(CURDIR)/build
 BUILD_TARGET    := $(BUILD_DIRECTORY)/MoleculeOS
@@ -54,6 +74,7 @@ ISO_CONFIG_PATH := $(ISO_BUILD_FOLDER)/boot/grub/grub.cfg
 HDD_IMAGE			  := $(BUILD_DIRECTORY)/MoleculeOS.img
 HDD_IMAGE_SECTOR_SIZE := 2048
 
+# All source tree modules
 MODULE_MAKEFILES :=
 MODULE_MAKEFILES += arch/$(ARCHITECTURE)/iso
 MODULE_MAKEFILES += arch/$(ARCHITECTURE)/kernel/src/idt
@@ -84,12 +105,16 @@ ALL_MODULE_PATHS :=
 FORCE:
 include $(addsuffix /Makefile,$(MODULE_MAKEFILES))
 
+# Builds the complete source tree if use `make` or `make all`. 
 all: $(BUILD_TARGET)
 
 
+# Cleans the build directory for this module.
+
 ifneq ($(filter clean,$(MAKECMDGOALS)),)
 
-CLEAN_MODULE_PATHS := $(filter $(ALL_MODULE_PATHS),$(filter-out clean,$(MAKECMDGOALS)))
+CLEAN_MODULE_PATHS := $(filter $(ALL_MODULE_PATHS), \
+					  $(filter-out clean,$(MAKECMDGOALS)))
 
 ifneq ($(strip $(CLEAN_MODULE_PATHS)),)
 
@@ -113,10 +138,13 @@ $(BUILD_TARGET): $(ALL_OBJECTS) $(LINKER_SCRIPT)
 	@mkdir -p "$(dir $@)"
 	$(LINKER) $(LINKER_FLAGS) $(ALL_OBJECTS) -o $@
 
+# Builds a HDD-image (`.img` file) if we use `make run` and
+# a HDD image doesn't exists.
 $(HDD_IMAGE):
 	@mkdir -p "$(dir $@)"
 	dd if=/dev/zero of="$@" bs=512 count=$(HDD_IMAGE_SECTOR_SIZE)
 
+# Builds a ISO-image with `GRUB` if `make iso` is entered.
 iso: $(BUILD_TARGET) $(GRUB_CONFIG_FILE)
 	rm -rf "$(ISO_BUILD_FOLDER)"
 	@mkdir -p "$(dir $(COMPILED_SYSTEM))"
@@ -126,6 +154,8 @@ iso: $(BUILD_TARGET) $(GRUB_CONFIG_FILE)
 	grub-mkrescue -o "$(ISO_IMAGE)" "$(ISO_BUILD_FOLDER)"
 	rm -rf "$(ISO_BUILD_FOLDER)"
 
+# Runs `QEMU` if `make run` is entered. 
 run: iso $(HDD_IMAGE)
-	qemu-system-i386 -drive file="$(HDD_IMAGE)",format=raw -cdrom "$(ISO_IMAGE)" -boot order=d
-	
+	qemu-system-i386 -drive file="$(HDD_IMAGE)",format=raw \
+					 -cdrom "$(ISO_IMAGE)" \
+					 -boot order=d
