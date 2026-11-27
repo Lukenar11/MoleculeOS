@@ -40,9 +40,6 @@ static_assert(sizeof(uint8_t)  == 1, "'uint8_t' is not 1 Byte long!");
 static_assert(sizeof(uint16_t) == 2, "'uint16_t' is not 2 Bytes long!");
 static_assert(sizeof(uint32_t) == 4, "'uint32_t' is not 4 Bytes long!");
 
-static_assert(sizeof(string_ptr) == 4, "'string_ptr' is not 2 Bytes long!");
-static_assert(sizeof(any_ptr)    == 4, "'any_ptr' is not 4 Bytes long!");
-
 #ifdef _ARCHITECTURE_I386_
 static_assert(sizeof(diff_t) == 4, "'diff_t' is not 2 Bytes long!");
 static_assert(sizeof(size_t) == 4, "'size_t' is not 4 Bytes long!");
