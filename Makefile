@@ -10,7 +10,7 @@
 ARCHITECTURE	   := i386
 ARCHITECTURE_MACRO := _ARCHITECTURE_I386_
 
-LINKER_SCRIPT    := tools/linker.ld
+LINKER_SCRIPT    := arch/i386/tools/linker-config.ld
 GRUB_CONFIG_FILE := arch/i386/iso/boot/grub/grub.cfg
 
 GENERAL_COMPILER_FLAGS :=

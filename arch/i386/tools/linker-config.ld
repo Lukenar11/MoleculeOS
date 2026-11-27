@@ -1,10 +1,12 @@
-/*
-    Copyright (c) 2026 Lukenar11 (Luke Matthes)
-    MIT Licensed
-    https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
-*/
+/**
+ * copyright: Copyright (c) 2026 Lukenar11 (Luke Matthes)              
+ * license:   https://github.com/Lukenar11/MoleculeOS/blob/main/LICENSE
+ * author:    Lukenar11 (Luke Matthes)                                 
+ */
+
 
 ENTRY(_start)
+
 
 SECTIONS 
 {
