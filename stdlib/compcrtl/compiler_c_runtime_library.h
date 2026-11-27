@@ -9,24 +9,58 @@
  */
 
 
-#ifndef COMPILER_C_API
-#define COMPILER_C_API
+#ifndef COMPILER_C_RUNTIME_LIBRARY
+#define COMPILER_C_RUNTIME_LIBRARY
 
-#include <include/stdlib/sal.hpp>
+/**
+ * @brief Declares a parameter as input variable that 
+ *        is supposed to be modified after use.
+ * 
+ * @note This is only documentation for the developer and 
+ *       doesn't chance anything in the logic or mutability.
+ */
+#define _INOUT_
 
-#ifdef __cplusplus
-#   include <include/stdlib/types.hpp>
-#else
+
+/**
+ * @brief Declares a parameter as output variable.
+ * 
+ * @note This is only documentation for the developer and 
+ *       doesn't chance anything in the logic or mutability.
+ */
+#define _OUT_
+
+
+/**
+ * @brief Declares a parameter as input variable.
+ * 
+ * @note This is only documentation for the developer and 
+ *       doesn't chance anything in the logic or mutability.
+ */
+#define _IN_
+
+
+/**
+ * @brief Declares a function or method as public.
+ * 
+ * @note This is only documentation for the developer and 
+ *       doesn't chance anything in the logic or mutability.
+ */
+#define _API_
+
+
+/**
+ * @brief Declares a function as public and C-API.
+ * 
+ * @note This is only documentation for the developer and 
+ *       doesn't chance anything in the logic or mutability.
+ */
+#define _C_API_
+
+
 typedef unsigned char uint8_t;
 typedef unsigned int  uint32_t;
 typedef signed int    int32_t;
-#endif
-
-#ifdef __cplusplus
-_C_API_
-extern "C"
-{
-#endif
 
 
 /**
@@ -174,8 +208,4 @@ strchr(_IN_ const char* string,
        _IN_ int32_t symbol);
 
 
-#ifdef __cplusplus
-}
-#endif
-
-#endif // COMPILER_C_API
+#endif // COMPILER_C_RUNTIME_LIBRARY

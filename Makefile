@@ -105,7 +105,7 @@ ALL_MODULE_PATHS :=
 FORCE:
 include $(addsuffix /Makefile,$(MODULE_MAKEFILES))
 
-# Builds the complete source tree if use `make` or `make all`. 
+# Builds the complete source tree if `make all` is entered. 
 all: $(BUILD_TARGET)
 
 
