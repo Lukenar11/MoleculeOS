@@ -58,7 +58,7 @@
                 "${workspaceFolder}/terminal/src"
             ],
             "defines": [
-                "__I386__"
+                "_ARCHITECTURE_I386_"
             ]
         }
     ]

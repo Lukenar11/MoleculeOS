@@ -8,7 +8,7 @@
 .DEFAULT_GOAL := all
 
 ARCHITECTURE	   := i386
-ARCHITECTURE_MACRO := __I386__
+ARCHITECTURE_MACRO := _ARCHITECTURE_I386_
 
 LINKER_SCRIPT    := tools/linker.ld
 GRUB_CONFIG_FILE := arch/i386/iso/boot/grub/grub.cfg

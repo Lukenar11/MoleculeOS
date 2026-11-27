@@ -11,7 +11,7 @@
 
 #pragma once
 
-#ifdef __I386__
+#ifdef _ARCHITECTURE_I386_
 #   include "arch/i386/stdlib/include/platform_io.hpp"
 #else
 #   error "Architecture is not supported!"

@@ -46,7 +46,7 @@ using uint16_pref = uint16_t*&;
 using uint32_pref = uint32_t*&;
 
 
-#ifdef __I386__
+#ifdef _ARCHITECTURE_I386_
 using diff_t = signed int;
 using size_t = unsigned int;
 #else
@@ -76,7 +76,7 @@ static_assert(sizeof(uint32_t) == 4, "byte size of 'uint32_t' is not '4'!");
 static_assert(sizeof(string_ptr) == 4, "byte size of 'string_ptr' is not '4'!");
 static_assert(sizeof(any_ptr)    == 4, "byte size of 'any_ptr' is not '4'!");
 
-#ifdef __I386__
+#ifdef _ARCHITECTURE_I386_
 static_assert(sizeof(diff_t) == 4, "byte size of 'diff_t' is not '4'!");
 static_assert(sizeof(size_t) == 4, "byte size of 'size_t' is not '4'!");
 #else

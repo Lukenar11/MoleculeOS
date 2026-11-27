@@ -11,7 +11,7 @@
 
 #pragma once
 
-#ifdef __I386__
+#ifdef _ARCHITECTURE_I386_
 #   include "arch/i386/kernel/include/utils/regs.hpp"
 #   include "arch/i386/kernel/include/sys/eflags.hpp"
 #   include "arch/i386/kernel/include/sys/interrupts.hpp"
