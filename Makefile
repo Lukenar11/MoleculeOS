@@ -71,7 +71,7 @@ ISO_IMAGE	     := $(BUILD_DIRECTORY)/MoleculeOS.iso
 COMPILED_SYSTEM := $(ISO_BUILD_FOLDER)/boot/MoleculeOS
 ISO_CONFIG_PATH := $(ISO_BUILD_FOLDER)/boot/grub/grub.cfg
 
-HDD_IMAGE			  := $(BUILD_DIRECTORY)/MoleculeOS.img
+HDD_IMAGE			  := $(BUILD_DIRECTORY)/HardDrive.img
 HDD_IMAGE_SECTOR_SIZE := 2048
 
 # All source tree modules
